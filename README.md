@@ -7,7 +7,7 @@ The demo showcases the search and sort the images for a quick and easy viewing e
 It features searching images locally when the cloud is not available due to lost or no connectivity. With AMD XDNA™ dedicated AI accelerator hardware seamlessly integrated on-chip and software that intelligently optimizes tasks and workloads, freeing up CPU and GPU resources, it makes new user experiences possible.
 
 <p align="center">
-    <img src="https://github.com/amd/ms-build-demo/assets/43718156/c7e53a2f-e545-4fd7-ab10-a672ac543483" alt="msft build demo" width="1022" height="416")
+    <img width="100%" height="100%" src="images/demo_msft_build.png">
 <p>
 
 Please note the demo is for functional demonstration purposes only and does not represent the highest possible performance or accuracy.
@@ -19,7 +19,7 @@ To run this demo, you need a AMD Ryzen 7040HS Series mobile processor powered la
 Please make sure the IPU driver (tested with 10.105.5.38) has been installed as shown below. 
 
 <p align="center">
-    <img src="https://github.com/amd/ms-build-demo/assets/43718156/524f8fcd-1408-4f35-8cfa-648f4f7c2007" alt="ipu driver" width="600" height="400">
+    <img src="images/ipu_driver.png" alt="ipu driver" width="600" height="400">
 <p>
 
 
