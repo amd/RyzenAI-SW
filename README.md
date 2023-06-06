@@ -115,7 +115,7 @@ npm start
     
 ## Model quantization with Microsoft Olive
 
-The demo uses quantized onnx models. To know how to generate quantized onnx model, please check out the [quantization example](https://github.com/microsoft/Olive/tree/main/examples/resnet_vitis_ai_ptq_cpu) in the Microsoft Olive github. 
+The demo uses quantized onnx models. To know how to generate quantized onnx model, please check out the [quantization example](https://github.com/microsoft/Olive/tree/v0.2.1/examples/resnet_vitis_ai_ptq_cpu) in the Microsoft Olive github. 
 
 ## Run your own models with ONNXRuntime on Ryzen AI
     
