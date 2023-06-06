@@ -279,6 +279,12 @@
           }
         }
 
+        $('#form-search').keydown(function (e) {
+          if(e.keyCode == 13){
+            $("#search").click();
+          }
+        });
+
         $("#search-results").html("<div>" + results.length 
           + " found</div><div class='gallery'></div>");
 
