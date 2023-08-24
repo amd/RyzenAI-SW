@@ -65,6 +65,7 @@ class Runner:
             vaip_config = Path(__file__).parents[1].resolve() / 'vaip_config.json'
             cache_dir = Path(__file__).parent.resolve()
             cache_key = 'cache'
+            sess_opt.intra_op_num_threads = 1
             provider_options = [{
                 'config_file': str(vaip_config),
                 'cacheDir': str(cache_dir),
