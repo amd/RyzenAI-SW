@@ -120,4 +120,4 @@ The demo uses quantized onnx models. To know how to generate quantized onnx mode
 ## Run your own models with ONNXRuntime on Ryzen AI
     
 The demo uses Yolov5 and Retinaface models. To know how to run your own models with ONNXRuntime on Ryzen AI, please find more details on 
-the [ONNXRuntime Vitis-AI EP](https://onnxruntime.ai/docs/execution-providers/community-maintained/Vitis-AI-ExecutionProvider.html) page.
+the [Ryzen AI Software Platform Developer Guide](https://ryzenai.docs.amd.com/en/latest/index.html) page.
