@@ -14,7 +14,7 @@ Please note the demo is for functional demonstration purposes only and does not 
     
 ## Setup
 
-To run this demo, you need a AMD Ryzen 7040HS Series mobile processor powered laptop with Windows 11 OS.  
+To run this demo, you need a AMD Ryzen™ 7040HS Series mobile processor powered laptop with Windows 11 OS.  
     
 Please make sure the IPU driver (tested with 10.105.5.38) has been installed as shown below. 
 
