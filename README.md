@@ -35,8 +35,9 @@ conda install -n ms-build-demo -c conda-forge nodejs zlib re2
 conda activate ms-build-demo
 copy %CONDA_PREFIX%\Library\bin\zlib.dll %CONDA_PREFIX%\Library\bin\zlib1.dll
 pip install zmq tornado opencv-python onnxruntime torch pyyaml pillow tqdm pandas torchvision matplotlib seaborn
-pip install wheels\onnxruntime_vitisai-1.16.0-cp39-cp39-win_amd64.whl
+pip install wheels\onnxruntime_vitisai-1.15.1-cp39-cp39-win_amd64.whl
 pip install wheels\voe-0.1.0-cp39-cp39-win_amd64.whl
+python wheels\installer.py
 set XLNX_VART_FIRMWARE=C:\path\to\ms-build-demo\xclbin\1x4.xclbin
 ```
 
