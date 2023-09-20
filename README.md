@@ -38,7 +38,6 @@ pip install zmq tornado opencv-python onnxruntime torch pyyaml pillow tqdm panda
 pip install wheels\onnxruntime_vitisai-1.15.1-cp39-cp39-win_amd64.whl
 pip install wheels\voe-0.1.0-cp39-cp39-win_amd64.whl
 python wheels\installer.py
-set XLNX_VART_FIRMWARE=C:\path\to\ms-build-demo\xclbin\1x4.xclbin
 ```
 
 If you are using a Powershell prompt, please replace the `copy` command with:

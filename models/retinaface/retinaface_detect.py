@@ -97,7 +97,7 @@ class Runner:
         self.instance_count = 1
         self.run_opt = ort.RunOptions()
 
-        if ep == 'ipu' and 'XLNX_VART_FIRMWARE' not in os.environ:
+        if ep == 'ipu':
             xclbin_path = Path(__file__).resolve().parents[2] / 'xclbin' / '1x4.xclbin'
             os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)
 

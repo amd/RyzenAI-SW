@@ -101,9 +101,8 @@ class Runner:
             self.run_opt.add_run_config_entry('azure.auth_key', self.azure_config['auth_key'])
 
         if ep == 'ipu':
-            if 'XLNX_VART_FIRMWARE' not in os.environ:
-                xclbin_path = Path(__file__).resolve().parents[2] / 'xclbin' / '1x4.xclbin'
-                os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)
+            xclbin_path = Path(__file__).resolve().parents[2] / 'xclbin' / '1x4.xclbin'
+            os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)
 
         self.create_session(weights, ep)
         self.imgsz = self.session.get_inputs()[0].shape[2:]
