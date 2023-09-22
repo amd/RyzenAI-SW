@@ -35,6 +35,7 @@ conda install -n ms-build-demo -c conda-forge nodejs zlib re2
 conda activate ms-build-demo
 copy %CONDA_PREFIX%\Library\bin\zlib.dll %CONDA_PREFIX%\Library\bin\zlib1.dll
 pip install zmq tornado opencv-python onnxruntime torch pyyaml pillow tqdm pandas torchvision matplotlib seaborn
+pip install -r .\pyapp\requirements.txt
 pip install wheels\onnxruntime_vitisai-1.15.1-cp39-cp39-win_amd64.whl
 pip install wheels\voe-0.1.0-cp39-cp39-win_amd64.whl
 python wheels\installer.py
@@ -78,14 +79,9 @@ There are 3 ways to run the demo:
 3. Use GUI exe
 
 ## 1. run QT GUI
+Execute the batch script:
 ```
-cd pyapp
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the app
-python main.py
+run_pyapp.bat
 ```
 
 Both 2 and 3 need to start the server as below:
