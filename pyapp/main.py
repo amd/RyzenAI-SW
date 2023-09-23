@@ -260,7 +260,7 @@ class Backend(QObject):
                         itemLinkFullPath = os.path.join(itemLinkDirectory,imageFileName) 
                         if not os.path.exists(itemLinkDirectory):
                             os.makedirs(itemLinkDirectory)
-                        os.link(os.path.join(inputFolderPath, imageFileName), itemLinkFullPath)
+                        shutil.copy(os.path.join(inputFolderPath, imageFileName), itemLinkFullPath)
                         #symlink requires to be run in admin mode
                         #os.symlink(os.path.join(inputFolderPath, imageFileName), itemLinkFullPath)
 
@@ -397,7 +397,7 @@ class Backend(QObject):
                     detectedObjectsDictionary[numDetectedFaces] = detectedObject
                     os.makedirs(itemLinkDirectory)
                 detectedObjectsDictionary[numDetectedFaces].count += 1
-                os.link(os.path.join(inputFolderPath, imageFileName), itemLinkFullPath)
+                shutil.copy(os.path.join(inputFolderPath, imageFileName), itemLinkFullPath)
                 #symlink requires to be run in admin mode
                 #os.symlink(os.path.join(inputFolderPath, imageFileName), itemLinkFullPath)
             
