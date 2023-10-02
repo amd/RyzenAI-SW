@@ -30,24 +30,8 @@ Please make sure [Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_re
 Start a conda command prompt and run:
 
 ```
-conda create --name ms-build-demo python=3.9
-conda install -n ms-build-demo -c conda-forge nodejs zlib re2
-conda activate ms-build-demo
-copy %CONDA_PREFIX%\Library\bin\zlib.dll %CONDA_PREFIX%\Library\bin\zlib1.dll
-pip install zmq tornado opencv-python onnxruntime torch pyyaml pillow tqdm pandas torchvision matplotlib seaborn
-pip install -r .\pyapp\requirements.txt
-pip install wheels\onnxruntime_vitisai-1.15.1-cp39-cp39-win_amd64.whl
-pip install wheels\voe-0.1.0-cp39-cp39-win_amd64.whl
-python wheels\installer.py
+setup.bat
 ```
-
-If you are using a Powershell prompt, please replace the `copy` command with:
-
-```
-Copy-Item -Path $env:CONDA_PREFIX\Library\bin\zlib.dll $env:CONDA_PREFIX\Library\bin\zlib1.dll
-```
-
-All the following commands are executed in conda environment. 
 
 ### Azure cloud setup on Windows
 
