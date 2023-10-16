@@ -1,6 +1,6 @@
-conda create --name ms-build-demo python=3.9
-conda install -n ms-build-demo -c conda-forge nodejs zlib re2
-conda activate ms-build-demo
+call conda create -y --name ms-build-demo python=3.9
+call conda install -y -n ms-build-demo -c conda-forge nodejs zlib re2
+call conda activate ms-build-demo
 copy %CONDA_PREFIX%\Library\bin\zlib.dll %CONDA_PREFIX%\Library\bin\zlib1.dll
 pip install -r .\requirements.txt
 pip install -r .\pyapp\requirements.txt
