@@ -1,0 +1,17 @@
+{
+ "passes": [
+    {
+        "name": "gemm_asr_fuse",
+        "plugin": "vaip-pass_gemm_asr",
+        "pass_asr_config": {
+            "target": "llvm",
+            "target_host": "llvm",
+            "opt_level": 3,
+            "build_version": "aie.en",
+            "aie_target": "aieml-gemm-asr-qdq -device=aiemaize -mattr=+bdrp,+opt,+tct,+double-buffer",
+            "aiectrl_cfg": "other_libs_qdq/asr_qdq_4x2.json",
+            "xclbin": "other_libs_qdq/asr_qdq_4x2.xclbin"
+        }
+    }
+ ]
+}
