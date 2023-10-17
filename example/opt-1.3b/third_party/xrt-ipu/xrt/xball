@@ -1,0 +1,230 @@
+#!/bin/bash
+#
+# Copyright (C) 2021, Xilinx Inc - All rights reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You may
+# not use this file except in compliance with the License. A copy of the
+# License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+
+# ------------------------------------
+# 0. Prepare the execution environment
+""":" # Hide bash from python
+XRT_BIN_DIR="`dirname \"$0\"`"
+
+#-------------------------
+# 1. Collect the arguments
+prog_args=""
+help_arg=false
+device_filter=""
+xrt_app=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        # Device filter argument
+	--device-filter)
+            shift
+	    device_filter=$1
+	    shift
+	    ;;
+
+        # Help argument
+        --help)
+            help_arg=true
+            shift
+            ;;
+
+        # Application tool
+        xbutil|xbmgmt )
+            xrt_app=$1
+            shift
+
+            # Copy the remaining options
+            while [ $# -gt 0 ]; do
+                case "$1" in
+                    # Device option detected
+                    --device|-d)
+                        echo "Error: Use of the --device or -d option is not permitted."
+                        exit 1
+                    ;;
+
+                    # Duplicate xbutil & xbmgmt options detected
+                    xbutil|xbmgmt)
+                         echo "Error: Mulitple xbutil and/or xbmgmt definitions detected."
+                         exit 1
+                    ;;
+
+                    # Copy the remaining options
+	            *)
+                    if [ -z "$prog_args" ]; then
+                        prog_args=$1
+                    else
+	                prog_args="$prog_args $1"
+                    fi
+	            shift
+	            ;;
+                esac
+            done
+            ;;
+
+	# Discard unknown options
+	*)
+	    shift
+	    ;;
+    esac
+done
+
+#-------------------------
+# 2. Evaluate the arguments
+
+# -- Help --
+if [ "$help_arg" = "true" ]; then
+    echo
+    echo "DESCRIPTION: This script will discover the installed card(s) in the system,"
+    echo "             optionally filter the cards of interest, and execute the given"
+    echo "             command options for either the 'xbutil' or 'xbmgmt' applications."
+    echo 
+    echo "USAGE: xball [--help] [--device-filter arg] <xbutil | xbmgmt> <utility arguments>"
+    echo 
+    echo "OPTIONS:"
+    echo "  --help          - Help to use this script."
+    echo "  --device-filter - Shell name regex filter.  For example:"
+    echo "                      '.'            - Applies command to ALL found devices (default)"
+    echo "                      'u30'          - Only u30 devices"
+    echo "                      '^xilinx_u250' - Shell names starting with xilnx_u250"
+    echo 
+    echo "Additionally, the 'utility arguments' are the arguments that will be sent to"
+    echo "the given XRT utility (e.g., xbutil or xbmgmt)"
+    echo
+    exit
+fi
+
+# Make sure the application has been defined
+if [ -z "$xrt_app" ]; then
+    echo "Error: The option --xrt-app is not defined"
+    exit 1
+fi
+
+#------------------------------------------------------------------
+# 3. Discover all of the devices and write the output to a JSON file
+# Source the environment
+echo "Discovering installed devices...."
+# Files
+temp_python_status=$(mktemp -u --suffix=.xball.python.status)
+temp_json_file=$(mktemp -u --suffix=.xball.json)
+temp_log_file=$(mktemp -u --suffix=.xball.log)
+"${XRT_BIN_DIR}/${xrt_app}" examine --format json --output "${temp_json_file}" --force 2>&1 > "${temp_log_file}"
+
+
+# 4. Use python to read the JSON file to find the devices of interest
+# This command invokes the python script found at the bottom of this file
+python3 $0 "${temp_python_status}" "${temp_json_file}" "${device_filter}" "${xrt_app}" "$prog_args"
+
+# 5. Get python exit code
+python_exit_code=1     # Assume the it failed
+if test -f "${temp_python_status}"; then
+    if grep PASSED "${temp_python_status}" 2>&1 > /dev/null; then
+        python_exit_code=0
+    fi
+    rm "${temp_python_status}"
+fi
+
+# 6. Clean up after ourselves
+rm "${temp_json_file}"
+rm "${temp_log_file}"
+
+# 7. Exit the a pass (0) or failed (1) status
+exit $python_exit_code
+""" # Hide bash from python
+
+# Python script starts here
+import json
+import os
+import re
+import sys
+
+temp_python_status = sys.argv[1]
+temp_json_file = sys.argv[2]
+device_filter = sys.argv[3]
+xrt_app = sys.argv[4]
+prog_args = sys.argv[5]
+
+# Read in the JSON file produced earlier
+with open(temp_json_file) as f:
+  data = json.load(f)
+
+# Filter on the devices of interest
+working_devices = []
+devices = data["system"]["host"]["devices"]
+
+regex_string="."
+if len(device_filter) != 0:
+    regex_string=device_filter
+
+try:
+  pattern=re.compile(regex_string) 
+except:    # catch all exceptions
+  print("Error: Malformed device filter: '%s'" % regex_string)
+  exit(1)
+
+for device in devices:
+  shell_vbnv = device["vbnv"]
+
+  if len(device_filter) != 0:
+    if pattern.search(shell_vbnv):
+        print("Match: %s" % shell_vbnv);
+    else:
+        print("Skip: %s" % shell_vbnv);
+        continue
+
+  working_devices.append(device)
+  
+ 
+# Perform the operation on the filtered working devices 
+failed_devices=0
+passed_devices=0
+device_count = 1
+for device in working_devices: 
+  
+  # Invoke XRT application for this given device
+  print("\n")
+  print("=====================================================================")
+  print("%d / %d [%s] : %s" % (device_count, len(working_devices), device["bdf"], device["vbnv"]))
+  cmd = os.environ['XILINX_XRT'] + "/bin/" + xrt_app + " --device " + device["bdf"] + " " + prog_args
+  print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+  print("Command: %s\n" % cmd)
+  exit_code = os.system(cmd)
+
+  if exit_code == 0:
+    print("\nCommand Return Value: 0 [Operation successful]");
+    passed_devices += 1
+  else:
+    print("\nCommand Return Value: %d [Error(s) occured]" % exit_code)
+    failed_devices += 1
+
+  device_count += 1
+
+# Summary of all of the operations
+print("\n")
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+print("Summary:")
+print("   Installed device(s) : %d" % len(devices))
+print("          Shell Filter : '%s'" % regex_string)
+print("      Number Evaluated : %d" % len(working_devices))
+print("                Passed : %d" % passed_devices)
+print("                Failed : %d" % failed_devices)
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+# Operation complete
+with open(temp_python_status, "w") as f:
+    if failed_devices == 0:
+        print("PASSED", file=f)
+    else:
+        print("FAILED", file=f)

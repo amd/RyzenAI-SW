@@ -1,103 +1,40 @@
-# Ryzen™ AI cloud-to-client demo
+# Ryzen™ AI Software Platform
 
 ## Introduction
 
-The demo showcases the search and sort the images for a quick and easy viewing experience on your [AMD Ryzen™ AI](https://www.amd.com/en/products/ryzen-ai) based PC with two AI models - Yolov5 and Retinaface. 
+AMD Ryzen™ AI Software Platform includes the tools and runtime libraries for for optimizing and deploying AI inference on your [AMD Ryzen™ AI](https://www.amd.com/en/products/ryzen-ai) based PC. It enables developers to quickly build and run a variety of AI applications for Ryzen™ AI. It is designed with high efficiency and ease-of-use in mind, unleashing the full potential of AI acceleration on Ryzen™ AI.
 
-It features searching images locally when the cloud is not available due to lost or no connectivity. With AMD XDNA™ dedicated AI accelerator hardware seamlessly integrated on-chip and software that intelligently optimizes tasks and workloads, freeing up CPU and GPU resources, it makes new user experiences possible.
+This repository contains the demos, examples and tutorials, demonstrating usage and capabilities of the Ryzen™ AI Software Platform. It is a subset of the Ryzen™ AI Software release.
 
-<p align="center">
-    <img width="100%" height="100%" src="images/demo_msft_build.png">
-<p>
-
-Please note the demo is for functional demonstration purposes only and does not represent the highest possible performance or accuracy.
     
-## Setup
+## Examples
 
-To run this demo, you need a AMD Ryzen™ 7040HS Series mobile processor powered laptop with Windows 11 OS.  
+- [Run LLM OPT-1.3B model with ONNXRuntime](example/opt-1.3b/opt-onnx)
+- [Run LLM OPT-1.3B model with PyTorch](example/opt-1.3b/opt-pytorch)
+- [Run Whipser-tiny model with ONNXRuntime](example/Whipser-tiny) 
+- [Run multiple concurrent AI applications with ONNXRuntime](example/multi-model)
+- [Real-time object detection with Yolov8](example/Yolov8)
+
+## Demos
+
+- [Cloud-to-Client demo on Ryzen AI](demo/cloud-to-client)
+- [Multiple model concurrency demo on Ryzen AI](demo/multi-model-exec)
+
+## Tutorials
+
+- [A Getting Started Tutorial with a ResNet50 model](tutorial/getting_started_resnet)
+- [End-to-end Object Detection](tutorial/yolov8_e2e)
+- [Quantization for Ryzen AI](tutorial/RyzenAI_quant_tutorial)
+
+
+
+## Getting Started
     
-Please make sure the IPU driver (tested with 10.105.5.38) has been installed as shown below. 
+To run the demos and examples in this repository, please follow the instructions of README.md in each directory. 
 
-<p align="center">
-    <img src="images/ipu_driver.png" alt="ipu driver" width="600" height="400">
-<p>
+## Reference
 
-
-Please make sure [Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) and conda ([Miniconda](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) or [Anaconda](https://www.anaconda.com/download/)) has been installed on Windows.
-
-### Client setup
-
-Start a conda command prompt and run:
-
-```
-setup.bat
-```
-
-### Azure cloud setup on Windows
-
-> Please refer to [this page](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-with-triton?view=azureml-api-2&tabs=python%2Cendpoint) for more detailed setup instructions.
-
-Note that Azure cloud setup is needed only for running the application with Azure cloud and it requires an Azure account and subscription. If you only need to run the application locally, you can skip the Azure cloud setup step.
-
-1. Install azure python sdk
-    ```
-    pip install azure-ai-ml azure-identity
-    ```
-1. Create your workspace [here](https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.MachineLearningServices%2Fworkspaces)
-2. After the workspace is created, navigate to your workspace's dashboard and click `Download config.json`
-3. Create Azure endpoint.
-    ```
-    python models/setup_azure_ep.py --prefix <custom_endpoint_prefix> --config <config_json_path> -m [retinaface/yolov5] --step endpoint
-    ```
-    After this step you should see a newly generated `azure_config.yaml` file under `models/<model>/` directory with your `auth_key` and endpoint `uri`. If `uri` is none, wait for a short while and run the same command again.
-4. Deploy the model
-    ```
-    python models/setup_azure_ep.py --prefix <custom_endpoint_prefix> --config <config_json_path> -m [retinaface/yolov5] --step deployment
-    ```
-    The cloud deployment will take a long time. Please go to your [Azure portal](http://portal.azure.com/) to check the deployment status (Azure portal -> your workspace -> launch studio -> endpoints -> your_endpoint).
-5. Set the endpoint traffic. In your Azure portal's endpoint status page, click on `Update traffic` and set the traffic to 100
-
-There are 3 ways to run the demo:
-1. Use QT GUI in python
-2. Use web brower
-3. Use GUI exe
-
-## 1. run QT GUI
-Execute the batch script:
-```
-run_pyapp.bat
-```
-
-Both 2 and 3 need to start the server as below:
-
-## start server
-
-```
-cd webapp
-python server.py
-```
-
-## 2. visit GUI in browser
-
-```
-http://localhost:8998
-```
-or
-
-## 3. build and run GUI exe
-```
-cd electron-quick-start
-npm install electron-packager
-npx electron-packager . ms-build-demo --platform=win32 --arch=x64 --overwrite
-npm install
-npm start
-```
-    
-## Model quantization with Microsoft Olive
-
-The demo uses quantized onnx models. To know how to generate quantized onnx model, please check out the [quantization example](https://github.com/microsoft/Olive/tree/v0.2.1/examples/resnet_vitis_ai_ptq_cpu) in the Microsoft Olive github. 
-
-## Run your own models with ONNXRuntime on Ryzen AI
-    
-The demo uses Yolov5 and Retinaface models. To know how to run your own models with ONNXRuntime on Ryzen AI, please find more details on 
-the [Ryzen AI Software Platform Developer Guide](https://ryzenai.docs.amd.com/en/latest/index.html) page.
+- [Ryzen™ AI Developer Guide](https://ryzenai.docs.amd.com/en/latest)
+- [ONNXRuntime Vitis-AI EP](https://onnxruntime.ai/docs/execution-providers/Vitis-AI-ExecutionProvider.html)
+- [Quantization with Microsoft Olive](https://github.com/microsoft/Olive/tree/main/examples/resnet)
+- [AMD AI Developer Forum](https://community.amd.com/t5/ai/ct-p/amd_ai)

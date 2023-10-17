@@ -1,0 +1,13 @@
+#vai-rt: c07e419dfcc66e614af5e62b65feacf691b73096
+unilog: ed27e72c7cb92eb487e05b0be4ec9994d432ab97
+xir: dc507e4931eeced052022332ed09fac99c197e41
+target_factory: ecd9a37f17218e4a21ea9bc5e5a3169308d38ab8
+trace_logging: b4d5060dd3635409f1e79fac8ec9e6c0e8a09e7f
+vart: b5dec11845ad24feb3752a9a11b93ad5f2d3e915
+xcompiler: fc270a34eafd08357e02e76f3dd1282de81bd3f2
+graph-engine: eab9d27498572cb71cfaa4d59771dec715c38e7b
+vairt: 82ffe5a67749cc5e2e93556cd07f9ed031cc9ffe
+testcases: ba2b9e62f95d1832a0b4a6e947eb7d61f5a62337
+onnxruntime: v1.15.1
+vaip: a9db1184cca0c68dbf25e08a5c45699cacba3a7e
+test_onnx_runner: fc2ee4a30688c32f06e6eaf26e05f06499b5c5a3

@@ -1,0 +1,722 @@
+{
+    "facebook/opt-125m_1_512_torch.float32": [
+        6,
+        256,
+        256
+    ],
+    "facebook/opt-125m_2_512_torch.float32": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-125m_4_512_torch.float32": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-125m_1_1024_torch.float32": [
+        4,
+        256,
+        512
+    ],
+    "facebook/opt-125m_2_1024_torch.float32": [
+        4,
+        256,
+        512
+    ],
+    "facebook/opt-125m_4_1024_torch.float32": [
+        2,
+        512,
+        256
+    ],
+    "facebook/opt-125m_1_1536_torch.float32": [
+        2,
+        768,
+        768
+    ],
+    "facebook/opt-125m_2_1536_torch.float32": [
+        3,
+        768,
+        384
+    ],
+    "facebook/opt-125m_4_1536_torch.float32": [
+        2,
+        384,
+        384
+    ],
+    "facebook/opt-125m_1_2048_torch.float32": [
+        6,
+        1024,
+        512
+    ],
+    "facebook/opt-125m_2_2048_torch.float32": [
+        3,
+        512,
+        512
+    ],
+    "facebook/opt-125m_4_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-350m_1_512_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-350m_2_512_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-350m_4_512_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-350m_1_1024_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-350m_2_1024_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-350m_4_1024_torch.float32": [
+        2,
+        512,
+        256
+    ],
+    "facebook/opt-350m_1_1536_torch.float32": [
+        4,
+        768,
+        384
+    ],
+    "facebook/opt-350m_2_1536_torch.float32": [
+        4,
+        384,
+        384
+    ],
+    "facebook/opt-350m_4_1536_torch.float32": [
+        4,
+        384,
+        384
+    ],
+    "facebook/opt-350m_1_2048_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-350m_2_2048_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-350m_4_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_1_512_torch.float32": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-1.3b_2_512_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-1.3b_4_512_torch.float32": [
+        8,
+        128,
+        128
+    ],
+    "facebook/opt-1.3b_1_1024_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_2_1024_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_4_1024_torch.float32": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-1.3b_1_1536_torch.float32": [
+        8,
+        384,
+        384
+    ],
+    "facebook/opt-1.3b_2_1536_torch.float32": [
+        4,
+        768,
+        384
+    ],
+    "facebook/opt-1.3b_4_1536_torch.float32": [
+        4,
+        384,
+        384
+    ],
+    "facebook/opt-1.3b_1_2048_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_2_2048_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_4_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-2.7b_1_512_torch.float32": [
+        8,
+        128,
+        256
+    ],
+    "facebook/opt-2.7b_2_512_torch.float32": [
+        8,
+        128,
+        256
+    ],
+    "facebook/opt-2.7b_4_512_torch.float32": [
+        4,
+        128,
+        256
+    ],
+    "facebook/opt-2.7b_1_1024_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-2.7b_2_1024_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-2.7b_4_1024_torch.float32": [
+        2,
+        256,
+        512
+    ],
+    "facebook/opt-2.7b_1_1536_torch.float32": [
+        2,
+        768,
+        768
+    ],
+    "facebook/opt-2.7b_2_1536_torch.float32": [
+        4,
+        384,
+        384
+    ],
+    "facebook/opt-2.7b_4_1536_torch.float32": [
+        2,
+        512,
+        384
+    ],
+    "facebook/opt-2.7b_1_2048_torch.float32": [
+        4,
+        512,
+        1024
+    ],
+    "facebook/opt-2.7b_2_2048_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-2.7b_4_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-6.7b_1_512_torch.float32": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-6.7b_2_512_torch.float32": [
+        2,
+        256,
+        256
+    ],
+    "facebook/opt-6.7b_4_512_torch.float32": [
+        4,
+        256,
+        128
+    ],
+    "facebook/opt-6.7b_1_1024_torch.float32": [
+        4,
+        256,
+        512
+    ],
+    "facebook/opt-6.7b_2_1024_torch.float32": [
+        1,
+        512,
+        512
+    ],
+    "facebook/opt-6.7b_4_1024_torch.float32": [
+        2,
+        512,
+        256
+    ],
+    "facebook/opt-6.7b_1_1536_torch.float32": [
+        2,
+        768,
+        384
+    ],
+    "facebook/opt-6.7b_2_1536_torch.float32": [
+        4,
+        512,
+        384
+    ],
+    "facebook/opt-6.7b_4_1536_torch.float32": [
+        1,
+        768,
+        384
+    ],
+    "facebook/opt-6.7b_1_2048_torch.float32": [
+        4,
+        1024,
+        512
+    ],
+    "facebook/opt-6.7b_2_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-6.7b_4_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-13b_1_512_torch.float32": [
+        8,
+        128,
+        256
+    ],
+    "facebook/opt-13b_2_512_torch.float32": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-13b_4_512_torch.float32": [
+        2,
+        128,
+        256
+    ],
+    "facebook/opt-13b_1_1024_torch.float32": [
+        8,
+        512,
+        256
+    ],
+    "facebook/opt-13b_2_1024_torch.float32": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-13b_4_1024_torch.float32": [
+        1,
+        512,
+        256
+    ],
+    "facebook/opt-13b_1_1536_torch.float32": [
+        4,
+        384,
+        384
+    ],
+    "facebook/opt-13b_2_1536_torch.float32": [
+        8,
+        384,
+        384
+    ],
+    "facebook/opt-13b_4_1536_torch.float32": [
+        1,
+        384,
+        384
+    ],
+    "facebook/opt-13b_1_2048_torch.float32": [
+        4,
+        1024,
+        512
+    ],
+    "facebook/opt-13b_2_2048_torch.float32": [
+        2,
+        512,
+        1024
+    ],
+    "facebook/opt-13b_4_2048_torch.float32": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-125m_1_512_torch.bfloat16": [
+        6,
+        256,
+        256
+    ],
+    "facebook/opt-125m_2_512_torch.bfloat16": [
+        6,
+        256,
+        256
+    ],
+    "facebook/opt-125m_4_512_torch.bfloat16": [
+        6,
+        256,
+        256
+    ],
+    "facebook/opt-125m_1_1024_torch.bfloat16": [
+        6,
+        512,
+        256
+    ],
+    "facebook/opt-125m_2_1024_torch.bfloat16": [
+        6,
+        512,
+        512
+    ],
+    "facebook/opt-125m_4_1024_torch.bfloat16": [
+        4,
+        512,
+        256
+    ],
+    "facebook/opt-125m_1_1536_torch.bfloat16": [
+        6,
+        384,
+        768
+    ],
+    "facebook/opt-125m_2_1536_torch.bfloat16": [
+        3,
+        512,
+        768
+    ],
+    "facebook/opt-125m_4_1536_torch.bfloat16": [
+        6,
+        768,
+        512
+    ],
+    "facebook/opt-125m_1_2048_torch.bfloat16": [
+        6,
+        1024,
+        512
+    ],
+    "facebook/opt-125m_2_2048_torch.bfloat16": [
+        6,
+        1024,
+        512
+    ],
+    "facebook/opt-125m_4_2048_torch.bfloat16": [
+        4,
+        1024,
+        512
+    ],
+    "facebook/opt-350m_1_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-350m_2_512_torch.bfloat16": [
+        8,
+        128,
+        256
+    ],
+    "facebook/opt-350m_4_512_torch.bfloat16": [
+        8,
+        256,
+        128
+    ],
+    "facebook/opt-350m_1_1024_torch.bfloat16": [
+        8,
+        512,
+        512
+    ],
+    "facebook/opt-350m_2_1024_torch.bfloat16": [
+        8,
+        512,
+        256
+    ],
+    "facebook/opt-350m_4_1024_torch.bfloat16": [
+        4,
+        256,
+        512
+    ],
+    "facebook/opt-350m_1_1536_torch.bfloat16": [
+        8,
+        512,
+        768
+    ],
+    "facebook/opt-350m_2_1536_torch.bfloat16": [
+        8,
+        768,
+        384
+    ],
+    "facebook/opt-350m_4_1536_torch.bfloat16": [
+        4,
+        384,
+        512
+    ],
+    "facebook/opt-350m_1_2048_torch.bfloat16": [
+        4,
+        1024,
+        1024
+    ],
+    "facebook/opt-350m_2_2048_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-350m_4_2048_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_1_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-1.3b_2_512_torch.bfloat16": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-1.3b_4_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-1.3b_1_1024_torch.bfloat16": [
+        8,
+        512,
+        256
+    ],
+    "facebook/opt-1.3b_2_1024_torch.bfloat16": [
+        8,
+        512,
+        256
+    ],
+    "facebook/opt-1.3b_4_1024_torch.bfloat16": [
+        2,
+        512,
+        512
+    ],
+    "facebook/opt-1.3b_1_1536_torch.bfloat16": [
+        8,
+        768,
+        512
+    ],
+    "facebook/opt-1.3b_2_1536_torch.bfloat16": [
+        4,
+        768,
+        768
+    ],
+    "facebook/opt-1.3b_4_1536_torch.bfloat16": [
+        8,
+        384,
+        384
+    ],
+    "facebook/opt-1.3b_1_2048_torch.bfloat16": [
+        4,
+        1024,
+        1024
+    ],
+    "facebook/opt-1.3b_2_2048_torch.bfloat16": [
+        2,
+        1024,
+        1024
+    ],
+    "facebook/opt-1.3b_4_2048_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-2.7b_1_512_torch.bfloat16": [
+        8,
+        128,
+        256
+    ],
+    "facebook/opt-2.7b_2_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-2.7b_4_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-2.7b_1_1024_torch.bfloat16": [
+        8,
+        512,
+        256
+    ],
+    "facebook/opt-2.7b_2_1024_torch.bfloat16": [
+        8,
+        256,
+        512
+    ],
+    "facebook/opt-2.7b_4_1024_torch.bfloat16": [
+        4,
+        256,
+        512
+    ],
+    "facebook/opt-2.7b_1_1536_torch.bfloat16": [
+        8,
+        768,
+        768
+    ],
+    "facebook/opt-2.7b_2_1536_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-2.7b_4_1536_torch.bfloat16": [
+        4,
+        512,
+        768
+    ],
+    "facebook/opt-2.7b_1_2048_torch.bfloat16": [
+        8,
+        1024,
+        1024
+    ],
+    "facebook/opt-2.7b_2_2048_torch.bfloat16": [
+        8,
+        512,
+        512
+    ],
+    "facebook/opt-2.7b_4_2048_torch.bfloat16": [
+        8,
+        1024,
+        512
+    ],
+    "facebook/opt-6.7b_1_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-6.7b_2_512_torch.bfloat16": [
+        4,
+        256,
+        128
+    ],
+    "facebook/opt-6.7b_4_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-6.7b_1_1024_torch.bfloat16": [
+        8,
+        512,
+        512
+    ],
+    "facebook/opt-6.7b_2_1024_torch.bfloat16": [
+        4,
+        256,
+        512
+    ],
+    "facebook/opt-6.7b_4_1024_torch.bfloat16": [
+        4,
+        512,
+        256
+    ],
+    "facebook/opt-6.7b_1_1536_torch.bfloat16": [
+        2,
+        768,
+        512
+    ],
+    "facebook/opt-6.7b_2_1536_torch.bfloat16": [
+        4,
+        768,
+        384
+    ],
+    "facebook/opt-6.7b_4_1536_torch.bfloat16": [
+        2,
+        768,
+        384
+    ],
+    "facebook/opt-6.7b_1_2048_torch.bfloat16": [
+        4,
+        1024,
+        1024
+    ],
+    "facebook/opt-6.7b_2_2048_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-6.7b_4_2048_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-13b_1_512_torch.bfloat16": [
+        4,
+        256,
+        256
+    ],
+    "facebook/opt-13b_2_512_torch.bfloat16": [
+        8,
+        256,
+        256
+    ],
+    "facebook/opt-13b_4_512_torch.bfloat16": [
+        8,
+        128,
+        256
+    ],
+    "facebook/opt-13b_1_1024_torch.bfloat16": [
+        8,
+        512,
+        512
+    ],
+    "facebook/opt-13b_2_1024_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-13b_4_1024_torch.bfloat16": [
+        2,
+        512,
+        256
+    ],
+    "facebook/opt-13b_1_1536_torch.bfloat16": [
+        8,
+        768,
+        384
+    ],
+    "facebook/opt-13b_2_1536_torch.bfloat16": [
+        2,
+        768,
+        512
+    ],
+    "facebook/opt-13b_4_1536_torch.bfloat16": [
+        4,
+        384,
+        512
+    ],
+    "facebook/opt-13b_1_2048_torch.bfloat16": [
+        8,
+        512,
+        512
+    ],
+    "facebook/opt-13b_2_2048_torch.bfloat16": [
+        4,
+        512,
+        512
+    ],
+    "facebook/opt-13b_4_2048_torch.bfloat16": [
+        4,
+        1024,
+        512
+    ]
+}
