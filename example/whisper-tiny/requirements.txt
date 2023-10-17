@@ -1,0 +1,13 @@
+numpy>=1.24.4
+tqdm
+more-itertools
+transformers>=4.19.0
+requests==2.31.0
+psutil
+more-itertools==10.0.0
+ffmpeg-python==0.2.0
+soundfile==0.12.1
+SpeechRecognition==3.10.0
+PyAudio==0.2.13
+protobuf
+# h5py
