@@ -1,0 +1,5 @@
+add_subdirectory(util)
+add_subdirectory(onnx)
+add_subdirectory(models)
+add_subdirectory(processing)
+add_subdirectory(app)

@@ -1,0 +1,2 @@
+[console_scripts]
+voe_vis_pass = voe.vis_pass:main
