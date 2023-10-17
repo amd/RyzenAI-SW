@@ -133,4 +133,8 @@ if __name__ == "__main__":
         print(f"[RESULT] Maximum err between pytorch_quant_out and onnx_quant_out: {err.abs().max().item()}")
 
     else:
-        print(f"Nothing to do, exitting !!")
+        print(f"Nothing to do, exiting !!")
+        
+#################################################################################  
+#License
+#Ryzen AI is licensed under `MIT License <https://github.com/amd/ryzen-ai-documentation/blob/main/License>`_ . Refer to the `LICENSE File <https://github.com/amd/ryzen-ai-documentation/blob/main/License>`_ for the full license text and copyright notice.
