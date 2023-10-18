@@ -201,7 +201,7 @@
 
               // update gallery
               if (obj.objects.length) {
-                if (!lastStreamGalleryUpdate[obj.type] || now - lastStreamGalleryUpdate[obj.type] > 250) {
+                if (!lastStreamGalleryUpdate[obj.type] || now - lastStreamGalleryUpdate[obj.type] > 10) {
                   updateHistogram('s1-hist', labelImgCounts);
                   addGalleryImage("#canvas .gallery .stream1 .carousel", obj.url, obj.objects, 6);
                   lastStreamGalleryUpdate[obj.type] = now;
@@ -227,7 +227,7 @@
 
               // update gallery
               if (obj.objects.length) {
-                if (!lastStreamGalleryUpdate[obj.type] || now - lastStreamGalleryUpdate[obj.type] > 250) {
+                if (!lastStreamGalleryUpdate[obj.type] || now - lastStreamGalleryUpdate[obj.type] > 10) {
                   updateHistogram('s2-hist', faceCounts);
                   addGalleryImage("#canvas .gallery .stream2 .carousel", obj.url, obj.objects, 6);
                   lastStreamGalleryUpdate[obj.type] = now;

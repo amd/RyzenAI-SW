@@ -27,7 +27,7 @@ def parse_args():
                         type=str, help='Trained state_dict file path to open')
     parser.add_argument('--source', default='./images',
                         type=str, help='Trained state_dict file path to open')
-    parser.add_argument('--imgsz', type=int, default=320, help='input image size (integer)')
+    parser.add_argument('--imgsz', type=int, default=640, help='input image size (integer)')
     parser.add_argument('--ep', type=str, default='cpu',choices = ['cpu','ipu','azure'], help='EP backend selection')
     parser.add_argument('--instance-count', type=int, default=0, help='instance count for streaming')
     parser.add_argument('--save-img', action='store_true', help='save_img')
@@ -77,7 +77,7 @@ class Runner:
                                             provider_options = provider_options)
 
     def __init__(self, weights,
-                imgsz = 320, # HW
+                imgsz = 640, # HW
                 confidence_threshold = 0.02,
                 top_k = 5000,
                 nms_threshold = 0.4,
