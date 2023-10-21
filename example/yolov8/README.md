@@ -3,21 +3,18 @@ This package provides 3 yolov8 sample that running on RyzenAI and OnnxRuntime(Vi
 Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.docs.amd.com/en/latest/inst.html#) to install all the dependent packages. 
 
 ## How to build:
-1. move `Yolov8` folder to `VOE` folder(same level as **vitis_ai_ep_cxx_sample**)
-
-2. ./build.bat
-
-Output:
-```
-    ......
-    -- Installing: C:/Users/ibane/Desktop/voe-win_amd64-with_xcompiler_on-c07e419-latest/bin/camera_yolov8.exe
-    -- Installing: C:/Users/ibane/Desktop/voe-win_amd64-with_xcompiler_on-c07e419-latest/bin/camera_yolov8_nx1x4.exe
-    -- Installing: C:/Users/ibane/Desktop/voe-win_amd64-with_xcompiler_on-c07e419-latest/bin/test_jpeg_yolov8.exe
-```
-
-
+1. move `yolov8`(path: example/yolov8) folder into the 'yolov8_e2e' folder (path: tutorial/yolov8_e2e/..)
+└── yolov8_e2e
+    ├── bin
+    ├── code 
+    ├── images
+    ├── vitis_ai_ep_cxx_samples
+    ├── vitis_ai_ep_py_samples
+    ├── yolov8
+           └── yolov8_e2e
+    └── ...
 ## Run 
-
+cd tutorial\yolov8_e2e\yolov8
 ### Jpeg sample
 ```
 .\run_jpeg.bat .\DetectionModel_int.onnx .\sample_yolov5.jpg
