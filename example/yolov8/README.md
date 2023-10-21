@@ -14,7 +14,7 @@ Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.do
     ├── yolov8
            └── yolov8_e2e
     └── ...
-
+```
 ## Run 
 cd tutorial\yolov8_e2e\yolov8
 ### Jpeg sample
