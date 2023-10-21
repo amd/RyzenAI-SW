@@ -20,7 +20,7 @@ Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.do
 cd tutorial\yolov8_e2e\yolov8
 ### Jpeg sample
 ```
-.\run_jpeg.bat .\DetectionModel_int.onnx .\sample_yolov5.jpg
+.\run_jpeg.bat .\DetectionModel_int.onnx .\sample_yolov8.jpg
 ```
 Output:      
 result: 0       person  490.38498       85.79535        640.00488       475.18262       0.932453     
