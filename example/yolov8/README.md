@@ -4,6 +4,7 @@ Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.do
 
 ## How to build:
 1. move `yolov8`(path: example/yolov8) folder into the 'yolov8_e2e' folder (path: tutorial/yolov8_e2e/..)
+```
 └── yolov8_e2e
     ├── bin
     ├── code 
@@ -13,6 +14,7 @@ Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.do
     ├── yolov8
            └── yolov8_e2e
     └── ...
+
 ## Run 
 cd tutorial\yolov8_e2e\yolov8
 ### Jpeg sample
