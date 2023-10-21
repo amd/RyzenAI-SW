@@ -12,7 +12,8 @@ Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.do
     ├── vitis_ai_ep_cxx_samples
     ├── vitis_ai_ep_py_samples
     ├── yolov8
-           └── yolov8_e2e
+           └── video
+           └── yolov8
     └── ...
 ```
 ## Run 
