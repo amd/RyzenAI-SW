@@ -8,9 +8,9 @@
 #  Yolov8 on Ryzen AI Software Platform
 
 
-- Version:      Ryzen AI Software Platform v0.8 
+- Version:      Ryzen AI Software Platform v0.9 
 - Support:      AMD Ryzen 7040U, 7040HS series mobile processors with Windows 11 OS.
-- Last update:  27 Sep. 2023
+- Last update:  18 Oct. 2023
 
 
 ## Table of Contents
@@ -46,8 +46,8 @@ In this Deep Learning(DL) tutorial, you will see how to deploy the Yolov8 detect
 - gflags
 - cmake (version >= 3.26)
 - python (version >= 3.9) (Recommended for python 3.9.13 64bit)
-- IPU driver & IPU xclbin release >= 20230726
-- voe package >= (jenkins-nightly-build-id==205)
+- IPU driver & IPU xclbin = 0.9 release 
+- voe package = 0.9 release
 
 ## 3 Installation
 
@@ -59,9 +59,9 @@ The [Visual Studio](https://my.visualstudio.com/Downloads?q=visual%20studio%2020
 
 ### IPU Driver
 
-Please download the Adrenalin IPU driver from the Link below and install it on your laptop.
+Please download the IPU driver from the Link below and install it on your laptop.
 
-[Adrenalin IPU Driver](https://amdcloud-my.sharepoint.com/:u:/g/personal/anluo_amd_com/EaZ7iksQO2xKs7efI-zZ8BgBZo0wwEyQo91v8xa3br3wNw?e=gA2jTF)
+[IPU Driver](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=ipu_stack_rel_silicon_2309.zip)
 
 Ensure that the IPU driver is installed from `Device Manager` -> `System Devices` -> `AMD IPU Device` as shown in the following image. The version is expected to be 10.106.6.52
 
@@ -190,12 +190,12 @@ Successfully installed cmake-3.27.4.1
 
 Download the Execution Provider setup package with the link below:
 
-[Vitis AI ONNX Runtime EP](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=voe-3.5-win_amd64.zip)
+[Vitis AI ONNX Runtime EP](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=ryzen-ai-sw-0.9.zip)
 
 Change the directory to the extracted Execution Provider setup package directory and install the necessary packages:
 
 ```Conda Prompt
-# cd voe-3.5-win_amd64\voe-3.5-win_amd64
+# cd ryzen-ai-sw-0.9\voe-4.0-win_amd64
 # python installer.py
 # pip install voe-0.1.0-cp39-cp39-win_amd64.whl
 # pip install onnxruntime_vitisai-1.15.1-cp39-cp39-win_amd64.whl
