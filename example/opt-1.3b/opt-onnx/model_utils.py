@@ -265,6 +265,7 @@ def decode_prompt(model, tokenizer, prompt, input_ids=None, max_new_tokens=30):
     logging.critical(f"[PROFILE][WARMUP] tokenizer decode: {end-start}")
     
     print(f"response: {response}")
+    print("Time taken to generate one token:",time_per_token," ms")
     logging.critical(f"response: {response}")
             
 
