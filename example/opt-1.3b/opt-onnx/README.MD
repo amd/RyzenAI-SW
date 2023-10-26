@@ -185,7 +185,7 @@ Each run generates a log directory `log_<model_name>`. The log files in this dir
 
 Gilgamesh is a character from the epic poem Gilgamesh. He is the son of the god
 ```
-Here, the time taken by the tokenizer, time taken for generation of 30 tokens, number of tokens in the prompt, and time taken for decoding the genrations are saved.
+This log reports total time to generate the all the tokens (which is 30 in the above example) for the given input prompt, along with input prompt token length. The timing information for tokenizing and decoding are also saved. 
 
 
 ### Perplexity on wikitext2-raw dataset
