@@ -171,7 +171,7 @@ Prompt: Who is Gilgamesh?
 Response: 
 
 Gilgamesh is a character from the epic poem Gilgamesh. He is the son of the god
-Time taken to generate one token: 218.01996231079102  ms 
+Average time to generate each new token: 218.01996231079102  ms 
 ```
 
 Each run generates a log directory `log_<model_name>`. The log files in this directory contain more timing information for the decode and generation process. Here is a snippet from the logfile: 
