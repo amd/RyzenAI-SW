@@ -149,7 +149,6 @@ options:
   --dataset {non-raw,raw}
                         wikitext2-raw-v1, wikitext2-v1
 ```
-Each run generates a log directory `log_<model_name>` and all logs are within this directory. 
 
 ### Decode prompts
 Use the following commands to execute the quantized ONNX models on the CPU and IPU. 
@@ -166,13 +165,29 @@ python run.py --model_name opt-1.3b --target cpu --disable_cache --local_path ./
 python run.py --model_name opt-1.3b --target aie --disable_cache --local_path ./opt-1.3b_ortquantized 
 ```
 
-One example of an answer is shown below.
+One example of an answer is shown below. The time taken to generate a single token is also printed out.
 ```
 Prompt: Who is Gilgamesh?
 Response: 
 
 Gilgamesh is a character from the epic poem Gilgamesh. He is the son of the god
+Average time to generate each new token: 218.01996231079102  ms 
 ```
+
+Each run generates a log directory `log_<model_name>`. The log files in this directory contain more timing information for the decode and generation process. Here is a snippet from the logfile: 
+
+```
+18:11:16,618 root CRITICAL ****************************************
+18:11:16,618 root CRITICAL [PROFILE][WARMUP] tokenizer: 0.0
+18:11:21,633 root CRITICAL [PROFILE][AIE] generate: 5.014459133148193 for 30 tokens; prompt-tokens: 7
+18:11:21,633 root CRITICAL [PROFILE][WARMUP] tokenizer decode: 0.0
+18:11:21,633 root CRITICAL response: Who is Gilgamesh?
+
+Gilgamesh is a character from the epic poem Gilgamesh. He is the son of the god
+```
+This log reports total time to generate the all the tokens (which is 30 in the above example) for the given input prompt, along with input prompt token length. The timing information for tokenizing and decoding are also saved. 
+
+
 ### Perplexity on wikitext2-raw dataset
 [Perplexity](https://huggingface.co/docs/transformers/perplexity) is a metric commonly used to evaluate language models. It represents the model's ability to generate uniformly among the set of specified tokens in the corpus. Specifically, it quantifies how surprised or uncertain the model is when trying to predict the next word in a sequence based on the context of the previous words. A lower perplexity indicates that the model is better at predicting the next word, while a higher perplexity suggests that the model struggles with the prediction.
 
