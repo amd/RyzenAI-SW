@@ -5,10 +5,10 @@
  </tr>
 </table>
 
-#  Yolov8 on Ryzen AI Software Platform
+#  Yolov8 on Ryzen AI
 
 
-- Version:      Ryzen AI Software Platform v0.9 
+- Version:      Ryzen AI Software v0.9 
 - Support:      AMD Ryzen 7040U, 7040HS series mobile processors with Windows 11 OS.
 - Last update:  18 Oct. 2023
 
@@ -71,7 +71,7 @@ Ensure that the IPU driver is installed from `Device Manager` -> `System Devices
 
 ### Denpendencies
 
-The Ryzen AI Software Platform requires using a [Conda](https://docs.anaconda.com/free/anaconda/install/windows/) environment for the installation process.
+The Ryzen AI Software requires using a [Conda](https://docs.anaconda.com/free/anaconda/install/windows/) environment for the installation process.
 
 Start a `Conda Prompt`. In the Conda Prompt, create and activate an environment for the rest of the installation process. We will use ***ryzen_test*** here as an example.
 
