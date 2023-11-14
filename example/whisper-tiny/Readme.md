@@ -1,6 +1,6 @@
 # Running Whisper-tiny on Ryzen AI
 
-This is an example of running [whisper-tiny](https://huggingface.co/openai/whisper-tiny) model on Ryzen-AI Software platform. 
+This is an example of running [whisper-tiny](https://huggingface.co/openai/whisper-tiny) model on Ryzen-AI Software. 
 
 
 # whisper-onnx
