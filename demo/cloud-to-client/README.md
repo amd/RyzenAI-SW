@@ -97,4 +97,4 @@ npm start
 ## Run your own models with ONNXRuntime on Ryzen AI
     
 The demo uses Yolov5 and Retinaface models. To know how to run your own models with ONNXRuntime on Ryzen AI, please find more details on 
-the [Ryzen AI Software Platform Developer Guide](https://ryzenai.docs.amd.com/en/latest/index.html) page.
+the [Ryzen AI Software Developer Guide](https://ryzenai.docs.amd.com/en/latest/index.html) page.
