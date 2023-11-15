@@ -18,6 +18,7 @@ from torchvision.models import ResNet50_Weights, resnet50
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_epochs", type=int, default=0)
+    parser.add_argument("--train", action='store_true')
     args = parser.parse_args()
     return args
 
@@ -130,13 +131,18 @@ def main():
     _, models_dir, data_dir, _ = get_directories()
     args = get_args()
 
-    data_download_path = data_dir / "cifar-10-python.tar.gz"
-    urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz", data_download_path)
-    file = tarfile.open(data_download_path)
-    file.extractall(data_dir)
-    file.close()
-
-    prepare_model(args.num_epochs, models_dir, data_dir)
+    data_download_path_python = data_dir / "cifar-10-python.tar.gz"
+    data_download_path_bin = data_dir / "cifar-10-binary.tar.gz"
+    urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz", data_download_path_python)
+    urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz", data_download_path_bin)
+    file_python = tarfile.open(data_download_path_python)
+    file_python.extractall(data_dir)
+    file_python.close()
+    file_bin = tarfile.open(data_download_path_bin)
+    file_bin.extractall(data_dir)
+    file_bin.close()
+    if args.train:
+        prepare_model(args.num_epochs, models_dir, data_dir)
 
 
 if __name__ == "__main__":
