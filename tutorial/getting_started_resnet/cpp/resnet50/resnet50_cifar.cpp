@@ -168,18 +168,24 @@ int main(int argc, char* argv[]) {
     vector<pair<string, string>> results;
     int opt = 0;
     int64_t batch_number = 1;
-    cout << "opt ind:" << optind<< " argc:" << argc << endl;
     auto model_name = strconverter.from_bytes(std::string(argv[optind]));
-    cout << "model name:" << std::string(argv[optind]);
-    auto json_config = std::string(argv[optind + 1]);
+    cout << "model name:" << std::string(argv[optind])<<endl;
+    auto json_config = std::string(argv[optind + 2]);
+    auto ep = std::string(argv[optind + 1]);
+    cout << "ep:" << ep <<endl;
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "resnet50_cifar");
     auto session_options = Ort::SessionOptions();
 
     // assume running at root directory and json is inside bin folder
     auto config_key = std::string{ "config_file" };
+ 
+    if(ep=="ipu")
+    {
     auto options =
         std::unordered_map<std::string, std::string>{ {config_key, json_config} };
     session_options.AppendExecutionProvider("VitisAI", options);
+    }
+
     auto session = Ort::Experimental::Session(env, model_name, session_options);
     // print name/shape of inputs and outputs
     std::vector<std::string> input_names = session.GetInputNames();
