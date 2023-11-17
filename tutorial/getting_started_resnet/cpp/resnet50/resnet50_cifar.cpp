@@ -115,7 +115,7 @@ static string postprocess_resnet50(const string file,
     auto output_tensor_ptr = output_tensor.GetTensorMutableData<float>();
     auto softmax_output = softmax(output_tensor_ptr, channel);
     auto tb_top5 = topk(softmax_output, 5);
-    print_topk(tb_top5);
+    //print_topk(tb_top5);
     auto top1 = tb_top5[0];
     auto cls = std::string("") + lookup(top1.first) + " prob. " +
         std::to_string(top1.second);
@@ -176,7 +176,6 @@ int main(int argc, char* argv[]) {
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "resnet50_cifar");
     auto session_options = Ort::SessionOptions();
 
-    // assume running at root directory and json is inside bin folder
     auto config_key = std::string{ "config_file" };
  
     if(ep=="ipu")
@@ -207,7 +206,7 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 10; i++)
     {
         const std::string curr_file = "./images/cifar_image_" + std::to_string(i) + ".png";
-        cout << "curr file: " << curr_file << endl; 
+        //cout << "curr file: " << curr_file << endl; 
         auto input_shape = input_shapes[0];
         if (input_shape[0] == -1) {
             input_shape[0] = batch_number;
@@ -224,17 +223,17 @@ int main(int argc, char* argv[]) {
         assert(input_tensors[0].IsTensor() &&
             input_tensors[0].GetTensorTypeAndShapeInfo().GetShape() ==
             input_shape);
-        cout << "\ninput_tensor shape: "
+        /*cout << "\ninput_tensor shape: "
             << print_shape(input_tensors[0].GetTensorTypeAndShapeInfo().GetShape())
-            << endl;
+            << endl;*/
 
 
         // pass data through model
-        cout << "Running model...";
+        //cout << "Running model...";
         try {
             auto output_tensors = session.Run(session.GetInputNames(), input_tensors,
                 session.GetOutputNames());
-            cout << "done" << endl;
+            //cout << "done" << endl;
 
             // double-check the dimensions of the output tensors
             // NOTE: the number of output tensors is equal to the number of output nodes
@@ -243,7 +242,7 @@ int main(int argc, char* argv[]) {
                 output_tensors[0].IsTensor());
             auto output_shape =
                 output_tensors[0].GetTensorTypeAndShapeInfo().GetShape();
-            cout << "output_tensor_shape: " << print_shape(output_shape) << endl;
+            //cout << "output_tensor_shape: " << print_shape(output_shape) << endl;
             string predicted = postprocess_resnet50(curr_file, output_tensors[0]);
             int lab = labeled_images[i].second;
             results.push_back(std::make_pair(predicted, lookup(lab))); 
