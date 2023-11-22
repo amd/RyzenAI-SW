@@ -335,7 +335,9 @@ $ cd <Vitis-AI-Home>
 $ git clone https://github.com/amd/RyzenAI-SW.git
 $ ./docker_run.sh xilinx/vitis-ai-pytorch-gpu:<Your-Image-Tag>
 $ cd RyzenAI-SW/tutorial/yolov8_e2e
-$ bash env_setup.sh
+$ sudo bash env_setup.sh
+$ cd code
+$ python3 setup.py develop
 ```
 
 User could use the ***run_test.sh*** script to validate the float point model first before the quantization.

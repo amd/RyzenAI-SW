@@ -221,7 +221,7 @@ class BaseTrainer:
             self.ori_model = deepcopy(self.model)
             self.ori_model_ema = deepcopy(self.model)
             self.model.forward = partial(self.model.forward, quant=True)
-            self.qat_processor = QatProcessor(self.model, (im,), bitwidth=8, mix_bit=False)
+            self.qat_processor = QatProcessor(self.model, (im,), bitwidth=8)
             weights = self.args.model
             calib_dir = Path(weights).parent / 'nndct_quant'
             post_method = self.model.model[-1].post_process

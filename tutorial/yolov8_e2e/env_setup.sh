@@ -8,6 +8,4 @@ apt-get install gcc-4.9
 apt-get upgrade libstdc++6
 pip install pycocotools
 pip install urllib3==1.26.11
-
-cd code/
-python3 setup.py develop
+pip install yolo
