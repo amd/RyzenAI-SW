@@ -26,7 +26,6 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 
 ```bash
 .
-├── 1x4.xclbin
 ├── CMakeLists.txt
 ├── README.md
 ├── build.bat #easy build script
