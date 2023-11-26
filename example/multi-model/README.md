@@ -41,7 +41,7 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 ## 3 How To Build:
 
 ### 3.1 Requirement
-1. Visual Studio 2022 (with Desktop dev c++ )
+1. Visual Studio 2019 or 2022 (with Desktop dev c++ )
 2. cmake (version >= 3.26)
 3. python (version >= 3.9) (Recommended for python 3.9.13 64bit)
 4. IPU driver & IPU xclbin reledease >= 20230823
@@ -51,7 +51,10 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 ### 3.2 Clean Cache 
 When you replace the IPU driver or 1x4.xclbin, you need to clear the cache of the old compiled model, they are located in C:\temp\rd\vaip\\.cache, and delete everything under this folder.
 
-### 3.3 Install OpenCV and glog
+### 3.3 Create conda env 
+About how to create conda env please refer to [Demo Readme](../../demo/multi-demo-exec/README.md)
+
+### 3.4 Install Opencv and Glog
 1. opencv (version=4.6.0)
 ```
 git clone https://github.com/opencv/opencv.git -b 4.6.0
