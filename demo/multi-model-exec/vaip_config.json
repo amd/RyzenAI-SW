@@ -79,11 +79,11 @@
       "plugin": "vaip-pass_create_const_op"
      },
      {
-      "name": "convert_quantizeLinear_and_dequantizeLinear",
+      "name": "convert_to_xir_op",
       "plugin": "vaip-pass_py_ext",
       "disabled" : false,
       "pyExt": {
-       "moduleName": "voe.passes.convert_quantizeLinear_and_dequantizeLinear",
+       "moduleName": "voe.passes.convert_to_xir_op",
        "methodName": "rules"
       }
      },
@@ -189,7 +189,8 @@
      },
      {
       "name": "graph_output_add_node",
-      "plugin": "vaip-pass_graph_output_add_node"
+      "plugin": "vaip-pass_graph_output_add_node",
+      "disabled": true
      },
      {
       "_comment" : "test case 20",
@@ -256,10 +257,16 @@
             "stringValue" : "performance"
         },
         "dpu_subgraph_num" : {
-            "intValue" : 2
+            "intValue" : 32
         },
         "opt_level" : {
             "intValue" : 0
+        },
+        "dump_subgraph_ops" : {
+            "boolValue" : false
+        },
+        "profile" : {
+            "boolValue" : false
         },
         "prefetch" : {
             "boolValue" : false
