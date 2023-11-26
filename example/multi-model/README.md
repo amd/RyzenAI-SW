@@ -14,8 +14,8 @@
 - [3 How to Build](#3-How-To-Build)
     - [3.1 Requirement](#31-Requirement)
     - [3.2 Clean Cache](#32-Clean-Cache)
-    - [3.3 Prepare Conda Env](#33-PrepareConda-Env)
-    - [3.3 Prepare-Conda-Env](#34-Install-python-package)
+    - [3.3 Prepare Conda Env](#33-Prepare-Conda-Env)
+    - [3.4 Install python package](#34-Install-python-package)
     - [3.5 Compile the Application](#35-Compile-the-Application)
 - [4 Run The Demos](#3-Run-The-Demos)
 
