@@ -34,25 +34,38 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 
 
 ```
-.
-.
-├── 1x4.xclbin
-├── README.md
-├── bin
-│   ├── ipu_multi_models.exe
-│   ├── onnxruntime.dll
-│   ├── onnxruntime_providers_shared.dll
-│   ├── onnxruntime_vitisai_ep.dll
-├── ipu_modelsx4_demo
-│   ├── generate_script.py
-│   ├── modelsx4_screenshot.png
-│   ├── run_mobile_net_v2.bat
-│   ├── run_modelx4.bat
-│   ├── run_resnet50.bat
-│   ├── run_retinaface.bat
-│   ├── run_segmentation.bat
-│   └── run_yolovx.bat
-└── vaip_config.json
+│  1x4.xclbin
+│  env.yaml
+│  README.md
+│  vaip_config.json
+│  voe-0.1.0-cp39-cp39-win_amd64.whl
+│
+├─.vscode
+│      settings.json
+│
+├─bin
+│      ipu_multi_models.exe
+│      onnxruntime.dll
+│      onnxruntime_vitisai_ep.dll
+│
+├─images
+│      mobilenet_V2.jpg
+│      modelsx4.jpg
+│      resnet50.jpg
+│      retina.jpg
+│      segmentation.jpg
+│      yolox.jpg
+│
+└─ipu_modelsx4_demo
+    │  generate_script.py
+    │
+    └─config
+            mobile_net_v2.json
+            modelx4.json
+            resnet50.json
+            retinaface.json
+            segmentation.json
+            yolovx.json
 ```
 
 ## 3 Demo Setup
@@ -69,9 +82,9 @@ Please make sure the IPU driver has been installed by following the instructions
 
 - **Verify Installation:** After installation, open Anaconda Prompt on Windows and type `conda --version` to verify that Anaconda was installed correctly. You should see the installed Conda version.
 
-2. Create a Conda Environment
+2. Create a Conda Environment by using the env.yaml
     ```bash
-      conda create --name <env_name> python=3.9
+      conda create --name <env_name> --file=env.yaml
     ```
 
 3. Activate the Environment

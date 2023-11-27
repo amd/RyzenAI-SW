@@ -1,0 +1,62 @@
+{
+    "split_matrix_size": 2,
+    "screen_height": 640,
+    "screen_width": 1024,
+    "models": {
+        "yolovx": {
+            "model_filter_id": 0,
+            "thread_num": 4,
+            "onnx_model_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\nano-YOLOX_int.onnx",
+            "video_file_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\detection.avi",
+            "onnx_config": {
+                "onnx_x": 1,
+                "onnx_y": 1,
+                "onnx_disable_spinning": false,
+                "onnx_disable_spinning_between_run": false,
+                "intra_op_thread_affinities": ""
+            }
+        },
+        "retinaface": {
+            "model_filter_id": 6,
+            "thread_num": 4,
+            "onnx_model_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\RetinaFace_int.onnx",
+            "confidence_threshold": 0.3,
+            "video_file_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\face.avi",
+            "onnx_config": {
+                "onnx_x": 1,
+                "onnx_y": 1,
+                "onnx_disable_spinning": false,
+                "onnx_disable_spinning_between_run": false,
+                "intra_op_thread_affinities": ""
+            }
+        },
+        "segmentation": {
+            "model_filter_id": 7,
+            "thread_num": 4,
+            "onnx_model_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\pointpainting-nus-FPN_int.onnx",
+            "confidence_threshold": 0.3,
+            "video_file_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\seg_512_288.avi",
+            "onnx_config": {
+                "onnx_x": 1,
+                "onnx_y": 1,
+                "onnx_disable_spinning": false,
+                "onnx_disable_spinning_between_run": false,
+                "intra_op_thread_affinities": ""
+            }
+        },
+        "mobile_net_v2": {
+            "model_filter_id": 5,
+            "thread_num": 4,
+            "onnx_model_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\mobilenetv2_1.4_int.onnx",
+            "confidence_threshold": 0.3,
+            "video_file_path": "C:\\Users\\li_da\\Desktop\\ARC3\\RyzenAI-SW\\demo\\multi-model-exec\\ipu_modelsx4_demo\\resource\\detection.avi",
+            "onnx_config": {
+                "onnx_x": 1,
+                "onnx_y": 1,
+                "onnx_disable_spinning": false,
+                "onnx_disable_spinning_between_run": false,
+                "intra_op_thread_affinities": ""
+            }
+        }
+    }
+}
