@@ -1,0 +1,3 @@
+/scratch/dachang/RyzenAI-SW/tutorial/RyzenAI_quant_tutorial/onnx_example/vai_q_onnx/operators/custom_ops/build/CMakeFiles/rebuild_cache.dir
+/scratch/dachang/RyzenAI-SW/tutorial/RyzenAI_quant_tutorial/onnx_example/vai_q_onnx/operators/custom_ops/build/CMakeFiles/vai_custom_op.dir
+/scratch/dachang/RyzenAI-SW/tutorial/RyzenAI_quant_tutorial/onnx_example/vai_q_onnx/operators/custom_ops/build/CMakeFiles/edit_cache.dir
