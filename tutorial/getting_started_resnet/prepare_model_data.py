@@ -111,6 +111,24 @@ def prepare_model(num_epochs=0, models_dir="models", data_dir="data"):
     # Save the model
     model.to("cpu")
     torch.save(model, str(models_dir / "resnet_trained_for_cifar10.pt"))
+    # dummy_inputs = torch.randn(1, 3, 32, 32)
+    # input_names = ['input']
+    # output_names = ['output']
+    # dynamic_axes = {'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
+    # tmp_model_path = str(models_dir / "resnet_trained_for_cifar10.onnx")
+    # torch.onnx.export(
+    #         model,
+    #         dummy_inputs,
+    #         tmp_model_path,
+    #         export_params=True,
+    #         opset_version=13,
+    #         input_names=input_names,
+    #         output_names=output_names,
+    #         dynamic_axes=dynamic_axes,
+    #     )
+
+def export_to_onnx(model, models_dir): 
+    model.to("cpu")
     dummy_inputs = torch.randn(1, 3, 32, 32)
     input_names = ['input']
     output_names = ['output']
@@ -126,6 +144,7 @@ def prepare_model(num_epochs=0, models_dir="models", data_dir="data"):
             output_names=output_names,
             dynamic_axes=dynamic_axes,
         )
+
 
 def main():
     _, models_dir, data_dir, _ = get_directories()
@@ -143,6 +162,8 @@ def main():
     file_bin.close()
     if args.train:
         prepare_model(args.num_epochs, models_dir, data_dir)
+    model = torch.load(str(models_dir / "resnet_trained_for_cifar10.pt"))
+    export_to_onnx(model, models_dir)
 
 
 if __name__ == "__main__":
