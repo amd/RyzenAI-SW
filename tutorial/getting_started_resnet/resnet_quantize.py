@@ -80,7 +80,7 @@ def main():
     # `calibration_dataset_path` is the path to the dataset used for calibration during quantization.
     calibration_dataset_path = "data/"
 
-    # `dr` (Data Reader) is an instance of ResNet50DataReader, which is a utility class that 
+    # `dr` (Data Reader) is an instance of ResNetDataReader, which is a utility class that 
     # reads the calibration dataset and prepares it for the quantization process.
     dr = resnet_calibration_reader(calibration_dataset_path)
 
