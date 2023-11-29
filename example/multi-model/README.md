@@ -51,7 +51,7 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 When you replace the IPU driver or 1x4.xclbin, you need to clear the cache of the old compiled model, they are located in C:\temp\rd\vaip\\.cache, and delete everything under this folder.
 
 ### 3.3 Prepare Conda Env
-About how to create conda env please refer to [Demo Readme](../../demo/multi-demo-exec/README.md)
+About how to create conda env please refer to [Demo Readme](../../demo/multi-model-exec/README.md)
 
 clone Opencv and Glog
 1. opencv (version=4.6.0)
