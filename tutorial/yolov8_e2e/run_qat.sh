@@ -21,4 +21,4 @@ EPOCH=50
 cd code
 
 CUDA_VISIBLE_DEVICES=${GPU_ID} yolo detect train data="datasets/coco.yaml" model=${WEIGHTS} pretrained=True sync_bn=True \
-    epochs=${EPOCH} batch=${BATCH} optimizer="AdamW" device=${GPU_ID} lr0=0.0001 nndct_quant=True
+    epochs=${EPOCH} batch=${BATCH} optimizer="AdamW" device=${GPU_ID} lr0=0.0001 nndct_quant=True --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish

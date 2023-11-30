@@ -9,16 +9,22 @@ Please refer to the [Ryzen AI SW platform installation guide](https://ryzenai.do
     ├── bin
     ├── code 
     ├── images
-    ├── vitis_ai_ep_cxx_samples
-    ├── vitis_ai_ep_py_samples
     ├── yolov8
-           └── video
            └── yolov8
-    └── ...
+    └── ... 
 ```
-## Run 
+
+2. build with batch file
+
+```
 cd tutorial\yolov8_e2e\yolov8
+.\build.bat
+```
+
+## Run 
+
 ### Jpeg sample
+
 ```
 .\run_jpeg.bat .\DetectionModel_int.onnx .\sample_yolov8.jpg
 ```
