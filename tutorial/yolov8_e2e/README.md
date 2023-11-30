@@ -10,7 +10,7 @@
 
 - Version:      Ryzen AI Software v1.0 
 - Support:      AMD Ryzen 7040U, 7040HS series mobile processors with Windows 11 OS.
-- Last update:  22 Nov. 2023
+- Last update:  30 Nov. 2023
 
 
 ## Table of Contents
@@ -244,6 +244,8 @@ The output will be generated as below.
 
 To validate your setup, the following command will do the inference with single image.
 
+Please modify the ***conda env name*** in the batch file before execution.
+
 ```
 # run_jpeg.bat DetectionModel_int.onnx sample_yolov8.jpg
 ```
@@ -261,6 +263,8 @@ result: 27      tie     175.62622       224.15210       235.84900       248.8355
 ### Run with Live Camera
 
 To run with live camera, user needs to change the display and camera settings manually as below.
+
+Please modify the ***conda env name*** in the batch file before execution.
 
 - Go to `Display settings`, change Scale to ***100%*** in the `Scale & layout` section.
 - Go to `Bluetooth & devices` -> `Cameras` -> `USB2.0 FHD UVC WebCam`, turn off the Background effects in the `Windows Studio Effects` section.
