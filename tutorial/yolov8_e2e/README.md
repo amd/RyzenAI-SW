@@ -270,13 +270,13 @@ camera.bat
 ```
 
 <p align="left">
-<img src="images/image2.png">
+<img src="images/image.png">
 </p>
 
 Possible options to run the yolov8 demo.
 
 ```
-# camera_nx.bat -h
+# camera.bat -h
 
 Options:
       -c [parallel runs]: Specifies the (max) number of runs to invoke simultaneously. Default:1.
