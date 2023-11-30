@@ -59,10 +59,35 @@ In this conda environment, python version is 3.7, pytorch version is 1.12 and to
 - Copy resnet50_quant.py to docker environment
 - Download pre-trained [Resnet50 model](https://download.pytorch.org/models/resnet50-19c8e357.pth)
   ```shell
-  wget https://download.pytorch.org/models/resnet50-19c8e357.pth -O resnet50.pth
+  wget https://download.pytorch.org/models/resnet50-19c8e357.pth 
   ```
 - Prepare Imagenet validation images. [Pytorch example repo](https://github.com/pytorch/examples/tree/master/imagenet) for reference.
 - Modify default data_dir and model_dir in resnet50_quant.py
+
+- Data Preparation (optional: for accuracy evaluation)
+1. Download the iamagenet dataset 
+2. Organise the dataset directory as follows
+
+```shell
+imagenet/
+├── train
+│   ├── n01440764
+│   ├── n01443537
+│   ├── n01484850
+│   ├── n01491361
+│   ├── n01494475
+│   ├── n01496331
+│   ├── n01498041
+│   ├── n01514668
+|
+└── val
+    ├── n01440764
+    ├── n01443537
+    ├── n01484850
+    ├── n01491361
+    ├── n01494475
+    ├── n01496331
+```
 - [Optional] Evaluate float model
   ```shell
   python resnet50_quant.py --quant_mode float
@@ -117,7 +142,7 @@ Take resnet50_quant.py to demonstrate how to apply this feature.
    ```
 Run command with "--quant_mode float&emsp;--inspect&emsp;--target {target_name}" to inspect model.
 ```py
-    python resnet50_quant.py --quant_mode float --inspect --target DPUCAHX8L_ISA0_SP
+    python resnet50_quant.py --quant_mode float --inspect --target AMD_AIE2_Nx4_Overlay
 ```
 Inspector will display some special messages on screen with special color and special keyword prefix "VAIQ_*" according to the verbose_level setting.Note the messages displayed between "[VAIQ_NOTE]: =>Start to inspect model..." and "[VAIQ_NOTE]: =>Finish inspecting."
 
@@ -469,6 +494,126 @@ class Inspector():
         1: print summary report of operations assigned to CPU.
         2: print summary report of device allocation of all operations.
     image_format: Export visualized inspection result. Support 'svg' / 'png' image format.
+
+
+### Quantization Aware Training
+This demonstrate code supplies the quantization for ResNet-18 and MobileNet V2. This demonstrate supplies several configurations under different quantization schemas. Including methods like TQT, LSQ, and statistic-based float/poweroftwo scale quantization.
+  - Train a quantized model
+  ```shell
+  cd <path-to-RyzenSW/>
+  python main.py \
+        --model_name=[model] \
+        --pretrained=[model_weight_path]
+        --mode=train \
+        --config_file=[configs_file_path]
+  ```
+  - Deploy a quantized model (Not all types quantized model support export deploy model, under developing )
+
+```shell
+$ cd <Path-to-RyzenAI_quant_tutorial>/pytorch_example/torch_qat
+$ python main.py \
+    --model_name=[model] \
+    --qat_ckpt=[model_weight_path]
+    --mode=deploy \
+    --config_file=[configs_file_path]
+```
+
+  - model_name: MobileNetV2, resnet18
+  - 
+  - pretrained: pre-trained fp32 model file path
+  - 
+  - qat_ckpt: quantized model weight saved after  - training
+  - 
+  - config_file: e.g: ./config_files/int_pof2_tqt.json (Different quantization method config file can be seen in fold configs )
+
+### Auto module
+In QAT, tensors are quantized by manipulation of torch.nn.Module objects. For parameter quantization, quantizer replaces modules with parameters with quantized version of the modules(for instance, replacing nn.Conv2d with QuantizedConv2d and replacing nn.Linear with QuantizedLinear), in which quantizers for parameters are inserted. For input and output quantization, the quantizer adds quantization step in module's forward_hook and forward_pre_hook. But for non-module operations, the quantizer cannot directly modify their behavior. For example, if we have a model:
+```python
+import torch
+from torch import nn
+
+class MyModel(nn.Module):
+  def __init__(self):
+    super().__init__()
+  
+  def forward(self, x, y, z):
+    tmp = x + y
+    ret = tmp * z
+    return ret
+```
+How do we quantize intputs and outputs of operator "+" and "*" in this model? One way is to replace the native operators with modules mannually like below.
+
+```python
+import torch
+from torch import nn
+
+class Add(nn.Module):
+  def __init__(self):
+    super().__init__()
+
+  def forward(self, x, y):
+    return x + y
+
+class Mul(nn.Module):
+  def __init__(self):
+    super().__init__()
+
+  def forward(self, x, y):
+    return x * y
+
+class MyModel(nn.Module):
+  def __init__(self):
+    super().__init__()
+    self.add = Add()
+    self.Mul = Mul()
+
+  def forward(self, x, y, z):
+    tmp = self.add(x, y)
+    ret = self.mul(tmp, z)
+    return ret
+```
+
+After the replacement, QAT can insert quantizers for tensor x, y, tmp and z via forward_hook and forward_pre_hook.
+
+QAT now provides a tool called auto_module, which could be used to replace the non-module operators with modules automatically.
+
+- Usage
+
+Users can use auto_module by a simple function call. Here's an example.
+```python
+import torch
+from torch import nn
+from pytorch_nndct.quantization.auto_module import wrap
+
+class MyModel(nn.Module):
+  def __init__(self):
+    super().__init__()
+  
+  def forward(self, x, y, z):
+    tmp = x + y
+    ret = tmp * z
+    return ret
+
+model = MyModel()
+x = torch.rand((2, 2))
+y = torch.rand((2, 2))
+z = torch.rand((2, 2))
+wrapped_model = wrap(model, x, y, z)
+```
+wrapped_model is the model with all native operators("+" and "*" in this example) replaced with modules, which can be processed by QatProcessor like normal models.
+
+The signature of function wrap is as follows.
+```python
+def wrap(model: nn.Module, *args, **kwargs) -> nn.Module
+  """
+  Args:
+    model (nn.Module): The model to be processed by auto_module
+    args, kwargs: The inputs of model. There is model inference in this function. 
+      `args` and `kwargs` will be fed to model directly during model inference.
+  """
+```
+
+
 :arrow_forward:**Next Topic:**  [3. Tensorflow1.x Quantization Tutorial](./TF_README.md) 
 
 :arrow_backward:**Previous Topic:**  [2. ONNX Quantization Tutorial](./ONNX_README.md)

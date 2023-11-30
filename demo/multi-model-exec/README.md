@@ -151,3 +151,4 @@ run_modelx4.bat
 
 - Python version version 3.9 is required if not "The code execution cannot proceed because python39.dll was not found. Reinstalling he programm may fix this problem"
 - If you find an exclamation mark on the icon of the AMD IPU device in the System Devices list in your Device Manager, it indicates that there is an issue with your driver installation, and the program may not function correctly.
+- If this demo aborted with the 'glog.dll cannot be found' error, you need to use the command 'set PATH=C:<path-to-conda-glog>;%PATH%' to explicitly export the path to 'glog.dll'. 'glog.dll' is installed along with ANACONDA3. The recommended ANACONDA3 installer is 'Anaconda3-2023.07-2-Windows-x86_64'.
