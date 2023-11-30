@@ -2,6 +2,23 @@ import os
 import json 
 import copy
 import pathlib as pl
+import sys
+import shutil
+
+def recreate_config_folder():
+    # Define the folder name
+    config_folder = 'config'
+
+    # Check if the 'config' folder exists
+    if not os.path.exists(config_folder):
+        os.mkdir(config_folder)
+        print(f'{config_folder} folder has been created.')
+
+
+#Get the sys.path 
+paths=sys.path
+#Link all the path into str, and divided by ";"
+pythonpath_value=";".join(paths)
 yolovx_config = {
       "model_filter_id":0,
       "thread_num": 4,
@@ -107,7 +124,8 @@ config_framework={
     }
 
 bat_file =["set XLNX_VART_FIRMWARE=%cd%\\..\\1x4.xclbin\n",
-           "set PATH=%cd%\\..\\bin;%cd%\\..\\python;%cd%\\..;%PATH%\n",
+           "set PATH=%cd%\\..\\bin;%cd%\\..\\python;%cd%\\..;%PATH%\n"
+           "set PYTHONPATH="+pythonpath_value+";%PYTHONPATH%"
            "set DEBUG_ONNX_TASK=0\n",
            "set DEBUG_DEMO=0\n",
            "set NUM_OF_DPU_RUNNERS=4\n",
@@ -166,19 +184,16 @@ def try_generate_video(name,pwd):
     print("exe -> ",cmd)
     os.system(cmd)
 if __name__=="__main__":
-    raw_cwd = ger_raw_cwd()
-    # Define the directory name
     directory_name = "config"
-
-# Check if the directory exists using os.path.exists
     if not os.path.exists(directory_name):
     # If the directory does not exist, create it using os.mkdir
       os.mkdir(directory_name)
       print(f"Directory '{directory_name}' created successfully.")
     else:
       print(f"Directory '{directory_name}' already exists.")
-    # try_generate_video("detection",raw_cwd)
-    # try_generate_video("face",raw_cwd)
+    raw_cwd = ger_raw_cwd()
+    try_generate_video("detection",raw_cwd)
+    try_generate_video("face",raw_cwd)
     print("cur_dir: ",raw_cwd)
     for c in model_config.values():
         set_cwd(c,raw_cwd)
