@@ -33,7 +33,7 @@ VAI_Q_ONNX operates under the following test environment requirements:
 
 ### Create and Activate Conda Environment
 ```shell
-$ cd <path-to-onnx_example>
+$ cd <RyzenAI-SW>/tutorial/RyzenAI_quant_tutorial/onnx_example
 $ conda env create --name ${env_name} --file=env.yaml
 $ conda activate ${env_name}
 ``` 
@@ -67,8 +67,9 @@ You can easily install VAI_Q_ONNX by following the steps below:
  To Prepare the test data, please check the download section of the main website: https://huggingface.co/datasets/imagenet-1k/tree/main/data
 You need to register and download val_images.tar.gz, Then, create the validation dataset and calibration dataset.
     ```shell
-    mkdir val_data && tar -xzf val_images.tar.gz -C val_data
-    python prepare_data.py val_data calib_data
+    $ cd tutorial/RyzenAI_quant_tutorial/onnx_example/onnx_model_ptq
+    $ mkdir val_data && tar -xzf val_images.tar.gz -C val_data
+    $ python prepare_data.py val_data calib_data
     ```
 
 ## Running vai_q_onnx
@@ -78,19 +79,8 @@ Quantization in ONNX Runtime refers to the linear quantization of an ONNX model.
 
 vai_q_onnx supports static quantization and the usage is as follows.
 
-### vai_q_onnx Post-Training Quantization(PTQ)
 
-Use the following steps to prepare the onnx model
-```shell
-$ cd /path/to/onnx_example
-$ python prepare.py
-```
-Use the following step to run do the quantize for the float onnx model.
 
-```shell
-$ python resnet_ptq_example_QDQ_U8S8.py
-
-```
 
 1.  #### Preparing the Float Model and Calibration Set
 
@@ -117,7 +107,7 @@ If you already have an ImageNet datasets with the above structure, you can also 
 Finally, download onnx model from the link.
 
 ```shell 
-mkdir models && wget https://github.com/onnx/models/blob/main/vision/classification/resnet/model/resnet50-v1-12.onnx
+$ mkdir models && wget https://github.com/onnx/models/blob/main/vision/classification/resnet/model/resnet50-v1-12.onnx
 ```
 
 
@@ -132,7 +122,7 @@ This will generate quantized model using QDQ quant format and Int8 activation ty
 
 For IPU config:
 ```shell
-python quantize_onnx_model_ipu.py models/resnet50-v1-12.onnx models/resnet50-v1-12.U8S8.pof2s.onnx calib_data
+$ python quantize_onnx_model_ipu.py models/resnet50-v1-12.onnx models/resnet50-v1-12.U8S8.pof2s.onnx calib_data
 ```
 
 
@@ -143,22 +133,22 @@ Test the accuracy of a float model on ImageNet val dataset (Prec@1 76.130 Prec@5
 
 
 ```shell
-python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.onnx
+$ python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.onnx
 ```
 For a float model, you can use GPU to accelerate the evaluation.
 
 ```shell
-python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.onnx --gpu
+$ python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.onnx --gpu
 ```
 
 Test the accuracy of a CPU quantized config model on ImageNet val dataset (Prec@1 72.55% Prec@5 90.95%):
 ```shell
-python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.U8S8.fs.onnx
+$ python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.U8S8.fs.onnx
 ```
 Test the accuracy of a IPU quantized config model on ImageNet val dataset (Prec@1 73.52% Prec@5 91.29%):
 
 ```shell
-python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.U8S8.pof2s.onnx
+$ python onnx_validate.py val_data --onnx-input models/resnet50-v1-12.U8S8.pof2s.onnx
 ```
 
 
