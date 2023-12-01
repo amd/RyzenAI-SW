@@ -45,6 +45,7 @@ You can easily install VAI_Q_ONNX by following the steps below:
 
     Build VAI_Q_ONNX using the provided build script:
     ```bash
+    $ cd tutorial/RyzenAI_quant_tutorial/onnx_example
     $ sh build.sh
     $ pip install pkgs/*.whl
     ```
@@ -54,11 +55,13 @@ You can easily install VAI_Q_ONNX by following the steps below:
   If you can't build the wheel package successfully, you can also use the existing package we've built for you. Follow these steps to install it:
 
     ```shell
+    $ cd tutorial/RyzenAI_quant_tutorial/onnx_example
     $ pip install pkgs/*.whl
     ```
 
 3. For native Windows users, We recommend the following commands in *command prompt* for a minimal installation that not include custom operations library:
     ```shell
+    $ cd tutorial/RyzenAI_quant_tutorial/onnx_example
     $ python3 setup.py bdist_wheel --release    --dist-dir=pkgs
     $ pip install pkgs/*.whl
     ```
