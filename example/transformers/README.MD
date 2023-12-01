@@ -24,7 +24,9 @@ pip install ops\cpp --force-reinstall
 ```
 
 ## Step 4: Install ONNX EP for running ONNX based flows
+
 Please refer to [OPT-ONNX](models/opt-onnx/README.MD)
+
 Please refer to [VISION-TRANSFORMER-ONNX](models/vision-transformer-onnx/README.MD)
 
 # Run Transformers
