@@ -5,14 +5,14 @@ This folder contains example code for quantizing a [ResNet-B image classificatio
 
 The example has the following parts:
 
-- [Install necessary packages](#install-necessary-packages)
+- [Create conda env and Install necessary packages](#Create-conda-env-and-Install-necessary-packages)
 - [Prepare the data and the model](#prepare-the-data-and-the-model)
 - [Quantize the onnx float model](#quantize-the-onnx-float-model)
 - [Evaluate the float model and the quantized model](#evaluate-the-float-model-and-the-quantized-model)
 
 
-## Install necessary packages
-Install vai_q_onnx from the release wheel package or refer to [README](https://gitenterprise.xilinx.com/VitisAI-CP/vai_q_onnx/blob/dev/README.md).
+## Create conda env and Install necessary packages
+Create conda environment and Install VAI_Q_ONNX from the release wheel package or refer to [README](../../../tutorial/RyzenAI_quant_tutorial/Docs/ONNX_README.md).
 
 Install the necessary python packages:
 ```
