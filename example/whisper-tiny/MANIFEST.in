@@ -1,4 +1,0 @@
-include whisper/assets/*
-include whisper/assets/gpt2/*
-include whisper/assets/multilingual/*
-include whisper/normalizers/english.json
