@@ -14,7 +14,8 @@ Create conda environment and Install VAI_Q_ONNX from the release wheel package o
 
 Install the necessary python packages:
 ```
-python -m pip install -r requirements.txt
+$ conda activate $env_name
+$ python -m pip install -r requirements.txt
 ```
 
 ## Prepare the data and the model
