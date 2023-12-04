@@ -27,7 +27,7 @@ pip install ops\cpp --force-reinstall
 
 Please refer to [OPT-ONNX](models/opt-onnx/README.MD)
 
-Please refer to [VISION-TRANSFORMER-ONNX](models/vision-transformer-onnx/README.MD)
+Please refer to [VISION-TRANSFORMER-ONNX](models/vision-transformer-onnx)
 
 # Run Transformers
 
