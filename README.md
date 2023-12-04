@@ -9,8 +9,9 @@ This repository contains the demos, examples and tutorials, demonstrating usage 
     
 ## Examples
 
-- [Run LLM OPT-1.3B model with ONNXRuntime](example/opt-1.3b/opt-onnx)
-- [Run LLM OPT-1.3B model with PyTorch](example/opt-1.3b/opt-pytorch)
+- [Run Vision-Transformer model with ONNXRuntime](example/transformers/vision-transformer-onnx)
+- [Run LLM OPT-1.3B model with ONNXRuntime](example/transformers/opt-onnx)
+- [Run LLM OPT-1.3B model with PyTorch](example/transformers/opt-pytorch)
 - [Run multiple concurrent AI applications with ONNXRuntime](example/multi-model)
 - [Real-time object detection with Yolov8](example/yolov8)
 

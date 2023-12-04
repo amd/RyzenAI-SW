@@ -8,7 +8,7 @@ import time
 import gc
 import os
 import sys 
-sys.path.append("../opt") 
+sys.path.append("../opt-pytorch") 
 from model_utils import warmup, decode_prompts, perplexity
 from transformers import set_seed
 from transformers import AutoTokenizer
