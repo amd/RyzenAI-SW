@@ -10,7 +10,7 @@
 
 - Version:      Ryzen AI Software v1.0 
 - Support:      AMD Ryzen 7040U, 7040HS series mobile processors with Windows 11 OS.
-- Last update:  30 Nov. 2023
+- Last update:  4 Dec. 2023
 
 
 ## Table of Contents
@@ -245,7 +245,7 @@ The output will be generated as below.
 
 To validate your setup, the following command will do the inference with single image.
 
-Please modify the ***conda env name*** in the batch file before execution.
+Please modify the ***conda env path*** in the batch file before execution.
 
 ```
 # run_jpeg.bat DetectionModel_int.onnx sample_yolov8.jpg
