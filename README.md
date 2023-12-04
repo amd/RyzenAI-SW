@@ -14,6 +14,7 @@ This repository contains the demos, examples and tutorials, demonstrating usage 
 - [Run LLM OPT-1.3B model with ONNXRuntime](example/transformers/opt-onnx)
 - [Run LLM OPT-1.3B model with PyTorch](example/transformers/opt-pytorch)
 - [Run Vision-Transformer model with ONNXRuntime](example/transformers/vision-transformer-onnx)
+- [Run ONNX end-to-end examples with custom pre/post-processing nodes running on IPU](https://github.com/amd/RyzenAI-SW/tree/main/example/onnx-e2e)
 
 ## Demos
 
