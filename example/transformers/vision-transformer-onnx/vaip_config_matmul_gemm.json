@@ -1,0 +1,62 @@
+{
+  "passes": [
+    {
+      "name": "init",
+      "plugin": "vaip-pass_init"
+    },
+    {
+      "name": "fuse_GEMM",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": true,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_GEMM",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_QDQ_GEMM",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_GEMM_qdq",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_QDQ_MATMUL",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_QDQ_MATMUL",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_resize_norm",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_resize_norm",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_decode_filter_boxes",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_decode_filter_boxes",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_NMS",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": true,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_NMS",
+        "methodName": "rules"
+      }
+    }
+  ]
+}

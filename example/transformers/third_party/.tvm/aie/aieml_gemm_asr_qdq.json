@@ -1,0 +1,302 @@
+{
+  "TARGET" : "aieml-gemm-asr-qdq",
+  "HW_VER" : "0.0.1",
+  "XRT_KERNEL_ARGS" : 5,
+  "AIE_INFO": {
+    "ROWS": 8,
+    "COLS": 32,
+    "SHIM_BD": {
+      "STEP_BITS": 19,
+      "WRAP_BITS": 10,
+      "PAD_BITS": 0,
+      "BUFLEN_BITS": 31,
+      "DATA_GRANULARITY": 4,
+      "REPEAT_COUNT_BITS": 8,
+      "ITERATION_WRAP_BITS": 6
+    },
+    "DMA_BD": {
+      "STEP_BITS": 16,
+      "WRAP_BITS": 10,
+      "PAD_BITS": 4,
+      "BUFLEN_BITS": 17,
+      "DATA_GRANULARITY": 4,
+      "REPEAT_COUNT_BITS": 8,
+      "ITERATION_WRAP_BITS": 6
+    }
+  },
+  "SUPERKERNEL_INFO": {
+    "INSTR_BUFFER_BYTES": 8192,
+    "KERNEL_IN_SEL": [0, 1]
+  },
+  "INSTR_INFO": {
+    "TOTAL_SIZE_BYTES": 4,
+    "PAD_SIZE_BYTES": 4,
+    "INSTR_SIZE_BYTES": 2,
+    "CORE_MASK_BYTES": 4,
+    "OUT_SIZE_BYTES": 4,
+    "SIZE_BYTES": 4,
+    "OPCODE_SIZE": 8,
+    "CONF_SIZE": 24,
+    "DATA_SIZE": 0,
+    "CONFIG": {
+      "init": {
+        "CONF_SHIFT": 16,
+        "RESET": 1,
+        "VALUE": {
+          "1": 1
+        }
+      },
+      "out": {
+        "CONF_SHIFT": 16,
+        "RESET": 2,
+        "VALUE": {
+          "1": 2
+        }
+      },
+      "ACQUIRE_A": {
+        "CONF_SHIFT": 16,
+        "RESET": 4,
+        "VALUE": {
+          "1": 4
+        }
+      },
+      "ACQUIRE_B": {
+        "CONF_SHIFT": 16,
+        "RESET": 8,
+        "VALUE": {
+          "1": 8
+        }
+      },
+      "fused_out": {
+        "CONF_SHIFT": 16,
+        "RESET": 16,
+        "VALUE": {
+          "1": 16
+        }
+      },
+      "inplace": {
+        "CONF_SHIFT": 16,
+        "RESET": 32,
+        "VALUE": {
+          "1": 32
+        }
+      },
+      "IN_SEL_A": {
+        "CONF_SHIFT": 12,
+        "RESET": 15,
+        "VALUE": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5
+        }
+      },
+      "IN_SEL_B": {
+        "CONF_SHIFT": 8,
+        "RESET": 15,
+        "VALUE": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5
+        }
+      },
+      "OUT_SEL": {
+        "CONF_SHIFT": 0,
+        "RESET": 15,
+        "VALUE": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5
+        }
+      }
+    }
+  },
+  "NODES": {
+    "GEMM": [[[0, 1], [0, 4]]],
+    "MISC": [[[1, 1], [0, 4]]]
+  },
+  "DATATYPE_CODE": {
+    "int8": 0,
+    "int16": 1,
+    "uint16": 2
+  },
+  "OPS" : {
+    "gemm": {
+      "OPCODE": 1,
+      "CONFIG": {},
+      "ATTRS": {
+        "PM": 1,
+        "PN": 1,
+        "QM": 1,
+        "QN": 1,
+        "TM": 4,
+        "TK": 8,
+        "TN": 8,
+        "TDM": 4,
+        "TDN": 2,
+        "M0": 4,
+        "K0": 8,
+        "N0": 8
+      },
+      "NODES": ["GEMM"]
+    },
+    "requantize": {
+      "OPCODE": 4,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 1024
+      },
+      "NODES": ["GEMM"]
+    },
+    "qnn.aie.gelu_0": {
+      "OPCODE": 5,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 2048
+      },
+      "NODES": ["MISC"]
+    },
+    "qnn.aie.softmax_0": {
+      "OPCODE": 7,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 8,
+        "TN": 512,
+        "M0": 1,
+        "N0": 4
+      },
+      "NODES": ["MISC"]
+    },
+    "qnn.tanh_0": {
+      "OPCODE": 9,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 1024
+      },
+      "NODES": ["MISC"]
+    },
+    "slice_0":  {
+      "OPCODE": 11,
+      "CONFIG": {},
+      "ATTRS": {
+        "VECTOR_SIZE": 8
+      },
+      "NODES": ["GEMM"]
+    },
+    "dense_subtract_weight_zp_cross_terms_0": {
+      "OPCODE": 12,
+      "CONFIG": {},
+      "ATTRS": {
+      },
+      "NODES": ["GEMM"]
+    },
+    "qnn.add_0": {
+      "OPCODE": 13,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "int16", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "N_MAX": 1500,
+        "N_MIN": 64
+      },
+      "NODES": ["MISC"]
+    },
+    "qnn.mul_0": {
+      "OPCODE": 14,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "int16", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "N_MAX": 1500,
+        "N_MIN": 64
+      },
+      "NODES": ["MISC"]
+    },
+    "qnn.sigmoid_0": {
+      "OPCODE": 15,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 1024
+      },
+      "NODES": ["MISC"]
+    },
+    "qnn.aie.layer_norm_0": {
+      "OPCODE": 6,
+      "CONFIG": {},
+      "IN_DATATYPES": [["int8", "uint16"]],
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 4,
+        "TN": 128,
+        "M0": 1,
+        "N0": 8
+      },
+      "NODES": ["GEMM"]
+    },
+    "shuffle_0": {
+      "OPCODE": 11,
+      "CONFIG": {},
+      "ATTRS": {"QN": 1,"shuffle_mode_int8_8x4": 47,"shuffle_mode_int16_8x4": 29},
+      "NODES": ["MISC"]
+    },
+    "qnn.concatenate_0": {
+      "OPCODE": 16,
+      "CONFIG": {},
+      "ATTRS": {"QN": 1},
+      "NODES": ["MISC"]
+    }
+
+  },
+  "SUPPORTED_RELAY_OPS": [
+    "qnn.aie.batch_matmul",
+    "qnn.aie.matmul",
+    "qnn.requantize",
+    "qnn.add",
+    "transpose",
+    "qnn.mul",
+    "qnn.aie.gelu",
+    "qnn.aie.softmax",
+    "qnn.tanh",
+    "qnn.sigmoid",
+    "qnn.aie.layer_norm",
+    "qnn.concatenate"
+  ]
+}
+
