@@ -1,2 +1,0 @@
-from whisper.normalizers.basic import BasicTextNormalizer
-from whisper.normalizers.english import EnglishTextNormalizer

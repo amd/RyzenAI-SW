@@ -1,6 +1,12 @@
 set XLNX_VART_FIRMWARE=%cd%\..\1x4.xclbin
-@REM set XILINX_XRT=%cd%\..\xrt
+set VITISAI_EP_JSON_CONFIG=%cd%\..\vaip_config.json
+:: please setup your conda env path below. For example, C:\Users\AMD\anaconda3\envs\ryzen_ai
+set ENV_PATH=<YOUR-CONDA-ENV-PATH>
 
-set PATH=%cd%\..\bin;%cd%\..\python;%cd%\..;%PATH%;C:\Program Files\gflags\bin;C:\Program Files\glog\bin
+set PATH=%cd%\..\lib;%ENV_PATH%;%PATH%;C:\Program Files\gflags\bin;C:\Program Files\glog\bin
+
 ::the following two paths does not work in embedded python. To edit path for embbed python, change .pth file in the python folder
-%cd%\..\bin\test_jpeg_yolov8.exe %1 %2
+set PATHONHOME=%ENV_PATH%
+set PYTHONPATH=%ENV_PATH%\Lib;%ENV_PATH%\DLLs
+
+%cd%\..\bin\test_jpeg_yolov8.exe .\DetectionModel_int.onnx .\sample_yolov8.jpg

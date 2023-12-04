@@ -1,0 +1,9 @@
+numpy
+onnx
+onnxruntime-gpu>=1.15.0
+onnxruntime_extensions
+timm
+torch
+torchvision
+rich
+

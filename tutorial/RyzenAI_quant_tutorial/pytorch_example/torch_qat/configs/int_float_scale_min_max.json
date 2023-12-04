@@ -1,0 +1,49 @@
+{
+  "convert_relu6_to_relu": false,
+  "convert_silu_to_hswish": false,
+  "keep_first_last_layer_accuracy": false,
+  "keep_add_layer_accuracy": false,
+  "target_device": "CPU",
+  "onnx_opset_version": 14,
+  "quantizable_data_type": [
+    "input",
+    "weights",
+    "bias",
+    "activation"
+  ],
+  "overall_quantize_config": {
+    "datatype": "int",
+    "bit_width": 8,
+    "round_mode": "half_even",
+    "scale_type": "float",
+    "calib_statistic_method":"mean"
+  },
+  "tensor_quantize_config": {
+    "weights": {
+      "symmetry": true,
+      "per_channel": true,
+      "method": "maxmin",
+      "signed": true,
+      "narrow_range": true
+    },
+    "bias": {
+      "symmetry": true,
+      "per_channel": true,
+      "method": "maxmin",
+      "signed": true,
+      "narrow_range": true
+    },
+    "input": {
+      "symmetry": false,
+      "method": "moving_avg_max_min",
+      "per_channel": false,
+      "signed": false
+    },
+    "activation": {
+      "symmetry": false,
+      "method": "moving_avg_max_min",
+      "per_channel": false,
+      "signed": false
+    }
+  }
+}
