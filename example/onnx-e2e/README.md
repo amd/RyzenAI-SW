@@ -22,20 +22,15 @@ enables running end-to-end ML inference on different Execution Providers.
 The current pre/post processing OPs available can be found in [vitis_customop](./vitis_customop)
 
 ## Setup
-- [Add an IPU device driver and XRT](https://mkmartifactory.amd.com/artifactory/atg-cvml-generic-local/builds/ipu/Nightly/atg-dev/jenkins-CVML-IPU_Driver-ipu-windows-nightly-877/Release/)
 
-### Install Vitis-AI Execution Provider
-- [Download onnx-rt package](http://xcoartifactory/artifactory/vai-rt-ipu-prod-local/com/amd/onnx-rt/phx/dev/603/windows/voe-4.0-win_amd64.zip)
-- Install the package
-```powershell
-pip install --upgrade --force-reinstall onnxruntime_vitisai-1.15.1-cp39-cp39-win_amd64.whl
-pip install --upgrade --force-reinstall voe-0.1.0-cp39-cp39-win_amd64.whl
-python installer.py
-```
+Please ensure you have installed Ryzen-AI Software by following the official installation page
+
+https://ryzenai.docs.amd.com/en/latest/inst.html
+
+Ensure driver and [Vitis-AI Execution Provider](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-vitis-ai-execution-provider) is installed properly
 
 ### Create conda environment
 
-:pushpin: [Download & Install Anaconda](https://www.anaconda.com/download)
 
 ```powershell
 conda env create --file setup/env.yml
