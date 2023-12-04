@@ -98,10 +98,10 @@ def main():
         input_model_path,
         output_model_path,
         dr,
-        quant_format=QuantFormat.QDQ,
+        quant_format=vai_q_onnx.QuantFormat.QDQ,
         calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
-        activation_type=QuantType.QInt8,
-        weight_type=QuantType.QInt8,
+        activation_type=vai_q_onnx.QuantType.QUInt8,
+        weight_type=vai_q_onnx.QuantType.QInt8,
         enable_dpu=True, 
         extra_options={'ActivationSymmetric': True} 
     )
