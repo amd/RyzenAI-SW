@@ -25,11 +25,7 @@ The current pre/post processing OPs available can be found in [vitis_customop](.
 
 ### Ensure IPU Driver installation
 
-Please ensure you have installed Ryzen-AI Software by following the official installation page
-
-https://ryzenai.docs.amd.com/en/latest/inst.html
-
-Ensure IPU driver and [Vitis-AI Execution Provider](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-vitis-ai-execution-provider) is installed properly
+Ensure [IPU Driver](https://ryzenai.docs.amd.com/en/latest/inst.html) is installed as per the official installation page
 
 ### Create conda environment
 
