@@ -26,7 +26,7 @@ CNN and GEMM Operators of Vision Transformer models.
   .\setup.bat
 
   ## Navigate back to models/vision_transformer_onnx
-  cd models\vision_transformer_onnx
+  cd vision-transformer-onnx
 
   ## Run setup for examples
   .\setup.bat
