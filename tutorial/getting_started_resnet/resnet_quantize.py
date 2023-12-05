@@ -80,7 +80,7 @@ def main():
     # `calibration_dataset_path` is the path to the dataset used for calibration during quantization.
     calibration_dataset_path = "data/"
 
-    # `dr` (Data Reader) is an instance of ResNet50DataReader, which is a utility class that 
+    # `dr` (Data Reader) is an instance of ResNetDataReader, which is a utility class that 
     # reads the calibration dataset and prepares it for the quantization process.
     dr = resnet_calibration_reader(calibration_dataset_path)
 
@@ -98,10 +98,10 @@ def main():
         input_model_path,
         output_model_path,
         dr,
-        quant_format=QuantFormat.QDQ,
+        quant_format=vai_q_onnx.QuantFormat.QDQ,
         calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
-        activation_type=QuantType.QInt8,
-        weight_type=QuantType.QInt8,
+        activation_type=vai_q_onnx.QuantType.QUInt8,
+        weight_type=vai_q_onnx.QuantType.QInt8,
         enable_dpu=True, 
         extra_options={'ActivationSymmetric': True} 
     )
