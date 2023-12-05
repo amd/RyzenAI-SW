@@ -23,31 +23,29 @@ The current pre/post processing OPs available can be found in [vitis_customop](.
 
 ## Setup
 
+### Ensure IPU Driver installation
+
 Please ensure you have installed Ryzen-AI Software by following the official installation page
 
 https://ryzenai.docs.amd.com/en/latest/inst.html
 
 Ensure IPU driver and [Vitis-AI Execution Provider](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-vitis-ai-execution-provider) is installed properly
 
-Open Anaconda Prompt 
-
-```
-git clone https://github.com/amd/RyzenAI-SW.git
-cd RyzenAI-SW\example\onnx-e2e
-```
-
 ### Create conda environment
 
+Open Anaconda environment and create conda environment
 
 ```powershell
+git clone https://github.com/amd/RyzenAI-SW.git
+cd RyzenAI-SW\example\onnx-e2e
 conda env create --file setup/env.yml
-```
-
-- Activate conda environment
-
-```powershell
 conda activate onnx-vai
 ```
+
+### Install Vitis AI Execution Provider package
+
+Download [Setup package](https://ryzenai.docs.amd.com/en/latest/manual_installation.html) and install [Vitis AI Execution Provider](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-vitis-ai-execution-provider)
+
 
 ## Examples
 
