@@ -55,7 +55,7 @@ cd ..\..
 .\setup.bat
 
 ## Navigate back to models/vision_transformer_onnx
-cd models\vision_transformer_onnx
+cd opt-onnx
 
 ## Run setup for examples
 .\setup.bat
