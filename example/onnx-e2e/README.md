@@ -27,7 +27,14 @@ Please ensure you have installed Ryzen-AI Software by following the official ins
 
 https://ryzenai.docs.amd.com/en/latest/inst.html
 
-Ensure driver and [Vitis-AI Execution Provider](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-vitis-ai-execution-provider) is installed properly
+Ensure IPU driver and [Vitis-AI Execution Provider](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-vitis-ai-execution-provider) is installed properly
+
+Open Anaconda Prompt 
+
+```
+git clone https://github.com/amd/RyzenAI-SW.git
+cd RyzenAI-SW\example\onnx-e2e
+```
 
 ### Create conda environment
 
