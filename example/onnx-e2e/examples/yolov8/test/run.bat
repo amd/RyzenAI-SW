@@ -73,10 +73,10 @@ set ITERATIONS= 1
     set "IMAGE=%~2"
     shift & shift
   ) else if /I "%~1" == "--iterations" (
-    set "ITERATIONS= %~2"
+    set "ITERATIONS=%~2"
     shift & shift
   ) else if /I "%~1" == "--voe-path" (
-    set "PKG= %~2"
+    set "PKG=%~2"
     shift & shift
   ) else if /I "%~1" == "--debug-msgs" (
     set DEBUG_FUSE_DEVICE_SUBGRAPH=0
