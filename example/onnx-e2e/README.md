@@ -38,7 +38,7 @@ conda env create --file setup/env.yml
 conda activate onnx-vai
 ```
 
-### Install Vitis AI Execution Provider package
+### Install Vitis AI Execution Provider
 
 1. Download and extract [Ryzen AI Software installation package](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#download-the-package) 
 
