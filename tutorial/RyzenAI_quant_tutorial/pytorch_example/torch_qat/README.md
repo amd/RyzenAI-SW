@@ -160,7 +160,7 @@ This quantizer supports learnable scale and the scale type is float. The scale f
   "method": "lsq",
   "calib_statistic_method": "mean"
 }
-    ```
+```
 
 - Note: `calib_statistic_method=mean` is used for avoiding code error, not effect in QAT.
 
@@ -184,7 +184,9 @@ Overview： During training in each quantizer a model called observer does the s
 |                  bit width                   |                        4, 6, 8                         |
 |   ch_axis (effect under per_channel mode)    |           axis index to perform quantization           |
 
-- ```json
+- 
+```
+  ```json
   "overall_quantize_config": {
     "datatype": "int",
     "bit_width": 8,
