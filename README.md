@@ -23,7 +23,7 @@ This repository contains the demos, examples and tutorials, demonstrating usage 
 
 ## Tutorials
 
-- [A Getting Started Tutorial with a ResNet50 model](tutorial/getting_started_resnet)
+- [A Getting Started Tutorial with a fine-tuned ResNet model](tutorial/getting_started_resnet)
 - [End-to-end Object Detection](tutorial/yolov8_e2e)
 - [Quantization for Ryzen AI](tutorial/RyzenAI_quant_tutorial)
 
