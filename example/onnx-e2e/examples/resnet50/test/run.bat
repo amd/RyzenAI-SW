@@ -14,6 +14,7 @@
 :: the License.
 ::
 @ECHO OFF
+setlocal
 
 @REM Save intermediate results from model compilation
 set XLNX_ENABLE_DUMP_XIR_MODEL=0
@@ -39,6 +40,7 @@ set XLNX_USE_SHARED_CONTEXT=1
 set DEBUG_DECODE_FITLER_BOX_CUSTOM_OP=0
 set DEBUG_RESIZE_NORM_CUSTOM_OP=0
 set DEBUG_DPU_CUSTOM_OP=0
+set NUM_OF_DPU_RUNNERS=1
 
 @REM Init
 set "__BAT_FILE=%~0"
@@ -78,27 +80,6 @@ set ITERATIONS= 1
   ) else if /I "%~1" == "--voe-path" (
     set "PKG=%~2"
     shift & shift
-  ) else if /I "%~1" == "--debug-msgs" (
-    set DEBUG_FUSE_DEVICE_SUBGRAPH=0
-    set DEBUG_VAIP_PY_EXT=0
-    set DEBUG_DPU_CUSTOM_OP=1
-    set DEBUG_RESIZE_NORM_CUSTOM_OP=1
-    set DEBUG_DECODE_FITLER_BOX_CUSTOM_OP=1
-    shift
-  ) else if /I "%~1" == "--save-inter-models" (
-    set XLNX_ENABLE_DUMP_XIR_MODEL=1
-    set XLNX_ENABLE_DUMP_ONNX_MODEL=1
-    set ENABLE_SAVE_ONNX_MODEL=1
-    shift
-  ) else if /I "%~1" == "--profile" (
-    set DEEPHI_PROFILING=1
-    shift
-  ) else if /I "%~1" == "--copy-dll" (
-    echo - Copying DLLs from: %~2, to: %PKG% 
-    copy "%~2"\install\bin\*.dll %PKG%\bin > NUL 2>&1
-    copy "%~2"\install\bin\*.dll %PKG%\python\Lib\site-packages\onnxruntime\capi > NUL 2>&1
-    copy "%~2"\build\tmp\python\Lib\site-packages\voe\*.pyd %PKG%\python\Lib\site-packages\voe > NUL 2>&1
-    shift & shift
   ) else if /I "%~1" == "" (
     goto RUN
   ) else (
@@ -109,19 +90,23 @@ set ITERATIONS= 1
   )
 if not (%1)==() goto GETOPTS
 
-@REM Python, XCLBIN and CONFIG paths
-set PYPATH=%PKG%\python
+@REM XCLBIN and CONFIG paths
 set VAIP_CONFIG=%PKG%\vaip_config.json
 set XLNX_VART_FIRMWARE=%PKG%\1x4.xclbin
 
 :: Run Detection
 :RUN 
     if exist %CONDA_PREFIX%\Lib\site-packages\voe (
-      echo - Running with Anaconda env python 
-      python run.py %HELP% %E2E% %EXEC_PROVIDER% %OP_PROFILE% %POWER_PROFILE% %E2E_PROFILE% --config %VAIP_CONFIG% --img %IMAGE% --iterations %ITERATIONS% --voe-path %PKG%
-    ) else (
-      echo - Running with Packaged python
-      %PYPATH%\python run.py %HELP% %E2E% %EXEC_PROVIDER% %OP_PROFILE% %POWER_PROFILE% %E2E_PROFILE% --config %VAIP_CONFIG% --img %IMAGE% --iterations %ITERATIONS%
+      echo - Running with Anaconda env python
+      if defined EXEC_PROVIDER (
+          if not defined PKG (
+            echo - Provide the voe package path
+          ) else (
+             python run.py %HELP% %E2E% %EXEC_PROVIDER% %OP_PROFILE% %POWER_PROFILE% %E2E_PROFILE% --config %VAIP_CONFIG% --img %IMAGE% --iterations %ITERATIONS% 
+          ) 
+      ) else (
+          python run.py %HELP% %E2E% %OP_PROFILE% %POWER_PROFILE% %E2E_PROFILE%  --img %IMAGE% --iterations %ITERATIONS% 
+      )
     )
     goto :eof
 
