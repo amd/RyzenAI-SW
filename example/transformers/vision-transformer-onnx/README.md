@@ -20,7 +20,7 @@ CNN and GEMM Operators of Vision Transformer models.
 
   ```
   ## On Anaconda Command Prompt, go to transformers root directory
-  cd ..\..
+  cd ..
 
   ## Run setup script
   setup.bat
