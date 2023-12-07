@@ -49,7 +49,7 @@ Please refer to the [manual installation instructions](https://ryzenai.docs.amd.
 
 ```
 ## On Anaconda Command Prompt, go to transformers root directory
-cd ..\..
+cd ..
 
 ## Run setup script
 setup.bat
