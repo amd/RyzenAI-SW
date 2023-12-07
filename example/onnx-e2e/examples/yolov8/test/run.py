@@ -460,7 +460,6 @@ if __name__ == "__main__":
         help="Run e2e model (with pre/post processing)",
     )
     parser.add_argument("--img", type=str, required=True, help="Path to input image.")
-    parser.add_argument("--voe-path", type=str, default="", help="Path to voe package")
     parser.add_argument(
         "--conf-thres", type=float, default=float(0.25), help="Confidence threshold"
     )
