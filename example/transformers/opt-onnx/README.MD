@@ -45,27 +45,27 @@ The flow consists of the sequence of steps enumerated below.
 conda activate ryzenai-transformers
 ```
 
-Please refer to the [manual installation instructions](https://ryzenai.docs.amd.com/en/latest/inst.html#) to properlly install the Ryzen AI software.
+Please refer to the [manual installation instructions](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#install-the-onnx-runtime) to properlly install the Ryzen AI software.
 
 ```
 ## On Anaconda Command Prompt, go to transformers root directory
-cd ..\..
+cd ..
 
 ## Run setup script
-.\setup.bat
+setup.bat
 
-## Navigate back to models/vision_transformer_onnx
+## Navigate back to opt-onnx
 cd opt-onnx
 
 ## Run setup for examples
-.\setup.bat
+setup.bat
 ```
 
 
 
 ## Step 2 - Generate ort dynamic quantized model
 ```
-.\prepare_model.bat opt-1.3b
+prepare_model.bat opt-1.3b
 ```
 This script creates the directory `<model_name>_ortquantized`.
 
@@ -78,7 +78,7 @@ This script gives option to do the following:
 
 Run the following batch script to set the required environment variables:
   ```
-  .\set_opt_onnx_env.bat opt-1.3b
+  set_opt_onnx_env.bat opt-1.3b
   ```
 
 Then, you can use `run.py` to run the model.
@@ -118,7 +118,7 @@ Xilinx is a global leader in the design and manufacture of integrated circuits, 
 ```
 
 ### Profiling
-To enable token time calculation, use `--amdort` flag. To understand more about how it is measured, please look at the detailed description [here](../opt/README.MD#profiling).
+To enable token time calculation, use `--amdort` flag. To understand more about how it is measured, please look at the detailed description [here](../opt-onnx/README.MD#profiling).
 
 One example is given below:
 ```

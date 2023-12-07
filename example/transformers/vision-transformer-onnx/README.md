@@ -20,16 +20,16 @@ CNN and GEMM Operators of Vision Transformer models.
 
   ```
   ## On Anaconda Command Prompt, go to transformers root directory
-  cd ..\..
+  cd ..
 
   ## Run setup script
-  .\setup.bat
+  setup.bat
 
-  ## Navigate back to models/vision_transformer_onnx
+  ## Navigate back to vision-transformer-onnx
   cd vision-transformer-onnx
 
   ## Run setup for examples
-  .\setup.bat
+  setup.bat
   ```
 
 - Run model
@@ -40,13 +40,13 @@ CNN and GEMM Operators of Vision Transformer models.
 
   ```
   ## Check usage
-  .\classify.bat --help
+  classify.bat --help
 
   ## With CPU-EP
-  .\classify.bat --model <path-to-onnx-model> --ep cpu --img <path-to-image>
+  classify.bat --model <path-to-onnx-model> --ep cpu --img <path-to-image>
 
   ## With VAI-EP
-  .\classify.bat --model <path-to-onnx-model> --img <path-to-image>
+  classify.bat --model <path-to-onnx-model> --img <path-to-image>
   ```
 
 - Run multiple models
