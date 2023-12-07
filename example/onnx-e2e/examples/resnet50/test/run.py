@@ -314,7 +314,6 @@ def main(args):
     parser.add_argument(
         "--power-profile", action="store_true", default=False, help="Power profiling"
     )
-    parser.add_argument("--voe-path", type=str, default="", help="Path to voe package")
     parser.add_argument(
         "--operator-profile",
         action="store_true",
