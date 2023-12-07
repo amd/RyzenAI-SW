@@ -37,13 +37,13 @@ cd test
 :caution: **The shape of input image should be same as the image that was used for generating model**
 
 ## CPU EP
-.\run.bat --e2e --img <image-path> --voe-path <path to voe package>
+.\run.bat --e2e --img <image-path> 
 
 # VitisAI EP
 .\run.bat --e2e --vai-ep --img <image-path> --voe-path <path to voe package>
 
 ## operator level profiling on CPU EP 
-.\run.bat --e2e --img <image-path> --op-profile --voe-path <path to voe package>
+.\run.bat --e2e --img <image-path> --op-profile 
 
 # operator level profiling on VitisAI EP
 .\run.bat --e2e --vai-ep --img <image-path> --op-profile --voe-path <path to voe package>
@@ -89,13 +89,13 @@ cd test
 :caution: **The shape of input image should be same as the image that was used for generating model**
 
 ## CPU EP
-.\run.bat --e2e --img <image-path> --voe-path <path to voe package>
+.\run.bat --e2e --img <image-path> 
 
 # VitisAI EP
 .\run.bat --e2e --vai-ep --img <image-path> --voe-path <path to voe package>
 
 ## operator level profiling on CPU EP 
-.\run.bat --e2e --img <image-path> --op-profile --voe-path <path to voe package>
+.\run.bat --e2e --img <image-path> --op-profile 
 
 # operator level profiling on VitisAI EP
 .\run.bat --e2e --vai-ep --img <image-path> --op-profile --voe-path <path to voe package>
