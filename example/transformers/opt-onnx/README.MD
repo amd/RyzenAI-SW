@@ -118,7 +118,7 @@ Xilinx is a global leader in the design and manufacture of integrated circuits, 
 ```
 
 ### Profiling
-To enable token time calculation, use `--amdort` flag. To understand more about how it is measured, please look at the detailed description [here](../opt/README.MD#profiling).
+To enable token time calculation, use `--amdort` flag. To understand more about how it is measured, please look at the detailed description [here](../opt-onnx/README.MD#profiling).
 
 One example is given below:
 ```
