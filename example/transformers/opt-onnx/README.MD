@@ -41,6 +41,9 @@ The flow consists of the sequence of steps enumerated below.
 
 ## Step 1 - Install Ryzen AI package:
 
+Please ensure that you followed the instructions from the [Transformer folder readme](../README.md) before following the steps and created `ryzenai-transformers` environment
+
+
 ```
 conda activate ryzenai-transformers
 ```
@@ -58,7 +61,7 @@ setup.bat
 cd opt-onnx
 
 ## Run setup for examples
-setup.bat
+set_opt_onnx_env.bat
 ```
 
 
