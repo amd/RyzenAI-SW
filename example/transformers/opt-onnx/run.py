@@ -16,6 +16,7 @@ import pathlib
 from profiler import ProfileAIE
 
 import smooth
+import builtins
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 print(CURRENT_DIR.parent)
@@ -33,6 +34,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(f"{args}")
+
+    builtins.impl="v0"
 
     log_dir = "./logs_%s"%args.model_name
     if not os.path.exists(log_dir):
