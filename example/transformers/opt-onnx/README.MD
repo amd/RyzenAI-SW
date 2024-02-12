@@ -41,7 +41,7 @@ The flow consists of the sequence of steps enumerated below.
 
 ## Step 1 - Install Ryzen AI package:
 
-Please ensure that you followed the instructions from the [Transformer folder readme](../README.md) before following the steps and created `ryzenai-transformers` environment
+Please ensure that you followed the instructions from the [Transformer folder readme](../README.MD) before following the steps and created `ryzenai-transformers` environment
 
 
 ```
