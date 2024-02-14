@@ -73,8 +73,7 @@ The following models are used:
 ## 3 Demo Setup
 
 ### 3.1 Environment Setup 
-
-Please make sure the IPU driver has been installed by following the instructions on the [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com/en/latest). The IPU driver version >= 10.106.8.62 has been tested. The older version might work but no guaranteed. 
+Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. Make sure the IPU driver has been installed by following the instructions on the [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com/en/latest). The IPU driver version >= 10.106.8.62 has been tested. The older version might work but no guaranteed. 
 
 1. Follow these steps to install Anaconda on your system if it has not been installed:
 
@@ -129,6 +128,8 @@ Please make sure the IPU driver has been installed by following the instructions
 
 ## 4 Run The Demo
 
+
+Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt*** 
 You can load and run the models one by one: 
 run_mobile_net_v2.bat
 
@@ -153,4 +154,4 @@ run_modelx4.bat
 
 - Python version version 3.9 is required if not "The code execution cannot proceed because python39.dll was not found. Reinstalling he programm may fix this problem"
 - If you find an exclamation mark on the icon of the AMD IPU device in the System Devices list in your Device Manager, it indicates that there is an issue with your driver installation, and the program may not function correctly.
-- If this demo aborted with the 'glog.dll cannot be found' error, you need to use the command 'set PATH=C:<path-to-conda-glog>;%PATH%' to explicitly export the path to 'glog.dll'. 'glog.dll' is installed along with ANACONDA3. The recommended ANACONDA3 installer is 'Anaconda3-2023.07-2-Windows-x86_64'.
+- If this demo aborted with the 'glog.dll cannot be found' error, you need to use the command 'set PATH=path-to-conda-glog;%PATH%' to explicitly export the path to 'glog.dll'. 'glog.dll' is installed along with ANACONDA3. The recommended ANACONDA3 installer is 'Anaconda3-2023.07-2-Windows-x86_64'.
