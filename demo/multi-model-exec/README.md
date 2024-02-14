@@ -20,7 +20,9 @@
 
 ## 1 Introduction
 
-This is the demo of showing multiple AI models running concurrently on Ryzen AI. The following models are used:
+This is the demo of showing multiple AI models running concurrently on Ryzen AI. Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***, if you perform this demo in ***Windows Powershell***, some errors will occur.
+
+The following models are used:
 - MobileNet_v2
 - ResNet50
 - Retinaface
