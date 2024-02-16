@@ -1,0 +1,9 @@
+auth_key: your_auth_key
+instance_count: 1
+session_options:
+  endpoint_type: triton
+  uri: https://my_endpoint_name.my_region.inference.ml.azure.com
+  model_name: RetinaFace
+  model_version: '1'
+  verbose: False
+

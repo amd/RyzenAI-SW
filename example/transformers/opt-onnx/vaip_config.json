@@ -1,0 +1,35 @@
+{
+  "passes": [
+    {
+      "name": "init",
+      "plugin": "vaip-pass_init"
+    },
+    {
+      "name": "fuse_GEMM",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_GEMM",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_MATMUL",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_MATMUL",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_MATMULINTEGER",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_MATMULINTEGER",
+        "methodName": "rules"
+      }
+    }
+  ]
+}
