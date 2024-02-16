@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AMD</title>
+    <!--
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
+    -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery-ui.min.js"></script>
+    <script src="/static/js/plotly-2.20.0.min.js" charset="utf-8"></script>
+    <script src="/static/js/drawboxes.js"></script>
+    <script src="/static/js/index.js"></script>
+    <link href="/static/css/index.css" rel="stylesheet" />
+  </head>
+  <body class="p-4">
+    <div class="container-fluid">
+      <img src="https://companieslogo.com/img/orig/AMD_BIG.D-7dc90896.png?t=1632720791" width="200px" class="py-2" />
+      <div class="input-group mb-3 mt-3">
+        <input class="form-control" type="text" id="form-path" placeholder="Path to scan" />
+        <button type="button" class="ms-1 btn btn-primary px-3 go-btn" data-backend="ipu">Scan with Ryzen AI</button>
+        <button type="button" class="ms-1 btn btn-primary px-3 go-btn" data-backend="azure">Scan with Azure ONNX EP</button>
+      </div>
+      <div id="canvas">
+        <div class="gallery">
+          <div class="row">
+           <div class="col-9 stream1">
+            <h4>stream 1: object detection</h4>
+            <div class="carousel text-nowrap overflow-hidden"></div>
+            <div class="count pb-2"></div>
+           </div>
+           <div class="col-3 pr-1">
+            <!-- histogram -->
+            <div id="s1-hist" class="stream-hist"></div>
+           </div>
+          </div>
+
+          <div class="row">
+           <div class="col-9 stream2">
+            <h4>stream 2: face detection</h4>
+            <div class="carousel text-nowrap overflow-hidden"></div>
+            <div class="count"></div>
+           </div>
+           <div class="col-3 pr-1">
+            <!-- histogram -->
+            <div id="s2-hist" class="stream-hist"></div>
+           </div>
+          </div>
+
+        </div>
+      </div> <!--canvas-->
+
+      <div id="search-widget">
+       <div class="input-group mb-3 mt-3">
+         <input class="form-control" type="text" id="form-search" placeholder="Search image database" />
+         <button type="button" class="btn btn-primary px-4" id="search">Search</button>
+       </div>
+       <div id="search-results"></div>
+      </div>
+
+    </div>
+    
+    <script>
+      var drawbox = new DeepRect();
+      var clientId = -1;
+      var imgId = 0;
+      var imgObjects = {};
+      var imgFaces = {};
+      var labelImgCounts = {};
+      var faceCounts = {};
+
+      function initHistogram(selector) {
+        var x = [];
+        var y = [];
+        var trace = {
+            x: x,
+            y: y,
+            type: 'bar'
+        };
+        var layout = {
+          bargap: 0.1,
+          paper_bgcolor: "#212529",
+          plot_bgcolor: "#212529",
+          margin: {
+            t: 25,
+            b: 50,
+            r: 20,
+            l: 30
+          },
+          xaxis: {
+              color: "rgb(200,200,200)"
+          },
+          yaxis: {
+              color: "rgb(200,200,200)"
+          },
+        };
+        var data = [trace];
+        var config = { responsive: true }
+        Plotly.newPlot(selector, data, layout, config);
+      }
+
+      // initialize histograms
+      initHistogram('s1-hist');
+      initHistogram('s2-hist');
+
+      // start with unused UI elements hidden
+      $("#canvas .gallery").hide();
+      $("#search-widget").hide();
+
+      function updateHistogram(selector, dict) {
+        var keys = Object.keys(dict);
+        keys.sort(function(a, b) { return (dict[a] > dict[b])? -1 : 1; });
+
+        var x = [];
+        var y = [];
+        keys.forEach(function(k) {
+          x.push(k);
+          y.push(dict[k]);
+        });
+        
+        Plotly.restyle(selector, {
+          'x': [x], 'y': [y]
+        });
+      }
+
+      function addGalleryImage(selector, url, objects, limit) {
+        var tmpImg = new Image();
+        tmpImg.src = url;
+        tmpImg.onload = function() {
+          if ($(selector + ' .img-wrapper').length > limit) {
+            // limit displayed images
+            $(selector + ' .img-wrapper').last().remove();
+          }
+          $(selector).prepend(`<div class='img-wrapper d-inline-block overflow-hidden me-2' id='img-${imgId}'>
+            <img src='${url}' />
+          </div>`);
+          $(`#img-${imgId}`).hide().fadeIn();
+
+          // get image dimensions
+          var imgSelector = `#img-${imgId}`; 
+          imgId = (imgId + 1) % 9999999;
+          var img = $(imgSelector + " img");
+          var w = img.width();
+          var h = img.height();
+
+          // draw bbox
+          for (var i=0; i < objects.length; i++) {
+            var x1 = objects[i].bbox[0] * w;
+            var y1 = objects[i].bbox[1] * h;
+            var x2 = Math.min(objects[i].bbox[2] * w, w);
+            var y2 = Math.min(objects[i].bbox[3] * h, h);
+
+            drawbox.draw($(imgSelector), x1, y1, x2-x1, y2-y1,
+              objects[i].label);
+          }
+        };
+      }
+
+      var hostname = window.location.hostname;
+      var lastStreamGalleryUpdate = {};
+      var wsMgr = new WebsocketMgr({
+        url: "ws://" + hostname + ":" + {{ wsport }} + "/",
+        callbacks: {
+          'id': function(data) {
+            console.log("Demo widget client ID: " + data);
+            clientId = data;
+          },
+          'callback': function(data) {
+            var obj = JSON.parse(data);
+            var now = Date.now();
+            if (obj.type == 'objdetect') {
+              //console.log(obj);
+
+              // update stats
+              var firstTime = false;
+              if (!(obj.url in imgObjects)) {
+                imgObjects[obj.url] = obj.objects;
+
+                // only count if seeing this image for the first time
+                var uniqueObjects = new Set();
+                for (var i=0; i < obj.objects.length; i++) {
+                  var label = obj.objects[i].label;
+                  uniqueObjects.add(label);
+                }
+                uniqueObjects.forEach(function(e) {
+                  if (!labelImgCounts[e]) 
+                    labelImgCounts[e] = 0;
+                  labelImgCounts[e] += 1;
+                });
+              }
+
+              // update processed image count
+              $("#canvas .gallery .stream1 .count").html("<small>"+Object.keys(imgObjects).length+" scanned</small>");
+
+              // update gallery
+              if (obj.objects.length) {
+                if (!lastStreamGalleryUpdate[obj.type] || now - lastStreamGalleryUpdate[obj.type] > 10) {
+                  updateHistogram('s1-hist', labelImgCounts);
+                  addGalleryImage("#canvas .gallery .stream1 .carousel", obj.url, obj.objects, 6);
+                  lastStreamGalleryUpdate[obj.type] = now;
+                }
+              }
+            } else if (obj.type == 'facedetect') {
+              //console.log(obj);
+
+              // update stats
+              if (!imgFaces[obj.url]) {
+                imgFaces[obj.url] = obj.objects;
+
+                // only count if seeing this image for the first time
+                if (obj.objects.length) {
+                  if (!faceCounts[obj.objects.length]) 
+                    faceCounts[obj.objects.length] = 0;
+                  faceCounts[obj.objects.length] += 1;
+                }
+              }
+
+              // update processed image count
+              $("#canvas .gallery .stream2 .count").html("<small>"+Object.keys(imgFaces).length+" scanned</small>");
+
+              // update gallery
+              if (obj.objects.length) {
+                if (!lastStreamGalleryUpdate[obj.type] || now - lastStreamGalleryUpdate[obj.type] > 10) {
+                  updateHistogram('s2-hist', faceCounts);
+                  addGalleryImage("#canvas .gallery .stream2 .carousel", obj.url, obj.objects, 6);
+                  lastStreamGalleryUpdate[obj.type] = now;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      $(".go-btn").on('click auxclick', function() {
+        var path = $("#form-path").val();
+        var backend = $(this).data('backend');
+        $.get(`/infer/objdetect_bg?callback_id=${clientId}&path=${path}&backend=${backend}`, function() {
+          console.log('objdetect request sent');
+        });
+        $.get(`/infer/facedetect_bg?callback_id=${clientId}&path=${path}&backend=${backend}`, function() {
+          console.log('facedetect request sent');
+        });
+
+        // show UI elements
+        $("#canvas .gallery").show();
+        $("#search-widget").show();
+      });
+
+      $("#search").on('click auxclick', function() {
+        // search for matching images
+        var searchStr = $("#form-search").val();
+
+        var results = [];
+        var showObjResults = false;
+        var showFaceResults = false;
+        for (var url in imgObjects) {
+          imgObjects[url].forEach(function(o) {
+            if (searchStr.includes(o.label) && results.indexOf(url) == -1) {
+              showObjResults = true;
+              results.push(url);
+            }
+          });
+        }
+
+        if (searchStr.includes("face")) {
+          showFaceResults = true;
+          for (var url in imgFaces) {
+            if (imgFaces[url].length == 0)
+              continue;
+            if (results.indexOf(url) == -1)
+              results.push(url);
+          }
+        }
+
+        $('#form-search').keydown(function (e) {
+          if(e.keyCode == 13){
+            $("#search").click();
+          }
+        });
+
+        $("#search-results").html("<div>" + results.length 
+          + " found</div><div class='gallery'></div>");
+
+        results = results.slice(0, 20);
+        results.forEach(function(url) {
+          var objects = [];
+          if (showObjResults && imgObjects[url] && imgObjects[url].length) {
+            imgObjects[url].forEach(function(o) { 
+              if (searchStr.includes(o.label))
+                objects.push(o);
+            });
+          }
+          if (showFaceResults && imgFaces[url] && imgFaces[url].length) {
+            console.log(imgFaces[url]);
+            objects = objects.concat(imgFaces[url]);
+          }
+          addGalleryImage("#search-results .gallery", url, objects, 20);
+        });
+      });
+    </script>
+  </body>
+</html>

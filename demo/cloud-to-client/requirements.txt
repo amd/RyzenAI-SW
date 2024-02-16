@@ -1,0 +1,12 @@
+zmq
+tornado
+opencv-python
+onnxruntime
+torch
+pyyaml
+pillow
+tqdm
+pandas
+torchvision
+matplotlib
+seaborn
