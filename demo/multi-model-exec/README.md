@@ -20,7 +20,7 @@
 
 ## 1 Introduction
 
-This is the demo of showing multiple AI models running concurrently on Ryzen AI. The following models are used:
+This is the demo of showing multiple AI models running concurrently on Ryzen AI. Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***, if you perform this demo in ***Windows Powershell***, some errors will occur. The following models are used:
 - MobileNet_v2
 - ResNet50
 - Retinaface
@@ -72,7 +72,7 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 
 ### 3.1 Environment Setup 
 
-Please make sure the IPU driver has been installed by following the instructions on the [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com/en/latest). The IPU driver version >= 10.106.8.62 has been tested. The older version might work but no guaranteed. 
+Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. Make sure the IPU driver has been installed by following the instructions on the [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com/en/latest). The IPU driver version >= 10.106.8.62 has been tested. The older version might work but no guaranteed. 
 
 1. Follow these steps to install Anaconda on your system if it has not been installed:
 
@@ -127,7 +127,7 @@ Please make sure the IPU driver has been installed by following the instructions
 
 ## 4 Run The Demo
 
-You can load and run the models one by one: 
+Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. You can load and run the models one by one: 
 run_mobile_net_v2.bat
 
 ![MobilenetV2](images/mobilenet_V2.jpg)
