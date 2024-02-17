@@ -1,0 +1,24 @@
+{
+  "name": "yolov8-e2e",
+  "description": "yolov8-e2e",
+  "flow": "ryzen-ai",
+  "env_setup" : ["pip install cmake"],
+  "env_check" : [],
+  "test_steps" : ["git clone https://github.com/opencv/opencv.git -b 4.6.0", "cd opencv", "mkdir mybuild", "cd mybuild", 
+
+                  "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G \"Visual Studio 16 2019\" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\opencv' '-DCMAKE_PREFIX_PATH=.\opencv' -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_WITH_STATIC_CRT=OFF -B build -S ../",
+                  "cmake --build build --config Release","cmake --install build --config Release","cd ../..",
+
+                  "git clone https://github.com/gflags/gflags.git","cd gflags", "mkdir mybuild", "cd mybuild",
+
+                  "cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G \"Visual Studio 16 2019\" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\gflags'  -B build -S ../",
+                  "cmake --build build --config Release","cmake --install build --config Release","cd ../..",
+ 
+                  "git clone https://github.com/google/glog.git","cd glog", "mkdir mybuild", "cd mybuild",
+ 
+                  "cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G \"Visual Studio 16 2019\" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\glog'  -B build -S ../",
+                  "cmake --build build --config Release","cmake --install build --config Release","cd ../..",
+
+                  "cd implement", "build.sh", "set ENV_PATH in run_jpeg.sh to real env path",
+                  "run_jpeg.bat DetectionModel_int.onnx sample_yolov8.jpg" 
+}

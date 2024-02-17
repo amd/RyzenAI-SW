@@ -1,0 +1,13 @@
+{
+  "name": "getting-started-resnet",
+  "description": "getting-started-resnet",
+  "flow": "ryzen-ai",
+  "env_setup" : ["python -m pip install -r requirements.txt"],
+  "env_check" : ["XLNX_VART_FIRMWARE"],
+  "test_steps" : ["python prepare_model_data.py", "python resnet_quantize.py", "python predict.py", "python predict.py --ep ipu", "cd cpp", 
+                  "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -DCMAKE_INSTALL_PREFIX=. -DCMAKE_PREFIX_PATH=. -B build -S resnet_cifar -DOpenCV_DIR=${OPENCV_DIR} -G \"Visual Studio 16 2019\"",
+                  "cmake --build build --config Release",
+                  "cd ..", "xcopy cpp\\build\\Release\\resnet_cifar.exe .", "xcopy ${ONNXRUNTIME_DIR}\\bin\\onnxruntime.dll .", 
+                  "xcopy ${ONNXRUNTIME_DIR}\\bin\\onnxruntime_vitisai_ep.dll .",
+                  "resnet_cifar.exe models/resnet.qdq.U8S8.onnx cpu None", "resnet_cifar.exe models/resnet.qdq.U8S8.onnx ipu vaip_config.json"]
+}

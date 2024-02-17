@@ -1,0 +1,28 @@
+body {
+}
+
+#canvas .gallery {
+}
+
+#canvas .gallery .img-wrapper {
+  position: relative;
+}
+#canvas .gallery .img-wrapper img {
+  height: 200px;
+}
+
+#canvas .stream-hist {
+  height: 250px;
+  width: 100%;
+}
+
+.deep-rect {
+  font-size: small;
+}
+
+#search-results .gallery .img-wrapper {
+  position: relative;
+}
+#search-results .gallery .img-wrapper img {
+  height: 200px;
+}

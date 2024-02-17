@@ -1,0 +1,1393 @@
+{
+    "schema_version": {
+        "major": "1",
+        "minor": "0",
+        "patch": "0"
+    },
+    "aie_metadata": {
+        "driver_config": {
+            "hw_gen": 4,
+            "base_address": 2199023255552,
+            "npi_address": 0,
+            "column_shift": 25,
+            "row_shift": 20,
+            "num_rows": 6,
+            "num_columns": 8,
+            "shim_row": 0,
+            "reserved_row_start": 1,
+            "reserved_num_rows": 1,
+            "aie_tile_row_start": 2,
+            "aie_tile_num_rows": 4,
+            "partition_num_cols": 4,
+            "partition_overlay_start_cols": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "aiecompiler_options": {
+            "broadcast_enable_core": false,
+            "graph_iterator_event": false
+        },
+        "graphs": {
+            "graph0": {
+                "id": 0,
+                "name": "aie_graph",
+                "core_columns": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    2,
+                    2,
+                    2,
+                    3,
+                    3,
+                    3,
+                    3
+                ],
+                "core_rows": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3
+                ],
+                "iteration_memory_columns": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    2,
+                    2,
+                    2,
+                    3,
+                    3,
+                    3,
+                    3
+                ],
+                "iteration_memory_rows": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3
+                ],
+                "iteration_memory_addresses": [
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4,
+                    4
+                ],
+                "multirate_triggers": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ],
+                "pl_kernel_instance_names": [],
+                "pl_axi_lite_modes": []
+            }
+        },
+        "TileMapping": {
+            "AIEKernelToTileMapping": [
+                {
+                    "graph": "aie_graph.graph_gemm_",
+                    "tile": "aie",
+                    "column": 0,
+                    "row": 0,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 0>.kernels_[0]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_",
+                    "tile": "aie",
+                    "column": 0,
+                    "row": 1,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 0>.kernels_[1]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_",
+                    "tile": "aie",
+                    "column": 0,
+                    "row": 2,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 0>.kernels_[2]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_",
+                    "tile": "aie",
+                    "column": 0,
+                    "row": 3,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 0>.kernels_[3]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_2_",
+                    "tile": "aie",
+                    "column": 2,
+                    "row": 0,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 2>.kernels_[0]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_2_",
+                    "tile": "aie",
+                    "column": 2,
+                    "row": 1,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 2>.kernels_[1]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_2_",
+                    "tile": "aie",
+                    "column": 2,
+                    "row": 2,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 2>.kernels_[2]"
+                },
+                {
+                    "graph": "aie_graph.graph_gemm_2_",
+                    "tile": "aie",
+                    "column": 2,
+                    "row": 3,
+                    "schedule": 0,
+                    "function": "super_gemm<4096, 2>.kernels_[3]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_",
+                    "tile": "aie",
+                    "column": 1,
+                    "row": 0,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 1>.kernels_[0]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_",
+                    "tile": "aie",
+                    "column": 1,
+                    "row": 1,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 1>.kernels_[1]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_",
+                    "tile": "aie",
+                    "column": 1,
+                    "row": 2,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 1>.kernels_[2]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_",
+                    "tile": "aie",
+                    "column": 1,
+                    "row": 3,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 1>.kernels_[3]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_2_",
+                    "tile": "aie",
+                    "column": 3,
+                    "row": 0,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 3>.kernels_[0]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_2_",
+                    "tile": "aie",
+                    "column": 3,
+                    "row": 1,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 3>.kernels_[1]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_2_",
+                    "tile": "aie",
+                    "column": 3,
+                    "row": 2,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 3>.kernels_[2]"
+                },
+                {
+                    "graph": "aie_graph.graph_misc_2_",
+                    "tile": "aie",
+                    "column": 3,
+                    "row": 3,
+                    "schedule": 0,
+                    "function": "super_misc<1024, 3>.kernels_[3]"
+                }
+            ],
+            "SharedBufferToTileMapping": [
+                {
+                    "graph": "aie_graph",
+                    "tile": "memory",
+                    "bufferName": "mtx_[0]",
+                    "column": 0,
+                    "row": 0,
+                    "dmaChannels": {
+                        "mtx_[0].in[0]": {
+                            "channel": 0,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[0].in[1]": {
+                            "channel": 1,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[0].in[2]": {
+                            "channel": 2,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[0].in[3]": {
+                            "channel": 3,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[0].in[4]": {
+                            "channel": 4,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[0].in[5]": {
+                            "channel": 5,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[0].out[0]": {
+                            "channel": 0,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[0].out[1]": {
+                            "channel": 1,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[0].out[2]": {
+                            "channel": 2,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[0].out[3]": {
+                            "channel": 3,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[0].out[4]": {
+                            "channel": 4,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[0].out[5]": {
+                            "channel": 5,
+                            "direction": "mm2s"
+                        }
+                    }
+                },
+                {
+                    "graph": "aie_graph",
+                    "tile": "memory",
+                    "bufferName": "mtx_[1]",
+                    "column": 1,
+                    "row": 0,
+                    "dmaChannels": {
+                        "mtx_[1].in[0]": {
+                            "channel": 0,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[1].in[1]": {
+                            "channel": 1,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[1].in[2]": {
+                            "channel": 2,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[1].in[3]": {
+                            "channel": 3,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[1].in[4]": {
+                            "channel": 4,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[1].in[5]": {
+                            "channel": 5,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[1].out[0]": {
+                            "channel": 0,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[1].out[1]": {
+                            "channel": 1,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[1].out[2]": {
+                            "channel": 2,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[1].out[3]": {
+                            "channel": 3,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[1].out[4]": {
+                            "channel": 4,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[1].out[5]": {
+                            "channel": 5,
+                            "direction": "mm2s"
+                        }
+                    }
+                },
+                {
+                    "graph": "aie_graph",
+                    "tile": "memory",
+                    "bufferName": "mtx_[2]",
+                    "column": 2,
+                    "row": 0,
+                    "dmaChannels": {
+                        "mtx_[2].in[0]": {
+                            "channel": 0,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[2].in[1]": {
+                            "channel": 1,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[2].in[2]": {
+                            "channel": 2,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[2].in[3]": {
+                            "channel": 3,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[2].in[4]": {
+                            "channel": 4,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[2].in[5]": {
+                            "channel": 5,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[2].out[0]": {
+                            "channel": 0,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[2].out[1]": {
+                            "channel": 1,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[2].out[2]": {
+                            "channel": 2,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[2].out[3]": {
+                            "channel": 3,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[2].out[4]": {
+                            "channel": 4,
+                            "direction": "mm2s"
+                        }
+                    }
+                },
+                {
+                    "graph": "aie_graph",
+                    "tile": "memory",
+                    "bufferName": "mtx_[3]",
+                    "column": 3,
+                    "row": 0,
+                    "dmaChannels": {
+                        "mtx_[3].in[0]": {
+                            "channel": 0,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[3].in[1]": {
+                            "channel": 1,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[3].in[2]": {
+                            "channel": 2,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[3].in[3]": {
+                            "channel": 3,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[3].in[4]": {
+                            "channel": 4,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[3].in[5]": {
+                            "channel": 5,
+                            "direction": "s2mm"
+                        },
+                        "mtx_[3].out[0]": {
+                            "channel": 0,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[3].out[1]": {
+                            "channel": 1,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[3].out[2]": {
+                            "channel": 2,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[3].out[3]": {
+                            "channel": 3,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[3].out[4]": {
+                            "channel": 4,
+                            "direction": "mm2s"
+                        },
+                        "mtx_[3].out[5]": {
+                            "channel": 5,
+                            "direction": "mm2s"
+                        }
+                    }
+                }
+            ]
+        },
+        "RTPs": {},
+        "GMIOs": {
+            "gmio0": {
+                "id": 0,
+                "name": "aie_graph.in_[0][0]",
+                "logical_name": "aie_graph_in__0__0_",
+                "type": 0,
+                "shim_column": 0,
+                "channel_number": 2,
+                "stream_id": 3,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio1": {
+                "id": 1,
+                "name": "aie_graph.in_[0][1]",
+                "logical_name": "aie_graph_in__0__1_",
+                "type": 0,
+                "shim_column": 0,
+                "channel_number": 3,
+                "stream_id": 7,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio2": {
+                "id": 2,
+                "name": "aie_graph.out_[0][0]",
+                "logical_name": "aie_graph_out__0__0_",
+                "type": 1,
+                "shim_column": 0,
+                "channel_number": 0,
+                "stream_id": 2,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio3": {
+                "id": 3,
+                "name": "aie_graph.in_[1][0]",
+                "logical_name": "aie_graph_in__1__0_",
+                "type": 0,
+                "shim_column": 1,
+                "channel_number": 2,
+                "stream_id": 3,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio4": {
+                "id": 4,
+                "name": "aie_graph.in_[1][1]",
+                "logical_name": "aie_graph_in__1__1_",
+                "type": 0,
+                "shim_column": 1,
+                "channel_number": 3,
+                "stream_id": 7,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio5": {
+                "id": 5,
+                "name": "aie_graph.out_[1][0]",
+                "logical_name": "aie_graph_out__1__0_",
+                "type": 1,
+                "shim_column": 1,
+                "channel_number": 0,
+                "stream_id": 2,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio6": {
+                "id": 6,
+                "name": "aie_graph.in_[2][0]",
+                "logical_name": "aie_graph_in__2__0_",
+                "type": 0,
+                "shim_column": 2,
+                "channel_number": 2,
+                "stream_id": 3,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio7": {
+                "id": 7,
+                "name": "aie_graph.in_[2][1]",
+                "logical_name": "aie_graph_in__2__1_",
+                "type": 0,
+                "shim_column": 2,
+                "channel_number": 3,
+                "stream_id": 7,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio8": {
+                "id": 8,
+                "name": "aie_graph.out_[2][0]",
+                "logical_name": "aie_graph_out__2__0_",
+                "type": 1,
+                "shim_column": 2,
+                "channel_number": 0,
+                "stream_id": 2,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio9": {
+                "id": 9,
+                "name": "aie_graph.in_[3][0]",
+                "logical_name": "aie_graph_in__3__0_",
+                "type": 0,
+                "shim_column": 3,
+                "channel_number": 2,
+                "stream_id": 3,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio10": {
+                "id": 10,
+                "name": "aie_graph.in_[3][1]",
+                "logical_name": "aie_graph_in__3__1_",
+                "type": 0,
+                "shim_column": 3,
+                "channel_number": 3,
+                "stream_id": 7,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            },
+            "gmio11": {
+                "id": 11,
+                "name": "aie_graph.out_[3][0]",
+                "logical_name": "aie_graph_out__3__0_",
+                "type": 1,
+                "shim_column": 3,
+                "channel_number": 0,
+                "stream_id": 2,
+                "burst_length_in_16byte": 4,
+                "pl_kernel_instance_name": "",
+                "pl_parameter_index": -1
+            }
+        },
+        "PLIOs": {
+            "plio0": {
+                "id": 0,
+                "name": "aie_graph.token_out_[0]",
+                "logical_name": "TCT0",
+                "shim_column": 0,
+                "slaveOrMaster": 1,
+                "stream_id": 0
+            },
+            "plio1": {
+                "id": 1,
+                "name": "aie_graph.token_out_[1]",
+                "logical_name": "TCT1",
+                "shim_column": 1,
+                "slaveOrMaster": 1,
+                "stream_id": 0
+            },
+            "plio2": {
+                "id": 2,
+                "name": "aie_graph.token_out_[2]",
+                "logical_name": "TCT2",
+                "shim_column": 2,
+                "slaveOrMaster": 1,
+                "stream_id": 0
+            },
+            "plio3": {
+                "id": 3,
+                "name": "aie_graph.token_out_[3]",
+                "logical_name": "TCT3",
+                "shim_column": 3,
+                "slaveOrMaster": 1,
+                "stream_id": 0
+            }
+        },
+        "CDOs": {
+            "files": [
+                "aie_cdo_reset.bin",
+                "aie_cdo_error_handling.bin",
+                "aie_cdo_clock_gating.bin",
+                "aie_cdo_mem_clear.bin",
+                "aie_cdo_elfs_dm.bin",
+                "aie_cdo_elfs_pm.bin",
+                "aie_cdo_init_static.bin",
+                "aie_cdo_init_reconfig.bin",
+                "aie_cdo_enable.bin",
+                "aie_cdo_debug.bin"
+            ]
+        },
+        "EventGraphs": {
+            "graph0": {
+                "id": 0,
+                "name": "aie_graph",
+                "core_columns": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    2,
+                    2,
+                    2,
+                    3,
+                    3,
+                    3,
+                    3
+                ],
+                "core_rows": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3
+                ],
+                "dma_columns": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    2,
+                    2,
+                    2,
+                    2,
+                    2,
+                    2,
+                    2,
+                    3,
+                    3,
+                    3,
+                    3,
+                    3,
+                    3,
+                    3,
+                    3,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    2,
+                    2,
+                    2,
+                    3,
+                    3,
+                    3,
+                    3
+                ],
+                "dma_rows": [
+                    0,
+                    0,
+                    1,
+                    1,
+                    2,
+                    2,
+                    3,
+                    3,
+                    0,
+                    0,
+                    1,
+                    1,
+                    2,
+                    2,
+                    3,
+                    3,
+                    0,
+                    0,
+                    1,
+                    1,
+                    2,
+                    2,
+                    3,
+                    3,
+                    0,
+                    0,
+                    1,
+                    1,
+                    2,
+                    2,
+                    3,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3,
+                    0,
+                    1,
+                    2,
+                    3
+                ]
+            }
+        },
+        "DeviceData": {
+            "AIEBaseAddress": "0x20000000000",
+            "AIEFrequency": 1000
+        },
+        "TraceGMIOs": {},
+        "AIEConfigsForTraceAndProfile": {
+            "GMIOs": {
+                "gmio0": {
+                    "logical_name": "aie_graph_in__0__0_",
+                    "data_width": 32
+                },
+                "gmio1": {
+                    "logical_name": "aie_graph_in__0__1_",
+                    "data_width": 32
+                },
+                "gmio2": {
+                    "logical_name": "aie_graph_out__0__0_",
+                    "data_width": 32
+                },
+                "gmio3": {
+                    "logical_name": "aie_graph_in__1__0_",
+                    "data_width": 32
+                },
+                "gmio4": {
+                    "logical_name": "aie_graph_in__1__1_",
+                    "data_width": 32
+                },
+                "gmio5": {
+                    "logical_name": "aie_graph_out__1__0_",
+                    "data_width": 32
+                },
+                "gmio6": {
+                    "logical_name": "aie_graph_in__2__0_",
+                    "data_width": 32
+                },
+                "gmio7": {
+                    "logical_name": "aie_graph_in__2__1_",
+                    "data_width": 32
+                },
+                "gmio8": {
+                    "logical_name": "aie_graph_out__2__0_",
+                    "data_width": 32
+                },
+                "gmio9": {
+                    "logical_name": "aie_graph_in__3__0_",
+                    "data_width": 32
+                },
+                "gmio10": {
+                    "logical_name": "aie_graph_in__3__1_",
+                    "data_width": 32
+                },
+                "gmio11": {
+                    "logical_name": "aie_graph_out__3__0_",
+                    "data_width": 32
+                }
+            },
+            "PLIOs": {
+                "plio0": {
+                    "logical_name": "TCT0",
+                    "data_width": 32
+                },
+                "plio1": {
+                    "logical_name": "TCT1",
+                    "data_width": 32
+                },
+                "plio2": {
+                    "logical_name": "TCT2",
+                    "data_width": 32
+                },
+                "plio3": {
+                    "logical_name": "TCT3",
+                    "data_width": 32
+                }
+            }
+        },
+        "DMAChConfigs": {
+            "dma_ch_config0": {
+                "port_id": 104,
+                "port_name": "aie_graph.mtx_[0].in[0]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 0
+            },
+            "dma_ch_config1": {
+                "port_id": 105,
+                "port_name": "aie_graph.mtx_[0].in[1]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 1
+            },
+            "dma_ch_config2": {
+                "port_id": 106,
+                "port_name": "aie_graph.mtx_[0].in[2]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 2
+            },
+            "dma_ch_config3": {
+                "port_id": 107,
+                "port_name": "aie_graph.mtx_[0].in[3]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 3
+            },
+            "dma_ch_config4": {
+                "port_id": 108,
+                "port_name": "aie_graph.mtx_[0].in[4]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 4
+            },
+            "dma_ch_config5": {
+                "port_id": 109,
+                "port_name": "aie_graph.mtx_[0].in[5]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 5
+            },
+            "dma_ch_config6": {
+                "port_id": 110,
+                "port_name": "aie_graph.mtx_[0].out[0]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 0
+            },
+            "dma_ch_config7": {
+                "port_id": 111,
+                "port_name": "aie_graph.mtx_[0].out[1]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 1
+            },
+            "dma_ch_config8": {
+                "port_id": 112,
+                "port_name": "aie_graph.mtx_[0].out[2]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 2
+            },
+            "dma_ch_config9": {
+                "port_id": 113,
+                "port_name": "aie_graph.mtx_[0].out[3]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 3
+            },
+            "dma_ch_config10": {
+                "port_id": 114,
+                "port_name": "aie_graph.mtx_[0].out[4]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 4
+            },
+            "dma_ch_config11": {
+                "port_id": 115,
+                "port_name": "aie_graph.mtx_[0].out[5]",
+                "parent_id": 0,
+                "tile_type": 2,
+                "column": 0,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 5
+            },
+            "dma_ch_config12": {
+                "port_id": 116,
+                "port_name": "aie_graph.mtx_[1].in[0]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 0
+            },
+            "dma_ch_config13": {
+                "port_id": 117,
+                "port_name": "aie_graph.mtx_[1].in[1]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 1
+            },
+            "dma_ch_config14": {
+                "port_id": 118,
+                "port_name": "aie_graph.mtx_[1].in[2]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 2
+            },
+            "dma_ch_config15": {
+                "port_id": 119,
+                "port_name": "aie_graph.mtx_[1].in[3]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 3
+            },
+            "dma_ch_config16": {
+                "port_id": 120,
+                "port_name": "aie_graph.mtx_[1].in[4]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 4
+            },
+            "dma_ch_config17": {
+                "port_id": 121,
+                "port_name": "aie_graph.mtx_[1].in[5]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 5
+            },
+            "dma_ch_config18": {
+                "port_id": 122,
+                "port_name": "aie_graph.mtx_[1].out[0]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 0
+            },
+            "dma_ch_config19": {
+                "port_id": 123,
+                "port_name": "aie_graph.mtx_[1].out[1]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 1
+            },
+            "dma_ch_config20": {
+                "port_id": 124,
+                "port_name": "aie_graph.mtx_[1].out[2]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 2
+            },
+            "dma_ch_config21": {
+                "port_id": 125,
+                "port_name": "aie_graph.mtx_[1].out[3]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 3
+            },
+            "dma_ch_config22": {
+                "port_id": 126,
+                "port_name": "aie_graph.mtx_[1].out[4]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 4
+            },
+            "dma_ch_config23": {
+                "port_id": 127,
+                "port_name": "aie_graph.mtx_[1].out[5]",
+                "parent_id": 1,
+                "tile_type": 2,
+                "column": 1,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 5
+            },
+            "dma_ch_config24": {
+                "port_id": 128,
+                "port_name": "aie_graph.mtx_[2].in[0]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 0
+            },
+            "dma_ch_config25": {
+                "port_id": 129,
+                "port_name": "aie_graph.mtx_[2].in[1]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 1
+            },
+            "dma_ch_config26": {
+                "port_id": 130,
+                "port_name": "aie_graph.mtx_[2].in[2]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 2
+            },
+            "dma_ch_config27": {
+                "port_id": 131,
+                "port_name": "aie_graph.mtx_[2].in[3]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 3
+            },
+            "dma_ch_config28": {
+                "port_id": 132,
+                "port_name": "aie_graph.mtx_[2].in[4]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 4
+            },
+            "dma_ch_config29": {
+                "port_id": 133,
+                "port_name": "aie_graph.mtx_[2].in[5]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 5
+            },
+            "dma_ch_config30": {
+                "port_id": 134,
+                "port_name": "aie_graph.mtx_[2].out[0]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 0
+            },
+            "dma_ch_config31": {
+                "port_id": 135,
+                "port_name": "aie_graph.mtx_[2].out[1]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 1
+            },
+            "dma_ch_config32": {
+                "port_id": 136,
+                "port_name": "aie_graph.mtx_[2].out[2]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 2
+            },
+            "dma_ch_config33": {
+                "port_id": 137,
+                "port_name": "aie_graph.mtx_[2].out[3]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 3
+            },
+            "dma_ch_config34": {
+                "port_id": 138,
+                "port_name": "aie_graph.mtx_[2].out[4]",
+                "parent_id": 2,
+                "tile_type": 2,
+                "column": 2,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 4
+            },
+            "dma_ch_config35": {
+                "port_id": 139,
+                "port_name": "aie_graph.mtx_[3].in[0]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 0
+            },
+            "dma_ch_config36": {
+                "port_id": 140,
+                "port_name": "aie_graph.mtx_[3].in[1]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 1
+            },
+            "dma_ch_config37": {
+                "port_id": 141,
+                "port_name": "aie_graph.mtx_[3].in[2]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 2
+            },
+            "dma_ch_config38": {
+                "port_id": 142,
+                "port_name": "aie_graph.mtx_[3].in[3]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 3
+            },
+            "dma_ch_config39": {
+                "port_id": 143,
+                "port_name": "aie_graph.mtx_[3].in[4]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 4
+            },
+            "dma_ch_config40": {
+                "port_id": 144,
+                "port_name": "aie_graph.mtx_[3].in[5]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 0,
+                "channel": 5
+            },
+            "dma_ch_config41": {
+                "port_id": 145,
+                "port_name": "aie_graph.mtx_[3].out[0]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 0
+            },
+            "dma_ch_config42": {
+                "port_id": 146,
+                "port_name": "aie_graph.mtx_[3].out[1]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 1
+            },
+            "dma_ch_config43": {
+                "port_id": 147,
+                "port_name": "aie_graph.mtx_[3].out[2]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 2
+            },
+            "dma_ch_config44": {
+                "port_id": 148,
+                "port_name": "aie_graph.mtx_[3].out[3]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 3
+            },
+            "dma_ch_config45": {
+                "port_id": 149,
+                "port_name": "aie_graph.mtx_[3].out[4]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 4
+            },
+            "dma_ch_config46": {
+                "port_id": 150,
+                "port_name": "aie_graph.mtx_[3].out[5]",
+                "parent_id": 3,
+                "tile_type": 2,
+                "column": 3,
+                "row": 0,
+                "s2mm_or_mm2s": 1,
+                "channel": 5
+            }
+        }
+    }
+}

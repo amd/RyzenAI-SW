@@ -1,0 +1,273 @@
+{
+  "TARGET": "aie2p-gemm-strix-4x2-bf16",
+  "HW_VER": "0.0.1",
+  "XRT_KERNEL_ARGS": 5,
+  "AIE_INFO": {
+    "ROWS": 8,
+    "COLS": 32,
+    "SHIM_BD": {
+      "STEP_BITS": 19,
+      "WRAP_BITS": 10,
+      "PAD_BITS": 0,
+      "BUFLEN_BITS": 31,
+      "DATA_GRANULARITY": 4,
+      "REPEAT_COUNT_BITS": 8,
+      "ITERATION_WRAP_BITS": 6
+    },
+    "DMA_BD": {
+      "STEP_BITS": 16,
+      "WRAP_BITS": 10,
+      "PAD_BITS": 4,
+      "BUFLEN_BITS": 17,
+      "DATA_GRANULARITY": 4,
+      "REPEAT_COUNT_BITS": 8,
+      "ITERATION_WRAP_BITS": 6
+    }
+  },
+  "SUPERKERNEL_INFO": {
+    "INSTR_BUFFER_BYTES": 8192,
+    "KERNEL_IN_SEL": [0, 1]
+  },
+  "INSTR_INFO": {
+    "TOTAL_SIZE_BYTES": 4,
+    "PAD_SIZE_BYTES": 4,
+    "INSTR_SIZE_BYTES": 2,
+    "CORE_MASK_BYTES": 4,
+    "OUT_SIZE_BYTES": 4,
+    "SIZE_BYTES": 4,
+    "OPCODE_SIZE": 8,
+    "CONF_SIZE": 24,
+    "DATA_SIZE": 0,
+    "CONFIG": {
+      "init": {
+        "CONF_SHIFT": 16,
+        "RESET": 1,
+        "VALUE": {
+          "1": 1
+        }
+      },
+      "out": {
+        "CONF_SHIFT": 16,
+        "RESET": 2,
+        "VALUE": {
+          "1": 2
+        }
+      },
+      "ACQUIRE_A": {
+        "CONF_SHIFT": 16,
+        "RESET": 4,
+        "VALUE": {
+          "1": 4
+        }
+      },
+      "ACQUIRE_B": {
+        "CONF_SHIFT": 16,
+        "RESET": 8,
+        "VALUE": {
+          "1": 8
+        }
+      },
+      "fused_out": {
+        "CONF_SHIFT": 16,
+        "RESET": 16,
+        "VALUE": {
+          "1": 16
+        }
+      },
+      "inplace": {
+        "CONF_SHIFT": 16,
+        "RESET": 32,
+        "VALUE": {
+          "1": 32
+        }
+      },
+      "IN_SEL_A": {
+        "CONF_SHIFT": 12,
+        "RESET": 15,
+        "VALUE": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5
+        }
+      },
+      "IN_SEL_B": {
+        "CONF_SHIFT": 8,
+        "RESET": 15,
+        "VALUE": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5
+        }
+      },
+      "OUT_SEL": {
+        "CONF_SHIFT": 0,
+        "RESET": 15,
+        "VALUE": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5
+        }
+      }
+    }
+  },
+  "NODES": {
+    "GEMM": [[[0, 1], [0, 4]]],
+    "MISC": [[[1, 1], [0, 4]]]
+  },
+  "OPS": {
+    "gemm": {
+      "OPCODE": -1,
+      "CONFIG": {},
+      "ATTRS": {
+        "PM": 1,
+        "PN": 1,
+        "QM": 1,
+        "QN": 4,
+        "TM": 2,
+        "TK": 8,
+        "TN": 8,
+        "M0": 8,
+        "K0": 8,
+        "N0": 8
+      },
+      "NODES": ["GEMM"]
+    },
+    "gemm-bf16": {
+      "OPCODE": 1,
+      "CONFIG": {},
+      "ATTRS": {
+        "PM": 1,
+        "PN": 1,
+        "QM": 1,
+        "QN": 4,
+        "TM": 2,
+        "TK": 8,
+        "TN": 8,
+        "M0": 8,
+        "K0": 8,
+        "N0": 8
+      },
+      "NODES": [
+        "GEMM"
+      ]
+    },
+    "nn.relu_0": {
+      "OPCODE": 3,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 2048
+      },
+      "NODES": [
+        "MISC"
+      ]
+    },
+    "sign_0": {
+      "OPCODE": 10,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 2048
+      },
+      "NODES": ["MISC"]
+    },
+    "slice_0":  {
+      "OPCODE": 11,
+      "CONFIG": {},
+      "ATTRS": {
+        "VECTOR_SIZE": 8
+      },
+      "NODES": ["GEMM"]
+    },
+    "add_0": {
+      "OPCODE": 13,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 4,
+        "N_MAX": 1024,
+        "N_MIN": 16
+      },
+      "NODES": ["MISC"]
+    },
+    "multiply_0": {
+      "OPCODE": 14,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 4,
+        "N_MAX": 1024,
+        "N_MIN": 16
+      },
+      "NODES": [
+        "MISC"
+      ]
+    },
+    "sigmoid_0": {
+      "OPCODE": 15,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 2048
+      },
+      "NODES": ["MISC"]
+    },
+    "abs_0": {
+      "OPCODE": 19,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 2048
+      },
+      "NODES": ["MISC"]
+    },
+    "leaky_relu_0": {
+      "OPCODE": 20,
+      "CONFIG": {},
+      "ATTRS": {
+        "QM": 1,
+        "QN": 1,
+        "TM": 1,
+        "TN": 1,
+        "M0": 1,
+        "N0": 2048
+      },
+      "NODES": ["MISC"]
+    }
+  },
+  "SUPPORTED_RELAY_OPS": [
+    "nn.matmul",
+    "nn.relu",
+    "add",
+    "multiply",
+    "sigmoid",
+    "abs",
+    "sign",
+    "leaky_relu"
+  ]
+}

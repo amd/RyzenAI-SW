@@ -1,0 +1,102 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "release_2" ]
+  pull_request:
+    branches: [ "release_2" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  WORKSPACE: ${{ github.workspace }}
+  TVM_CONDA_ENV_NAME: tvm-aie
+  TRANSFORMERS_WS: C:\Users\Transformers
+  TRANSFORMERS_CONDA_ENV_NAME: ryzenai-transformers
+  XRT_PATH: C:\ipu_stack_rel_silicon\test_package\xrt-ipu
+  TVM_ROOT: ${{ github.workspace }}\ext\tvm_aie_compiler
+  REPO_NAME: ${{ env.GITHUB_REPOSITORY#*/ }}
+  REPO_PATH: "%TRANSFORMERS_WS%\%REPO_NAME%"
+  ACTIONS_RUNNER_DEBUG: '1'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  transformers-build:
+    # The type of runner that the job will run on
+    runs-on: [ phx-win-board ]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.XBUILD_GHE_PAT }}
+
+      - name: Update git submodules recursively
+        run: |
+          git submodule update --init --recursive
+          git submodule status > info.txt
+          echo ${{ github.sha }} ${{ github.repositoryUrl }} >> info.txt
+          cat info.txt > $env:GITHUB_STEP_SUMMARY
+
+
+      # Execute script to build Transformers
+      - name: Build Transformers
+        run: |
+          set REPO_PATH="%TRANSFORMERS_WS%\%REPO_NAME%"
+          del /q /s %REPO_PATH%
+          xcopy /e /y /s ${{ github.workspace }} %TRANSFORMERS_WS%
+          pushd %REPO_PATH%
+          .github\scripts\build_transformers.bat
+          popd
+        shell: cmd
+
+      - name: Package
+        run: |
+          cd %REPO_PATH%
+          mkdir transformers_release transformers_release\tests
+          for %%f in (.\*.whl) do (
+              echo %%f
+              xcopy %%f %WORKSPACE%\transformers_release\
+          )
+          xcopy dll %WORKSPACE%\transformers_release\ /E /I /H /Y
+          xcopy tests_release\* %WORKSPACE%\transformers_release\tests\ /E /I /H /Y
+          C:\"Program Files"\7-Zip\7z.exe a transformers_release.zip transformers_release
+          xcopy transformers_release.zip ${{ github.workspace }}
+        shell: cmd
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: transformers_release
+          path: transformers_release.zip
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: info.txt
+          path: info.txt
+
+      - name: run board tests
+        run: |
+          cd %REPO_PATH%
+          .github/scripts/run_tests.bat
+        shell: cmd
+
+      - name: Upload to artifactory
+        if: github.event_name != 'pull_request'
+        run: |
+          %JFROG_CLI% rt u transformers_release.zip %REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}/ --props "FOLDER_NAME=transformers-${{ github.run_number }};BRANCH=${{ github.ref_name }}"
+          %JFROG_CLI% rt u info.txt %REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}/ --props "FOLDER_NAME=transformers-${{ github.run_number }};BRANCH=${{ github.ref_name }}"
+          %JFROG_CLI% rt cp --flat "%REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}/*" %REPO_ROOT%/${{ github.ref_name }}/latest/ 
+          echo ### Artifacts location: [%ARTIFACTORY_URL%/%REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}](%ARTIFACTORY_URL%/%REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}) >> %GITHUB_STEP_SUMMARY%
+        shell: cmd
+        env:
+          JFROG_CLI: C:\Users\xbuild\jfrog-cli\bin\jfrog-cli.exe
+          REPO_ROOT: 'aie-ipu-prod-local/com/xilinx/transformers'
+          ARTIFACTORY_URL: 'https://xcoartifactory:443/artifactory'
+      
