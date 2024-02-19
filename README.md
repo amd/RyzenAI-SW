@@ -49,7 +49,7 @@ git lfs pull
 
 ## Benchmarking 
 
-- [ONNX CNN Benchmarking utilities](onnx-benchmark)
+- [ONNX Benchmarking utilities](onnx-benchmark)
 
 
 
