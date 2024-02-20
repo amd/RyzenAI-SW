@@ -41,6 +41,9 @@ The flow consists of the sequence of steps enumerated below.
 
 ## Step 1 - Install Ryzen AI package:
 
+Ensure that you followed the instructions from the [Transformer folder readme](../README.md) before following the steps here.
+
+
 ```
 conda activate ryzenai-transformers
 ```
