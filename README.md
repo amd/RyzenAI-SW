@@ -16,7 +16,7 @@ This repository contains the demos, examples and tutorials, demonstrating usage 
 ```
  - Clone the repository (or a fork of it): 
 ```
-git clone https://github.com/amd/RyzenAI-SW-internal.git
+git clone https://github.com/amd/RyzenAI-SW.git
 ```
 - Pull the actual LFS files: 
 ```
