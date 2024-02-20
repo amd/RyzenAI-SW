@@ -8,6 +8,7 @@ import time
 import gc
 import os
 import sys 
+import builtins
 sys.path.append("../opt-pytorch") 
 from model_utils import warmup, decode_prompts, perplexity
 from transformers import set_seed
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(f"{args}")
-
+    builtins.impl="v0"
     log_dir = "./logs_%s"%args.model_name
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
