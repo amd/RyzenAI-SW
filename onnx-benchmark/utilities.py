@@ -63,14 +63,21 @@ def parse_args():
         type=str,
         default=".\\Imagenet\\val",
         help=f"path to Imagenet database, used for quantization with calibration. Default= .\Imagenet\val ",
-    )
+    )   
+    
+    def_config_path = os.path.join(os.environ.get('RYZEN_AI_INSTALLER'), 'voe-4.0-win_amd64\\vaip_config.json')
     parser.add_argument(
-        "--config", "-c", type=str, default="vaip_config.json", help="path to config json file. Default=vaip_config.json"
+        "--config", 
+        "-c", 
+        type=str, 
+        default=def_config_path, 
+        help="path to config json file. Default= <release>\\vaip_config.json"
     )
     parser.add_argument(
         "--core",
         default="1x4",
         type=str,
+        choices=["1x4", "4x4"],
         help="Which core to use. Possible values are 1x4 and 4x4. Default=1x4",
     )
     parser.add_argument(
@@ -78,23 +85,29 @@ def parse_args():
         "-d",
         type=str,
         default="CPU",
-        choices=["CPU", "iGPU", "dGPU", "ZenDNN", "VitisAIEP"],
+        choices=["CPU", "VitisAIEP"],
         help="Execution Provider selection. Default=CPU",
     )
     parser.add_argument(
         "--infinite",
-        type=int,
-        default=1,
+        type=str,
+        default="1",
+        choices=["0", "1"],
         help="if 1: Executing an infinite loop, when combined with a time limit, enables the test to run for a specified duration. Default=1",
     )
     parser.add_argument(
-        "--instance-count",
+        "--instance_count",
         "-i",
         type=int,
         default=1,
         help="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1",
     )
-    parser.add_argument("--intra-op-num-threads", type=int, default=2, help="Number of CPU threads enabled when an operator is resolved by the CPU. Affects the performances but also the CPU power consumption. Default=2")
+    parser.add_argument(
+        "--intra_op_num_threads", 
+        type=int, 
+        default=2, 
+        help="In general this parameter controls the total number of INTRA threads to use to run the model. INTRA = parallelize computation inside each operator. Specific for VitisAI EP: number of CPU threads enabled when an operator is resolved by the CPU. Affects the performances but also the CPU power consumption. For best performance: set intra_op_num_threads to 0: INTRA Threads Total = Number of physical CPU Cores. For best power efficiency: set intra_op_num_threads to smallest number (>0) that sustains the close to optimal performance (likely 1 for most cases of models running on DPU). Default=2"
+        )
     
     parser.add_argument(
         "--json",
@@ -116,7 +129,7 @@ def parse_args():
         help="JSON file name where the measureemnts will be saved. Default = report_performance.json ",
     )
     parser.add_argument(
-        "--min-interval",
+        "--min_interval",
         type=float,
         default=0,
         help="Minimum time interval (s) for running inferences. Default=0",
@@ -129,19 +142,33 @@ def parse_args():
         help="Path to the ONNX model",
     )
     parser.add_argument(
-        "--no-inference",
-        type=int,
-        default=0,
+        "--no_inference",
+        type=str,
+        default="0",
+        choices=["0", "1"],
         help="When set to 1 the benchmark runs without inference for power measurements baseline. Default=0",
     )
     parser.add_argument(
-        "--num", "-n", type=int, default=100, help="The number of images loaded into memory and subsequently sent to the model. Default=100"
+        "--num", 
+        "-n", 
+        type=int, 
+        default=100, 
+        help="The number of images loaded into memory and subsequently sent to the model. Default=100"
     )
+    
+    parser.add_argument(
+        "--num_calib", 
+        type=int, 
+        default=10, 
+        help="The number of images for calibration. Default=10"
+    )
+    
     parser.add_argument(
         "--renew",
         "-r",
-        type=int,
-        default=1,
+        type=str,
+        default="1",
+        choices=["0", "1"],
         help="if set to 1 cancel the cache and recompile the model. Set to 0 to keep the old compiled file. Default=1",
     )
     parser.add_argument(
@@ -155,7 +182,11 @@ def parse_args():
         "--threads", "-t", type=int, default=1, help="CPU threads. Default=1"
     )
     parser.add_argument(
-        "--verbose", "-v", type=int, default=0, help="0 (default): no debug messages, 1: few debug messages, 2: all debug messages"
+        "--verbose", "-v",
+        type=str,
+        default="0",
+        choices=["0", "1", "2"],
+        help="0 (default): no debug messages, 1: few debug messages, 2: all debug messages"
     )
     parser.add_argument(
         "--warmup",
@@ -380,6 +411,9 @@ def check_args(args):
         args.instance_count = total_cpu
         ggprint(f"Limiting instance count to max cpu count ({total_cpu})")
 
+    if args.device == "VitisAIEP":
+        assert os.path.exists(args.config), f"ERROR {args.config} does not exist. Provide a valid path with --config option"
+
 
 def cancelcache(cache_path):
     #cache_path = r"modelcachekey"
@@ -391,6 +425,7 @@ def cancelcache(cache_path):
             ggprint(f"Error during cache cancellation: {e}")
     else:
         ggprint(f"{cache_path} does not exist or is not a directory")
+
 
 def set_ZEN_env():
     os.environ["ZENDNN_LOG_OPTS"] = "ALL:0"
@@ -435,6 +470,15 @@ def str_to_sec(date_string):
     time_str = date_string.split(" ")[1]
     seconds = time_to_seconds(time_str)
     return seconds
+
+def del_old_meas(measfile):
+    # Check if the file exists before attempting to delete it
+    if os.path.exists(measfile):
+        os.remove(measfile)
+        ggprint(f"Old measurement {measfile} deleted successfully")
+    else:
+        ggprint(f"{measfile} does not exist")
+
 
 def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     # dictionary of results
@@ -694,7 +738,9 @@ def PHX_1x4_setup(silicon):
     except ValueError as error:
         print(f"Error: {error}")
     else:
-        xclbin_path = os.path.join(os.getcwd(),"onnxrt\\1x4.xclbin")
+        #xclbin_path = os.path.join(os.getcwd(),"onnxrt\\1x4.xclbin")
+        xclbin_path = os.path.join(os.environ.get('RYZEN_AI_INSTALLER'), 'voe-4.0-win_amd64\\1x4.xclbin')
+
         os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
         os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_Nx4_Overlay"
         ggprint("PHOENIX 1x4")
@@ -708,7 +754,8 @@ def PHX_4x4_setup(silicon):
     except ValueError as error:
         print(f"Error: {error}")
     else:
-        xclbin_path = os.path.join(os.getcwd(),"onnxrt\\4x4.xclbin")
+        #xclbin_path = os.path.join(os.getcwd(),"onnxrt\\4x4.xclbin")
+        xclbin_path = os.path.join(os.environ.get('RYZEN_AI_INSTALLER'), 'voe-4.0-win_amd64\\4x4.xclbin')
         os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
         os.environ['XLNX_TARGET_NAME'] = "AMD_AIE2_4x4_Overlay"
         ggprint("PHOENIX 4x4")
@@ -722,7 +769,8 @@ def STX_1x4_setup(silicon):
     except ValueError as error:
         ggprint(f"Error: {error}")
     else:
-        xclbin_path = os.path.join(os.getcwd(),"onnxrt\\1x4.xclbin")
+        #xclbin_path = os.path.join(os.getcwd(),"onnxrt\\1x4.xclbin")
+        xclbin_path = os.path.join(os.environ.get('RYZEN_AI_INSTALLER'), 'voe-4.0-win_amd64\\1x4.xclbin')
         os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
         os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_Nx4_Overlay"
         ggprint("STRIX 1x4")
@@ -752,7 +800,8 @@ def checksilicon():
     with open('out.json', 'r') as file:
         data = json.load(file)
     # Access the value of "system-host-devices-vbnv"
-    silicon = data["system"]["host"]["devices"][0]["vbnv"]
+    #silicon = data["system"]["host"]["devices"][0]["vbnv"]
+    silicon = data["system"]["host"]["devices"][0]["name"]
     #print("The value of 'system-host-devices-vbnv' is:", silicon)
     return silicon
 
@@ -767,32 +816,31 @@ def set_engine_shape(case):
     action = switch_dict.get(f'{silicon}_{case}', DEF_setup)
     action(silicon)
 
-def SetCalibDir(source_directory, calib_dir):
+def SetCalibDir(source_directory, calib_dir, num_images_to_copy):
     if os.path.exists(calib_dir):
         shutil.rmtree(calib_dir)
     os.makedirs(calib_dir)
 
-    subfolders = [f.path for f in os.scandir(source_directory) if f.is_dir()]
-    copied_images = 0
-    num_images_to_copy = 200
-    random.shuffle(subfolders)
-    for subfolder in subfolders:
-        files = os.listdir(subfolder)
-        random.shuffle(files)
-
+    image_files = []
+    for root, dirs, files in os.walk(source_directory):
         for file in files:
-            if copied_images >= num_images_to_copy:
-                break
+            if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                image_files.append(os.path.join(root, file))
 
-            source_path = os.path.join(subfolder, file)
-            destination_path = os.path.join(calib_dir, file)
-        
-            # check if the image has three channels
-            image = Image.open(source_path)
-            image_mode = image.mode
-            if image_mode == 'RGB':
-                shutil.copy(source_path, destination_path)
-                copied_images += 1
+    random.shuffle(image_files)
+
+    copied_images = 0
+
+    for file in image_files:
+        if copied_images >= num_images_to_copy:
+            break
+        #destination_path = os.path.join(calib_dir, file)
+        # check if the image has three channels
+        image = Image.open(file)
+        image_mode = image.mode
+        if image_mode == 'RGB':
+            shutil.copy(file, calib_dir)
+            copied_images += 1
     return copied_images
 
 def list_operators(onnx_model_path):
@@ -815,23 +863,18 @@ def get_input_format(onnx_model_path):
         input_shapes.append(tuple(shape))
     return [input_node.name, input_shapes]
 
-def analyze_input_format(input_shapes):
+def analyze_input_format(input_shape):
     order = "unknown"
-    if len(input_shapes)>1:
-        print("I cannot handle multiple inputs models yet")
-        quit()
+    min_position = input_shape.index(min(input_shape[1:]))
+    if min_position == 1:
+        print("NCHW detected")
+        order = "NCHW"
+    elif min_position == 3:
+        print("NHWC detected")
+        order = "NHWC"
     else:
-        min_position = input_shapes[0].index(min(input_shapes[0][1:]))
-        if min_position == 1:
-            print("NCHW detected")
-            order = "NCHW"
-        elif min_position == 3:
-            print("NHWC detected")
-            order = "NHWC"
-        else:
-            print("Unknown input format")
-            quit()
-    
+        print("Unknown input format")
+        quit()   
     return order
    
 def list_files_in_directory(directory):
@@ -866,10 +909,10 @@ class DataReader:
             image = Image.open(image_path)
 
             if image is not None:
-                # temp = np.array(image)
-                # automatically transpose according to model input shape
-                # print(f'Image shape = {temp.shape}')
-                # print(f'original model input size = {self.target_size}')
+                #temp = np.array(image)
+                ## automatically transpose according to model input shape
+                #print(f'Image shape = {temp.shape}')
+                #print(f'original model input size = {self.target_size}')
 
                 min_position = self.target_size.index(min(self.target_size[1:]))
                 if min_position == 1:
@@ -903,15 +946,36 @@ class DataReader:
         # print(f'returned next data reader  {self.read_batch()["input"].shape}')
         return self.read_batch()
 
+def get_input_info(onnx_model_path):
+    input_info = {}
+    # Load the ONNX model without loading it into memory
+    with open(onnx_model_path, "rb") as f:
+        model_proto = onnx.load(f)
+
+        # Get the first input node in the graph
+        first_input = model_proto.graph.input[0]
+        input_name = first_input.name
+        input_shape = [d.dim_value for d in first_input.type.tensor_type.shape.dim]
+    return input_name, input_shape
+
+
 def ggquantize(args):
     input_model_path = args.model
     imagenet_directory = args.calib
-    
+
     # `output_model_path` is the path where the quantized model will be saved.
-    output_INT8_NHWC_model_path = "NHWC_qdq_U8S8.onnx"
+    base_name, extension = os.path.splitext(input_model_path)
+    output_INT8_NHWC_model_path = f"{base_name}_int8{extension}"
 
     # `calibration_dataset_path` is the path to the dataset used for calibration during quantization.
     calibration_dataset_path = "calibration"
+
+    # 0) cancel the cache
+    if args.renew == "1":
+        cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
+        cancelcache(cache_dir)
+        cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(output_INT8_NHWC_model_path))
+        cancelcache(cache_dir)
 
     # 1) check if the model is already quantized
     operators = list_operators(input_model_path)
@@ -922,8 +986,10 @@ def ggquantize(args):
         print(Colors.MAGENTA)
         print("The model is not quantized")
         # 2) recognize the model input format
-        [inputname, input_shape] = get_input_format(input_model_path)      
-        print(f"input data info: {inputname} {input_shape}")
+        input_name, input_shape = get_input_info(input_model_path)
+        print(f"First Input Name: {input_name}, First Input Shape: {input_shape}")
+
+        
         order = analyze_input_format(input_shape)
         if order == "NHWC":
             nchw_to_nhwc = False
@@ -934,44 +1000,48 @@ def ggquantize(args):
         else:
             print("Something unknown happened")
             quit()
-
+       
         # 3) prepare the calibration directory
         calib_dir = "calibration"
-        copied_images = SetCalibDir(imagenet_directory, calib_dir)
+        copied_images = SetCalibDir(imagenet_directory, calib_dir, args.num_calib)
         print(f"Successfully copied {copied_images} RGB images to {calib_dir}")
 
-        # Data Reader is a utility class that 
-        # reads the calibration dataset and prepares it for the quantization process.
-        # Initialize the DataReader
+        # Data Reader is a utility class that reads the calibration dataset and prepares it for the quantization process.
+        data_reader = DataReader( calibration_folder=calibration_dataset_path, batch_size=1, target_size=input_shape, inputname=input_name)
+
+
+        if args.device == "VitisAIEP":
         
-        #data_reader = DataReader(calibration_dataset_path, batch_size=1, target_size=(224, 224))
-        data_reader = DataReader( calibration_folder=calibration_dataset_path, batch_size=1, target_size=input_shape[0], inputname=inputname)
-
-        # 4) Quantize
-        # `quantize_static` is a function that applies static quantization to the model.
-        # The parameters of this function are:
-        # - `input_model_path`: the path to the original, unquantized model.
-        # - `output_model_path`: the path where the quantized model will be saved.
-        # - `dr`: an instance of a data reader utility, which provides data for model calibration.
-        # - `quant_format`: the format of quantization operators. Need to set to QDQ or QOperator.
-        # - `activation_type`: the data type of activation tensors after quantization. In this case, it's QUInt8 (Quantized Unsigned Int 8).
-        # - `weight_type`: the data type of weight tensors after quantization. In this case, it's QInt8 (Quantized Int 8).   
-
-        vai_q_onnx.quantize_static(
-            input_model_path,
-            output_INT8_NHWC_model_path,
-            data_reader,
-            quant_format=vai_q_onnx.QuantFormat.QDQ,
-            calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
-            activation_type=QuantType.QUInt8,
-            weight_type=QuantType.QInt8,
-            enable_dpu=True,
-            convert_nchw_to_nhwc=nchw_to_nhwc,
-            extra_options={
-                'ActivationSymmetric':True,
-            }
-        )
-
+            vai_q_onnx.quantize_static(
+                input_model_path,
+                output_INT8_NHWC_model_path,
+                data_reader,
+                quant_format=vai_q_onnx.QuantFormat.QDQ,
+                calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
+                activation_type=QuantType.QUInt8,
+                weight_type=QuantType.QInt8,
+                enable_ipu_cnn=True,
+                convert_nchw_to_nhwc=nchw_to_nhwc,
+                extra_options={
+                    'ActivationSymmetric':True,
+                    'RemoveQDQConvLeakyRelu':True,
+                    'RemoveQDQConvPRelu':True
+                }
+            )
+        
+        elif args.device == "CPU":
+            vai_q_onnx.quantize_static(
+                input_model_path,
+                output_INT8_NHWC_model_path,
+                data_reader,
+                activation_type=QuantType.QUInt8,
+                calibrate_method=vai_q_onnx.CalibrationMethod.Percentile,
+                include_cle=True,
+                extra_options={
+                    'ReplaceClip6Relu':True,
+                    'CLESteps':4,
+                }
+            )
 
         print('Calibrated and quantized NHWC model saved at:', output_INT8_NHWC_model_path)
         print(Colors.RESET)

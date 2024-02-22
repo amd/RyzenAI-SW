@@ -10,7 +10,7 @@ if "%CONDA_DEFAULT_ENV%" == "" (
 
 REM Check if XLNX_VART_FIRMWARE environment variable is set
 if not defined XLNX_VART_FIRMWARE (
-    echo XLNX_VART_FIRMWARE is not set. Please ensure that you run the `install.bat` located in the ... \ryzen-ai-sw-1.0.1\ directory before proceeding.
+    echo XLNX_VART_FIRMWARE is not set. Please ensure that you run the `install.bat` located in the installation folder.
     exit /b 1
 )
 
@@ -23,11 +23,6 @@ if not exist "!source_dir!\" (
     exit /b 1
 )
 
-REM Create the destination directory .\onnxrt if it doesn't exist
-if not exist ".\onnxrt\" mkdir ".\onnxrt"
-
-REM Copy all .xclbin files to .\onnxrt\
-copy "!source_dir!\*.xclbin" ".\onnxrt\"
 
 REM add additional packages
 pip install pandas matplotlib importlib-metadata psutil keyboard

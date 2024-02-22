@@ -30,7 +30,7 @@ def timed_inference(fn, output_names, input_dict_B):
     end = time.perf_counter()
     latencies_sum += end - timed_inference_start
     inferences += 1
-    if args.verbose > 1:
+    if args.verbose == "2":
         ggprint(f"end - timed_inference_start = {end - timed_inference_start}")
         ggprint(f"num_completed_tasks = {inferences}")
 
@@ -39,7 +39,7 @@ def process_task_queue(task_queue, session, output_names):
         try:
             input_dict = task_queue.get(block=False)
         except queue.Empty:
-            if args.verbose > 1:
+            if args.verbose == "2":
                 ggprint(f"Queue ended. Thread={threading.current_thread().ident} elapsed={latencies_sum} nct={inferences}")
             break
         timed_inference(session.run, output_names, input_dict)
@@ -90,6 +90,7 @@ def profile(args, num):
         session = rt.InferenceSession(args.model, so, providers=providers)
     elif args.device == "VitisAIEP":
         args.model = ggquantize(args)
+        
         EP_List.append("VitisAIExecutionProvider")
         cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
         so.intra_op_num_threads = args.intra_op_num_threads
@@ -142,7 +143,7 @@ def profile(args, num):
             )
             for n in input_nodes
         }
-        if args.no_inference==0:
+        if args.no_inference=="0":
             task_queue.put(input_dict)
 
     # Start profiling
@@ -152,7 +153,7 @@ def profile(args, num):
     profile_start = time.perf_counter()
     printonce = True
     while True: 
-        if args.no_inference==1:
+        if args.no_inference=="1":
             if printonce:
                 printonce = False
                 ggprint("Running without inference for power baseline")
@@ -187,7 +188,7 @@ def profile(args, num):
             # list of time spent to process each set of images (args.num)
             finaltottime.append(total_run_time)
             
-        if args.verbose > 0:
+        if args.verbose == "1" or args.verbose == "2":
             ggprint(f'{len(nctlist)} - test time = {(time.perf_counter() - profile_start):.2f} / {args.timelimit:.2f} sec')
 
         # break infinite loop
@@ -200,7 +201,7 @@ def profile(args, num):
             ggprint(f"\nLimit time {args.timelimit} s reached")
             break
     
-    if args.no_inference == 0:
+    if args.no_inference == "0":
         lat_results = 1000 * latencies_sum / inferences    
         thr_results = (inferences * args.batchsize) / sum(finaltottime)
     else:
@@ -208,7 +209,7 @@ def profile(args, num):
         thr_results = 0
 
     
-    if args.verbose > 0:
+    if args.verbose == "1" or args.verbose == "2":
         print("\n")
         print(f'inferences in every batch  ={int(num / args.batchsize)}')
         print(f'cumulative time spent by all threads ={latencies_sum}')
@@ -238,7 +239,9 @@ if __name__ == "__main__":
     check_env(release)
     # imput parameters control
     check_args(args)
-
+    # delete old measurement
+    del_old_meas(args.log_json)
+    
     # EP driven setup
     xclbin_path = ""
     if args.device == "VitisAIEP":
@@ -246,11 +249,11 @@ if __name__ == "__main__":
         os.environ['XLNX_ONNX_EP_VERBOSE'] = "0"
         os.environ['XLNX_ENABLE_STAT_LOG']= "0"
         set_engine_shape(args.core)
-        if args.renew == 1:
+        if args.renew == "1":
             cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
-            print(cache_dir)
+            #ggprint(cache_dir)
             cancelcache(cache_dir)
-  
+
     if args.device == "ZenDNN":
         set_ZEN_env()
     
@@ -266,7 +269,7 @@ if __name__ == "__main__":
     # performance benchmark
     thr_results, lat_results, inferences = profile(args, args.num)
 
-    if args.no_inference == 0:
+    if args.no_inference == "0":
         measurement = meas_init(
             args, release, thr_results, lat_results, xclbin_path
         )
