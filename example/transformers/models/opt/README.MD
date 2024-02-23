@@ -1,23 +1,27 @@
 # OPT - Pytorch
 
+**_NOTE:_**  Please ensure that you followed the environment setup instructions from the [Transformer folder readme](../../README.md) before following the steps here.
+
 OPT (Open Pre-trained Transformer) class of language models are released by Meta and are available through [Huggingface](https://huggingface.co/facebook/opt-1.3b)
 
 This example shows how to deploy OPT models on AIE and custom AIE+CPU backend in **eager mode**. 
 
-# Model Structure 
+### Model Structure 
+
 This image shows model structure after quantizing and replacing Linear node with AIE custom linear node.
 ![Model Structure](opt1.3b.png)
 
-# Model Variants
-OPT has several variants: **opt-125m, opt-350m, opt-1.3b, opt-2.7b, opt-6.7b, opt-66b, etc.**. User can select any model variant for this example but the upper limit is dependent on the system memory capacity. ***For Ryzen-AI, limit to opt1.3b***. 
+### Model Variants
 
-Max. sequence length of model is 2048  (max. position embeddings), i.e. maximum number of tokens in input prompt. 
+Ryzen-AI supports opt-125m, opt-350m, opt-1.3b up to a sequence length of 2048 tokens.
 
-# Pytorch Eager Mode flow
-The **eager mode** execution model consists of the sequence of steps enumerated below.
+
+### Model preparation steps
+
+The model preparation steps consist of: 
 
 1. Load FP32 or BFloat16 OPT model
-2. Perform state-of-the-art [SmoothQuant](https://arxiv.org/pdf/2211.10438.pdf) to condition weights before quantization.
+2. Perform [SmoothQuant](https://arxiv.org/pdf/2211.10438.pdf) to condition weights before quantization.
 3. Quantize the model usign PyTorch's dynamic quantization
   1. Optionally load from checpoint. 
 4. Idenfiy quantized linear nodes in the model
@@ -26,27 +30,37 @@ The **eager mode** execution model consists of the sequence of steps enumerated 
 7. Pad, tile and cache weights as initialization step
 8. Run inferece - benchmark, decode or perplexity
 
-In this flow, compute primitives are choses to optimize prompt/prefill phase and token phase, both independently.
+In this flow, compute primitives are chosen to optimize prompt/prefill phase and token phase, both independently.
 
-**_NOTE:_**  Please ensure that you followed the instructions from the [Transformer folder readme](../../README.md) before following the steps here.
+The flow below provides two precision mode options for quantization and subsequent deployment: w4abf16 and w8a8
 
-# Go to the opt folder for Pytorch
+## Precision w4abf16
+
+### Quantization 
+
+Go to the opt folder for PyTorch
+
 ```
 cd models/opt
 ```
 
-# Run OPT Model - w4abf16 
-int4 weights are obtained using AWQ
+Quantize w4abf16 using AWQ
+
 ```
 python run_awq.py --task quantize --model_name opt-1.3b
+```
+
+### Deployment 
+
+Run OPT Model   
+```
 python run_awq.py --task decode --target aie --model_name opt-1.3b
 ```
 
-### Decode prompts example
+Example output
+
+
 ```
-python run_awq.py --model_name opt-1.3b --target aie --task decode
-...
-...
 
 ****************************************
 prompt: What is the meaning of life?
@@ -57,11 +71,7 @@ prompt: Tell me something you don't know.
 response: Tell me something you don't know.
 I don't know how to make a sandwich.
 I don't know how to make a sandwich
-****************************************
-prompt: What does Xilinx do?
-response: What does Xilinx do?
 
-Xilinx is a hardware IP system that provides a complete set of IP peripherals. It includes
 ****************************************
 prompt: What is the mass of earth?
 response: What is the mass of earth?
@@ -105,7 +115,9 @@ response: How did it all begin?
 I’ve been a fan of the series since the very beginning. I’ve read all
 ```
 
-### Benchmarking w4abf16
+### Results 
+
+#### Benchmarking 
 
 ```
 python run_awq.py --model_name opt-1.3b --target aie --task benchmark
@@ -131,9 +143,11 @@ Example#:3      Prompt-len:1536 New-tokens-generated:11 Total-time:32.166s      
 Example#:4      Prompt-len:2000 New-tokens-generated:11 Total-time:46.789s      Prefill-phase:45040.952ms       Time/token:173ms        Tokens/sec:5.8
 ```
 
+## Precision w8a8
 
-# Run OPT Model - w8a8
-## Step 1- Quantize and save model weights
+### Quantization
+
+Quantize and save model weights
 ```
 python save_weights.py --action save --model_name opt-1.3b
 ```
@@ -143,7 +157,10 @@ This saves 3 sets of weights.
 2. "quantized_<model_name>_bfloat16.pth" - All linear ops are int8 dynamic quantized, while all other ops are in bfloat16
 3. "weights_<model_name>" directory for onnx
 
-## Step 2 Run using run.py
+### Deployment 
+
+Run using run.py
+
 This script gives option to do the following:
 * Benchmark code - measure time/token latency
 * Calculate perplexity score
@@ -182,7 +199,7 @@ optional arguments:
 
 ```
 
-## Logfiles
+
 Each run generates a log directory "log_<model_name>" and all logs are within this directory. 
 
 Each run generatses 2 log files in the "log_<model_name>" directory
@@ -194,7 +211,8 @@ logs_opt-1.3b\log_opt-1.3b_aie_ptdq_float32_profile.log
 ```
 *_profile.log file has details about time/token latency. 
 
-### Decode prompts example
+Decode prompts example
+
 ```
 python run.py --model_name opt-1.3b --load --smoothquant --quant_mode w8a8 --target aie --task decode
 ...
@@ -206,11 +224,7 @@ response: What is the meaning of life?
 
 The meaning of life is the question that is asked by many people. The meaning of life is the
 ****************************************
-prompt: What does Xilinx do?
-response: What does Xilinx do?
 
-Xilinx is a global leader in the design and manufacture of integrated circuits, software, and services
-****************************************
 prompt: What is recursion?
 response: What is recursion?
 
@@ -218,7 +232,11 @@ Recursion is a mathematical concept that describes the relationship between two 
 ****************************************
 ```
 
-### Perplexity scores#
+
+### Results
+
+#### Perplexity scores
+
 Perplexity is measured using negative log likelihood scores.
 ***Perplexity measurement takes 3-4hrs to coimplete on wikitext2-raw test set***
 ***Lower value is better***
@@ -227,7 +245,7 @@ Perplexity is measured using negative log likelihood scores.
 Baseline: V100 (FP32) : **14.6240**
 
 The following numbers are on RyzenAI
-| **Precision+Config** | **opt-1.3b CPU** | **opt-1.3b AIE**
+| **Precision+Config** | **opt-1.3b CPU** | **opt-1.3b NPU**
 |---------------|----------|---------|
 FP32                                                                 |  14.2637 | na
 FP32, Flash Attention v2                                             |  14.9346 | na
@@ -239,10 +257,8 @@ int8 GEMM (SmoothQuant + PTDQ), other ops BF16                       |    na    
 int8 GEMM (SmoothQuant + PTDQ), other ops BF16, Flash Attention v2   |    na    | 15.0854
 int4 AWQ (Group size:128), bf16                                      |          | 
 
-### Profiling
-The token time is calculation is examplained as follows:
+#### Profiling
 
-![Token time](./opt-1.3b_token_time.png)
 ```
 python run.py --model_name opt-1.3b --target cpu --quant_mode none --task decode --amdopt
 
@@ -273,8 +289,4 @@ Example#:9      Prompt-len:7    New-tokens-generated:23 Total-time:4.398s       
 Example#:10     Prompt-len:7    New-tokens-generated:23 Total-time:4.320s       Prefill-phase:218.778ms Time/token:186ms        Tokens/sec:5.4
 ```
 
-# AWQ
-To run AWQ on CPU
-```
-python run_awq.py --awq load --model_name opt-1.3b
-```
+

@@ -1,24 +1,29 @@
 # OPT - ONNX
 
-# Eager Mode
-The **eager mode** execution model consists of the sequence of steps enumerated below.
+**_NOTE:_**  Please ensure that you followed the environment setup instructions from the [Transformer folder readme](../../README.md) before following the steps here.
+
+The OPT-ONNX flow uses an eager mode execution flow which consists of the sequence of steps as enumerated below.
 1. Generate ort dynamic quantized model
 2. Load model and run inference
 
-**_NOTE:_**  Please ensure that you followed the instructions from the [Transformer folder readme](../../README.md) before following the steps here.
 
-# Go to the opt-onnx folder
+## Quantization
+
+- Go to the opt-onnx folder
 ```
 cd models/opt-onnx
 ```
 
-# Generate ort dynamic quantized model
+- Generate ort dynamic quantized model
 ```
 .\prepare_model.bat opt-1.3b
 ```
 This script creates the directory `<model_name>_ortquantized`.
 
-# Load model and run inference
+## Deployment
+
+Load model and run inference
+
 This script gives option to do the following:
 * Benchmark code - measure time/token latency
 * Calculate perplexity score
@@ -26,6 +31,7 @@ This script gives option to do the following:
 * Decode a set of prompts to show model liveliness
 
 Run the following batch script to set the required environment variables:
+
   ```
   .\set_opt_onnx_env.bat opt-1.3b
   ```
@@ -65,7 +71,7 @@ options:
 ```
 Each run generates a log directory `log_<model_name>` and all logs are within this directory.
 
-# Decode prompts
+- Decode prompts
 ```
 python run.py --model_name opt-1.3b --target cpu --local_path ./opt-1.3b_ortquantized 
 python run.py --model_name opt-1.3b --target aie --local_path ./opt-1.3b_ortquantized 
@@ -75,14 +81,16 @@ If it is 0, the cached executable will be ignored and the model will be recompil
 
 One example of an answer is shown below.
 ```
-Prompt: What does Xilinx do?
-Response:
+prompt: What is recursion?
+response: What is recursion?
 
-Xilinx is a global leader in the design and manufacture of integrated circuits, software, and services
+Recursion is a mathematical concept that allows you to solve a problem by recursively solving it.
 ```
 
-# Profiling
-To enable token time calculation, use `--amdort` flag. To understand more about how it is measured, please look at the detailed description [here](../opt/README.MD#profiling).
+## Result 
+
+### Profiling
+To enable token time calculation, use `--amdort` flag. 
 
 ```
 python run.py --model_name opt-1.3b --target aie --local_path ./opt-1.3b_ortquantized --amdort --impl v0 --task decode --profile
@@ -115,7 +123,8 @@ Example#:10     Prompt-len:7    New-tokens-generated:23 Total-time:2.290s       
 
 ```
 
-# Perplexity on wikitext2-raw dataset
+### Perplexity on wikitext2-raw dataset
+
 ```
 python run.py --model_name opt-1.3b --target cpu --local_path ./opt-1.3b_ortquantized --task perplexity
 python run.py --model_name opt-1.3b --target aie --local_path ./opt-1.3b_ortquantized --task perplexity
