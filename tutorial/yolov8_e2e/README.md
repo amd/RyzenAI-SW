@@ -97,46 +97,6 @@ Switch back to the `Conda Prompt`, and compile the OpenCV source code with cmake
 # cd ../..
 ```
 
-#### gflags
-
-In the Git Bash, clone the repository
-
-```Git Bash
-# git clone https://github.com/gflags/gflags.git
-```
-
-Switch back to the `Conda Prompt`, and compile the gflags source code with cmake.
-
-```Conda Prompt
-# cd gflags
-# mkdir mybuild
-# cd mybuild
-# cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 16 2019" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\gflags'  -B build -S ../
-# cmake --build build --config Release
-# cmake --install build --config Release
-# cd ../..
-```
-
-#### glog
-
-In the Git Bash, clone the repository
-
-```Git Bash
-# git clone https://github.com/google/glog.git
-```
-
-Switch back to the `Conda Prompt`, and compile the glog source code with cmake.
-
-```Conda Prompt
-# cd glog
-# mkdir mybuild
-# cd mybuild
-# cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 16 2019" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\glog'  -B build -S ../
-# cmake --build build --config Release
-# cmake --install build --config Release
-# cd ../..
-```
-
 All the dependencies on the Ryzen AI laptop are installed completely. User could run a end to end Yolov8 deplomyment progress with the following ***Section 4***, which will start from the FP32 Yolov8 model. The whole progress will last for several hours or one day depending on the hardware computing ability. 
 
 Alternatively, user who wants a quick benchmark could skip ***Section 4*** and start from ***Section 5*** with pre-quantized model.
