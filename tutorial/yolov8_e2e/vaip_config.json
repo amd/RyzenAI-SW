@@ -14,24 +14,6 @@
    }
   },
   {
-   "name": "fuse_softmax",
-   "plugin": "vaip-pass_py_ext",
-   "disabled": false,
-   "pyExt": {
-    "moduleName": "voe.passes.fuse_softmax",
-    "methodName": "rules"
-   }
-  },
-  {
-   "name": "fuse_topk",
-   "plugin": "vaip-pass_py_ext",
-   "disabled": false,
-   "pyExt": {
-    "moduleName": "voe.passes.fuse_topk",
-    "methodName": "rules"
-   }
-  },
-  {
    "name": "fuse_decode_filter_boxes",
    "plugin": "vaip-pass_py_ext",
    "disabled": false,
@@ -284,7 +266,7 @@
             "boolValue" : false
         },
         "profile" : {
-            "intValue" : 0
+            "boolValue" : false
         },
         "prefetch" : {
             "boolValue" : false
@@ -298,8 +280,7 @@
         "concat_skip_code_gen" : {
             "boolValue" : false
         }
-    },
-    "minimum_num_of_conv": 2
+     }
    }
   }
  ]
