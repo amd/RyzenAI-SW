@@ -2,8 +2,8 @@
 
 This repository consists of methods to run Transformers in PyTorch and ONNX with operators dispatch to NPU. 
 
-# Setup Transformers
-## Step 1: Download repository and create conda environment based on provided yaml file
+## Setup Transformers
+### Step 1: Download repository and create conda environment based on provided yaml file
 Open Anaconda prompt on Windows PC.
 
 ```
@@ -21,20 +21,20 @@ cd RyzenAI-SW\example\transformers\ext
 git clone https://huggingface.co/datasets/mit-han-lab/awq-model-zoo awq_cache
 ```
 
-## Step 2: Setup environment 
+### Step 2: Setup environment 
 
 ```
 cd RyzenAI-SW\example\transformers\ 
 setup.bat
 ```
 
-## Step 3: Build dependencies
+### Step 3: Build dependencies
 
 ```
 pip install ops\cpp --force-reinstall
 ```
 
-## Step 4: Install ONNX EP for running ONNX based flows 
+### Step 4: Install ONNX EP for running ONNX based flows 
 
 Download [Ryzen-AI Software package](https://ryzenai.docs.amd.com/en/latest/manual_installation.html#download-the-package) and extract
 
@@ -50,9 +50,9 @@ python installer.py
 
 # Run LLMs
 
-## [Run OPT Model in Pytorch](models/opt/README.MD)
+- [Run Llama2 Model in Pytorch](models/llama2/README.MD)
 
-## [Run Llama2 Model in Pytorch](models/llama2/README.MD)
+- [Run OPT Model in Pytorch](models/opt/README.MD)
 
-## [Run OPT Model in ONNX](models/opt-onnx/README.MD)
+- [Run OPT Model in ONNX](models/opt-onnx/README.MD)
 
