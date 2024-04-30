@@ -84,7 +84,7 @@ Please note that all the steps mentioned here need to be performed in ***Windows
 
 2. Create a Conda Environment by using the env.yaml
     ```bash
-      conda create --name <env_name> --file=env.yaml
+    conda env create --name <env_name> --file=env.yaml
     ```
 
 3. Activate the Environment
