@@ -1,0 +1,8 @@
+{
+    "name": "hello-world",
+    "description": "hello-world-example",
+    "flow": "ryzen-ai",
+    "env_setup" : ["python -m pip install -r requirements.txt"],
+    "env_check" : ["XLNX_VART_FIRMWARE"],
+    "test_steps" : ["python hello_world.py"]
+  }
