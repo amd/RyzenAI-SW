@@ -1,0 +1,37 @@
+diff --git a/cmake/onnxruntime_mlas.cmake b/cmake/onnxruntime_mlas.cmake
+index 6828dfd07..7d66ff164 100644
+--- a/cmake/onnxruntime_mlas.cmake
++++ b/cmake/onnxruntime_mlas.cmake
+@@ -346,20 +346,6 @@ else()
+           ${MLAS_SRC_DIR}/qgemm_kernel_udot.cpp
+           ${MLAS_SRC_DIR}/qgemm_kernel_sdot.cpp
+         )
+-        if (NOT APPLE)
+-          set(mlas_platform_srcs
+-            ${mlas_platform_srcs}
+-            ${MLAS_SRC_DIR}/aarch64/HalfGemmKernelNeon.S
+-            ${MLAS_SRC_DIR}/activate_fp16.cpp
+-            ${MLAS_SRC_DIR}/dwconv.cpp
+-            ${MLAS_SRC_DIR}/halfgemm_kernel_neon.cpp
+-            ${MLAS_SRC_DIR}/pooling_fp16.cpp
+-          )
+-          set_source_files_properties(${MLAS_SRC_DIR}/aarch64/HalfGemmKernelNeon.S PROPERTIES COMPILE_FLAGS " -march=armv8.2-a+fp16 ")
+-          set_source_files_properties(${MLAS_SRC_DIR}/activate_fp16.cpp PROPERTIES COMPILE_FLAGS " -march=armv8.2-a+fp16 ")
+-          set_source_files_properties(${MLAS_SRC_DIR}/dwconv.cpp PROPERTIES COMPILE_FLAGS " -march=armv8.2-a+fp16 ")
+-          set_source_files_properties(${MLAS_SRC_DIR}/pooling_fp16.cpp PROPERTIES COMPILE_FLAGS " -march=armv8.2-a+fp16 ")
+-        endif()
+ 
+         if(ONNXRUNTIME_MLAS_MULTI_ARCH)
+             onnxruntime_add_static_library(onnxruntime_mlas_arm64 ${mlas_platform_srcs})
+diff --git a/onnxruntime/core/mlas/inc/mlas.h b/onnxruntime/core/mlas/inc/mlas.h
+index d44e0ab15..88105df2c 100644
+--- a/onnxruntime/core/mlas/inc/mlas.h
++++ b/onnxruntime/core/mlas/inc/mlas.h
+@@ -85,7 +85,6 @@ Abstract:
+ // When building an universial binary for APPLE, this flag would
+ // cause trouble for x64 target.
+ 
+-#define MLAS_F16VEC_INTRINSICS_SUPPORTED
+ 
+ #endif // 
+ #endif // ARM64

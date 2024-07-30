@@ -1,0 +1,16 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "https://gitenterprise.xilinx.com"
+    },
+    {
+      "pattern": "http://mkmartifactory.amd.com"
+    },
+    {
+      "pattern": "https://people.eecs.berkeley.edu/~hendrycks/data.tar"
+    },
+    {
+      "pattern": "https://amdcloud-my.sharepoint.com"
+    }
+  ]
+}

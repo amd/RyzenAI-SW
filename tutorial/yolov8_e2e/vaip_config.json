@@ -1,0 +1,306 @@
+{
+ "passes": [
+  {
+   "name": "init",
+   "plugin": "vaip-pass_init"
+  },
+  {
+   "name": "fuse_resize_norm",
+   "plugin": "vaip-pass_py_ext",
+   "disabled": false,
+   "pyExt": {
+    "moduleName": "voe.passes.fuse_resize_norm",
+    "methodName": "rules"
+   }
+  },
+  {
+   "name": "fuse_softmax",
+   "plugin": "vaip-pass_py_ext",
+   "disabled": false,
+   "pyExt": {
+    "moduleName": "voe.passes.fuse_softmax",
+    "methodName": "rules"
+   }
+  },
+  {
+   "name": "fuse_topk",
+   "plugin": "vaip-pass_py_ext",
+   "disabled": false,
+   "pyExt": {
+    "moduleName": "voe.passes.fuse_topk",
+    "methodName": "rules"
+   }
+  },
+  {
+   "name": "fuse_decode_filter_boxes",
+   "plugin": "vaip-pass_py_ext",
+   "disabled": false,
+   "pyExt": {
+    "moduleName": "voe.passes.fuse_decode_filter_boxes",
+    "methodName": "rules"
+   }
+  },
+  {
+   "name": "fuse_NMS",
+   "plugin": "vaip-pass_py_ext",
+   "disabled": true,
+   "pyExt": {
+    "moduleName": "voe.passes.fuse_NMS",
+    "methodName": "rules"
+   }
+  },
+  {
+   "name": "fuse_DPU",
+   "plugin": "vaip-pass_level1_dpu",
+   "passDpuParam": {
+    "subPass": [
+        {
+      "_comment" : "# issue 1048",
+      "name": "convert_ending_blacklist_ops_to_unknown_op",
+      "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+      "disabled": false
+        },
+        {
+      "_comment" : "test case : yolov5s6",
+      "name": "manual_partition",
+      "plugin": "vaip-pass_manual_partition",
+      "disabled": true,
+      "manualPartition": {
+       "fromOps": [
+        "1745/duplicated_token_14",
+        "1764/duplicated_token_10",
+        "1783/duplicated_token_6",
+        "1802/duplicated_token_2"
+       ],
+       "toOps": [
+           "2895"
+       ]
+      }
+     },
+     {
+      "name": "dynamic_input_batch",
+      "plugin": "vaip-pass_dynamic_input_batch"
+     },
+     {
+      "_comment" : "test case q_operator_resnet50",
+      "name": "convert_qlinear_to_qdq",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": true,
+      "enableGc": true,
+      "pyExt": {
+       "moduleName": "voe.passes.convert_qlinear_to_qdq",
+       "methodName": "rules"
+      }
+     },
+     {
+      "name": "create_const_op",
+      "plugin": "vaip-pass_create_const_op"
+     },
+     {
+      "name": "convert_to_xir_op",
+      "plugin": "vaip-pass_py_ext",
+      "disabled" : false,
+      "pyExt": {
+       "moduleName": "voe.passes.convert_to_xir_op",
+       "methodName": "rules"
+      }
+     },
+     {
+      "name": "to_xir",
+      "plugin": "vaip-pass_to_xir_ops"
+     },
+     {
+      "name": "remove_extra_q_dq",
+      "plugin": "vaip-pass_remove_extra_q_dq"
+     },
+     {
+      "name": "merge_add_into_conv_bias",
+      "plugin": "vaip-pass_merge_add_into_conv_bias"
+     },
+     {
+      "name": "merge_fix",
+      "plugin": "vaip-pass_py_ext",
+      "enableGc": true,
+      "pyExt": {
+       "moduleName": "voe.passes.merge_fix",
+       "methodName": "rules"
+      }
+     },
+     {
+      "name": "layoutransform",
+      "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+     },
+     {
+      "name": "gc_after_layout_transform",
+      "plugin": "vaip-pass_remove_isolated_node"
+     },
+     {
+      "name": "fuse_transpose",
+      "plugin": "vaip-pass_fuse_transpose",
+      "enableGc": true
+     },
+     {
+      "name": "gc_after_fuse_transpose",
+      "plugin": "vaip-pass_remove_isolated_node"
+     },
+     {
+      "name": "remove_identity",
+      "plugin": "vaip-pass_remove_identity",
+      "logVerbosity": 1
+     },
+     {
+      "name": "add_fix_after_const",
+      "plugin": "vaip-pass_const_add_fix"
+     },
+     {
+       "_comment" : "test case 41 see issue #611 #626 for more detail",
+      "name": "merge_duplicated_fix",
+      "plugin": "vaip-pass_merge_duplicated_fix",
+      "disabled": true,
+      "enableGc": true
+     },
+     {
+      "_comment": "test case 112",
+      "name": "remove_reshape_fix",
+      "plugin": "vaip-pass_py_ext",
+      "pyExt": {
+       "moduleName": "voe.passes.remove_reshape_fix",
+       "methodName": "rules"
+      }
+     },
+     {
+      "_comment" : "test case 5",
+      "name": "const_fold_batchnorm_to_scale",
+      "plugin": "vaip-pass_py_ext",
+      "pyExt": {
+       "moduleName": "voe.passes.const_fold_batchnorm_to_scale",
+       "methodName": "rules"
+      }
+     },
+     {
+      "name": "const_fold_transpose",
+      "plugin": "vaip-pass_const_fold_transpose"
+     },
+     {
+      "name": "merge_pad",
+      "plugin": "vaip-pass_merge_pad"
+     },
+     {
+      "name": "merge_hard_sigmoid",
+      "plugin": "vaip-pass_merge_hard_sigmoid"
+     },
+     {
+      "_comment" : "test case 112",
+      "name": "merge_mul",
+      "plugin": "vaip-pass_py_ext",
+      "pyExt": {
+       "moduleName": "voe.passes.merge_mul",
+       "methodName": "rules"
+      }
+     },
+     {
+      "name": "merge_consecutive_fix",
+      "plugin": "vaip-pass_merge_consecutive_fix",
+      "disabled": true,
+      "enableLog": true,
+      "logVerbosity": 1
+     },
+     {
+      "name": "graph_output_add_node",
+      "plugin": "vaip-pass_graph_output_add_node",
+      "disabled": true
+     },
+     {
+      "_comment" : "test case 20",
+      "name": "convert_transpose_add_fix_input_fix_input",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": true,
+      "pyExt": {
+       "moduleName": "voe.passes.convert_transpose_add_fix_input_fix_input",
+       "methodName": "process"
+      }
+     },
+     {
+      "_comment" : "test case 100",
+      "name": "convert_transpose_fix_pad_fix_input",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": true,
+      "pyExt": {
+       "moduleName": "voe.passes.convert_transpose_fix_pad_fix_input",
+       "methodName": "process"
+      }
+     },
+     {
+      "_comment" : "test case 100",
+      "name": "convert_transpose_fix_input",
+      "plugin": "vaip-pass_py_ext",
+      "enableGc": true,
+      "disabled": true,
+      "pyExt": {
+       "moduleName": "voe.passes.convert_transpose_fix_input",
+       "methodName": "process"
+      }
+     },
+     {
+      "_comment": "test case 110",
+      "name": "convert_softmax_to_hard_softmax",
+      "plugin": "vaip-pass_py_ext",
+      "disabled" : true,
+      "pyExt": {
+       "moduleName": "voe.passes.convert_softmax_to_hard_softmax",
+       "methodName": "rules"
+      }
+     },
+     {
+      "_comment": "test case 43",
+      "name": "remove_top_transpose",
+      "plugin": "vaip-pass_merge_input_transpose",
+      "disabled": true,
+      "enableGc": true
+     },
+     {
+      "_comment": "test case 110",
+      "name": "remove_bottom_transpose",
+      "plugin": "vaip-pass_remove_bottom_transpose",
+      "disabled": true,
+      "enableGc": true
+      },
+     {
+      "name": "final_gc",
+      "plugin": "vaip-pass_remove_isolated_node"
+     }
+    ],
+    "xcompilerAttrs": {
+        "debug_mode" : {
+            "stringValue" : "performance"
+        },
+        "dpu_subgraph_num" : {
+            "intValue" : 32
+        },
+        "opt_level" : {
+            "intValue" : 0
+        },
+        "dump_subgraph_ops" : {
+            "boolValue" : false
+        },
+        "profile" : {
+            "intValue" : 0
+        },
+        "prefetch" : {
+            "boolValue" : false
+        },
+        "preassign" : {
+            "boolValue" : false
+        },
+        "disable_std_quant" : {
+            "boolValue" : false
+        },
+        "concat_skip_code_gen" : {
+            "boolValue" : false
+        }
+    },
+    "minimum_num_of_conv": 2
+   }
+  }
+ ]
+}

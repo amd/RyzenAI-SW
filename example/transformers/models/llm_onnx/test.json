@@ -1,0 +1,61 @@
+{
+  "owner": "sumitn",
+  "test_steps": [
+    {
+      "name": "facebook_opt-125m",
+      "command": "python prepare_model.py --model_name facebook/opt-125m --output_model_dir opt-125m --export --optimize --quantize && python infer.py --model_name facebook/opt-125m --target aie --model_dir opt-125m/quant --task decode && python infer.py --model_name facebook/opt-125m --target aie --model_dir opt-125m/quant --task benchmark && python infer.py --model_name facebook/opt-125m --target aie --model_dir opt-125m/quant --task perplexity",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "facebook_opt-1.3b",
+      "command": "python prepare_model.py --model_name facebook/opt-1.3b --output_model_dir opt-1.3b --export --optimize --quantize && python infer.py --model_name facebook/opt-1.3b --target aie --model_dir opt-1.3b/quant --task decode && python infer.py --model_name facebook/opt-1.3b --target aie --model_dir opt-1.3b/quant --task benchmark && python infer.py --model_name facebook/opt-1.3b --target aie --model_dir opt-1.3b/quant --task perplexity",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "facebook_opt-2.7b",
+      "command": "python prepare_model.py --model_name facebook/opt-2.7b --output_model_dir opt-2.7b --export --optimize --quantize && python infer.py --model_name facebook/opt-2.7b --target aie --model_dir opt-2.7b/quant --task decode && python infer.py --model_name facebook/opt-2.7b --target aie --model_dir opt-2.7b/quant --task benchmark && python infer.py --model_name facebook/opt-2.7b --target aie --model_dir opt-2.7b/quant --task perplexity",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "facebook_opt-6.7b",
+      "command": "python prepare_model.py --model_name facebook/opt-6.7b --output_model_dir opt-6.7b --export --optimize --quantize && python infer.py --model_name facebook/opt-6.7b --target aie --model_dir opt-6.7b/quant --task decode && python infer.py --model_name facebook/opt-6.7b --target aie --model_dir opt-6.7b/quant --task benchmark && python infer.py --model_name facebook/opt-6.7b --target aie --model_dir opt-6.7b/quant --task perplexity",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "meta-llama_Llama-2-7b-hf",
+      "command": "python prepare_model.py --model_name meta-llama/Llama-2-7b-hf --output_model_dir Llama-2-7b-hf --export --optimize --quantize && python infer.py --model_name meta-llama/Llama-2-7b-hf --target aie --model_dir Llama-2-7b-hf/quant --task decode && python infer.py --model_name meta-llama/Llama-2-7b-hf --target aie --model_dir Llama-2-7b-hf/quant --task benchmark && python infer.py --model_name meta-llama/Llama-2-7b-hf --target aie --model_dir Llama-2-7b-hf/quant --task perplexity",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    }
+  ],
+  "cleanup": []
+}

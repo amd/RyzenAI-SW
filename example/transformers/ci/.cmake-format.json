@@ -1,0 +1,24 @@
+{
+  "format": {
+    "autosort": true,
+    "dangle_parens": true,
+    "max_subgroups_hwrap": 3
+  },
+  "markup": {
+    "enable_markup": false,
+    "first_comment_is_literal": true
+  },
+  "parse": {
+    "additional_commands": {
+      "list": {
+        "kwargs": {
+          "APPEND": 1,
+          "OUTPUT_VARIABLE": 1,
+          "PREPEND": 1,
+          "TRANSFORM": 1
+        },
+        "pargs": "*"
+      }
+    }
+  }
+}

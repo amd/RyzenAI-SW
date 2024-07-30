@@ -1,0 +1,14 @@
+bin/*
+include/vart_dll/*
+include/xir/*
+include/graph-engine/*
+include/UniLog/*
+include/vaip/*
+include/vitis/*
+include/xcompiler/*
+include/onnxruntime_vitisai_ep/*
+include/plugin/*
+lib/vart_dll.lib
+lib/tvm_ipu.dll
+share/cmake/*
+-share/cmake/pybind11

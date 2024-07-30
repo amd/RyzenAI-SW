@@ -1,0 +1,65 @@
+#!/bin/bash
+
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2020-2022 Xilinx, Inc.
+#
+
+# -- Detect a Windows environment and automatically switch to the .bat file
+if [[ "`uname`" == windows32* ]] || [[ "`uname`" == CYGWIN* ]] ; then
+    trap "" INT
+    "$0.bat" "$@"
+    exit $?
+fi
+
+# Working variables
+XRT_PROG=xbutil2
+
+# -- Examine the options
+XRTWARP_PROG_ARGS_size=0
+XRTWRAP_PROG_ARGS=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+    # Indicates that the legacy was specified
+    -legacy|--legacy)
+        echo "----------------------------------------------------------------------"
+        echo "Error: Obsoleted option
+       The --legacy option is no longer supported.
+    
+       For legacy migration, please refer to the XRT github.io utility 
+       migration guide.
+
+       Commands, options, arguments and their descriptions can also be 
+       reported via the --help option."
+        echo "----------------------------------------------------------------------"
+        exit 1
+	    ;;
+	# Copy the options the remaining options
+	*)
+	    XRTWRAP_PROG_ARGS[$XRTWARP_PROG_ARGS_size]="$1"
+	    XRTWARP_PROG_ARGS_size=$(($XRTWARP_PROG_ARGS_size + 1))
+	    shift
+	    ;;
+    esac
+done
+
+# -- Find loader directory
+XRT_LOADER_DIR="`dirname \"$0\"`"
+
+# For edge platforms loader is not required as tools are in standard location(/usr).
+# So calling unwrapped tool from this script itself.
+if [[ $XRT_LOADER_DIR =~ "/usr" ]]; then
+    "${XRT_LOADER_DIR}/unwrapped/${XRT_PROG}" "${XRTWRAP_PROG_ARGS[@]}"
+    exit 0
+fi
+
+# Call loader for dc platforms
+XRT_LOADER="${XRT_LOADER_DIR}/unwrapped/loader"
+if [ ! -f "$XRT_LOADER" ]; then
+    echo "ERROR: Could not find 64-bit loader executable."
+    echo "ERROR: ${XRT_LOADER} does not exist."
+    exit 1
+fi
+
+"${XRT_LOADER}" -exec ${XRT_PROG} "${XRTWRAP_PROG_ARGS[@]}"

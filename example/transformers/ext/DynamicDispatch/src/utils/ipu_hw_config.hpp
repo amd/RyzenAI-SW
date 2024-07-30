@@ -1,0 +1,12 @@
+#pragma once
+
+#define XAIE_NUM_ROWS 6
+#define XAIE_NUM_COLS 4
+#define XAIE_BASE_ADDR 0
+#define XAIE_COL_SHIFT 25
+#define XAIE_ROW_SHIFT 20
+#define XAIE_SHIM_ROW 0
+#define XAIE_MEM_TILE_ROW_START 1
+#define XAIE_MEM_TILE_NUM_ROWS 1
+#define XAIE_AIE_TILE_ROW_START 2
+#define XAIE_AIE_TILE_NUM_ROWS 4

@@ -1,0 +1,74 @@
+# Copyright © 2023 Advanced Micro Devices, Inc. All rights reserved.
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - docs/**
+      - figures/**
+      - "**.md"
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - docs/**
+      - figures/**
+      - "**.md"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Cancel in-progress runs if a new event occurs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  WORKSPACE: ${{ github.workspace }}
+  TRANSFORMERS_CONDA_ENV_NAME: ryzenai-transformers
+  XRT_PATH: C:\ipu_stack_rel_silicon\test_package\xrt-ipu
+  ACTIONS_RUNNER_DEBUG: '1'
+  CONDA_PATH: C:\ProgramData\anaconda3
+  # this is used to create a new virtual drive to avoid long path issues on Windows
+  FREE_DRIVE: "Z:"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+  test-transformers:
+    runs-on: transformers-ci-${{ matrix.device }}
+    strategy:
+      matrix:
+        device: [ "phx" ]
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 60
+    steps:
+      - run: |
+          git config --global core.longpaths true
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.XBUILD_GHE_PAT }}
+
+      - name: Test transformers
+        shell: cmd
+        run: |
+          call %CONDA_PATH%\Scripts\activate.bat %CONDA_PATH%
+          call conda remove -p %USERPROFILE%\.conda\envs\%TRANSFORMERS_CONDA_ENV_NAME% --all --force --yes
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          call conda env create --file env.yaml --prefix %USERPROFILE%\.conda\envs\%TRANSFORMERS_CONDA_ENV_NAME% --yes
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          call conda activate %USERPROFILE%\.conda\envs\%TRANSFORMERS_CONDA_ENV_NAME%
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          subst /d %FREE_DRIVE%
+          subst %FREE_DRIVE% %cd%
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          %FREE_DRIVE%
+          call setup_${{ matrix.device }}.bat
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          call ci\run_${{ matrix.device }}.bat
+          if errorlevel 1 (exit /B 1 %errorlevel%)

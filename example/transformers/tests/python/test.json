@@ -1,0 +1,227 @@
+{
+  "owner": "sumitn",
+  "setup": [],
+  "test_steps": [
+    {
+      "name": "py_mha",
+      "command": "pytest test_llama_mha.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_rms_norm",
+      "command": "set MLADF=2x4x4&& pytest test_rms_norm.py && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_rope",
+      "command": "set MLADF=2x4x4&& pytest test_rope.py && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_bmm",
+      "command": "set MLADF=2x4x4&& pytest test_bmm.py && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_mlp",
+      "command": "set MLADF=2x4x4&& pytest test_llama_fast_mlp.py && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_silu",
+      "command": "set MLADF=2x4x4 && pytest test_silu.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_elem_mult",
+      "command": "set MLADF=2x4x4  && pytest test_elemw_mul.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_elem_add",
+      "command": "set MLADF=2x4x4  && pytest test_elemw_add.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_mha_npu",
+      "command": "set MLADF=2x4x4  && pytest test_mha_npu.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_qlinear",
+      "command": "pytest test_qlinear.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_qlinear_pergrp_w4abf16_4x4_mladf",
+      "command": "set MLADF=4x4&& pytest --w_bit 4 test_qlinear_pergrp.py::test_QLinear_pergrp_mladf && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_qlinear_pergrp_w4abf16_2x4x4_mladf",
+      "command": "set MLADF=2x4x4&& pytest --w_bit 4 test_qlinear_pergrp.py::test_QLinear_pergrp_mladf && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "gemm_torch_w4abf16_2x4x4_mladf",
+      "command": "set MLADF=2x4x4&& pytest --w_bit 4 test_qlinear_pergrp_gemm.py && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_opt_fa_w4abf16",
+      "command": "pytest --quant_mode w4abf16 test_opt_flash_attention.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_llama_fa_w4abf16",
+      "command": "pytest --quant_mode w4abf16 test_llama_flash_attention.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_llama_fa_w8a8",
+      "command": "pytest --quant_mode w8a8 test_llama_flash_attention.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_llama_fa_w8a16",
+      "command": "pytest --quant_mode w8a16 test_llama_flash_attention.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "py_qwen2_fa_w4abf16",
+      "command": "pytest --quant_mode w4abf16 test_qwen2_flash_attention.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "py_chatglm3_fa_w4abf16",
+      "command": "pytest --quant_mode w4abf16 test_chatglm3_flash_attention.py",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    }
+  ],
+  "cleanup": []
+}

@@ -1,0 +1,18 @@
+# Experimental Release Manifest That Includes TVM ENGINE
+
+boost: v1.79.0
+glog: v0.6.0
+protobuf: v3.18.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+unilog: 7320c418b77713efb908a82bae6bb24cf60931ab
+xir: 9204ac72103092a7b253a0c23ec7471481656940
+target_factory: e70b1a9f716367e2a06180d176b551ce8b338b3b
+vart: 64537becc626a82c45ef9c3445297b68a59b66f3
+xcompiler: e9e377edb656be3a9962a3d275e77e1d661aeaaa
+graph-engine: e1744127520e356fa558c9bc8939039aff616ff6
+tvm-engine: 397442507c9f4220ad07025a68257593fca6fb20
+vaip: d2ae90c6dabfd9beeb0def2243085efd566f0ec1
+onnxruntime: 06e9e9df79eba15a3807ad35ac457571f3ab132d
+test_onnx_runner: f5195d2bfcc951a6e9931ff7831450c1453ae913

@@ -1,0 +1,30 @@
+{
+    "install_prefix": "~/.local/Ubuntu.20.04.x86_64.Debug",
+    "build_dir": "~/build/build.Ubuntu.20.04.x86_64.Debug",
+    "projects": [
+        {
+            "name": "unilog",
+            "src_dir": "unilog"
+        },
+        {
+            "name": "target_factory",
+            "src_dir": "target_factory"
+        },
+        {
+            "name": "xir",
+            "src_dir": "xir"
+        },
+        {
+            "name": "xcompiler",
+            "src_dir": "xcompiler"
+        },
+        {
+            "name": "vart",
+            "src_dir": "vart"
+        },
+        {
+            "name": "vaip",
+            "src_dir": "vaip"
+        }
+    ]
+}

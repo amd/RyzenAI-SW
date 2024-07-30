@@ -1,0 +1,35 @@
+diff --git a/src/glog/logging.h.in b/src/glog/logging.h.in
+index 95a573b..f39968c 100644
+--- a/src/glog/logging.h.in
++++ b/src/glog/logging.h.in
+@@ -1619,7 +1619,7 @@ class GLOG_EXPORT LogMessageFatal : public LogMessage {
+  public:
+   LogMessageFatal(const char* file, int line);
+   LogMessageFatal(const char* file, int line, const CheckOpString& result);
+-  @ac_cv___attribute___noreturn@ ~LogMessageFatal();
++  @ac_cv___attribute___noreturn@ ~LogMessageFatal() noexcept(false);
+ };
+ 
+ // A non-macro interface to the log facility; (useful
+diff --git a/src/logging.cc b/src/logging.cc
+index 4028ccc..3f32196 100644
+--- a/src/logging.cc
++++ b/src/logging.cc
+@@ -406,7 +406,7 @@ const char*const LogSeverityNames[NUM_SEVERITIES] = {
+ };
+ 
+ // Has the user called SetExitOnDFatal(true)?
+-static bool exit_on_dfatal = true;
++static bool exit_on_dfatal = false;
+ 
+ const char* GetLogSeverityName(LogSeverity severity) {
+   return LogSeverityNames[severity];
+@@ -2553,7 +2553,7 @@ LogMessageFatal::LogMessageFatal(const char* file, int line,
+                                  const CheckOpString& result) :
+     LogMessage(file, line, result) {}
+ 
+-LogMessageFatal::~LogMessageFatal() {
++LogMessageFatal::~LogMessageFatal() noexcept(false){
+     Flush();
+     LogMessage::Fail();
+ }

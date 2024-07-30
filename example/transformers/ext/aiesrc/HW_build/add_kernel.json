@@ -1,0 +1,77 @@
+{
+  "ps-kernels" : {
+    "kernels" : [
+      {
+        "name" : "DPU",
+        "type" : "dpu",
+        "extended-data" : {
+            "subtype" : "DPU",
+            "functional" : "0",
+            "dpu_kernel_id" : "0x100"
+        },
+        "arguments" : [
+          {
+            "name" : "opcode",
+            "address-qualifier" : "SCALAR",
+            "type" : "uint64_t",
+            "offset" : "0x00"
+          },
+          {
+            "name" : "ifm",
+            "memory-connection" : "HOST",
+            "address-qualifier" : "GLOBAL",
+            "type" : "char *",
+            "offset" : "0x08"
+          },
+          {
+            "name" : "param",
+            "memory-connection" : "HOST",
+            "address-qualifier" : "GLOBAL",
+            "type" : "char *",
+            "offset" : "0x10"
+          },
+          {
+            "name" : "ofm",
+            "memory-connection" : "HOST",
+            "address-qualifier" : "GLOBAL",
+            "type" : "char *",
+            "offset" : "0x18"
+          },
+          {
+            "name" : "inter",
+            "memory-connection" : "HOST",
+            "address-qualifier" : "GLOBAL",
+            "type" : "char *",
+            "offset" : "0x20"
+          },
+          {
+            "name" : "instruct",
+            "memory-connection" : "SRAM",
+            "address-qualifier" : "GLOBAL",
+            "type" : "char *",
+            "offset" : "0x28"
+          },
+          {
+            "name" : "nistruct",
+            "address-qualifier" : "SCALAR",
+            "type" : "uint32_t",
+            "offset" : "0x30"
+          },
+          {
+            "name" : "mc",
+            "memory-connection" : "HOST",
+            "address-qualifier" : "GLOBAL",
+            "type" : "char *",
+            "offset" : "0x34"
+          }
+        ],
+        "instances" : [
+          {
+            "name" : "IPUV2CNN"
+          }
+        ]
+      }
+    ]
+  }
+}
+

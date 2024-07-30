@@ -1,0 +1,5 @@
+$env:CMAKE_PREFIX_PATH = "$env:CMAKE_PREFIX_PATH;$PSScriptRoot"
+$env:PATH = "$env:PATH;$PSScriptRoot\build\aie-rt\Release"
+$env:FLEXML_OP_DIR = "$PSScriptRoot\tests\flexml"
+$env:DOD_ROOT = "$PSScriptRoot"
+$env:DEVICE = "stx"

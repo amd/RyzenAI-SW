@@ -1,0 +1,254 @@
+# Copyright © 2023 Advanced Micro Devices, Inc. All rights reserved.
+
+name: CI-dsv
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - docs/**
+      - figures/**
+      - "**.md"
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - docs/**
+      - figures/**
+      - "**.md"
+#   schedule:
+#     - cron: '30 19 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Cancel in-progress runs if a new event occurs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-dsv
+  cancel-in-progress: true
+
+env:
+  WORKSPACE: ${{ github.workspace }}
+  TRANSFORMERS_CONDA_ENV_NAME: ryzenai-transformers
+  XRT_PATH: C:\ipu_stack_rel_silicon\test_package\xrt-ipu
+  ACTIONS_RUNNER_DEBUG: '1'
+  CONDA_PATH: C:\ProgramData\anaconda3
+  FREE_DRIVE: "Z:"
+
+
+jobs:
+  lint:
+    runs-on: [ self-hosted, Ubuntu-22.04 ]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.XBUILD_GHE_PAT }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pre-commit
+          git remote set-branches origin main
+          git fetch origin main --depth 1
+      - name: Run pre-commit
+        run: |
+          pre-commit run --from-ref origin/main --to-ref ${GITHUB_SHA}
+
+
+  package-transformers:
+    runs-on: [ transformers-ci ]
+    if: github.event_name != 'pull_request' && github.event_name != 'schedule'
+    needs: [ lint ]
+    timeout-minutes: 30
+    steps:
+      - run: |
+          git config --global core.longpaths true
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.XBUILD_GHE_PAT }}
+
+      - name: Update git submodules recursively
+        run: |
+          git submodule update --init --recursive
+          git submodule status > info.txt
+          echo ${{ github.sha }} ${{ github.repositoryUrl }} >> info.txt
+          cat info.txt > $env:GITHUB_STEP_SUMMARY
+
+      - name: Build transformers
+        shell: cmd
+        run: |
+          call %LOCALAPPDATA%\anaconda3\Scripts\activate.bat %LOCALAPPDATA%\anaconda3
+          call conda activate %TRANSFORMERS_CONDA_ENV_NAME%
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          call conda env update --file env.yaml --prune
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          subst /d %FREE_DRIVE%
+          subst %FREE_DRIVE% %cd%
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          %FREE_DRIVE%
+          call setup_phx.bat
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          call ci\steps.bat :BuildAndInstallWheels
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          call ci\steps.bat :BuildTransformers
+          mkdir %WORKSPACE%\tests_release\
+          copy .\build\tests\cpp\Release\cpp_tests.exe %WORKSPACE%\tests_release\
+
+      - name: Package
+        run: |
+          mkdir transformers_release transformers_release\tests
+          for %%f in (.\*.whl) do (
+              echo %%f
+              xcopy %%f %WORKSPACE%\transformers_release\
+          )
+          xcopy dll\* %WORKSPACE%\transformers_release\ /E /I /H /Y
+          xcopy tests_release\* %WORKSPACE%\transformers_release\tests\ /E /I /H /Y
+          C:\"Program Files"\7-Zip\7z.exe a transformers_release.zip transformers_release
+        shell: cmd
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: transformers_release
+          path: transformers_release.zip
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: info.txt
+          path: info.txt
+
+      - name: Upload to artifactory
+        run: |
+          %JFROG_CLI% rt u transformers_release.zip %REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}/ --props "FOLDER_NAME=transformers-${{ github.run_number }};BRANCH=${{ github.ref_name }}"
+          %JFROG_CLI% rt u info.txt %REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}/ --props "FOLDER_NAME=transformers-${{ github.run_number }};BRANCH=${{ github.ref_name }}"
+          %JFROG_CLI% rt cp --flat "%REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}/*" %REPO_ROOT%/${{ github.ref_name }}/latest/
+          echo ### Artifacts location: [%ARTIFACTORY_URL%/%REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}](%ARTIFACTORY_URL%/%REPO_ROOT%/${{ github.ref_name }}/transformers-${{ github.run_number }}) >> %GITHUB_STEP_SUMMARY%
+        shell: cmd
+        env:
+          JFROG_CLI: C:\Users\xbuild\jfrog-cli\bin\jfrog-cli.exe
+          REPO_ROOT: 'aie-ipu-prod-local/com/xilinx/transformers'
+          ARTIFACTORY_URL: 'https://xcoartifactory:443/artifactory'
+
+
+  test-transformers-dsv:
+    runs-on: transformers-ci-${{ matrix.device }}-test
+    strategy:
+      matrix:
+        include:
+          - device: "phx"
+            full_device: "phoenix"
+          - device: "stx"
+            full_device: "strix"
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 90
+    needs: [ lint ]
+    steps:
+      - run: |
+          git config --global core.longpaths true
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.XBUILD_GHE_PAT }}
+
+      - name: Parse json
+        uses: ./.github/actions/json_parser
+        id: parsedJsonOutput
+        with:
+          json_filepath: 'tests/suite.json'
+
+      - name: Pre-run setup
+        shell: cmd
+        run: |
+          if exist ${{ env.FREE_DRIVE }} call subst /d ${{ env.FREE_DRIVE }}
+
+      - name: Cleanup conda env
+        shell: cmd
+        run: |
+          if exist %LOCALAPPDATA%\anaconda3\envs\%TRANSFORMERS_CONDA_ENV_NAME% rmdir /q /s %LOCALAPPDATA%\anaconda3\envs\%TRANSFORMERS_CONDA_ENV_NAME%
+          conda config --append envs_dirs %LOCALAPPDATA%\anaconda3\envs
+
+      - name: Map drive to workaround long paths
+        shell: cmd
+        run: |
+          call subst ${{ env.FREE_DRIVE }} ${{ env.WORKSPACE }}
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+
+      - name: Download dependencies
+        run: |
+          Invoke-WebRequest ${{ fromJson(steps.parsedJsonOutput.outputs.parsed_json)['vars'][format('{0}', matrix.full_device)]['voe'] }} -OutFile voe-4.0-win_amd64.zip
+          tar -xf voe-4.0-win_amd64.zip
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/dod/ipu_rdi_tools/CI/wrapper_runner.bat -OutFile wrapper_runner.bat
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/dod/ipu_rdi_tools/CI/RunGenerator.py -OutFile RunGenerator.py
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/main/ipu_rdi_tools/CI/performance_definition.json -OutFile performance_definition.json
+
+      - name: store date, uppercase device name to a variable
+        run: |
+          $NOW=& Get-Date -format yyyyMMdd_HHmm
+          echo "NOW=$NOW" >> $env:GITHUB_ENV
+          $FULL_DEVICE_UPPER="${{ matrix.full_device }}".ToUpper()
+          echo "FULL_DEVICE_UPPER=$FULL_DEVICE_UPPER" >> $env:GITHUB_ENV
+
+      - name: Test transformers - PR/merge
+        shell: cmd
+        if: github.event_name != 'schedule'
+        run: |
+          call conda activate base
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          ${{ env.FREE_DRIVE }}
+          call wrapper_runner.bat transformers ${{ env.FREE_DRIVE }}\ %TRANSFORMERS_OUTPUT_DIR% %RUN_ID_STR% ${{ matrix.full_device }} %RUN_TYPE% %TEST_TYPE% %SPOOL_DIR%
+
+        env:
+          RUN_TYPE: pr
+          TEST_TYPE: unittests
+          TRANSFORMERS_OUTPUT_DIR: ${{ env.FREE_DRIVE }}\
+          TRANSFORMERS_REPO_PATH: ${{ env.FREE_DRIVE }}\
+          DEPENDENCY_PATH: ${{ env.FREE_DRIVE }}\
+          SPOOL_DIR: ${{ vars.SPOOL_DIR_LNX }}
+          RUN_ID_STR: ${{ env.NOW }}_${{ matrix.full_device }}_win64_wdf
+
+      - name: Test transformers - daily
+        shell: cmd
+        if: github.event_name == 'schedule'
+        continue-on-error: true
+        run: |
+          call conda activate base
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          ${{ env.FREE_DRIVE }}
+          call wrapper_runner.bat transformers ${{ env.FREE_DRIVE }}\ %TRANSFORMERS_OUTPUT_DIR% %RUN_ID_STR% ${{ matrix.full_device }} %RUN_TYPE% %TEST_TYPE% %SPOOL_DIR%
+        env:
+          RUN_TYPE: daily
+          TEST_TYPE: all
+          TRANSFORMERS_OUTPUT_DIR: ${{ env.FREE_DRIVE }}\
+          TRANSFORMERS_REPO_PATH: ${{ env.FREE_DRIVE }}\
+          DEPENDENCY_PATH: ${{ env.FREE_DRIVE }}\
+          SPOOL_DIR: ${{ vars.SPOOL_DIR_LNX }}
+          RUN_ID_STR: ${{ env.NOW }}_${{ matrix.full_device }}_win64_wdf
+
+      - name: Spool results to xoah
+        # Installs libs needed for spool script and runs the script.
+        if: github.event_name == 'schedule'
+        shell: cmd
+        run: |
+          xcopy /E /C /I %RUN_ID_STR% ${{ vars.TRANSFORMERS_RESULTS_UNC }}\%RUN_ID_STR%
+          subst R: \\xsjswsvm1-lif9\crdi
+          set PATH=C:\cygwin\bin;%PATH%
+          C:\cygwin\bin\bash.exe -c "cd ${{ vars.TRANSFORMERS_RESULTS_UNC_CYGWIN }}/${{ env.RUN_ID_STR }} && pip3.8 install simplejson requests pyyaml pytz && ../post_suite_execute.sh"
+          echo "Results link for ${{ matrix.full_device }}: http://xoah/summary?suiteRunName=%RUN_ID_STR%&superSuiteName=${{ env.FULL_DEVICE_UPPER }}&relBranch=1.0.0" >> %GITHUB_STEP_SUMMARY%
+          subst /d R:
+        env:
+          RUN_TYPE: daily
+          RUN_ID_STR: ${{ env.NOW }}_${{ matrix.full_device }}_win64_wdf
+
+      - name: Cleanup conda env
+        if: always()
+        continue-on-error: true
+        shell: cmd
+        run: |
+          conda remove --name ${{ env.TRANSFORMERS_CONDA_ENV_NAME }} --all --yes
+          subst /d ${{ env.FREE_DRIVE }}

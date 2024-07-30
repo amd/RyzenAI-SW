@@ -1,0 +1,111 @@
+{
+  "run_dir": ".",
+  "owner": "sumitn",
+  "setup": [
+    "cmake -B build\\",
+    "cmake --build build\\ --config=Release"
+  ],
+  "test_steps": [
+    {
+      "name": "cpp_Linear",
+      "command": "build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Linear*",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear2_w8a8",
+      "command": "build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2Testw8a8*",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear2_w4a16",
+      "command": "build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2Testw4a16*",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear2_w4a16_4x4_mladf",
+      "command": "set MLADF=4x4&& build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2Testw4a16.Kernel_mladf_1x*:Qlinear_2Testw4a16.Kernel_mladf_128x*:Qlinear_2Testw4a16.Kernel_mladf_2048x* && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear2_w4a16_2x4x4_mladf",
+      "command": "set MLADF=2x4x4&& build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2Testw4a16.Kernel_mladf_1x*:Qlinear_2Testw4a16.Kernel_mladf_128x*:Qlinear_2Testw4a16.Kernel_mladf_2048x* && set MLADF=",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear2_w3a16",
+      "command": "build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2Testw3a16*",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear2_w8a16",
+      "command": "build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2Testw8a16*",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "cpp_Qlinear_w4a16_llama_m2k",
+      "command": "build\\tests\\cpp\\Release\\cpp_tests.exe --gtest_filter=Qlinear_2_LlamaONNX*",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    },
+    {
+      "name": "llama_cpp",
+      "command": "ext\\llama.cpp\\build\\bin\\Release\\main.exe --help & dir ext\\llama.cpp\\build",
+      "run_type": [
+        "pr"
+      ],
+      "devices": [
+        "strix"
+      ]
+    }
+  ],
+  "cleanup": []
+}

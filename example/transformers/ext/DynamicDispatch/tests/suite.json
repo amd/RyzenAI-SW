@@ -1,0 +1,16 @@
+{
+  "owner": "sumitn",
+  "setup": [
+    "echo y|conda remove --name dynamic_op_dispatch --all",
+    "conda env create -f env.yml",
+    "conda activate dynamic_op_dispatch",
+    "set XRT_DIR=C:\\Users\\xrt_package\\xrt",
+    {
+      "strix": [
+        "setup.bat"
+      ]
+    },
+    "pip install ."
+  ],
+  "cleanup": []
+}

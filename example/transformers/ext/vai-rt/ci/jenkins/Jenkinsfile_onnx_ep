@@ -1,0 +1,210 @@
+/*
+ *  Copyright (C) 2023, Xilinx Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may
+ * not use this file except in compliance with the License. A copy of the
+ * License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+def FAILED_STAGE
+
+pipeline {
+  agent {
+      label {
+          label 'VITISAI-IPU-WINDOWS'
+          customWorkspace "C:\\Users\\xbuild\\Desktop\\xj3\\${JOB_BASE_NAME}"
+      }
+  } // agent
+  //Parameters for Jenkins Job
+  parameters {
+    booleanParam(defaultValue: false, description: 'DEV Run', name: 'is this a test run?')
+    string(defaultValue: '9999.0.0', name: 'RELEASE', description: 'RELEASE value e.g HEAD')
+    string(defaultValue: 'https://gitenterprise.xilinx.com/VitisAI/vai-rt.git', name: 'GITREPO', description: 'Git repo URL')
+    string(defaultValue: 'dev', name: 'GITBRANCH', description: 'Git Branch e.g master')
+//     string(defaultValue: '2023_03_01.txt', name: 'RELEASE_FILE', description: 'Build file to use')
+    string(defaultValue: 'https://xcoartifactory/artifactory', name: 'ARTIFACTORYSERVER', description: 'Artifactory Server URL')
+    string(defaultValue: 'shrishas@xilinx.com,abalasa@xilinx.com', name: 'EMAIL_RECIPIENTS', description: 'Email Receipients')
+    booleanParam(defaultValue: false, name: 'GENERATE_TESTS', description: 'Check the box to generate tests')
+    booleanParam(defaultValue: false, name:'prBuild', description: 'Check the box toenable PR Build')
+  }
+
+  environment {
+    VAI_RT_WORKSPACE = "${env.WORKSPACE}"
+    VAI_RT_PREFIX = "${env.WORKSPACE}\\install_dir"
+    VAI_RT_BUILD_DIR = "${env.WORKSPACE}\\build_dir"
+    VAI_RT_PACKAGER = "${env.WORKSPACE}\\ci\\packager"
+    XBUILD_PATH = "C:\\Users\\xbuild\\"
+    // Release file
+    RELEASE_FILE = "${params.RELEASE_FILE}"
+    // Email recepients
+    EMAIL_RECEPIENTS = "${params.EMAIL_RECEPIENTS}"
+    JFROG_CLI = "C:\\Users\\xbuild\\jfrog-cli.exe"
+
+    // TVM xclbins
+    TVM_XCLBINS_URL = "${params.TVM_XCLBINS_URL}"
+    //helperObject = load "ci\\jenkins\\helper.groovy"
+  } // environment
+
+  stages {
+    stage ("Sync Workspace") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+          env.ARTIFACTORY_REPO = params.DEV ? "vai-rt-ipu-dev-local":"vai-rt-ipu-prod-local"
+          env.ARTIFACTORY_REPO_PATH = "${env.ARTIFACTORY_REPO}/com/amd/onnx-rt/${params.GITBRANCH}/${env.BUILD_NUMBER}"
+          env.ARTIFACTORY_REPO_PATH_LATEST = "${env.ARTIFACTORY_REPO}/com/amd/onnx-rt/${GITBRANCH}/latest/"
+        } //script
+        cleanWs()
+        bat """
+          if exist ${env.XBUILD_PATH}\\workspace\\onnxruntime cd ${env.XBUILD_PATH}\\workspace & rmdir /s /q onnxruntime
+          if exist ${env.XBUILD_PATH}\\build\\external_workspace cd ${env.XBUILD_PATH}\\build & rmdir /s /q external_workspace
+        """
+        // Clone vai-rt repo
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "*/"+"${params.GITBRANCH}"]],
+        doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory'],
+        [$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: false]],
+        submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'gitenterprise-token-xbuild', url: "${params.GITREPO}"]]]
+
+        // Create build and install dirs
+        bat """
+          mkdir ${env.VAI_RT_PREFIX} ${env.VAI_RT_BUILD_DIR}
+        """
+      }
+    }
+
+    stage ("Get XRT-IPU") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+        }
+        //copy XRT-IPU from TA
+        bat """
+          xcopy \\\\xcoswsvm4-xbuildsFG\\xbuilds\\XRT-IPU\\9999.0.0\\9999.0.0.455\\WRelease\\XRT_202220.2.14.455_WindowsServer2019-amd64.zip .
+        """
+        // Extract thezip to install dir
+        bat """
+            for /F %%I IN ('dir /b XRT*.zip') DO (
+                tar -xf "%%I" -C ${env.VAI_RT_PREFIX} --strip-components=1
+            )
+        """
+      }
+    }
+
+    stage("Build ONNX-EP") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+        }
+        script {
+          if (env.RELEASE_FILE != "null") {
+          bat """
+            md onnx-rt
+            set WITH_XCOMPILER=ON
+            set WITH_TVM_AIE_COMPILER=ON
+            type release_file\\${env.RELEASE_FILE}
+            python main.py --release_file release_file\\${env.RELEASE_FILE} --type release
+          """
+          } else {
+          bat """
+            md onnx-rt
+            set WITH_XCOMPILER=ON
+            set WITH_TVM_AIE_COMPILER=ON
+            python main.py --update-src --type release
+          """  
+          }
+        }
+        fileExists "${env.VAI_RT_PREFIX}\\bin\\vart_dll.dll"
+      }
+    }
+
+    // stage("Build ONNX-RT Tests") {
+    //   when {
+    //     expression { 
+    //       params.GENERATE_TESTS == true
+    //     }
+    //   }
+    //   steps {
+    //     script {
+    //       FAILED_STAGE = env.STAGE_NAME
+    //     }
+
+    //     // Build Inference tests
+    //     bat """
+    //       md onnx-rt\\tests\\inference
+    //       cd tests\\inference
+    //       build_test_inference.bat ${env.VAI_RT_PREFIX}
+    //     """
+    //     bat """
+    //       xcopy /s /i /y tests\\inference\\bin\\* onnx-rt\\tests\\inference\\
+    //     """
+    //     fileExists "tests\\inference\\bin\\test_inference.exe"
+
+    //     // Build sample app
+    //     bat """
+    //       dir
+    //       cd tests\\sample_app
+    //       build_sample_app.bat ${env.VAI_RT_PREFIX}
+    //     """
+    //     bat """
+    //       md onnx-rt\\tests\\sample_app
+    //       xcopy tests\\sample_app\\bin\\sample_app.exe onnx-rt\\tests\\sample_app\\ /s /i /y
+    //     """
+    //     fileExists "tests\\sample_app\\bin\\sample_app.exe"
+    //   }
+    // }
+    
+    stage("Package and archive files") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+          env.INSTALL_RELEASE = "voe-4.0-win_amd64"
+        }
+        //Package files using package.py. Update ci/packager/package_list.txt to add any new binaries to be packaged
+        bat """${env.VAI_RT_PACKAGER}\\packager.bat ${VAI_RT_BUILD_DIR} ${env.VAI_RT_PREFIX} ${env.VAI_RT_PACKAGER} ${env.WORKSPACE} ${env.RELEASE_FILE} ${params.bin_1x4_url} ${params.bin_5x4_url} ${env.INSTALL_RELEASE} ${env.TVM_XCLBINS_URL}"""
+        archiveArtifacts 'info_1x4.txt'
+        archiveArtifacts 'info_5x4.txt'
+        archiveArtifacts 'onnx-rt.zip'
+        archiveArtifacts 'xrt.zip'
+        archiveArtifacts "${env.INSTALL_RELEASE}.zip"
+      }
+    }
+    
+    stage("Publish to artifactory") {
+      when {
+        expression {!params.prBuild}
+      }
+      steps {
+          script {
+              FAILED_STAGE = env.STAGE_NAME
+          }
+          bat """
+              echo "uploading: onnx-rt to ${env.ARTIFACTORY_REPO_PATH}"
+              ${env.JFROG_CLI} rt u onnx-rt.zip ${env.ARTIFACTORY_REPO_PATH}/onnx-rt.zip
+              ${env.JFROG_CLI} rt u ${env.INSTALL_RELEASE}.zip ${env.ARTIFACTORY_REPO_PATH}/${env.INSTALL_RELEASE}.zip    
+              ${env.JFROG_CLI} rt u xrt.zip ${env.ARTIFACTORY_REPO_PATH}/xrt.zip
+              ${env.JFROG_CLI} rt u info_1x4.txt ${env.ARTIFACTORY_REPO_PATH}/info_1x4.txt
+              ${env.JFROG_CLI} rt u info_5x4.txt ${env.ARTIFACTORY_REPO_PATH}/info_5x4.txt
+              ${env.JFROG_CLI} rt u info_tvm.txt ${env.ARTIFACTORY_REPO_PATH}/info_tvm.txt
+              
+              ${env.JFROG_CLI} rt cp --flat ${env.ARTIFACTORY_REPO_PATH}/* ${env.ARTIFACTORY_REPO_PATH_LATEST}
+          """
+      }
+    }
+  }
+  post {
+    failure {
+      echo 'This will run only if failed'
+      emailext body: "Something is wrong with ${BUILD_URL} failed at ${FAILED_STAGE}", to: params.EMAIL_RECIPIENTS, recipientProviders: [
+        [$class: 'DevelopersRecipientProvider']
+      ], subject: "Failed Pipeline: ${currentBuild.fullDisplayName}"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "aie_partition": {
+     "name": "QoS",
+      "operations_per_cycle": "2048",
+      "inference_fingerprint": "576462972803530250",
+      "pre_post_fingerprint": "12345",
+      "partition": {
+      "column_width": 4,
+        "start_columns": [0]
+    },
+      "PDIs": [{
+        "uuid": "00000000-0000-0000-0000-000000001111",
+        "file_name": "./full.pdi",
+        "cdo_groups": [{
+          "name": "DPU",
+          "type": "PRE_POST",
+          "pdi_id": "0xF0",
+          "dpu_kernel_ids": ["0x100"],
+          "pre_cdo_groups": ["0xC0"]
+        }
+        ]
+      },
+      {
+        "uuid": "00000000-0000-0000-0000-000000002222",
+        "file_name": "./lite.pdi",
+        "cdo_groups": [{
+          "name": "CONTEXT",
+          "type": "LITE",
+          "pdi_id": "0xF1",
+          "dpu_kernel_ids": ["0x104"]
+        }]
+      }
+    ]
+  }
+}

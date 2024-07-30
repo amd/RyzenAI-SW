@@ -1,0 +1,57 @@
+{
+  "install_prefix": "~/.local/Windows.10.0.14393.AMD64.Debug",
+  "build_dir": "~/build/build.Windows.10.0.14393.AMD64.Debug",
+  "projects": [
+    {
+      "name": "unilog",
+      "src_dir": "unilog"
+    },
+    {
+      "name": "target_factory",
+      "src_dir": "target_factory"
+    },
+    {
+      "name": "xir",
+      "src_dir": "xir",
+      "cmake_extra_args": [
+        "-DBUILD_PYTHON=ON",
+        "-DINSTALL_USER=ON"
+      ]
+    },
+    {
+      "name": "xcompiler",
+      "src_dir": "xcompiler",
+      "cmake_extra_args": [
+        "-DBUILD_PYTHON=OFF",
+        "-DBUILD_TEST=OFF",
+        "-DINSTALL_FAILURE_FUNC=OFF",
+        "-DENABLE_IPU=ON",
+        "-DSKIP_CLEAN_GRAPH=ON"
+      ]
+    },
+    {
+      "name": "vart",
+      "src_dir": "vart",
+      "cmake_extra_args": [
+        "-DBUILD_PYTHON=ON",
+        "-DINSTALL_USER=ON"
+      ]
+    },
+    {
+      "name": "graph-engine",
+      "src_dir": "graph-engine",
+      "cmake_extra_args": [
+        "-DBUILD_TEST=OFF",
+        "-DBUILD_DOC=OFF"
+      ]
+    },
+    {
+      "name": "vaip",
+      "src_dir": "vaip",
+      "cmake_extra_args": [
+        "-DBUILD_PYTHON=ON",
+        "-DINSTALL_USER=ON"
+      ]
+    }
+  ]
+}

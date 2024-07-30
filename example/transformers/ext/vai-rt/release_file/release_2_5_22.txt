@@ -1,0 +1,22 @@
+#for ipu only
+#vai-rt:72524bd2067b3a9256c5518aa0010d7380b8b322
+#xclbin_url:https://xcoartifactory.xilinx.com:443/artifactory/PHX_test_case_package/xclbin/release_xclbin_2.5.22/1x4_cfg0.xclbin
+boost: v1.79.0
+glog: v0.6.0
+protobuf: v3.21.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+gtest: release-1.12.1
+unilog: b28e41e68090cbce9f2626656bc094470c226e9a
+xir: 3c006f5c0d3908ad3ce7ea68daa9fb2b4e48c553
+target_factory: 2ba48c0352dce8e9f9f4d135383395742886e041
+trace_logging: b4d5060dd3635409f1e79fac8ec9e6c0e8a09e7f
+vart: 9e53d3a8d7b64eff0069d5e5cd5239c7145f8db2
+xcompiler: f42af91c5e96143332d481736c4666d07a7a5203
+graph-engine: 67a38803f2628f7a8a6365418808db63d7e6f94d
+vairt: 82ffe5a67749cc5e2e93556cd07f9ed031cc9ffe
+testcases: ba2b9e62f95d1832a0b4a6e947eb7d61f5a62337
+onnxruntime: e139ae238bbce6772be76fcb7ea13fb402adc483
+vaip: f104cfb3d6ed217e7180f5de28d2ac3f7085c0c6
+test_onnx_runner: 7eeb7f20b9d958dcb23cfe7285087ab8867fd374

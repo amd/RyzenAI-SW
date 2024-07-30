@@ -1,0 +1,37 @@
+{
+  "owner": "sumitn",
+  "setup": [
+    "conda remove --name ryzenai-transformers --all --yes",
+    "conda env create --file=env.yaml",
+    "conda activate ryzenai-transformers",
+    "build_dependencies.bat",
+    "git lfs install",
+    {
+      "phoenix": [
+        "setup_phx.bat"
+      ],
+      "strix": [
+        "setup_stx.bat"
+      ]
+    },
+    "pip install ops\\cpp --force-reinstall",
+    "pip install ops\\torch_cpp --force-reinstall",
+    "cmake -S ops\\cpp\\ -B ops\\cpp\\build\\ -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%",
+    "cmake --build ops\\cpp\\build\\ --config=Release --parallel",
+    "cmake --install ops\\cpp\\build\\ --config=Release",
+    "cmake -S ext\\llama.cpp\\ -B ext\\llama.cpp\\build\\ -DCMAKE_PREFIX_PATH='%CONDA_PREFIX%;%XRT_PATH%' -DLLAMA_RYZENAI=ON",
+    "cmake --build ext\\llama.cpp\\build\\ --config=Release --parallel"
+  ],
+  "cleanup": [
+    "conda deactivate",
+    "conda remove --name ryzenai-transformers --all --yes"
+  ],
+  "vars": {
+    "phoenix": {
+      "voe": "https://xcoartifactory/artifactory/vai-rt-ipu-prod-local/com/amd/onnx-rt/phx/dev/861/windows/voe-4.0-win_amd64.zip"
+    },
+    "strix": {
+      "voe": "https://xcoartifactory/artifactory/vai-rt-ipu-prod-local/com/amd/onnx-rt/stx/dev/897/windows/voe-4.0-win_amd64.zip"
+    }
+  }
+}

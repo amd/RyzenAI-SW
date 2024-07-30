@@ -1,0 +1,26 @@
+{
+  "passes": [
+    {
+      "name": "init",
+      "plugin": "vaip-pass_init"
+    },
+    {
+      "name": "fuse_MATMULINTEGER",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_MATMULINTEGER",
+        "methodName": "rules"
+      }
+    },
+    {
+      "name": "fuse_MATMULNBITS",
+      "plugin": "vaip-pass_py_ext",
+      "disabled": false,
+      "pyExt": {
+        "moduleName": "voe.passes.fuse_MATMULNBITS",
+        "methodName": "rules"
+      }
+    }
+  ]
+}

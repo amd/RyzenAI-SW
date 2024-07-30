@@ -1,0 +1,45 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "ryzenai-dynamic-dispatch"
+dynamic = ["version"]
+description = "Dynamic dispatch on AMD IPU with RyzenAI"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers=[
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: C++",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "onnx-tool"
+]
+
+[tool.scikit-build]
+cmake.version = ">=3.21"
+cmake.build-type = "Release"
+wheel.packages = ["src/python/ryzenai_dynamic_dispatch"]
+wheel.install-dir = "ryzenai_dynamic_dispatch"
+build-dir = "build/{wheel_tag}/{build_type}"
+wheel.license-files = []
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "VERSION"
+regex = "(?i)^(?P<value>.+)"
+
+[tool.scikit-build.cmake.define]
+ENABLE_DD_PYTHON = "ON"

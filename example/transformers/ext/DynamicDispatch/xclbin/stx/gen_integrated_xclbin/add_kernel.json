@@ -1,0 +1,71 @@
+{
+  "ps-kernels": {
+    "kernels": [
+      {
+        "name": "DPU_1",
+        "type": "dpu",
+        "extended-data": {
+          "subtype": "DPU",
+          "functional": "0",
+          "dpu_kernel_id": "0x101"
+        },
+        "arguments": [
+          {
+            "name": "opcode",
+            "address-qualifier": "SCALAR",
+            "type": "uint64_t",
+            "offset": "0x00"
+          },
+          {
+            "name": "instruct",
+            "memory-connection": "SRAM",
+            "address-qualifier": "GLOBAL",
+            "type": "char *",
+            "offset": "0x8"
+          },
+          {
+            "name": "nistruct",
+            "address-qualifier": "SCALAR",
+            "type": "uint32_t",
+            "offset": "0x10"
+          },
+          {
+            "name": "argv0",
+            "address-qualifier": "SCALAR",
+            "type": "uint64_t",
+            "offset": "0x14"
+          },
+          {
+            "name": "argv1",
+            "address-qualifier": "SCALAR",
+            "type": "uint64_t",
+            "offset": "0x1C"
+          },
+          {
+            "name": "argv2",
+            "address-qualifier": "SCALAR",
+            "type": "uint64_t",
+            "offset": "0x24"
+          },
+          {
+            "name": "argv3",
+            "address-qualifier": "SCALAR",
+            "type": "uint64_t",
+            "offset": "0x2C"
+          },
+          {
+            "name": "argv4",
+            "address-qualifier": "SCALAR",
+            "type": "uint64_t",
+            "offset": "0x34"
+          }
+        ],
+        "instances": [
+          {
+            "name": "IPUV1CNN"
+          }
+        ]
+      }
+    ]
+  }
+}

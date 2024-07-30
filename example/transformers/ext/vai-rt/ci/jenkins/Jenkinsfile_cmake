@@ -1,0 +1,160 @@
+/*
+ *  Copyright (C) 2023, Xilinx Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may
+ * not use this file except in compliance with the License. A copy of the
+ * License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+def FAILED_STAGE
+
+pipeline {
+  agent {
+      label {
+          label 'VITISAI-IPU-WINDOWS'
+          customWorkspace "C:\\Users\\xbuild\\Desktop\\xj3\\${JOB_BASE_NAME}"
+      }
+  } // agent
+  //Parameters for Jenkins Job
+  parameters {
+    booleanParam(defaultValue: false, description: 'DEV Run', name: 'is this a test run?')
+    string(defaultValue: '9999.0.0', name: 'RELEASE', description: 'RELEASE value e.g HEAD')
+    string(defaultValue: 'https://gitenterprise.xilinx.com/VitisAI/vai-rt.git', name: 'GITREPO', description: 'Git repo URL')
+    string(defaultValue: 'dev', name: 'GITBRANCH', description: 'Git Branch e.g master')
+    string(defaultValue: '2023_03_01.txt', name: 'RELEASE_FILE', description: 'Build file to use')
+    string(defaultValue: 'https://xcoartifactory/artifactory', name: 'ARTIFACTORYSERVER', description: 'Artifactory Server URL')
+    string(defaultValue: 'shrishas@xilinx.com,abalasa@xilinx.com', name: 'EMAIL_RECIPIENTS', description: 'Email Receipients')
+    booleanParam(defaultValue: false, name:'prBuild', description: 'Check the box toenable PR Build')
+  }
+
+  environment {
+    VAI_RT_WORKSPACE = "${env.WORKSPACE}"
+    VAI_RT_PREFIX = "${env.WORKSPACE}\\install_dir"
+    VAI_RT_BUILD_DIR = "${env.WORKSPACE}\\build_dir"
+    VAI_RT_PACKAGER = "${env.WORKSPACE}\\ci\\packager"
+
+    // Release file
+    RELEASE_FILE = "${params.RELEASE_FILE}"
+    // Email recepients
+    EMAIL_RECEPIENTS = "${params.EMAIL_RECEPIENTS}"
+
+    //helperObject = load "ci\\jenkins\\helper.groovy"
+  } // environment
+
+  stages {
+    stage ("Sync Workspace") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+          env.ARTIFACTORY_REPO = params.DEV ? "vai-rt-ipu-dev-local":"vai-rt-ipu-prod-local"
+          env.PUBLISH_FILE = "vitis-ai-runtime-*.zip"
+        } //script
+        cleanWs()
+        // Clone vai-rt repo
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "*/"+"${params.GITBRANCH}"]],
+        doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory'],
+        [$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: false]],
+        submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'gitenterprise-token-xbuild', url: "${params.GITREPO}"]]]
+
+        // Create build and install dirs
+        bat """
+          mkdir ${env.VAI_RT_PREFIX} ${env.VAI_RT_BUILD_DIR}
+        """
+      }
+    }
+
+    stage ("Get XRT-IPU") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+        }
+        //copy XRT-IPU from TA
+        bat """
+          xcopy \\\\xcoswsvm4-xbuildsFG\\xbuilds\\IPU-TA\\9999.0_integration_verified\\XRT-IPU\\WRelease\\XRT_*.zip .
+        """
+        // Extract thezip to install dir
+        bat """
+            for /F %%I IN ('dir /b XRT*.zip') DO (
+                tar -xf "%%I" -C ${env.VAI_RT_PREFIX} --strip-components=1
+            )
+        """
+      }
+    }
+
+    stage("BUild VAI-RT single DLL") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+        }
+        bat """
+          C:\\msvsn2019\\VC\\Auxiliary\\Build\\vcvars64.bat ^
+          & cd ${VAI_RT_WORKSPACE}\\cmake ^
+          & mkdir build ^
+          & pushd build ^
+          & cmake -G "Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX=${env.VAI_RT_PREFIX} -DCMAKE_PREFIX_PATH=${env.VAI_RT_PREFIX} ^
+          -DBUILD_THIRD_PARTY=ON -DBUILD_GRAPH_ENGINE=ON -DBUILD_TESTCASES=ON -DSKIP_DOWNLOAD=OFF -DBUILD_SINGLE_LIBRARY=ON -B. -S.. ^
+          & cmake --build . --config Release --parallel 4 ^
+          & popd build
+        """
+        fileExists "${env.VAI_RT_PREFIX}\\bin\\vart_dll.dll"
+      }
+    }
+    
+    stage("Package and archive files") {
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+        }
+        bat """
+          cd ${env.VAI_RT_PREFIX} & tar -acf test.zip bin
+        """
+        dir('cmake\\build\\vairt\\vairt-prefix\\src\\vairt-build') {
+            archiveArtifacts "${env.PUBLISH_FILE}"
+        }
+      }
+    }
+    stage("Publish to artifactory") {
+        when {
+          expression {!params.prBuild}
+        }
+        steps {
+            script {
+                FAILED_STAGE = env.STAGE_NAME
+                env.PUBLISH_FILE_NAME = findFiles(glob: "cmake\\build\\vairt\\vairt-prefix\\src\\vairt-build\\${env.PUBLISH_FILE}")[0].name
+                env.ARTIFACTORY_REPO_PATH = "${env.ARTIFACTORY_REPO}/com/amd/${GITBRANCH}/${BUILD_TAG}/${env.PUBLISH_FILE_NAME}"
+            }
+            dir("${env.VAI_RT_PREFIX}") {
+              // packaging test bins for testing
+                bat """
+                C:\\Users\\xbuild\\jfrog-cli.exe rt u test.zip ${env.ARTIFACTORY_REPO}/com/amd/${GITBRANCH}/${BUILD_TAG}/test.zip
+                C:\\Users\\xbuild\\jfrog-cli.exe rt u test.zip ${env.ARTIFACTORY_REPO}/com/amd/${GITBRANCH}/latest/test.zip
+                """
+            }
+            dir('cmake\\build\\vairt\\vairt-prefix\\src\\vairt-build') {
+              //packaging deliverables that will be sent to customer
+                bat """
+                echo "uploading: vai-rt to ${env.ARTIFACTORY_REPO_PATH}"
+                C:\\Users\\xbuild\\jfrog-cli.exe rt u ${env.PUBLISH_FILE_NAME} ${env.ARTIFACTORY_REPO_PATH}
+                C:\\Users\\xbuild\\jfrog-cli.exe rt u ${env.PUBLISH_FILE_NAME} ${env.ARTIFACTORY_REPO}/com/amd/${GITBRANCH}/latest/${env.PUBLISH_FILE_NAME}
+                """
+            }
+        }
+    }
+  }
+  post {
+    failure {
+      echo 'This will run only if failed'
+      emailext body: "Something is wrong with ${BUILD_URL} failed at ${FAILED_STAGE}", to: params.EMAIL_RECIPIENTS, recipientProviders: [
+        [$class: 'DevelopersRecipientProvider']
+      ], subject: "Failed Pipeline: ${currentBuild.fullDisplayName}"
+    }
+  }
+}

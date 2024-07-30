@@ -1,0 +1,21 @@
+## Can we build ONNX-EP with these commits. It will be great if we can
+## test both models this week. As we need to release next week, so we can
+## start legal scan process too.
+## https://confluence.xilinx.com/display/~jianweng/HP+Requests boost:
+#
+boost: v1.79.0
+glog: v0.6.0
+protobuf: v3.20.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+unilog: 7320c418b77713efb908a82bae6bb24cf60931ab
+xir: b99fdca8006da12cc1c7e4de8cb4a72161950b51
+target_factory: e70b1a9f716367e2a06180d176b551ce8b338b3b
+vart: 7bcee94d7d5b6b9434cf785f4b0c04654a129218
+xcompiler: 278523011db81e877e3ed6e5ca5a4b708ed34536
+## PR https://gitenterprise.xilinx.com/VitisAI/graph-engine/pull/1/commits
+graph-engine: d3e11a599460b353539ea91469178abf0889cfa1
+vaip: d1f4684959974f9a5130df847476f38fc920e045
+onnxruntime: 083874d62bf3c9b28b191b8f32cc0eed6671f47d
+test_onnx_runner: f065c8c5884fda65e14d4dc38d7075d21e221662

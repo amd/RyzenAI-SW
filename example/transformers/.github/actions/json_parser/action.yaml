@@ -1,0 +1,30 @@
+name: Parse Json
+
+description: Github action to parse a json file and return a string
+
+inputs:
+  json_filepath:
+    description: Path to json file
+    required: true
+
+outputs:
+  parsed_json:
+    description: Parsed json as a string
+    value: ${{ steps.parsedJsonOutput.outputs.parsed_json }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@v6.3.3
+      id: parsedJsonOutput
+      with:
+        script: |
+          try {
+            const fs = require('fs')
+            const jsonString = fs.readFileSync("${{ inputs.json_filepath }}")
+            var parsedJson = JSON.parse(jsonString)
+            core.setOutput("parsed_json", parsedJson)
+          } catch(err) {
+            core.error("Error while reading or parsing the JSON")
+            core.setFailed(err)
+          }

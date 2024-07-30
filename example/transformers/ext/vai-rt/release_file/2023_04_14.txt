@@ -1,0 +1,15 @@
+boost: v1.79.0
+glog: v0.6.0
+protobuf: v3.20.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+unilog: ac306fafdebf8364497a7136c9a7d22c137c018b
+xir: 3c006f5c0d3908ad3ce7ea68daa9fb2b4e48c553
+target_factory: 4ad0c91523c08f7f35281bb86d3882b5089b5a8b
+vart: fe125f9e8ea3bca44bb0e95911495b90249f9047
+xcompiler: 0bc05822e3343d6c2956a689fe37803f0e324765
+graph-engine: 9cb6021fcee1fbc4fa350c590bc5ceb97972cfbb
+vaip: 8aef0181bc0d9f72714fb31414c296781f5cf665
+onnxruntime: 379b080ced0881d5c27fe82bbd1dc06dc4c8a64d
+test_onnx_runner: 17d644e96f3026c408ff0a69108d48b3ca54a53b

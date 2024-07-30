@@ -1,0 +1,92 @@
+###############################################################################
+# Copyright (C) 2018 - 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+###############################################################################
+
+APP = aiengine
+
+CC ?= gcc
+CP = cp
+LIBSOURCES = $(wildcard ./*/*.c) $(wildcard ./*/*/*.c)
+CFLAGS += -Wall -Wextra --std=c11
+EXTRA_CFLAGS += -D_POSIX_C_SOURCE=200809 -D_DEFAULT_SOURCE
+DOCS_DIR = ../tmp
+DOXYGEN_CONFIG_FILE = ../docs/aie_driver_docs_config.dox
+
+OUTS = $(LIBSOURCES:.c=.o)
+INCLUDEFILES = ./*/xaie_clock.h ./*/xaie_reset.h ./*/xaie_core.h ./*/xaie_dma.h ./*/xaie_elfloader.h ./*/xaie_events.h ./*/xaie_events_aie.h ./*/xaie_events_aieml.h ./*/xaie_interrupt.h ./*/xaie_lite.h ./*/xaie_lite_util.h ./*/xaie_locks.h ./*/xaie_mem.h ./*/xaie_perfcnt.h ./*/xaie_plif.h ./*/xaie_rsc.h ./*/xaie_ss.h ./*/xaie_timer.h ./*/xaie_trace.h ./*/xaie_util_events.h ./*/xaiegbl.h ./*/xaiegbl_defs.h ./*/xaiegbl_dynlink.h ./*/xaiegbl_regdef.h ./*/xaie_io.h ./*/xaie_feature_config.h ./*/xaie_helper.h ./*/xaie_lite_hwcfg.h ./*/xaiegbl_params.h ./xaiengine.h ./*/xaie_txn.h
+INTERNALFILES = ./*/*.h ./*/*/*.h
+INCLUDEDIR = ../include
+INTERNALDIR = ../internal
+NAME := xaiengine
+MAJOR = 3
+MINOR = 5
+VERSION = $(MAJOR).$(MINOR)
+
+all: include lib$(NAME).so
+
+include:
+	mkdir $(INCLUDEDIR)/xaiengine -p
+	mkdir $(INTERNALDIR)/xaiengine -p
+	$(CP) xaiengine.h $(INCLUDEDIR)
+	$(CP) $(INCLUDEFILES) $(INCLUDEDIR)/xaiengine
+	$(CP) xaiengine.h $(INTERNALDIR)
+	$(CP) $(INTERNALFILES) $(INTERNALDIR)/xaiengine
+
+lib$(NAME).so.$(VERSION): $(OUTS)
+	$(CC) $(LDFLAGS) $^ -shared -Wl,-soname,lib$(NAME).so.$(MAJOR) -o lib$(NAME).so.$(VERSION)
+
+lib$(NAME).so: lib$(NAME).so.$(VERSION)
+	rm -f lib$(NAME).so.$(MAJOR) lib$(NAME).so
+	ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so.$(MAJOR)
+	ln -s lib$(NAME).so.$(MAJOR) lib$(NAME).so
+
+%.o: %.c include
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -I$(INTERNALDIR) -I$(INTERNALDIR)/xaiengine -c -fPIC $< -o $@
+
+baremetal: include lib$(NAME).so
+CFLAGS_bare += -Wall -Wextra --std=c11 -D__AIEBAREMETAL__
+ifeq ($(MAKECMDGOALS) ,baremetal)
+%.o: %.c include
+	$(CC) $(CFLAGS_bare) -I$(INTERNALDIR) -I$(INTERNALDIR)/xaiengine -c -fPIC $< -o $@
+endif
+
+simulation: include lib$(NAME).so
+CFLAGS_simulation += -Wall -Wextra --std=c11 -D__AIESIM__
+ifeq ($(MAKECMDGOALS),simulation)
+%.o: %.c include
+	$(CC) $(CFLAGS_simulation) -I$(INTERNALDIR) -I$(INTERNALDIR)/xaiengine -c -fPIC $< -o $@
+endif
+
+cdo: include lib$(NAME).so
+CFLAGS_cdo += -Wall -Wextra --std=c11 -D__AIECDO__
+ifeq ($(MAKECMDGOALS) ,cdo)
+%.o: %.c include
+	$(CC) $(CFLAGS_cdo) -I$(INTERNALDIR) -I$(INTERNALDIR)/xaiengine -c -fPIC $< -o $@
+endif
+
+controlcode: include lib$(NAME).so
+CFLAGS_controlcode += -Wall -Wextra --std=c11 -D__AIECONTROLCODE__
+ifeq ($(MAKECMDGOALS) ,controlcode)
+%.o: %.c include
+	$(CC) $(CFLAGS_controlcode) -I$(INTERNALDIR) -I$(INTERNALDIR)/xaiengine -c -fPIC $< -o $@
+endif
+
+
+
+
+
+
+doc-generate:
+	mkdir -p $(DOCS_DIR)
+	doxygen $(DOXYGEN_CONFIG_FILE)
+	cd $(DOCS_DIR)/latex; make; cd ..
+
+doc-clean:
+	rm -rf $(DOCS_DIR)
+
+clean:
+	rm -rf $(OUTS) *.so *.so.*
+	rm -rf $(INCLUDEDIR)
+	rm -rf $(INTERNALDIR)

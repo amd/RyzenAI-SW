@@ -1,0 +1,189 @@
+# Copyright © 2023 Advanced Micro Devices, Inc. All rights reserved.
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main", "computex-2024" ]
+    paths-ignore:
+      - docs/**
+      - figures/**
+      - "**.md"
+  pull_request:
+    branches: [ "main", "computex-2024" ]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - docs/**
+      - figures/**
+      - "**.md"
+  schedule:
+    - cron: '0 1 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Cancel in-progress runs if a new event occurs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  WORKSPACE: ${{ github.workspace }}
+  CONDA_ENV_NAME: dynamic_op_dispatch
+  FREE_DRIVE: "Z:"
+
+
+jobs:
+  lint:
+    runs-on: [ self-hosted, Ubuntu-22.04 ]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pre-commit
+          git remote set-branches origin main
+          git fetch origin main --depth 1
+      - name: Run pre-commit
+        run: |
+          pre-commit run --from-ref origin/main --to-ref ${GITHUB_SHA}
+
+  run_build_tests_win:
+    runs-on: [ "${{ matrix.device }}" , board_host, "${{ matrix.drv_framework }}"]
+    strategy:
+      matrix:
+        include:
+          - device: "stx"
+            full_device: "strix"
+            drv_framework: "mcdm"
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 120
+    needs: [ lint ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Pre-run setup
+        shell: cmd
+        run: |
+          if exist ${{ env.FREE_DRIVE }} call subst /d ${{ env.FREE_DRIVE }}
+          conda init --all --system
+
+      - name: Cleanup conda env
+        shell: cmd
+        run: |
+          if exist %LOCALAPPDATA%\anaconda3\envs\%CONDA_ENV_NAME% rmdir /q /s %LOCALAPPDATA%\anaconda3\envs\%CONDA_ENV_NAME%
+          conda config --append envs_dirs %LOCALAPPDATA%\anaconda3\envs
+
+      - name: Map drive to workaround long paths
+        shell: cmd
+        run: |
+          call subst ${{ env.FREE_DRIVE }} ${{ env.WORKSPACE }}
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+
+      - name: Download dependenciestest scripts
+        run: |
+          Invoke-WebRequest https://xcoartifactory/artifactory/xrt-mcdm-prod-local/com/amd/mcdm/main/latest/xrt_package.zip -OutFile xrt_package.zip
+          Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/xrt_package.zip", "$PWD")
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/dod/ipu_rdi_tools/CI/wrapper_runner.bat -OutFile wrapper_runner.bat
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/dod/ipu_rdi_tools/CI/RunGenerator.py -OutFile RunGenerator.py
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/dod/ipu_rdi_tools/CI/performance_definition.json -OutFile performance_definition.json
+          Invoke-WebRequest https://raw.gitenterprise.xilinx.com/DSVApps/IPU/main/ipu_rdi_tools/CI/post_suite_execute.sh -OutFile post_suite_execute.sh
+
+      - name: store date, uppercase device name to a variable
+        run: |
+          $NOW=& Get-Date -format yyyyMMdd_HHmm
+          echo "NOW=$NOW" >> $env:GITHUB_ENV
+          $FULL_DEVICE_UPPER="${{ matrix.full_device }}".ToUpper()
+          echo "FULL_DEVICE_UPPER=$FULL_DEVICE_UPPER" >> $env:GITHUB_ENV
+
+      - name: store RUN_ID_STR as an env variable
+        run: |
+          echo "RUN_ID_STR=${{ env.NOW }}_${{ matrix.full_device }}_win64_${{ matrix.drv_framework }}" >> $env:GITHUB_ENV
+
+      - name: Run build/tests - PR/merge
+        shell: cmd
+        if: github.event_name != 'schedule'
+        run: |
+          call conda activate base
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          ${{ env.FREE_DRIVE }}
+          call wrapper_runner.bat dod ${{ env.FREE_DRIVE }}\ %TESTS_OUTPUT_DIR% %RUN_ID_STR% ${{ matrix.full_device }} %RUN_TYPE% %TEST_TYPE% %SPOOL_DIR%
+        env:
+          RUN_TYPE: pr
+          TEST_TYPE: unittests
+          TESTS_OUTPUT_DIR: ${{ env.FREE_DRIVE }}\
+          CLONED_REPO_PATH: ${{ env.FREE_DRIVE }}\
+          DEPENDENCY_PATH: ${{ env.FREE_DRIVE }}\
+          SPOOL_DIR: ${{ vars.SPOOL_DIR_LNX }}/%CONDA_ENV_NAME%
+
+      - name: Run build/tests - daily
+        shell: cmd
+        if: github.event_name == 'schedule'
+        continue-on-error: true
+        run: |
+          call conda activate base
+          if errorlevel 1 (exit /B 1 %errorlevel%)
+          ${{ env.FREE_DRIVE }}
+          call wrapper_runner.bat dod ${{ env.FREE_DRIVE }}\ %TESTS_OUTPUT_DIR% %RUN_ID_STR% ${{ matrix.full_device }} %RUN_TYPE% %TEST_TYPE% %SPOOL_DIR% ${{ vars.TESTS_RESULTS_UNC }}\%CONDA_ENV_NAME%
+        env:
+          RUN_TYPE: daily
+          TEST_TYPE: all
+          TESTS_OUTPUT_DIR: ${{ env.FREE_DRIVE }}\
+          CLONED_REPO_PATH: ${{ env.FREE_DRIVE }}\
+          DEPENDENCY_PATH: ${{ env.FREE_DRIVE }}\
+          SPOOL_DIR: ${{ vars.SPOOL_DIR_LNX }}/%CONDA_ENV_NAME%
+
+      - name: Spool results to xoah
+        # Installs libs needed for spool script and runs the script.
+        if: github.event_name == 'schedule'
+        shell: cmd
+        run: |
+          subst R: \\xsjswsvm1-lif9\crdi
+          set PATH=C:\cygwin\bin;%PATH%
+          C:\cygwin\bin\bash.exe -c "/bin/cp post_suite_execute.sh ${{ vars.TESTS_RESULTS_UNC_CYGWIN }}/%CONDA_ENV_NAME% && cd ${{ vars.TESTS_RESULTS_UNC_CYGWIN }}/${{ env.CONDA_ENV_NAME }}/${{ env.RUN_ID_STR }} && pip3.8 install simplejson requests pyyaml pytz && ../post_suite_execute.sh"
+          echo "Results link for ${{ matrix.full_device }}: http://xoah/summary?suiteRunName=%RUN_ID_STR%&superSuiteName=${{ env.FULL_DEVICE_UPPER }}&relBranch=1.0.0" >> %GITHUB_STEP_SUMMARY%
+          subst /d R:
+        env:
+          RUN_TYPE: daily
+
+      - name: Cleanup conda env
+        if: always()
+        continue-on-error: true
+        shell: cmd
+        run: |
+          subst /d ${{ env.FREE_DRIVE }}
+          conda remove --name ${{ env.CONDA_ENV_NAME }} --all --yes
+
+  run_build_tests_lnx: # Runs inside a container
+    runs-on: [self-hosted, Linux, dod]
+    container:
+      image: artifactory.xilinx.com/aie-ipu-build-docker-local/aie-ipu-aiebuild-dod:0506
+      options: --user root
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 120
+    needs: [ lint ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Run  Build
+        run: |
+          source scl_source enable devtoolset-9 && \
+          echo $0 && \
+          cat /opt/xilinx/xrt/version.json && \
+          source /opt/xilinx/xrt/setup.sh && \
+          source setup.sh && \
+          mkdir -p build && \
+          printenv && \
+          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=build/Release -DENABLE_DD_TESTS=ON -DLOGGING_EN=ON -DUNIT_TEST_PERF_EN=ON && \
+          cmake --build build --config=Release --target install --parallel
+        shell: bash

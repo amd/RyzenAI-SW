@@ -1,0 +1,4 @@
+onnx==1.15.0
+tabulate
+black
+colorama

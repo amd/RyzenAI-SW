@@ -1,0 +1,25 @@
+#for ipu only
+#ipu_driver:https://mkmartifactory.amd.com/artifactory/atg-cvml-generic-local/builds/ipu/Nightly/atg-dev/jenkins-CVML-IPU_Driver-ipu-windows-nightly-695/Release/
+boost: v1.79.0
+glog: v0.6.0
+gsl: v4.0.0
+protobuf: v3.21.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+zlib: v1.2.13
+gtest: release-1.12.1
+tvm_aie_compiler_artifact: tvm-1067
+transformers_header: 9e2cef7cfc0f926b6ba322623a5407efd7616642
+unilog: ed27e72c7cb92eb487e05b0be4ec9994d432ab97
+xir: da52848e416080b9440e0c8e0fad4d2c13b1f5ec
+target_factory: 657f2b8d05232567b4d53dd723d09d821a28e640
+trace_logging: b4d5060dd3635409f1e79fac8ec9e6c0e8a09e7f
+vart: 262a6ec658c4b7c9ed4735061bd3ab3bc47997de
+xcompiler: 95f116df19dd5037c70cc12bdfbca1e7954adc13
+graph-engine: f01a7d0e1e135c613f5ea42a7e6eea4ec48b4788
+vairt: 82ffe5a67749cc5e2e93556cd07f9ed031cc9ffe
+testcases: ba2b9e62f95d1832a0b4a6e947eb7d61f5a62337
+onnxruntime: v1.15.1
+vaip: 83680e613f5684aa75113cce1fb9623e8ace3008
+test_onnx_runner: fc2ee4a30688c32f06e6eaf26e05f06499b5c5a3

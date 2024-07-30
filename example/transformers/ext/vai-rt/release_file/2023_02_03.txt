@@ -1,0 +1,16 @@
+# Delivered to Yiming Hu. Added perf on 2022/2/27
+boost: v1.79.0
+glog: v0.6.0
+protobuf: v3.18.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+unilog: 3cf6490ffeccf18567dc345fbf994679d39dfa9f
+xir: b6e11d9833f101a697038c3b3d0becaf29577e57
+target_factory: 966735b7e2a779d42589f37162bab5773a0219f0
+vart: 4e9befa3ef48f32d7a75ae262f00750645b05d13
+xcompiler: 6b2a106c33cdefb267a003f4c4542cab6259d7b4
+graph-engine: 2ce1a2a52fc421fd9a18ecdeb6a33af1d9dd6e3b
+vaip: 52b46489c13de774991f7d0c17d085c28735b4d4
+onnxruntime: c6c701bd453050bcf09ca9ec49e2eb8e85988648
+test_onnx_runner: f5195d2bfcc951a6e9931ff7831450c1453ae913

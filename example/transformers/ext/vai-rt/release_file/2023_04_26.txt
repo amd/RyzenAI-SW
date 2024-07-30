@@ -1,0 +1,18 @@
+#for ipu only
+#vai-rt: 5e381527743a68c51affa8a98a67c521806ad8c9
+boost: v1.79.0
+glog: v0.6.0
+protobuf: v3.21.1
+eigen: d10b27fe37736d2944630ecd7557cefa95cf87c9
+pybind11: v2.10.0
+opencv: 4.6.0
+unilog: c4635d00861563f0930e7c08d142007b7ba37e0d
+xir: 3c006f5c0d3908ad3ce7ea68daa9fb2b4e48c553
+target_factory: 1281b14667737fad6eb1437f616f465d904532a2
+trace_logging: b4d5060dd3635409f1e79fac8ec9e6c0e8a09e7f
+vart: 0c7db93ddb89654000d793c47d5e3a1ee73ed8ac
+xcompiler: f488f46a7b90f5d5cabcd853e29887c8e388c325
+graph-engine: 58dbd295dbdd0643568c196e7f7134f93c3e7caa
+vaip: 7fd4f5205be5c76dc2c11123e714396f885e6fd2
+onnxruntime: e139ae238bbce6772be76fcb7ea13fb402adc483
+test_onnx_runner: 5a8f62977e2bd11fdb1a2c5b48ee05f6012679b6

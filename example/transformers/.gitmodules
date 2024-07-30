@@ -1,0 +1,29 @@
+[submodule "ext/stable_diffusion"]
+	path = ext/stable_diffusion
+	url = https://gitenterprise.xilinx.com/rajeevp/stable_diffusion.git
+[submodule "ext/smoothquant"]
+	path = ext/smoothquant
+	url = https://gitenterprise.xilinx.com/rajeevp/smoothquant.git
+[submodule "ext/vai-rt"]
+	path = ext/vai-rt
+	url = https://gitenterprise.xilinx.com/VitisAI/vai-rt.git
+[submodule "ext/pytorch-light"]
+	path = ext/pytorch-light
+	url = https://gitenterprise.xilinx.com/chiz/pytorch-light.git
+[submodule "ext/llm-awq"]
+	path = ext/llm-awq
+	url = https://gitenterprise.xilinx.com/rajeevp/llm-awq.git
+[submodule "ext/llama.cpp"]
+	path = ext/llama.cpp
+	url = https://gitenterprise.xilinx.com/VitisAI/llama.cpp.git
+	branch = ggml-ryzenai
+[submodule "ext/DynamicDispatch"]
+	path = ext/DynamicDispatch
+	url = https://gitenterprise.xilinx.com/VitisAI/DynamicDispatch.git
+[submodule "ext/aie-rt"]
+	path = ext/aie-rt
+	url = https://gitenterprise.xilinx.com/ai-engine/aie-rt.git
+	branch = main_aig
+[submodule "ext/aie_controller"]
+	path = ext/aie_controller
+	url = https://gitenterprise.xilinx.com/VitisAI/aie_controller.git

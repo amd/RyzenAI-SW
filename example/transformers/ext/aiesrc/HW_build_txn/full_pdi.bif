@@ -1,0 +1,16 @@
+all:
+ {
+    id_code = 0x14ca8093
+    extended_id_code = 0x01
+    image
+    {
+      name=aie_image, id=0x1c000000
+      { type=cdo
+       file=./Work/ps/cdo/aie_cdo_error_handling.bin
+       file=./Work/ps/cdo/aie_cdo_elfs_dm.bin
+       file=./Work/ps/cdo/aie_cdo_elfs_pm.bin
+       file=./Work/ps/cdo/aie_cdo_init_static.bin
+       file=./Work/ps/cdo/aie_cdo_init_reconfig.bin
+       file=./Work/ps/cdo/aie_cdo_enable.bin }
+    }
+ }

@@ -1,0 +1,22 @@
+{
+  "run_dir": ".",
+  "owner": "z1_acas_test",
+  "setup": [
+    "echo 'Python setup'",
+    "echo 'Nothing new to be done'"
+  ],
+  "test_steps": [
+    {
+      "name": "run_single_silu_python",
+      "command": "python tests\\cpp\\silu\\model.py && python tests\\python\\silu\\test_silu.py test_silu_abf16\\model_silu_meta.json",
+      "run_type": [
+        "pr",
+        "daily"
+      ],
+      "devices": [
+        "strix"
+      ]
+    }
+  ],
+  "cleanup": []
+}
