@@ -48,11 +48,18 @@ static std::vector<std::pair<int, float>> topk(const std::vector<float>& score,
 static void print_topk(const std::vector<std::pair<int, float>>& topk);
 static const char* lookup(int index);
 
+std::vector<float> convertToFloat32(const Ort::Float16_t* input, size_t size) {
+    std::vector<float> output(size);
+    for (size_t i = 0; i < size; ++i) {
+        output[i] = static_cast<float>(input[i]);
+    }
+    return output;
+}
+
 // preprocess
 static void preprocess_resnet(const string file,
     std::vector<Ort::Float16_t>& input_tensor_values,
     std::vector<int64_t>& input_shape) {
-    std::cout << "inside preprocess";
     auto channel = input_shape[1];
     auto height = input_shape[2];
     auto width = input_shape[3];
@@ -77,8 +84,9 @@ static string postprocess_resnet(const string file,
     Ort::Value& output_tensor) {
     auto output_shape = output_tensor.GetTensorTypeAndShapeInfo().GetShape();
     auto channel = output_shape[1];
-    auto output_tensor_ptr = output_tensor.GetTensorMutableData<float>();
-    auto softmax_output = softmax(output_tensor_ptr, channel);
+    auto output_tensor_ptr = output_tensor.GetTensorMutableData<Ort::Float16_t>();
+    std::vector<float> float_output_tensor = convertToFloat32(output_tensor_ptr, channel);
+    auto softmax_output = softmax(float_output_tensor.data(), channel);
     auto tb_top5 = topk(softmax_output, 5);
     //print_topk(tb_top5);
     auto top1 = tb_top5[0];
@@ -111,26 +119,20 @@ static int calculate_product(const std::vector<int64_t>& v) {
 }
 
 static void usage() {
-    std::cout << "usage: resnet_cifar <onnx model> <json_config> "
-        " <img_url> [img_url]... \n"
-        << std::endl;
+    std::cout << "usage: resnet50 <path to onnx model> <provider> <path to image>"<< std::endl;
 }
 
 int main(int argc, char* argv[]) {
-
-    const char* env_val = getenv("CONDA_PREFIX");
-    const char* env_name = "PYTHONHOME";
-    _putenv_s(env_name, env_val);
 
     vector<pair<string, string>> results;
     int opt = 0;
     int64_t batch_number = 1;
     auto model_name = strconverter.from_bytes(std::string(argv[optind]));
     cout << "model name:" << std::string(argv[optind]) << endl;
-    auto json_config = std::string(argv[optind + 2]);
     auto ep = std::string(argv[optind + 1]);
+    auto curr_file = std::string(argv[optind + 2]);
     cout << "ep:" << ep << endl;
-    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "resnet_cifar");
+    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "resnet50");
     auto session_options = Ort::SessionOptions();
 
     auto config_key = std::string{ "config_file" };
@@ -148,7 +150,7 @@ int main(int argc, char* argv[]) {
         int deviceIndex = 0;
 
         ortDmlApi->SessionOptionsAppendExecutionProvider_DML(session_options, deviceIndex);
-        cout<<"Finished appending DML session options"<<endl; 
+        cout << "Finished appending DML session options" << endl;
 
     }
     auto session = Ort::Session(env, model_name.data(), session_options);
@@ -190,7 +192,6 @@ int main(int argc, char* argv[]) {
     }
     for (int i = 0; i < 1; i++)
     {
-        const std::string curr_file = "cat.jpg";
         auto input_shape = input_shapes[0];
         if (input_shape[0] == -1) {
             input_shape[0] = batch_number;
@@ -205,7 +206,6 @@ int main(int argc, char* argv[]) {
             cout << "ERROR running preprocess: " << exception.what() << endl;
             exit(-1);
         }
-        cout << "after preprocess";
         std::vector<Ort::Value> input_tensors;
         Ort::MemoryInfo info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
         input_tensors.push_back(Ort::Value::CreateTensor<Ort::Float16_t>(
@@ -230,9 +230,6 @@ int main(int argc, char* argv[]) {
             exit(-1);
         }
     }
-
-    const char* temp = "";
-    _putenv_s(env_name, temp);
 
     return 0;
 }
@@ -266,7 +263,6 @@ static cv::Mat preprocess_image(const cv::Mat& image, cv::Size size) {
 static void set_input_image(const cv::Mat& image, Ort::Float16_t* data) {
     float mean[3] = { 0.0f, 0.0f, 0.0f };
     float scales[3] = { 1.0f, 1.0f, 1.0f };
-    std::cout << image.rows << image.cols;
     for (int c = 0; c < 3; c++) {
         for (int h = 0; h < image.rows; h++) {
             for (int w = 0; w < image.cols; w++) {
@@ -278,7 +274,6 @@ static void set_input_image(const cv::Mat& image, Ort::Float16_t* data) {
             }
         }
     }
-    std::cout << "finished set input img";
 }
 
 static std::vector<float> softmax(float* data, int64_t size) {
