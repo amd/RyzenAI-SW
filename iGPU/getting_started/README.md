@@ -63,20 +63,22 @@ cmake --install build --config Release
 ```
 The build files will be written to ``build\``.
 
-### Run Olive-optimized ResNet50 model on the iGPU
+#### Run Olive-optimized ResNet50 model on the iGPU
 
 Build the given ResNet50 C++ example: 
 
-.. code-block:: bash 
+```powershell
 
-    cd cpp 
-    compile.bat "path/to/your/opencv/build"
+cd cpp 
+compile.bat "path/to/your/opencv/build"
+```
 
 Run inference: 
 
-.. code-block:: bash 
+```powershell
 
-    run.bat
+run.bat
+```
 
 
 
