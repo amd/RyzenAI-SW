@@ -50,7 +50,7 @@ python predict.py
 
 #### Install OpenCV from source 
 
-It is recommended to build OpenCV from the source code and use static build. The following instruction installs OpenCV in the location "C:\\opencv" as an example, this can be changed by modifying CMAKE_PREFIX_PATH in the following cmake command. You may first change the directory to where you want to clone the OpenCV repository.
+It is recommended to build OpenCV from the source code and use static build. The following instruction installs OpenCV in the location "C:\\opencv" as an example, this can be changed by modifying `CMAKE_PREFIX_PATH` in the following cmake command. You may first change the directory to where you want to clone the OpenCV repository.
 
 ```powershell
 git clone https://github.com/opencv/opencv.git -b 4.6.0
