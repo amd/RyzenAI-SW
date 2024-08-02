@@ -8,6 +8,9 @@ if "%1"=="" (
     exit /b 1
 )
 
+set "OpenCV_DIR=%~1"
+
+echo OpenCV_DIR is set to: %OpenCV_DIR%
 
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -DCMAKE_INSTALL_PREFIX=. -DCMAKE_PREFIX_PATH=. -B build -S resnet50 -DOpenCV_DIR="%OpenCV_DIR%" -G "Visual Studio 17 2022"
 
