@@ -17,6 +17,24 @@ conda env create --file=env.yaml
 conda activate ryzenai-transformers
 ```
 
+⚠️ **Warning:** Windows has a path length limit that you may hit when building the project or installing the wheels, resulting in cryptic errors.
+To work around it, use a virtual drive to shorten the path the repository is cloned to:
+
+*On Command Prompt*
+```batch
+@REM use any unused drive letter, Z: for example
+subst Z: %cd%
+@REM switch to the Z: drive
+Z:
+```
+
+You can remove the virtual drive with:
+
+*On Command Prompt*
+```batch
+subst /d Z:
+```
+
 ### Build and Install RyzenAI
 ```console
 setup_phx.bat # or setup_stx.bat
