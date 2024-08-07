@@ -17,9 +17,15 @@ and accept [Huggingface license](https://huggingface.co/meta-llama/Llama-2-7b-hf
 
 :pushpin: Conda environment with python 3.10
 
+Setup the environment variable:
+```powershell
+cd <transformers>
+set TRANSFORMERS_ROOT=%CD%
+```
+
 Create conda environment:
 ```powershell
-cd <transformers/models/llm_onnx>
+cd %TRANSFORMERS_ROOT%\models\llm_onnx
 conda update -n base -c defaults conda -y
 conda env create --file=env.yaml
 conda activate llm_onnx
@@ -40,13 +46,13 @@ pip install numpy==1.26.4
 
 ##### For PHX
 ```
-cd <transformers>
+cd %TRANSFORMERS_ROOT%
 .\setup_phx.bat
 ```
 
 ##### For STX
 ```
-cd <transformers>
+cd %TRANSFORMERS_ROOT%
 .\setup_stx.bat
 ```
 
