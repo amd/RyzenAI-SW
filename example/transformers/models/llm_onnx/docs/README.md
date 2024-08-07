@@ -64,6 +64,7 @@ Use "prepare_model.py" script to export, optimize and quantize the LLMs. You can
 
 Check script usage
 ```powershell
+cd %TRANSFORMERS_ROOT%\models\llm_onnx
 python prepare_model.py --help
 
 usage: prepare_model.py [-h]
@@ -92,7 +93,6 @@ optional arguments:
 #### Export, Optimize and quantize the model
 
 ```powershell
-
 python .\prepare_model.py --model_name <model_name> --output_model_dir <output directory> --export --optimize --quantize
 ```
 #### Optimize and quantize existing model
@@ -155,7 +155,7 @@ as `float32` model. The quantizer used is `MatMul4BitsQuantizer` from onnxruntim
  > As for the optimizer , ORT optimizer is used.
 ### Using ONNX Runtime Interface
  
-Copy the 'model.onnx.data' file from output_model_dir to the models/llm_onnx/ folder.
+**Note:** Copy the 'model.onnx.data' file from output_model_dir to the models/llm_onnx/ folder.
 
 **Note:** Each run generates a log file in `./logs` directory with name `log_<model_name>.log`.
 ```powershell
