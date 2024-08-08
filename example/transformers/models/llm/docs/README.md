@@ -37,6 +37,7 @@ The above list is a just representative collection of models supported using the
 Create conda environment:
 ```powershell
 cd <transformers>
+set TRANSFORMERS_ROOT=%CD%
 conda env create --file=env.yaml
 conda activate ryzenai-transformers
 build_dependencies.bat
@@ -45,7 +46,7 @@ build_dependencies.bat
 AWQ Model zoo has precomputed scales, clips and zeros for various LLMs including OPT, Llama. Get the precomputed results:
 ```powershell
 git lfs install
-cd <transformers>\ext
+cd %TRANSFORMERS_ROOT%\ext
 git clone https://huggingface.co/datasets/mit-han-lab/awq-model-zoo awq_cache
 ```
 
@@ -100,7 +101,7 @@ pip install ops\torch_cpp --force-reinstall
 When using locally downloaded weights, pass the model directory name as the argument to model_name. Only certain model names are supported by default, make sure the model directory name matches the supported model name.
 
 ```powershell
-cd <transformers>\models\llm
+cd  %TRANSFORMERS_ROOT%\models\llm
 ```
 
 ### Recipe 1: Smoothquant with w8a8/w8a16
