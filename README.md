@@ -6,6 +6,8 @@ AMD Ryzen™ AI Software includes the tools and runtime libraries for optimizing
 
 This repository contains the demos, examples and tutorials, demonstrating usage and capabilities of the Ryzen™ AI Software. It is a subset of the Ryzen™ AI Software release.
 
+Follow the instructions at [Ryzen™ AI Software](https://ryzenai.docs.amd.com/en/latest/inst.html) for installation.
+
 ## Git LFS and Instructions to clone: 
 
  Due to the presence of large files in some examples/tutorials, Git Large File Storage (LFS) has been configured in this repository. Follow the instructions below to ensure Git LFS is properly set up: 
