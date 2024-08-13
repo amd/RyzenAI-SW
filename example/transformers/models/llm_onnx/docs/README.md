@@ -67,28 +67,7 @@ Check script usage
 cd %TRANSFORMERS_ROOT%\models\llm_onnx
 python prepare_model.py --help
 
-usage: prepare_model.py [-h]
-                        [--model_name {facebook/opt-125m,facebook/opt-1.3b,facebook/opt-2.7b,facebook/opt-6.7b,llama-2-7b,meta-llama/Llama-2-7b-hf,Qwen/Qwen1.5-7B-Chat,THUDM/chatglm3-6b,codellama/CodeLlama-7b-hf}]
-                        [--groupsize {32,64,128}] --output_model_dir OUTPUT_MODEL_DIR [--input_model INPUT_MODEL] [--only_onnxruntime]
-                        [--opt_level {0,1,2,99}] [--export] [--optimize] [--quantize]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --model_name {facebook/opt-125m,facebook/opt-1.3b,facebook/opt-2.7b,facebook/opt-6.7b,llama-2-7b,meta-llama/Llama-2-7b-hf,Qwen/Qwen1.5-7B-Chat,THUDM/chatglm3-6b,codellama/CodeLlama-7b-hf}
-                        model name
-  --groupsize {32,64,128}
-                        group size for blockwise quantization
-  --output_model_dir OUTPUT_MODEL_DIR
-                        output directory path
-  --input_model INPUT_MODEL
-                        input model path to optimize/quantize
-  --only_onnxruntime    optimized by onnxruntime only, and no graph fusion in Python
-  --opt_level {0,1,2,99}
-                        onnxruntime optimization level. 0 will disable onnxruntime graph optimization. Level 2 and 99 are intended for --only_onnxruntime.
-  --export              export float model
-  --optimize            optimize exported model
-  --quantize            quantize float model
-```
+```python prepare_model.py --help```
 
 #### Export, Optimize and quantize the model
 
@@ -110,44 +89,8 @@ python .\prepare_model.py --input_model <input model path> --output_model_dir <o
 ### Running Inference
 
 Check script usage
-```powershell
-python infer.py --help
 
-usage: infer.py [-h] --model_dir MODEL_DIR [--draft_model_dir DRAFT_MODEL_DIR] --model_name
-                {facebook/opt-125m,facebook/opt-1.3b,facebook/opt-2.7b,facebook/opt-6.7b,meta-llama/Llama-2-7b-hf,Qwen/Qwen1.5-7B-Chat,THUDM/chatglm3-6b,codellama/CodeLlama-7b-hf}
-                [--tokenizer TOKENIZER] [--dll DLL] [--target {cpu,aie}] [--task {decode,benchmark,perplexity}] [--seqlen SEQLEN [SEQLEN ...]]
-                [--max_new_tokens MAX_NEW_TOKENS] [--ort_trace] [--view_trace] [--prompt PROMPT] [--max_length MAX_LENGTH] [--profile] [--power_profile]
-                [-v]
-
-LLM Inference on Ryzen-AI
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --model_dir MODEL_DIR
-                        Model directory path
-  --draft_model_dir DRAFT_MODEL_DIR
-                        Draft Model directory path for speculative decoding
-  --model_name {facebook/opt-125m,facebook/opt-1.3b,facebook/opt-2.7b,facebook/opt-6.7b,meta-llama/Llama-2-7b-hf,Qwen/Qwen1.5-7B-Chat,THUDM/chatglm3-6b,codellama/CodeLlama-7b-hf}
-                        model name
-  --tokenizer TOKENIZER
-                        Path to the tokenizer (Optional).
-  --dll DLL             Path to the Ryzen-AI Custom OP Library
-  --target {cpu,aie}    Target device (CPU or Ryzen-AI)
-  --task {decode,benchmark,perplexity}
-                        Run model with a specified task
-  --seqlen SEQLEN [SEQLEN ...]
-                        Input Sequence length for benchmarks
-  --max_new_tokens MAX_NEW_TOKENS
-                        Number of new tokens to be generated
-  --ort_trace           Enable ORT Trace dump
-  --view_trace          Display trace summary on console
-  --prompt PROMPT       User prompt
-  --max_length MAX_LENGTH
-                        Number of tokens to be generated
-  --profile             Enable profiling summary
-  --power_profile       Enable power profiling via AGM
-  -v, --verbose         Enable argument display
-```
+```python prepare_model.py --help```
 
 > As we are using an `int4` quantized model, responses might not be as accurate
 as `float32` model. The quantizer used is `MatMul4BitsQuantizer` from onnxruntime
