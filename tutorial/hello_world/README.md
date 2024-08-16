@@ -7,7 +7,6 @@ This folder contains the following files:
 - `README.md`: This file provides an overview of the folder's contents.
 - `requirements.txt`: This file contains the necessary dependencies and packages required to run the code in this folder.
 - `models\`: This folder is initially empty. After running the hello_world example, the ONNX file of the model and the quantized ONNX file will be stored in this folder.
-- `vaip_config.json`: This is the default runtime configuration file. It can also be found in the `ryzen-ai-sw` installation package.
 
 ## Getting Started
 
