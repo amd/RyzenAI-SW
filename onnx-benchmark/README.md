@@ -35,7 +35,7 @@ Author: AIG-SAIS AMD-Xilinx
     - [3.3.8 File of parameters](#338-file-of-parameters)
 - [4 Additional features](#4-additional-features)
   - [4.1 Auto quantization](#41-auto-quantization)
-  - [3.4 tricks](#34-tricks)
+  - [4.2 tricks](#42-tricks)
 
 
 # <a name='Title'></a>RYZENAI-ONNX-CNNs-BENCHMARK
@@ -233,5 +233,5 @@ Prior to quantization, the user is required to download some images, for example
 python performance_benchmark.py -m ".\models\resnet50\resnet50_fp32.onnx" -e VitisAIEP --calib <images folder> --num_calib 10
 ```
 
-## 3.4 tricks
+## 4.2 tricks
 Once executed in the GUI, the equivalent command line is copied to the clipboard, making it easy to paste into the terminal.
