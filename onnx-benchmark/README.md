@@ -172,7 +172,7 @@ This user-friendly graphical interface is designed to assist users in composing 
 ```
 python gui_pb.py
 ```
-![GUI](./doc/gui_public.png)
+![GUI](./figures/gui.png)
 
 
 ###  3.3.2 <a name='PerformancewithasingleinstanceusingaCPU'></a>Performance with a single instance using a CPU
