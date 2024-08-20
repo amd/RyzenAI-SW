@@ -293,7 +293,7 @@ def conf_pb(device):
     return(parser)
 
 def about():
-    print("This GUI has been created for Performance Benchmark release 17")
+    print("This GUI has been created for Performance Benchmark release 18")
 
 def populatebenchmark(root, device):
     # Remove the existing frame, if any
@@ -327,7 +327,7 @@ def populatehelp(root):
     label_text = "This GUI has been created for Performance Benchmark release 18"
     label = tk.Label(frame, text=label_text, wraplength=600, anchor='w')
     label.grid(sticky='w', row=0, column=0, pady=(10, 0))
-    
+
     def open_link(event):
         webbrowser.open("https://gitenterprise.xilinx.com/AIG-SAIS/RyzenAI-ONNX-CNNs-Benchmark/tree/strix")
     

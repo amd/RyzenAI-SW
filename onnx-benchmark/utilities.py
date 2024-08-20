@@ -103,7 +103,7 @@ class DataReader:
 
     def reset(self):
         self.batch_index = 0
-    
+
     def get_next(self):
         # print(f'returned next data reader  {self.read_batch()["input"].shape}')
         return self.read_batch()

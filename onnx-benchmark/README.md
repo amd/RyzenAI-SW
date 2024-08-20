@@ -7,7 +7,7 @@ Author: AIG-SAIS AMD-Xilinx
 
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> AIG - Strategical AI Solutions </h1>
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> NPU Benchmark Tool with ONNXRT for Windows OS </h1>
     </td>
  </tr>
 </table>
@@ -35,7 +35,7 @@ Author: AIG-SAIS AMD-Xilinx
     - [3.3.8 File of parameters](#338-file-of-parameters)
 - [4 Additional features](#4-additional-features)
   - [4.1 Auto quantization](#41-auto-quantization)
-  - [4.2 Tricks](#42-tricks)
+  - [4.2 tricks](#42-tricks)
 
 
 # <a name='Title'></a>RYZENAI-ONNX-CNNs-BENCHMARK
@@ -46,8 +46,6 @@ The NPU benchmark tool is designed to measure the performance of ONNX-based Conv
 The 'performance_benchmark.py' tool is capable of reporting:
 1. Throughput, measured in frames per second
 2. Latency, measured in milliseconds
-
-NOTE: This tool has undergone primary testing on the Ryzen processor named "STRIX". 
 
 ## 1.1 <a name='Notesforthisrelease'></a>Notes for this release
 Windows release supporting PHOENIX and STRIX devices.
@@ -68,15 +66,26 @@ conda activate ryzen-ai-1.2.0
 pip install pandas pyarrow matplotlib psutil keyboard pyperclip importlib-metadata
 ```
 Finally, set some permanent variables. Assuming that the installation path is `C:\Program Files\RyzenAI\1.2.0\`:
-```
-conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\<strix or phoenix>"
-conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
-conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\<strix or phoenix>\<strix:AMD_AIE2P_Nx4_Overlay.xclbin, phoenix:1x4.xclbin>"
-conda env config vars set XLNX_TARGET_NAME=<strix or phoenix>\<strix:AMD_AIE2P_Nx4_Overlay, phoenix:AMD_AIE2P_Nx4_Overlay>
 
+In case of STRIX device:
+```
+conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\strix"
+conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\strix\AMD_AIE2P_Nx4_Overlay.xclbin"
+conda env config vars set XLNX_TARGET_NAME=AMD_AIE2P_Nx4_Overlay
+conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
 conda deactivate
 conda activate ryzen-ai-1.2.0
+conda env config vars list
+```
 
+In case of PHOENIX device:
+```
+conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix"
+conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix\1x4.xclbin"
+conda env config vars set XLNX_TARGET_NAME=AMD_AIE2_Nx4_Overlay
+conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
+conda deactivate
+conda activate ryzen-ai-1.2.0
 conda env config vars list
 ```
 
@@ -172,7 +181,7 @@ This user-friendly graphical interface is designed to assist users in composing 
 ```
 python gui_pb.py
 ```
-![GUI](./figures/gui.png)
+![GUI](./doc/gui_public.png)
 
 
 ###  3.3.2 <a name='PerformancewithasingleinstanceusingaCPU'></a>Performance with a single instance using a CPU
@@ -233,5 +242,5 @@ Prior to quantization, the user is required to download some images, for example
 python performance_benchmark.py -m ".\models\resnet50\resnet50_fp32.onnx" -e VitisAIEP --calib <images folder> --num_calib 10
 ```
 
-## 4.2 Tricks
+## 4.2 tricks
 Once executed in the GUI, the equivalent command line is copied to the clipboard, making it easy to paste into the terminal.
