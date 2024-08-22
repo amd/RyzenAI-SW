@@ -35,7 +35,7 @@ Author: AMD-Xilinx
     - [3.3.8 File of parameters](#338-file-of-parameters)
 - [4 Additional features](#4-additional-features)
   - [4.1 Auto quantization](#41-auto-quantization)
-  - [4.2 tricks](#42-tricks)
+  - [4.2 Tricks](#42-tricks)
 
 
 # <a name='Title'></a>RYZENAI-ONNX-CNNs-BENCHMARK
@@ -88,6 +88,13 @@ conda deactivate
 conda activate ryzen-ai-1.2.0
 conda env config vars list
 ```
+
+Downgrade onnx to 1.16.1 to resolve an issue with the 1.16.2 release
+https://github.com/onnx/onnx/issues/6267 
+```
+pip install onnx==1.16.1
+```
+
 
 ---
 
@@ -242,5 +249,5 @@ Prior to quantization, the user is required to download some images, for example
 python performance_benchmark.py -m ".\models\resnet50\resnet50_fp32.onnx" -e VitisAIEP --calib <images folder> --num_calib 10
 ```
 
-## 4.2 tricks
+## 4.2 Tricks
 Once executed in the GUI, the equivalent command line is copied to the clipboard, making it easy to paste into the terminal.
