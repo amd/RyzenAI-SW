@@ -35,11 +35,7 @@ Author: AMD-Xilinx
     - [3.3.8 File of parameters](#338-file-of-parameters)
 - [4 Additional features](#4-additional-features)
   - [4.1 Auto quantization](#41-auto-quantization)
-<<<<<<< HEAD
   - [4.2 Tricks](#42-tricks)
-=======
-  - [4.2 tricks](#42-tricks)
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 
 
 # <a name='Title'></a>RYZENAI-ONNX-CNNs-BENCHMARK
@@ -83,7 +79,6 @@ conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4
 conda deactivate
 conda activate ryzen-ai-1.2.0
 conda env config vars list
-<<<<<<< HEAD
 ```
 
 In case of PHOENIX device:
@@ -101,8 +96,6 @@ Downgrade onnx to 1.16.1 to resolve an issue with the 1.16.2 release
 https://github.com/onnx/onnx/issues/6267 
 ```
 pip install onnx==1.16.1
-=======
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 ```
 
 In case of PHOENIX device:
@@ -115,6 +108,13 @@ conda deactivate
 conda activate ryzen-ai-1.2.0
 conda env config vars list
 ```
+
+Downgrade onnx to 1.16.1 to resolve an issue with the 1.16.2 release
+https://github.com/onnx/onnx/issues/6267 
+```
+pip install onnx==1.16.1
+```
+
 
 ---
 
@@ -269,9 +269,5 @@ Prior to quantization, the user is required to download some images, for example
 python performance_benchmark.py -m ".\models\resnet50\resnet50_fp32.onnx" -e VitisAIEP --calib <images folder> --num_calib 10
 ```
 
-<<<<<<< HEAD
 ## 4.2 Tricks
-=======
-## 4.2 tricks
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 Once executed in the GUI, the equivalent command line is copied to the clipboard, making it easy to paste into the terminal.
