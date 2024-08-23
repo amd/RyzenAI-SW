@@ -38,7 +38,7 @@ To run the demos and examples in this repository, please follow the instructions
 
 ## LLM Flow
 
-- [LLMs on RyzenAI with Pytorch, ONNX, llama.cpp](example/transformers)
+- [LLMs on RyzenAI with Pytorch](example/transformers)
 
 
 ## Examples
