@@ -1,5 +1,9 @@
 # LLMs on RyzenAI with Pytorch
 
+This page describes the flow for running LLMs on an AMD NPU using PyTorch. This is a general-purpose flow providing functional support for a broad set of LLMs. It is intended for prototyping and early development activities. This flow is not optimized for performance and should not be used for benchmarking purposes.
+
+For benchmarking and deployment purposes, a set of performance-optimized models is available upon request on the AMD secure download site: [Optimized LLMs on RyzenAI](https://account.amd.com/en/member/ryzenai-sw-ea.html)
+
 ## Models supported with Pytorch flow
 
 The following models are supported on RyzenAI with the 4 quantization recipes described in here.
