@@ -65,6 +65,9 @@ Follow the instructions from the official [RyzenAI 1.2 Installation](https://ryz
 In the command below, please change the Conda environment name and installation path if you have altered them from the default settings.
 
 When the installation is completed, assuming that the generated Conda environment is named `ryzen-ai-1.2.0`, the following packages are needed for the benchmark:
+
+Assumes Anaconda prompt for these instructions.
+
 ```
 conda activate ryzen-ai-1.2.0
 pip install pandas pyarrow matplotlib psutil keyboard pyperclip importlib-metadata
