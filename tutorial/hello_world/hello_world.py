@@ -11,6 +11,7 @@ import vai_q_onnx
 
 torch.manual_seed(0)
 
+# Create a simple model
 class SmallModel(nn.Module):
     def __init__(self):
         super(SmallModel, self).__init__()
@@ -67,7 +68,7 @@ torch.onnx.export(
         dynamic_axes=dynamic_axes,
     )
 
-# 3. Quantize Model
+# Quantize Model
 
 # `input_model_path` is the path to the original, unquantized ONNX model.
 input_model_path = "models/helloworld.onnx"
@@ -84,14 +85,13 @@ vai_q_onnx.quantize_static(
     activation_type=vai_q_onnx.QuantType.QUInt8,
     weight_type=vai_q_onnx.QuantType.QInt8,
     enable_ipu_cnn=True,
-    extra_options={'ActivationSymmetric': True}
+    extra_options={'ActivationSymmetric':True}
 )
 
 print('Calibrated and quantized model saved at:', output_model_path)
 
 
-# 4. Run Model 
-# CPU Run
+# Run Model on CPU Run
 
 # Specify the path to the quantized ONNZ Model
 quantized_model_path = r'./models/helloworld_quantized.onnx'
@@ -114,7 +114,7 @@ start = timer()
 cpu_results = cpu_session.run(None, {'input': input_data})
 cpu_total = timer() - start
 
-# NPU Run
+# Run Model on NPU
 
 # Before running, we need to set the ENV variable for the specific NPU we have
 # Run pnputil as a subprocess to enumerate PCI devices
