@@ -14,6 +14,8 @@ string(APPEND CMAKE_CXX_FLAGS " /EHsc")
 string(APPEND CMAKE_CXX_FLAGS " /wd4996")
 string(APPEND CMAKE_CXX_FLAGS " /WX")
 string(APPEND CMAKE_CXX_FLAGS " /W0")
+
+set(OpenCV_DIR "C:/Users/dachang/work/opencv/mybuild/build")
 #string(APPEND CMAKE_CXX_FLAGS " /EHsc")
 
 
@@ -24,7 +26,8 @@ include_directories("${ONNXRUNTIME_ROOTDIR}/include"                           #
 			  )
 
 link_directories("${ONNXRUNTIME_ROOTDIR}/lib"
-                 "${CMAKE_PREFIX_PATH}/lib")
+                 "${CMAKE_PREFIX_PATH}/lib"
+                 )
 
 find_library(ORT_LIBRARY onnxruntime HINTS "${ONNXRUNTIME_ROOTDIR}/lib"
                                            REQUIRED)
