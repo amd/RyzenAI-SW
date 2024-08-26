@@ -74,10 +74,10 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 
 Make sure you have met all the requirements by following the [Installation Instructions](https://ryzenai.docs.amd.com/en/latest/inst.html#).
 
-Download the onnx models and test image/video package, and unzip it under **<path_to_RyzenAI-SW>/demo/multi-model-exec/npu_modelsx4_demo/**. 
+Download the onnx models and test image/video package, and unzip it under **<path_to_RyzenAI-SW>/demo/multi-model-exec/npu_modelsx4_demo/**
 
 
-    [Download Package](https://www.xilinx.com/bin/public/openDownload?filename=resource_multi_model_demo.zip)
+  [Download Resource Package](https://www.xilinx.com/bin/public/openDownload?filename=resource_multi_model_demo.zip)
 
  You should have the directory like this: 
  ```bash
