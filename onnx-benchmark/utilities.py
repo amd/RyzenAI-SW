@@ -472,17 +472,23 @@ def ggquantize(args):
 
     # temporary fix: after conversion the opset is not updated to 17 but to 1
     if opset_version<11:
-        ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
-        user_response = ask_update()
-        if user_response == 'y':
-            output_updated = f"{base_name}_opset17{extension}"
-            converted_model = version_converter.convert_version(original_model, newopset)
-            #print(f"The model after conversion:\n{converted_model}")
-            onnx.save(converted_model, output_updated)
-            print(f'The update model was saved with name {output_updated}')
-            input_model_path = output_updated
+        if opset_version==1 :
+            ggprint(f'[WARNING] The model opset version is 1, which seems unlikely. This might be the result of a previous opset conversion.')
         else:
-            print("You chose not to update")
+            ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
+            user_response = ask_update()
+            if user_response == 'y':
+                output_updated = f"{base_name}_opset17{extension}"
+                converted_model = version_converter.convert_version(original_model, newopset)
+                #print(f"The model after conversion:\n{converted_model}")
+                onnx.save(converted_model, output_updated)
+                print(f'The update model was saved with name {output_updated}')
+                # verify opset
+                updated_model = onnx.load(output_updated)
+                ggprint(f"Updated model opset version: {updated_model.opset_import[0].version}")
+                input_model_path = output_updated
+            else:
+                ggprint("You chose not to update")
     # free memory
     del original_model
     gc.collect()
