@@ -31,7 +31,7 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 ├── build.bat #easy build script
 └── src
     ├── CMakeLists.txt
-    ├── app  #ipu_multi_model app source code
+    ├── app  #npu_multi_model app source code
     ├── models
     ├── onnx # Onnx dependencies
     ├── processing
@@ -40,15 +40,13 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 ## 3 How To Build:
 
 ### 3.1 Requirement
-1. Visual Studio 2019 or 2022 (with Desktop dev c++ )
+1. Visual Studio 2022 (with Desktop dev c++ )
 2. cmake (version >= 3.26)
-3. python (version >= 3.9) (Recommended for python 3.9.13 64bit)
-4. IPU driver & IPU xclbin reledease >= 20230823
-
+3. python (version = 3.10)
 
 
 ### 3.2 Clean Cache 
-When you replace the IPU driver or 1x4.xclbin, you need to clear the cache of the old compiled model, they are located in C:\temp\rd\vaip\\.cache, and delete everything under this folder.
+When you replace the NPU driver or 1x4.xclbin, you need to clear the cache of the old compiled model, they are located in C:\temp\rd\vaip\\.cache, and delete everything under this folder.
 
 ### 3.3 Prepare Conda Env
 About how to create conda env please refer to [Demo Readme](../../demo/multi-model-exec/README.md)
@@ -102,7 +100,7 @@ python3 -m pip install pillow
   ```
 Output:
 ``` ......
-    -- Installing: ..../bin/ipu_multi_models.exe
+    -- Installing: ..../bin/npu_multi_models.exe
 ```
 
 
