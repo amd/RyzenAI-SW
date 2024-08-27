@@ -66,20 +66,20 @@ def profile(args, num):
 
     EP_List = []
 
-    if args.device == "iGPU":
+    if args.execution_provider == "iGPU":
         providers = [("DmlExecutionProvider", {"device_id": 0})]
         args.threads = 1  # iGPU does not take advantage of async multi-threading
         ggprint("Check with Task Manager which GPU is used!")
         session = rt.InferenceSession(args.model, so, providers=providers)
-    if args.device == "dGPU":
+    if args.execution_provider == "dGPU":
         # providers = ['DmlExecutionProvider', {'device_id':1}]
         providers = [("DmlExecutionProvider", {"device_id": 1})]
         ggprint("Check with Task Manager which GPU is used!")
         session = rt.InferenceSession(args.model, providers=providers)
-    elif args.device == "ZenDNN":
+    elif args.execution_provider == "ZenDNN":
         providers = ["ZendnnExecutionProvider"]
         session = rt.InferenceSession(args.model, so, providers=providers)
-    elif args.device == "CPU":
+    elif args.execution_provider == "CPU":
         providers = ["CPUExecutionProvider"]
         # ref: https://onnxruntime.ai/docs/performance/tune-performance/threading.html
         so.intra_op_num_threads = args.intra_op_num_threads
@@ -87,23 +87,25 @@ def profile(args, num):
         #so.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
         #so.add_session_config_entry("session.intra_op.allow_spinning", "1")
         session = rt.InferenceSession(args.model, so, providers=providers)
-    elif args.device == "ZenDPU":
+    elif args.execution_provider == "ZenDPU":
         providers = ["ZendpuExecutionProvider"]
         session = rt.InferenceSession(args.model, so, providers=providers)
-    elif args.device == "VitisAIEP":
+    elif args.execution_provider == "VitisAIEP":
+        ggprint(f"config path = {args.config}")
         args.model = ggquantize(args)
         
         EP_List.append("VitisAIExecutionProvider")
         cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
         so.intra_op_num_threads = args.intra_op_num_threads
+        
         provider_options = [
             {
                 "config_file": args.config,
                 "cacheDir": str(cache_dir),
                 "cacheKey": "modelcachekey",
+                "num_of_dpu_runners": args.instance_count,
             }
         ]
-        ggprint(f"config path = {args.config}")
         session = rt.InferenceSession(
             args.model, so, providers=EP_List, provider_options=provider_options
         )
@@ -235,29 +237,29 @@ def profile(args, num):
     # session.end_profiling()
 
 if __name__ == "__main__":
-    ggprint("THIS IS A HARDCODED VERSION FOR STRIX")
-    args = parse_args()
+    device = detect_device()
+    args, defaults = parse_args(device)
 
     # environment control
-    check_env(release, args)
+    check_env(release, args) 
     # imput parameters control
-    check_args(args)
+    check_args(args, defaults)
     # delete old measurement
-    del_old_meas(args.log_json)
+    del_old_meas("report_benchmark.json")
     
     # EP driven setup
     xclbin_path = ""
-    if args.device == "VitisAIEP":
+    if args.execution_provider == "VitisAIEP":
         os.environ['NUM_OF_DPU_RUNNERS'] = str(args.instance_count)
         os.environ['XLNX_ONNX_EP_VERBOSE'] = "0"
         os.environ['XLNX_ENABLE_STAT_LOG']= "0"
         set_engine_shape(args.core)
-
+        
         if args.renew == "1":
             cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
             cancelcache(cache_dir)
 
-    if args.device == "ZenDNN":
+    if args.execution_provider == "ZenDNN":
         set_ZEN_env()
     
     # Warmup. Skipping in case of infinite loop
@@ -277,8 +279,8 @@ if __name__ == "__main__":
             args, release, thr_results, lat_results, xclbin_path
         )
 
-        print(Colors.YELLOW + f"\nprofiling:  {args.model} running on {args.device}")
-        if (args.device == "VitisAIEP"): print(f"Instances (NPU runners)  = {args.instance_count}")
+        print(Colors.YELLOW + f"\nprofiling:  {args.model} running on {args.execution_provider}")
+        if (args.execution_provider == "VitisAIEP"): print(f"Instances (NPU runners)  = {args.instance_count}")
         print(f"Threads                  = {args.threads}")
         print(f"Batch size               = {args.batchsize}")
         print("-" * 80)
@@ -288,7 +290,7 @@ if __name__ == "__main__":
         print("-" * 80)
 
 
-        if args.device == "VitisAIEP":
+        if args.execution_provider == "VitisAIEP":
             cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
             try:
                 with open(os.path.join(cache_dir, r"modelcachekey\vitisai_ep_report.json"), "r") as json_file:
@@ -304,8 +306,7 @@ if __name__ == "__main__":
 
         print(Colors.RESET)
 
-        if args.log_json:
-            save_result_json(measurement, args.log_json)
+        save_result_json(measurement, "report_performance.json")
         if args.log_csv=="1":
             appendcsv(measurement, args)
     else:

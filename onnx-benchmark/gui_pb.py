@@ -8,6 +8,7 @@ import json
 import os
 import webbrowser
 import pyperclip
+from utilities import *
 
 def create_argparse_window(parser, root, parameter_values):
     for action in parser._actions:
@@ -58,14 +59,15 @@ def create_argparse_window(parser, root, parameter_values):
                 parameter_values[action.dest] = entry
 
     # -------------------------------------------------------------------
-    # button to compose the command string
+    # button to compose the command string    
     compose_button = tk.Button(root, text="RUN", command=lambda: startnewtest(parameter_values, result_frame))
     compose_button.grid(row=root.grid_size()[1], column=2, padx=10, pady=10)
+    
     # -------------------------------------------------------------------
     # frame for the results
     result_frame = tk.Frame(root, borderwidth=2, relief="ridge")
     result_frame.grid(row=root.grid_size()[1], column=0, columnspan=2, padx=10, pady=10)
-
+    
     label = tk.Label(result_frame, text=f"Measured throughput: ------- ", font=("Arial", 12, "bold"))
     label.grid(row=1, column=0, sticky='w')
     label = tk.Label(result_frame, text=f"Measured latency:    ------- ", font=("Arial", 12, "bold"))
@@ -106,8 +108,11 @@ def launch_benchmark(parameter_values):
         elif isinstance(value, tk.BooleanVar):
             entry_value = value.get()
         else:
+            entry_value = value.get().strip()           
             if param in {"config", "json", "model", "calib"}:
-                entry_value = f'"{value.get().strip()}"'
+                if ' ' in entry_value:
+
+                    entry_value = f'"{entry_value}"'
             else:
                 entry_value = value.get().strip()
 
@@ -129,8 +134,8 @@ def startnewtest(parameter_values, result_frame):
     launch_benchmark(parameter_values)  
     display_results(result_frame)
 
-def conf_pb():
-    # copied from utilities.py and reordered
+def conf_pb(device):
+    # almost copied from utilities.py and reordered
     parser = argparse.ArgumentParser(description='Argument Parser for Tkinter Window')
     parser.add_argument(
         "--json",
@@ -147,31 +152,41 @@ def conf_pb():
     )
 
     parser.add_argument(
-        "--device",
-        "-d",
+        "--execution_provider",
+        "-e",
         type=str,
         default="CPU",
         choices=["CPU", "VitisAIEP"],
         help="Execution Provider selection. Default=CPU",
     )
-    parser.add_argument(
-        "--core",
-        default="STX_1x4",
-        type=str,
-        choices=["STX_1x4","STX_4x4"],
-        help="Which core to use with STRIX silicon. Possible values are 1x4 and 4x4. Default=STX_1x4",
-    )
+
+    if device=="STRIX":
+        parser.add_argument(
+            "--core",
+            default="STX_1x4",
+            type=str,
+            choices=["STX_1x4","STX_4x4"],
+            help="Which core to use with STRIX silicon. Default=STX_1x4",
+        )
+    elif device=="PHOENIX":
+        parser.add_argument(
+            "--core",
+            default="PHX_1x4",
+            type=str,
+            choices=["PHX_1x4","PHX_4x4"],
+            help="Which core to use with PHOENIX silicon. Default=PHX_1x4",
+        )
 
     parser.add_argument(
         "--config", "-c", 
         type=str, 
-        default="vaip_config.json", 
+        default="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\vaip_config.json", 
         help="path to the file of VitisAI EP compiler configuration. Default=vaip_config.json"
     )
     parser.add_argument(
         "--intra_op_num_threads", 
         type=int, 
-        default=1,
+        default=1, 
         help="Number of CPU threads enabled when an operator is resolved by the CPU. Affects the performances but also the CPU power consumption. Default=1"
         )
 
@@ -278,9 +293,9 @@ def conf_pb():
     return(parser)
 
 def about():
-    print("This GUI has been created for Performance Benchmark release 17")
+    print("This GUI has been created for Performance Benchmark release 18")
 
-def populatebenchmark(root):
+def populatebenchmark(root, device):
     # Remove the existing frame, if any
     for widget in root.winfo_children():
         if isinstance(widget, tk.Frame):
@@ -293,7 +308,7 @@ def populatebenchmark(root):
     # Dictionary to store parameter values
     parameter_values = {}
     # Create widgets for each argument found
-    parser=conf_pb()
+    parser=conf_pb(device)
     create_argparse_window(parser, frame, parameter_values)
 
     root.update_idletasks()
@@ -315,7 +330,7 @@ def populatehelp(root):
 
     def open_link(event):
         webbrowser.open("https://gitenterprise.xilinx.com/AIG-SAIS/RyzenAI-ONNX-CNNs-Benchmark/tree/strix")
-
+    
     link_label = ttk.Label(frame, text="Click here to visit AIG-SAIS Github repo", cursor="hand2")
     link_label.grid(row=2, column=0, padx=10, pady=10)
     link_label.bind("<Button-1>", open_link)
@@ -326,7 +341,7 @@ def populatehelp(root):
     x, y = root.winfo_pointerxy()
     root.geometry(f"{frame.winfo_width()+ 20}x{frame.winfo_height()+20}+{x}+{40}")
 
-def menubar(root):
+def menubar(root, device):
     # -------------------------------------------------------------------
     # Create a menu bar
     menu_bar = Menu(root)
@@ -336,7 +351,7 @@ def menubar(root):
     test_menu = Menu(menu_bar, tearoff=0)
     menu_bar.add_cascade(label="Test", menu=test_menu)
     #---
-    test_menu.add_command(label="STRIX ONNX CNNs Benchmark", command=lambda: populatebenchmark(root))
+    test_menu.add_command(label=f"{device} ONNX CNNs Benchmark", command=lambda: populatebenchmark(root, device))
     test_menu.add_separator()
     test_menu.add_command(label="Exit", command=root.quit)
 
@@ -346,28 +361,17 @@ def menubar(root):
     #---
     help_menu.add_command(label="About", command=lambda: populatehelp(root))
 
-def runsubprocess(script_to_run):
-    result = subprocess.run(['python', script_to_run], capture_output=True, text=True)
-    print(result.stdout)
-    # Print any errors encountered while running the second script
-    if result.stderr:
-        print("Warnings or errors captured:")
-        print(result.stderr)
-    if result.returncode == 0:
-        print(f"The script {script_to_run} ran successfully.")
-    else:
-        print(f"The script {script_to_run} failed with return code {result.returncode}.")
-
 
 def main():
+    device = detect_device()
     # Create a Tkinter window where the mouse is
     root = tk.Tk()
-    root.withdraw()  # Hide the root window
-    root.title("STRIX ONNX Performance Benchmark")
+    root.withdraw()  # Hide the root window   
+    root.title(f"{device} ONNX Performance Benchmark")
     root.resizable(True, True)  # Allow resizing both horizontally and vertically
 
-    menubar(root)
-
+    menubar(root, device)
+    
     # Get the current mouse position
     # Set the root window geometry
     root.update_idletasks()
