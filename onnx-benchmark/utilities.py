@@ -1,4 +1,5 @@
-# release 18 with power
+# release 18 
+# STRIX and PHOENIX supported
 
 import pandas as pd
 import numpy as np
@@ -17,15 +18,17 @@ import psutil
 import re
 import csv
 from pathlib import Path
+import inspect
+import gc
 
 from onnxruntime.quantization.calibrate import CalibrationDataReader
 import onnx
 from onnxruntime.quantization import CalibrationDataReader, QuantType, QuantFormat, CalibrationMethod
+from onnx import version_converter, helper
 from onnxruntime.quantization import shape_inference
 import vai_q_onnx
 import random
 from PIL import Image
-
 
 class Colors:
     RESET = "\033[0m"
@@ -100,7 +103,7 @@ class DataReader:
 
     def reset(self):
         self.batch_index = 0
-
+    
     def get_next(self):
         # print(f'returned next data reader  {self.read_batch()["input"].shape}')
         return self.read_batch()
@@ -117,7 +120,7 @@ def analyze_input_format(input_shape):
         order = "NHWC"
     else:
         print("Unknown input format")
-        quit()
+        quit()   
     return order
 
 
@@ -128,7 +131,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
         "p_batchsize",
         "p_config",
         "p_core",
-        "p_device",
+        "p_execution_provider",
         "p_infinite",
         "p_instance_count",
         "p_intra_op_num_threads",
@@ -144,7 +147,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
         "p_warmup",
         "benchmark_release",
         "model",
-        "device",
+        "execution_provider",
         "total_throughput",
         "average_latency",
         "apu_perf_pow",
@@ -194,7 +197,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
                 "p_batchsize": args.batchsize,
                 "p_config": args.config,
                 "p_core": args.core,
-                "p_device": args.device,
+                "p_execution_provider": args.execution_provider,
                 "p_infinite": args.infinite,
                 "p_instance_count": args.instance_count,
                 "p_intra_op_num_threads": args.intra_op_num_threads,
@@ -210,7 +213,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
                 "p_warmup": args.warmup,
                 "benchmark_release": measurement["run"]["benchmark_release"],
                 "model": measurement["run"]["model"],
-                "device": measurement["run"]["device"],
+                "execution_provider": measurement["run"]["execution_provider"],
                 "total_throughput": measurement["results"]["performance"][
                     "total_throughput"
                 ],
@@ -266,6 +269,13 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
         )
     ggprint(f"Data appended to {csv_file}")
 
+def ask_update():
+    while True:
+        response = input("Do you want to update? (y/n): ").strip().lower()
+        if response in {'y', 'n'}:
+            return response
+        else:
+           print("Invalid input. Please enter 'y' or 'n'.")
 
 def check_package_version(package_name):
     try:
@@ -336,23 +346,6 @@ def check_env(release, args):
             (f"{package_name} version: {version}", Colors.RED + f"please update {package_name}" + Colors.RESET)
         )
 
-    # AGM
-    package_name = "AGM"
-    result = subprocess.run(r'"C:\Program Files\AMD Graphics Manager\AMDGraphicsManager.exe", "-list_smu_devices", "-version", "-skipulpscheck"', capture_output=True, text=True)
-    output = result.stdout
-    version = None
-    for line in output.split('\n'):
-        if "AMD Graphics Manager Version" in line:
-            version = line.strip().split("Version ")[1]
-    if version in ["4.1.35.0", "4.1.36.0"]:
-        data.append(
-            (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
-        )
-    else:
-        data.append(
-            (f"{package_name} version: {version}", Colors.RED + "" + Colors.RESET)
-        )
-
     max_width = max(len(row[0]) for row in data)
 
     for row in data:
@@ -360,8 +353,9 @@ def check_env(release, args):
         # Left-align the text in the first column and pad with spaces
         formatted_column1 = column1.ljust(max_width)
         ggprint(f"{formatted_column1} {column2}")
+    
 
-def check_args(args):
+def check_args(args, defaults):
     assert args.num >= (
         args.batchsize * args.instance_count
     ), "runs must be greater than batches*instance-count"
@@ -371,8 +365,10 @@ def check_args(args):
         args.instance_count = total_cpu
         ggprint(f"Limiting instance count to max cpu count ({total_cpu})")
 
-    if args.device == "VitisAIEP":
-        assert os.path.exists(args.config), f"ERROR {args.config} does not exist. Provide a valid path with --config option"
+    if args.execution_provider == "VitisAIEP":
+        assert os.path.exists(defaults['config']) or os.path.exists(args.config), (
+            f"ERROR: Neither the default config path {defaults['config']} nor the provided config path {args.config} exists."
+        )
 
 
 def check_silicon(expected, found):
@@ -383,7 +379,8 @@ def check_silicon(expected, found):
 
 
 def cancelcache(cache_path):
-    #cache_path = r"modelcachekey"
+    ggprint(80*"-")
+    ggprint("Cleaning cache")
     if os.path.exists(cache_path) and os.path.isdir(cache_path):
         try:
             shutil.rmtree(cache_path)
@@ -392,6 +389,14 @@ def cancelcache(cache_path):
             ggprint(f"Error during cache cancellation: {e}")
     else:
         ggprint(f"{cache_path} does not exist or is not a directory")
+
+
+def dbprint(message):
+    frame = inspect.currentframe()
+    caller_frame = frame.f_back
+    file_name = caller_frame.f_code.co_filename
+    line_number = caller_frame.f_lineno
+    print(Colors.BLUE + f"File: {file_name}, Line: {line_number} - {message}" + Colors.RESET)
 
 
 def DEF_setup(silicon):
@@ -410,9 +415,39 @@ def del_old_meas(measfile):
     # Check if the file exists before attempting to delete it
     if os.path.exists(measfile):
         os.remove(measfile)
-        ggprint(f"Old measurement {measfile} deleted successfully")
-    else:
-        ggprint(f"{measfile} does not exist")
+        #ggprint(f"Old measurement {measfile} deleted successfully")
+
+
+def detect_device():
+    def get_driver_info(device_name):
+        # PowerShell command to get device details
+        command = f'powershell -Command "Get-WmiObject Win32_PnPEntity | Where-Object {{ $_.Name -like \'*{device_name}*\' }} | Select-Object Name, DeviceID"'
+        result = subprocess.run(command, capture_output=True, text=True, shell=True)
+        device_info = result.stdout.strip()
+    
+        return device_info
+
+    device_name = "NPU Compute Accelerator Device"
+    device_info = get_driver_info(device_name)
+    #print("Device Info:\n", device_info)
+
+    if "17F0" in device_info:
+        device = "STRIX"
+    elif "1502" in device_info:
+        device = "PHOENIX"
+    else: device = "ERROR Device Unknown"
+
+    #print(f'Device = {device}')
+    return device   
+
+def get_driver_release_number(device_name):
+    command = f'powershell -Command "Get-WmiObject Win32_PnPSignedDriver | Where-Object {{ $_.DeviceName -like \'*{device_name}*\' }} | Select-Object DeviceName, DriverVersion"'
+    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+    if result.returncode != 0:
+        print("Error running PowerShell command:")
+        print(result.stderr)
+        return
+    return result.stdout.split("\n")[3].split(" ")[4].strip()
 
 
 def ggprint(linea):
@@ -423,26 +458,46 @@ def ggquantize(args):
     input_model_path = args.model
     imagenet_directory = args.calib
 
-    # `output_model_path` is the path where the quantized model will be saved.
     base_name, extension = os.path.splitext(input_model_path)
-    output_INT8_NHWC_model_path = f"{base_name}_int8{extension}"
 
-    # `calibration_dataset_path` is the path to the dataset used for calibration during quantization.
+    # OPSET update to 17
+    # A full list of supported adapters can be found here:
+    # https://github.com/onnx/onnx/blob/main/onnx/version_converter.py#L21
+    # Apply the version conversion on the original model
+
+    # Preprocessing: load the model to be converted.   
+    newopset = 17
+    original_model = onnx.load(input_model_path)
+    opset_version = original_model.opset_import[0].version
+    if opset_version<11:
+        ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
+        user_response = ask_update()
+        if user_response == 'y':
+            output_updated = f"{base_name}_opset17{extension}"
+            converted_model = version_converter.convert_version(original_model, newopset)
+            #print(f"The model after conversion:\n{converted_model}")
+            onnx.save(converted_model, output_updated)
+            print(f'The update model was saved with name {output_updated}')
+            input_model_path = output_updated
+        else:
+            print("You chose not to update")
+    # free memory
+    del original_model
+    gc.collect()
+
+    # check if the model is already quantized
+    output_INT8_NHWC_model_path = f"{base_name}_int8{extension}"
     calibration_dataset_path = "calibration"
 
-    # 0) cancel the cache
-    if args.renew == "1":
-        cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
-        cancelcache(cache_dir)
-        cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(output_INT8_NHWC_model_path))
-        cancelcache(cache_dir)
-
-    # 1) check if the model is already quantized
     operators = list_operators(input_model_path)
     if "QuantizeLinear" in operators:
         ggprint("The model is already quantized")
         return input_model_path
     else:
+        if args.renew == "1":
+            cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(output_INT8_NHWC_model_path))
+            cancelcache(cache_dir)
+
         print(Colors.MAGENTA)
         print("The model is not quantized")
         # 2) recognize the model input format
@@ -456,7 +511,7 @@ def ggquantize(args):
         elif order =="NCHW":
             nchw_to_nhwc = True
             print("The input format is NCHW - conversion to NHWC enabled")
-
+       
         # 3) prepare the calibration directory
         calib_dir = "calibration"
         copied_images = SetCalibDir(imagenet_directory, calib_dir, args.num_calib)
@@ -466,8 +521,8 @@ def ggquantize(args):
         data_reader = DataReader( calibration_folder=calibration_dataset_path, batch_size=1, target_size=input_shape, inputname=input_name)
 
 
-        if args.device == "VitisAIEP":
-
+        if args.execution_provider == "VitisAIEP":
+            
             base_name, extension = os.path.splitext(input_model_path)
             preprocessed_model_path = f"{base_name}_pp{extension}"
             shape_inference.quant_pre_process(
@@ -502,8 +557,8 @@ def ggquantize(args):
                     'RemoveQDQConvPRelu':True
                 }
             )
-
-        elif args.device == "CPU":
+        
+        elif args.execution_provider == "CPU":
             vai_q_onnx.quantize_static(
                 input_model_path,
                 output_INT8_NHWC_model_path,
@@ -564,7 +619,7 @@ def list_operators(onnx_model_path):
         oplist.append(node.op_type)
     return oplist
 
-
+   
 def list_files_in_directory(directory):
     file_paths = []
     for root, _, files in os.walk(directory):
@@ -589,7 +644,7 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     
     measurement["run"]["benchmark_release"] = release
     measurement["run"]["model"] = args.model
-    measurement["run"]["device"] = args.device
+    measurement["run"]["execution_provider"] = args.execution_provider
 
     measurement["results"] = {}
     measurement["results"]["performance"] = {}
@@ -641,27 +696,23 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     powershell_path = os.path.join(os.environ['SystemRoot'], 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe')
     if os.path.exists(powershell_path):
         try:
-            #powershell_command = 'Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.DeviceName -like "*AMD IPU*"} | Select-Object DeviceName, DriverVersion'
-            #result = subprocess.check_output([powershell_path, "-Command", powershell_command], text=True)
-            #lines = result.strip().split("\n")
-            #driver_version = lines[-1].split()[-1]
-            driver_version = "DEBUG"
+            driver_release=get_driver_release_number("NPU Compute Accelerator Device")
         except subprocess.CalledProcessError:
-            ggprint("Error: AMD IPU driver not found or PowerShell command failed.")
-            driver_version = "DEBUG"
-
+            ggprint("Error: AMD NPU driver not found or PowerShell command failed.")
+            driver_release = "Unknown"
+       
     else:
-        ggprint("Warning: Could not execute a Powershell command. Please manually verify that the AMD IPU Driver exists")       
-        driver_version = ""
+        ggprint("Warning: Could not execute a Powershell command. Please manually verify that the AMD NPU Driver exists")       
+        driver_release = "Unknown"
 
     measurement["system"]["driver"] = {}
-    measurement["system"]["driver"]["npu"] = driver_version
+    measurement["system"]["driver"]["npu"] = driver_release
 
     measurement["environment"] = {}
     measurement["environment"]["packages"] = {}
 
     # info stored in the cache (only with VitisAIEP)
-    if args.device == "VitisAIEP":
+    if args.execution_provider == "VitisAIEP":
         measurement["environment"]["xclbin"] = {}
         measurement["environment"]["xclbin"]["xclbin_path"] = xclbin_path
         cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
@@ -692,7 +743,7 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
             package_info[package_name] = package_version
     measurement["environment"]["packages"] = package_info
 
-    if args.device == "VitisAIEP":
+    if args.execution_provider == "VitisAIEP":
         measurement["environment"]["vaip_config"] = {}
         with open(args.config, "r") as json_file:
             vaip_conf = json.load(json_file)
@@ -702,40 +753,59 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     return measurement
 
 
-def parse_args():
+def parse_args(device):
+
+    def_config_path = os.path.join(os.environ.get('VAIP_CONFIG_HOME'), 'vaip_config.json')
+    defaults = {
+        'calib': ".\\images",
+        'config': def_config_path,
+        'core': "STX_1x4",
+        'execution_provider': 'CPU',
+    }
+
     if len(sys.argv) < 2:
         show_help()
         quit()
 
     parser = argparse.ArgumentParser()
+
     parser.add_argument("--batchsize", "-b", type=int, default=1, help="batch size: number of images processed at the same time by the model. VitisAIEP supports batchsize = 1. Default is 1")
     parser.add_argument(
         "--calib",
         type=str,
-        default=".\\Imagenet\\val",
+        default=defaults['calib'],
         help=f"path to Imagenet database, used for quantization with calibration. Default= .\Imagenet\val ",
+    )   
+    parser.add_argument(
+        "--config", 
+        "-c", 
+        type=str, 
+        default=defaults['config'],
+        help="path to config json file. Default= <release>\\vaip_config.json",
     )
 
-    def_config_path = os.path.join(os.environ.get('VAIP_CONFIG_HOME'), 'vaip_config.json')
+    if device=="STRIX":
+        parser.add_argument(
+            "--core",
+            default="STX_1x4",
+            type=str,
+            choices=["STX_1x4","STX_4x4"],
+            help="Which core to use with STRIX silicon. Default=STX_1x4",
+        )
+    elif device=="PHOENIX":
+        parser.add_argument(
+            "--core",
+            default="PHX_1x4",
+            type=str,
+            choices=["PHX_1x4","PHX_4x4"],
+            help="Which core to use with PHOENIX silicon. Default=PHX_1x4",
+        )
+
     parser.add_argument(
-        "--config",
-        "-c",
+        "--execution_provider",
+        "-e",
         type=str,
-        default=def_config_path,
-        help="path to config json file. Default= <release>\\vaip_config.json"
-    )
-    parser.add_argument(
-        "--core",
-        default="STX_1x4",
-        type=str,
-        choices=["STX_1x4","STX_4x4"],
-        help="Which core to use on STRIX silicon. Possible values are 1x4 and 4x4. Default=STX_1x4",
-    )
-    parser.add_argument(
-        "--device",
-        "-d",
-        type=str,
-        default="CPU",
+        default=defaults['execution_provider'],
         choices=["CPU", "VitisAIEP", "iGPU", "dGPU"],
         help="Execution Provider selection. Default=CPU",
     )
@@ -754,12 +824,12 @@ def parse_args():
         help="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1",
     )
     parser.add_argument(
-        "--intra_op_num_threads",
-        type=int,
-        default=1,
+        "--intra_op_num_threads", 
+        type=int, 
+        default=1, 
         help="In general this parameter controls the total number of INTRA threads to use to run the model. INTRA = parallelize computation inside each operator. Specific for VitisAI EP: number of CPU threads enabled when an operator is resolved by the CPU. Affects the performances but also the CPU power consumption. For best performance: set intra_op_num_threads to 0: INTRA Threads Total = Number of physical CPU Cores. For best power efficiency: set intra_op_num_threads to smallest number (>0) that sustains the close to optimal performance (likely 1 for most cases of models running on DPU). Default=1"
         )
-
+    
     parser.add_argument(
         "--json",
         type=str,
@@ -771,13 +841,6 @@ def parse_args():
         type=str,
         default="0",
         help="If this option is set to 1, measurement data will appended to a CSV file. Default=0",
-    )
-    parser.add_argument(
-        "--log_json",
-        "-j",
-        type=str,
-        default="report_performance.json",
-        help="JSON file name where the measureemnts will be saved. Default = report_performance.json ",
     )
     parser.add_argument(
         "--min_interval",
@@ -800,17 +863,17 @@ def parse_args():
         help="When set to 1 the benchmark runs without inference for power measurements baseline. Default=0",
     )
     parser.add_argument(
-        "--num",
-        "-n",
-        type=int,
-        default=100,
+        "--num", 
+        "-n", 
+        type=int, 
+        default=100, 
         help="The number of images loaded into memory and subsequently sent to the model. Default=100"
     )
-
+    
     parser.add_argument(
-        "--num_calib",
-        type=int,
-        default=10,
+        "--num_calib", 
+        type=int, 
+        default=10, 
         help="The number of images for calibration. Default=10"
     )
 
@@ -822,7 +885,7 @@ def parse_args():
         choices=["0", "1"],
         help="if set to 1 cancel the cache and recompile the model. Set to 0 to keep the old compiled file. Default=1",
     )
-
+    
     parser.add_argument(
         "--timelimit",
         "-l",
@@ -847,8 +910,12 @@ def parse_args():
         default=40,
         help="Perform warmup runs, default = 40",
     )
-    args, _ = parser.parse_known_args()
+
+    args = parser.parse_args()
+
+    #args, _ = parser.parse_known_args()
     if args.json:
+        ggprint("Loading the file of parameters")
         try:
             with open(args.json, "r") as json_file:
                 config = json.load(json_file)
@@ -856,9 +923,9 @@ def parse_args():
             for arg_name, value in config.items():
                 setattr(args, arg_name, value)
         except Exception as e:
-            print(f"Error loading JSON file: {e}")
-
-    return args
+            print(f"Error loading the file of parameters: {e}")
+    
+    return args, defaults  
 
 
 def set_ZEN_env():
@@ -895,7 +962,7 @@ def show_help():
     print("Usage: python performance_benchmark.py <parameters list>")
     print("Please fill the parameters list. Use -h for help")
     print("i.e.:")
-    print("python performance_benchmark.py --model resnet50_1_5_224x224-op13_NHWC_quantized.onnx --device VitisAIEP --num 2000 -i 4 -t 4 -p 1 -j demo.json -r 1")
+    print("python performance_benchmark.py --model resnet50_1_5_224x224-op13_NHWC_quantized.onnx --execution_provider VitisAIEP --num 2000 -i 4 -t 4 -p 1 -j demo.json -r 1")
 
 
 def save_result_json(results, filename):
@@ -907,28 +974,51 @@ def save_result_json(results, filename):
         json.dump(results, file_json, indent=4)
     ggprint(f"Data saved in {filename}")
 
+def PHX_1x4_setup(silicon):
+    xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), '1x4.xclbin')
+    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
+    os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_Nx4_Overlay"
+    ggprint(80*"-")
+    ggprint("Core selection")
+    ggprint(f"Path to xclbin_path = {xclbin_path}")
+    ggprint(os.environ["XLNX_TARGET_NAME"])
+
+
+def PHX_4x4_setup(silicon):
+    xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), '4x4.xclbin')
+    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
+    os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_4x4_Overlay"
+    ggprint(80*"-")
+    ggprint("Core selection")
+    ggprint(f"Path to xclbin_path = {xclbin_path}")
+    ggprint(os.environ["XLNX_TARGET_NAME"])
+
 
 def STX_1x4_setup(silicon):
-    ggprint("STRIX 1x4")
     xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_Nx4_Overlay.xclbin')
-    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)
+    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
     os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_Nx4_Overlay"
+    ggprint(80*"-")
+    ggprint("Core selection")
     ggprint(f"Path to xclbin_path = {xclbin_path}")
     ggprint(os.environ["XLNX_TARGET_NAME"])
 
 
 def STX_4x4_setup(silicon):
-    ggprint("STRIX 4x4")
+    #xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_4x4_Overlay_CFG0.xclbin')
     xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_4x4_Overlay.xclbin')
-    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)
+    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
     os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_4x4_Overlay"
+    ggprint(80*"-")
+    ggprint("Core selection")
     ggprint(f"Path to xclbin_path = {xclbin_path}")
     ggprint(os.environ["XLNX_TARGET_NAME"])
 
 
 def set_engine_shape(case):
-    #DEBUG: HARDCODED TO STRIX
     switch_dict = {
+        "PHX_1x4": PHX_1x4_setup,
+        "PHX_4x4": PHX_4x4_setup,
         "STX_1x4": STX_1x4_setup,
         "STX_4x4": STX_4x4_setup,
     }
