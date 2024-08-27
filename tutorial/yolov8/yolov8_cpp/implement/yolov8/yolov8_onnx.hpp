@@ -23,10 +23,14 @@
 #include <iomanip>
 #include <iostream>
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <numeric>  //accumulate
 =======
 #include <numeric> //accumulate
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+#include <numeric> //accumulate
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <vector>
@@ -40,35 +44,47 @@ using namespace std;
 using namespace cv;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static float overlap(float x1, float w1, float x2, float w2) {
 =======
 static float overlap(float x1, float w1, float x2, float w2)
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+static float overlap(float x1, float w1, float x2, float w2)
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   float left = max(x1 - w1 / 2.0, x2 - w2 / 2.0);
   float right = min(x1 + w1 / 2.0, x2 + w2 / 2.0);
   return right - left;
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static float cal_iou(vector<float> box, vector<float> truth) {
   float w = overlap(box[0], box[2], truth[0], truth[2]);
   float h = overlap(box[1], box[3], truth[1], truth[3]);
   if (w < 0 || h < 0) return 0;
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 static float cal_iou(vector<float> box, vector<float> truth)
 {
   float w = overlap(box[0], box[2], truth[0], truth[2]);
   float h = overlap(box[1], box[3], truth[1], truth[3]);
   if (w < 0 || h < 0)
     return 0;
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 
   float inter_area = w * h;
   float union_area = box[2] * box[3] + truth[2] * truth[3] - inter_area;
   return inter_area * 1.0 / union_area;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 static void applyNMS(const vector<vector<float>>& boxes,
                      const vector<float>& scores, const float nms,
@@ -81,6 +97,8 @@ static void applyNMS(const vector<vector<float>>& boxes,
   stable_sort(order.begin(), order.end(),
               [](const pair<float, size_t>& ls, const pair<float, size_t>& rs) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 static void applyNMS(const vector<vector<float>> &boxes,
                      const vector<float> &scores, const float nms,
                      const float conf, vector<size_t> &res)
@@ -94,11 +112,15 @@ static void applyNMS(const vector<vector<float>> &boxes,
   stable_sort(order.begin(), order.end(),
               [](const pair<float, size_t> &ls, const pair<float, size_t> &rs)
               {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
                 return ls.first > rs.first;
               });
   vector<size_t> ordered;
   transform(order.begin(), order.end(), back_inserter(ordered),
+<<<<<<< HEAD
 <<<<<<< HEAD
             [](auto& km) { return km.second; });
   vector<bool> exist_box(count, true);
@@ -108,6 +130,8 @@ static void applyNMS(const vector<vector<float>> &boxes,
     if (!exist_box[i]) continue;
     if (scores[i] < conf) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
             [](auto &km)
             { return km.second; });
   vector<bool> exist_box(count, true);
@@ -119,13 +143,17 @@ static void applyNMS(const vector<vector<float>> &boxes,
       continue;
     if (scores[i] < conf)
     {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
       exist_box[i] = false;
       continue;
     }
     /* add a box as result */
     res.push_back(i);
     // cout << "nms push "<< i<<endl;
+<<<<<<< HEAD
 <<<<<<< HEAD
     for (size_t _j = _i + 1; _j < count; ++_j) {
       size_t j = ordered[_j];
@@ -134,6 +162,8 @@ static void applyNMS(const vector<vector<float>> &boxes,
       ovr = cal_iou(boxes[j], boxes[i]);
       if (ovr >= nms) exist_box[j] = false;
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     for (size_t _j = _i + 1; _j < count; ++_j)
     {
       size_t j = ordered[_j];
@@ -143,21 +173,30 @@ static void applyNMS(const vector<vector<float>> &boxes,
       ovr = cal_iou(boxes[j], boxes[i]);
       if (ovr >= nms)
         exist_box[j] = false;
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     }
   }
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static void letterbox(const cv::Mat input_image, cv::Mat& output_image,
                       const int height, const int width, float& scale,
                       int& left, int& top) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
                       const int height, const int width, float &scale,
                       int &left, int &top)
 {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   cv::Mat image_tmp;
 
   scale = std::min(float(width) / input_image.cols,
@@ -168,11 +207,16 @@ static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
   image_tmp = input_image.clone();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   if (input_image.size() != cv::Size(unpad_w, unpad_h)) {
 =======
   if (input_image.size() != cv::Size(unpad_w, unpad_h))
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  if (input_image.size() != cv::Size(unpad_w, unpad_h))
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     cv::resize(input_image, image_tmp, cv::Size(unpad_w, unpad_h),
                cv::INTER_LINEAR);
   }
@@ -191,15 +235,21 @@ static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static vector<float> softmax(const std::vector<float>& input) {
 =======
 static vector<float> softmax(const std::vector<float> &input)
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+static vector<float> softmax(const std::vector<float> &input)
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   auto output = std::vector<float>(input.size());
   std::transform(input.begin(), input.end(), output.begin(), expf);
   auto sum = accumulate(output.begin(), output.end(), 0.0f, std::plus<float>());
   std::transform(output.begin(), output.end(), output.begin(),
+<<<<<<< HEAD
 <<<<<<< HEAD
                  [sum](float v) { return v / sum; });
   return output;
@@ -207,6 +257,8 @@ static vector<float> softmax(const std::vector<float> &input)
 
 static vector<float> conv(const vector<vector<float>>& input) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
                  [sum](float v)
                  { return v / sum; });
   return output;
@@ -214,26 +266,36 @@ static vector<float> conv(const vector<vector<float>>& input) {
 
 static vector<float> conv(const vector<vector<float>> &input)
 {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   // input size is 4 x 16
   // kernel is 16 x 1, value is 0,1,...,15
   vector<float> output(4, 0.0f);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   for (int row = 0; row < 4; row++) {
     for (int col = 0; col < 16; col++) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   for (int row = 0; row < 4; row++)
   {
     for (int col = 0; col < 16; col++)
     {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
       output[row] += input[row][col] * col;
     }
   }
   return output;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 static vector<vector<float>> make_anchors(int w, int h) {
   vector<vector<float>> anchor_points;
@@ -242,6 +304,8 @@ static vector<vector<float>> make_anchors(int w, int h) {
     float sy = i + 0.5f;
     for (int j = 0; j < h; ++j) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 static vector<vector<float>> make_anchors(int w, int h)
 {
   vector<vector<float>> anchor_points;
@@ -251,7 +315,10 @@ static vector<vector<float>> make_anchors(int w, int h)
     float sy = i + 0.5f;
     for (int j = 0; j < h; ++j)
     {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
       float sx = j + 0.5f;
       vector<float> anchor(2);
       anchor[0] = sx;
@@ -263,6 +330,7 @@ static vector<vector<float>> make_anchors(int w, int h)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static vector<float> dist2bbox(const vector<float>& distance,
                                const vector<float>& point, const float stride) {
 =======
@@ -270,6 +338,11 @@ static vector<float> dist2bbox(const vector<float> &distance,
                                const vector<float> &point, const float stride)
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+static vector<float> dist2bbox(const vector<float> &distance,
+                               const vector<float> &point, const float stride)
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   vector<float> box;
   box.resize(4);
   float x1 = point[0] - distance[0];
@@ -277,36 +350,52 @@ static vector<float> dist2bbox(const vector<float> &distance,
   float x2 = point[0] + distance[2];
   float y2 = point[1] + distance[3];
 <<<<<<< HEAD
+<<<<<<< HEAD
   box[0] = (x1 + x2) / 2.0f * stride;  // x_c
   box[1] = (y1 + y2) / 2.0f * stride;  // y_c
   box[2] = (x2 - x1) * stride;         // width
   box[3] = (y2 - y1) * stride;         // height
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   box[0] = (x1 + x2) / 2.0f * stride; // x_c
   box[1] = (y1 + y2) / 2.0f * stride; // y_c
   box[2] = (x2 - x1) * stride;        // width
   box[3] = (y2 - y1) * stride;        // height
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   return box;
 }
 
 // return value
+<<<<<<< HEAD
 <<<<<<< HEAD
 struct Yolov8OnnxResult {
 =======
 struct Yolov8OnnxResult
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+struct Yolov8OnnxResult
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   /**
    *@struct BoundingBox
    *@brief Struct of detection result with an object.
    */
+<<<<<<< HEAD
 <<<<<<< HEAD
   struct BoundingBox {
 =======
   struct BoundingBox
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  struct BoundingBox
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     /// Classification.
     int label;
     /// Confidence. The value ranges from 0 to 1.
@@ -321,23 +410,30 @@ struct Yolov8OnnxResult
 
 // model class
 <<<<<<< HEAD
+<<<<<<< HEAD
 class Yolov8Onnx : public OnnxTask {
  public:
   static std::unique_ptr<Yolov8Onnx> create(const std::string& model_name,
                                             const float conf_thresh_) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 class Yolov8Onnx : public OnnxTask
 {
 public:
   static std::unique_ptr<Yolov8Onnx> create(const std::string &model_name,
                                             const float conf_thresh_)
   {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     // cout << "create" << endl;
     return std::unique_ptr<Yolov8Onnx>(
         new Yolov8Onnx(model_name, conf_thresh_));
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
  protected:
   explicit Yolov8Onnx(const std::string& model_name, const float conf_thresh_);
@@ -357,6 +453,8 @@ public:
 
  private:
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 protected:
   explicit Yolov8Onnx(const std::string &model_name, const float conf_thresh_);
   Yolov8Onnx(const Yolov8Onnx &) = delete;
@@ -374,7 +472,10 @@ private:
   void preprocess(const std::vector<cv::Mat> &mats);
 
 private:
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   std::vector<float> input_tensor_values;
   std::vector<Ort::Value> input_tensors;
   std::vector<Ort::Value> output_tensors;
@@ -382,12 +483,17 @@ private:
   int real_batch;
   int batch_size;
 <<<<<<< HEAD
+<<<<<<< HEAD
   std::vector<float*> input_tensor_ptr;
   std::vector<float*> output_tensor_ptr;
 =======
   std::vector<float *> input_tensor_ptr;
   std::vector<float *> output_tensor_ptr;
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  std::vector<float *> input_tensor_ptr;
+  std::vector<float *> output_tensor_ptr;
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   int output_tensor_size = 4;
   int channel = 0;
   int sHeight = 0;
@@ -405,6 +511,7 @@ private:
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 void Yolov8Onnx::preprocess(const cv::Mat& image, int idx, float& scale,
                             int& left, int& top) {
 =======
@@ -412,6 +519,11 @@ void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
                             int &left, int &top)
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
+                            int &left, int &top)
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   cv::Mat resized_image;
   letterbox(image, resized_image, sHeight, sWidth, scale, left, top);
   set_input_image_rgb(resized_image,
@@ -423,22 +535,32 @@ void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
 
 // preprocess
 <<<<<<< HEAD
+<<<<<<< HEAD
 void Yolov8Onnx::preprocess(const std::vector<cv::Mat>& mats) {
 =======
 void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   real_batch = std::min((int)input_shapes_[0][0], (int)mats.size());
   scales.resize(real_batch);
   left.resize(real_batch);
   top.resize(real_batch);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   for (auto i = 0; i < real_batch; ++i) {
 =======
   for (auto i = 0; i < real_batch; ++i)
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  for (auto i = 0; i < real_batch; ++i)
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     preprocess(mats[i], i, scales[i], left[i], top[i]);
   }
   return;
@@ -448,15 +570,21 @@ inline float sigmoid(float src) { return (1.0f / (1.0f + exp(-src))); }
 
 // postprocess
 <<<<<<< HEAD
+<<<<<<< HEAD
 Yolov8OnnxResult Yolov8Onnx::postprocess(int idx) {
 =======
 Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
+{
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   vector<vector<float>> boxes;
   int count = 0;
   vector<vector<vector<float>>> pre_output;
   __TIC__(DECODE)
+<<<<<<< HEAD
 <<<<<<< HEAD
   for (int i = 1; i < output_tensor_size; i++) {
     int ca = output_shapes_[i][1];
@@ -464,6 +592,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     int wa = output_shapes_[i][3];
     if (ENV_PARAM(ENABLE_YOLO_DEBUG)) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   for (int i = 1; i < output_tensor_size; i++)
   {
     int ca = output_shapes_[i][1];
@@ -471,7 +601,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     int wa = output_shapes_[i][3];
     if (ENV_PARAM(ENABLE_YOLO_DEBUG))
     {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
       LOG(INFO) << "channel=" << ca << ", height=" << ha << ", width=" << wa
                 << ", stride=" << stride[i] << ", conf=" << conf_thresh
                 << ", idx=" << idx << endl;
@@ -482,6 +615,7 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     boxes.reserve(boxes.size() + sizeOut);
     auto conf_desigmoid = -logf(1.0f / conf_thresh - 1.0f);
     pre_output.reserve(pre_output.size() + sizeOut);
+<<<<<<< HEAD
 <<<<<<< HEAD
 #define POS(C) ((C)*ha * wa + h * wa + w)
     for (int h = 0; h < ha; ++h) {
@@ -494,6 +628,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
           softmax_.reserve(16);
           for (auto m = 0; m < 16; m++) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 #define POS(C) ((C) * ha * wa + h * wa + w)
     for (int h = 0; h < ha; ++h)
     {
@@ -508,7 +644,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
           softmax_.reserve(16);
           for (auto m = 0; m < 16; m++)
           {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
             float value =
                 output_tensor_ptr[i][POS(t * 16 + m) + idx * ca * wa * ha];
             softmax_.emplace_back(value);
@@ -518,6 +657,7 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
         auto distance = conv(pre_output_unit);
         auto dbox = dist2bbox(distance, anchor_points[h * wa + w], stride[i]);
 <<<<<<< HEAD
+<<<<<<< HEAD
         for (auto m = 0; m < num_classes; ++m) {
           auto score = output_tensor_ptr[i][POS(64 + m) + idx * ca * wa * ha];
           if (score > conf_desigmoid) {
@@ -525,6 +665,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
             vector<float> box(6);
             for (int j = 0; j < 4; j++) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
         for (auto m = 0; m < num_classes; ++m)
         {
           auto score = output_tensor_ptr[i][POS(64 + m) + idx * ca * wa * ha];
@@ -534,7 +676,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
             vector<float> box(6);
             for (int j = 0; j < 4; j++)
             {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
               box[j] = dbox[j];
             }
             float cls_score = 1.0 / (1 + exp(-1.0f * score));
@@ -548,6 +693,7 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   }
   __TOC__(DECODE)
 <<<<<<< HEAD
+<<<<<<< HEAD
   auto compare = [=](vector<float>& lhs, vector<float>& rhs) {
     return lhs[5] > rhs[5];
   };
@@ -560,6 +706,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     boxes.resize(max_boxes_num);
   } else {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   auto compare = [=](vector<float> &lhs, vector<float> &rhs)
   {
     return lhs[5] > rhs[5];
@@ -576,7 +724,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   }
   else
   {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     std::sort(boxes.begin(), boxes.end(), compare);
   }
 
@@ -585,11 +736,16 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   vector<vector<float>> scores(num_classes);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   for (const auto& box : boxes) {
 =======
   for (const auto &box : boxes)
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  for (const auto &box : boxes)
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     boxes_for_nms[box[4]].push_back(box);
     scores[box[4]].push_back(box[5]);
   }
@@ -597,15 +753,21 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   __TIC__(NMS)
   vector<vector<float>> res;
 <<<<<<< HEAD
+<<<<<<< HEAD
   for (auto i = 0; i < num_classes; i++) {
 =======
   for (auto i = 0; i < num_classes; i++)
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  for (auto i = 0; i < num_classes; i++)
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     vector<size_t> result_k;
     applyNMS(boxes_for_nms[i], scores[i], nms_thresh, 0, result_k);
     res.reserve(res.size() + result_k.size());
     transform(result_k.begin(), result_k.end(), back_inserter(res),
+<<<<<<< HEAD
 <<<<<<< HEAD
               [&](auto& k) { return boxes_for_nms[i][k]; });
   }
@@ -613,6 +775,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 
   if (static_cast<int>(res.size()) > max_nms_num) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
               [&](auto &k)
               { return boxes_for_nms[i][k]; });
   }
@@ -620,12 +784,16 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 
   if (static_cast<int>(res.size()) > max_nms_num)
   {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     __TIC__(PSORT)
     std::partial_sort(res.begin(), res.begin() + max_nms_num, res.end(),
                       compare);
     __TOC__(PSORT)
     res.resize(max_nms_num);
+<<<<<<< HEAD
 <<<<<<< HEAD
   } else {
 =======
@@ -633,6 +801,11 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   else
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  }
+  else
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     __TIC__(SORT)
     std::sort(res.begin(), res.end(), compare);
     __TOC__(SORT)
@@ -641,11 +814,16 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   __TIC__(BBOX)
   vector<Yolov8OnnxResult::BoundingBox> results;
 <<<<<<< HEAD
+<<<<<<< HEAD
   for (const auto& r : res) {
 =======
   for (const auto &r : res)
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  for (const auto &r : res)
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     Yolov8OnnxResult::BoundingBox result;
     result.score = r[5];
     result.label = r[4];
@@ -662,21 +840,28 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 std::vector<Yolov8OnnxResult> Yolov8Onnx::postprocess() {
   std::vector<Yolov8OnnxResult> ret;
   for (auto index = 0; index < (int)real_batch; ++index) {
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 std::vector<Yolov8OnnxResult> Yolov8Onnx::postprocess()
 {
   std::vector<Yolov8OnnxResult> ret;
   for (auto index = 0; index < (int)real_batch; ++index)
   {
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     ret.emplace_back(postprocess(index));
   }
   return ret;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 static int calculate_product(const std::vector<int64_t>& v) {
   int total = 1;
@@ -689,6 +874,8 @@ Yolov8Onnx::Yolov8Onnx(const std::string& model_name, const float conf_thresh_)
   int total_number_elements = calculate_product(input_shapes_[0]);
   // cout << total_number_elements << endl; 
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 static int calculate_product(const std::vector<int64_t> &v)
 {
   int total = 1;
@@ -702,7 +889,10 @@ Yolov8Onnx::Yolov8Onnx(const std::string &model_name, const float conf_thresh_)
 {
   int total_number_elements = calculate_product(input_shapes_[0]);
   // cout << total_number_elements << endl;
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   std::vector<float> input_tensor_values_(total_number_elements);
   input_tensor_values_.swap(input_tensor_values);
 
@@ -710,11 +900,16 @@ Yolov8Onnx::Yolov8Onnx(const std::string &model_name, const float conf_thresh_)
   sHeight = input_shapes_[0][2];
   sWidth = input_shapes_[0][3];
 <<<<<<< HEAD
+<<<<<<< HEAD
   if (ENV_PARAM(ENABLE_YOLO_DEBUG)) {
 =======
   if (ENV_PARAM(ENABLE_YOLO_DEBUG))
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  if (ENV_PARAM(ENABLE_YOLO_DEBUG))
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     LOG(INFO) << "channel=" << channel << ", height=" << sHeight
               << ", width=" << sWidth << endl;
   }
@@ -724,6 +919,7 @@ Yolov8Onnx::Yolov8Onnx(const std::string &model_name, const float conf_thresh_)
   conf_thresh = conf_thresh_;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 Yolov8OnnxResult Yolov8Onnx::run(const cv::Mat& mats) {
   return run(vector<cv::Mat>(1, mats))[0];
@@ -743,6 +939,8 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
         input_tensor_values.data(), input_tensor_values.size(),
         input_shapes_[0]));
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 Yolov8OnnxResult Yolov8Onnx::run(const cv::Mat &mats)
 {
   return run(vector<cv::Mat>(1, mats))[0];
@@ -768,7 +966,10 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
     input_tensors.push_back(Ort::Value::CreateTensor<float>(info,
                                                             input_tensor_values.data(), input_tensor_values.size(),
                                                             input_shapes_[0].data(), input_shapes_[0].size()));
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
   }
 
   __TOC__(preprocess)
@@ -776,11 +977,16 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
   __TIC__(session_run)
   run_task(input_tensors, output_tensors);
 <<<<<<< HEAD
+<<<<<<< HEAD
   for (int i = 1; i < output_tensor_size; i++) {
 =======
   for (int i = 1; i < output_tensor_size; i++)
   {
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+  for (int i = 1; i < output_tensor_size; i++)
+  {
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
     output_tensor_ptr[i] = output_tensors[i].GetTensorMutableData<float>();
   }
   __TOC__(session_run)
@@ -792,6 +998,9 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
   return ret;
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
