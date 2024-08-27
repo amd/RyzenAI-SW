@@ -1,0 +1,185 @@
+{
+    "passes": [
+        {
+            "name": "init",
+            "plugin": "vaip-pass_init"
+        },
+        {
+            "name": "fuse_DPU",
+            "plugin": "vaip-pass_level1_dpu",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "convert_ending_blacklist_ops_to_unknown_op",
+                        "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+                        "disabled": false
+                    },
+                    {
+                        "name": "dynamic_input_batch",
+                        "plugin": "vaip-pass_dynamic_input_batch"
+                    },
+                    {
+                        "name": "create_const_op",
+                        "plugin": "vaip-pass_create_const_op"
+                    },
+                    {
+                        "name": "convert_split_to_xir",
+                        "plugin": "vaip-pass_convert_split_to_xir_op"
+                    },
+                    {
+                        "name": "to_xir",
+                        "plugin": "vaip-pass_to_xir_ops"
+                    },
+                    {
+                        "name": "convert_pad",
+                        "plugin": "vaip-pass_convert_pad",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_in_to_gn",
+                        "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "remove_extra_q_dq",
+                        "plugin": "vaip-pass_remove_extra_q_dq"
+                    },
+                    {
+                        "name": "merge_add_into_conv_bias",
+                        "plugin": "vaip-pass_merge_add_into_conv_bias"
+                    },
+                    {
+                        "name": "merge_fix",
+                        "plugin": "vaip-pass_merge_fix",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "layoutransform",
+                        "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+                    },
+                    {
+                        "name": "gc_after_layout_transform",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "fuse_transpose",
+                        "plugin": "vaip-pass_fuse_transpose",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "gc_after_fuse_transpose",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "remove_identity",
+                        "plugin": "vaip-pass_remove_identity",
+                        "logVerbosity": 1
+                    },
+                    {
+                        "name": "add_fix_after_const",
+                        "plugin": "vaip-pass_const_add_fix"
+                    },
+                    {
+                        "name": "remove_reshape_fix",
+                        "plugin": "vaip-pass_py_ext",
+                        "disabled": true,
+                        "pyExt": {
+                            "moduleName": "voe.passes.remove_reshape_fix",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "const_fold_batchnorm_to_scale",
+                        "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+                    },
+                    {
+                        "name": "const_fold_transpose",
+                        "plugin": "vaip-pass_const_fold_transpose"
+                    },
+                    {
+                        "name": "merge_pad",
+                        "plugin": "vaip-pass_merge_pad"
+                    },
+                    {
+                        "name": "merge_hard_sigmoid",
+                        "plugin": "vaip-pass_merge_hard_sigmoid"
+                    },
+                    {
+                        "name": "merge_mul",
+                        "plugin": "vaip-pass_merge_mul",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "merge_consecutive_fix",
+                        "plugin": "vaip-pass_merge_consecutive_fix",
+                        "disabled": true,
+                        "enableLog": true,
+                        "logVerbosity": 1
+                    },
+                    {
+                        "_comment": "test case 110",
+                        "name": "convert_softmax_to_hard_softmax",
+                        "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+                        "disabled": true
+                    },
+                    {
+                        "name": "merge_fix_fix_transpose",
+                        "plugin": "vaip-pass_merge_fix_fix_transpose",
+                        "enableGc": true,
+                        "disabled": true
+                    },
+                    {
+                        "name": "final_gc",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    }
+                ],
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 500
+                    },
+                    "opt_level": {
+                        "uintValue": 3
+                    },
+                    "dump_subgraph_ops": {
+                        "boolValue": false
+                    },
+                    "profile": {
+                        "uintValue": 3
+                    },
+                    "disable_std_quant": {
+                        "boolValue": false
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "enable_weights_prefetch": {
+                        "boolValue": true
+                    },
+                    "enable_cost_model_tiling": {
+                        "boolValue": true
+                    },
+                    "enable_mergesync": {
+                        "boolValue": true
+                    },
+                    "enable_op_tensor_name_protection": {
+                        "boolValue": true
+                    }
+                },
+                "minimum_num_of_conv": 2
+            }
+        }
+    ],
+    "target": "RyzenAI_vision_config_1",
+    "targets": [
+        {
+            "name": "RyzenAI_vision_config_1",
+            "pass": [
+                "init",
+                "fuse_DPU"
+            ]
+        }
+    ]
+}
