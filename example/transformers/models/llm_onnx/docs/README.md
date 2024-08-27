@@ -63,9 +63,12 @@ cd %TRANSFORMERS_ROOT%
 Use "prepare_model.py" script to export, optimize and quantize the LLMs. You can also optimize or quantize an existing ONNX model by providing the path to the model directory.
 
 Check script usage
+<<<<<<< HEAD
 ```powershell
 cd %TRANSFORMERS_ROOT%\models\llm_onnx
 python prepare_model.py --help
+=======
+>>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 
 ```python prepare_model.py --help```
 

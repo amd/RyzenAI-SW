@@ -221,7 +221,10 @@ struct DecodeThread : public MyThread {
     auto& cap = *video_stream_.get();
     cv::Mat image;
     cap >> image;
+<<<<<<< HEAD
     __TIC__(decode)
+=======
+>>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
     auto video_ended = image.empty();
     if (video_ended) {
       // loop the video
@@ -233,7 +236,10 @@ struct DecodeThread : public MyThread {
     if (queue_->size() > 0 && is_camera_ == true) {
       return 0;
     }
+<<<<<<< HEAD
     __TOC__(decode)
+=======
+>>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
     while (!queue_->push(FrameInfo{channel_id_, ++frame_id_, image},
                          std::chrono::milliseconds(500))) {
       if (is_stopped()) {
@@ -316,7 +322,10 @@ struct GuiThread : public MyThread {
         return 0;
       }
     }
+<<<<<<< HEAD
     __TIC__(display)
+=======
+>>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
     inactive_counter_ = 0;
     frames_[frame_info.channel_id].frame_info = frame_info;
     frames_[frame_info.channel_id].dirty = true;
@@ -348,7 +357,10 @@ struct GuiThread : public MyThread {
       }
     }
     clean_up_queue();
+<<<<<<< HEAD
     __TOC__(display)
+=======
+>>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
     return 0;
   }
 

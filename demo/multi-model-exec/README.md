@@ -34,19 +34,16 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 
 
 ```
-│  1x4.xclbin
-│  env.yaml
 │  README.md
-│  vaip_config.json
-│  voe-0.1.0-cp39-cp39-win_amd64.whl
-│
-├─.vscode
-│      settings.json
 │
 ├─bin
-│      ipu_multi_models.exe
+│      npu_multi_models.exe
 │      onnxruntime.dll
+│      onnxruntime_providers_shared.dll
+│      onnxruntime_providers_vitisai.dll
 │      onnxruntime_vitisai_ep.dll
+│      DirectML.dll
+│      vaip_config.json
 │
 ├─images
 │      mobilenet_V2.jpg
@@ -56,12 +53,19 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 │      segmentation.jpg
 │      yolox.jpg
 │
-└─ipu_modelsx4_demo
-    │  generate_script.py
+└─npu_modelsx4_demo
+    │  run_mobile_net_v2.bat
+    │  run_modelx4.bat
+    │  run_modelx4_with_camera_on.bat
+    │  run_resnet50.bat
+    │  run_retinaface.bat
+    │  run_segmentation.bat
+    │  run_yolovx.bat
     │
     └─config
             mobile_net_v2.json
             modelx4.json
+            modelx4_with_camera_on.json
             resnet50.json
             retinaface.json
             segmentation.json
@@ -72,7 +76,7 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 
 ### 3.1 Environment Setup 
 
-Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. Make sure the IPU driver has been installed by following the instructions on the [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com/en/latest). The IPU driver version >= 10.106.8.62 has been tested. The older version might work but no guaranteed. 
+Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. Make sure the NPU driver has been installed by following the instructions on the [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com/en/latest). The NPU driver version = 32.0.201.204 has been tested. The older version might work but no guaranteed. 
 
 1. Follow these steps to install Anaconda on your system if it has not been installed:
 
@@ -82,10 +86,7 @@ Please note that all the steps mentioned here need to be performed in ***Windows
 
 - **Verify Installation:** After installation, open Anaconda Prompt on Windows and type `conda --version` to verify that Anaconda was installed correctly. You should see the installed Conda version.
 
-2. Create a Conda Environment by using the env.yaml
-    ```bash
-      conda create --name <env_name> --file=env.yaml
-    ```
+2. Install Ryzen AI by following the [documentation](https://ryzenai.docs.amd.com/en/latest/inst.html#) 
 
 3. Activate the Environment
     ```bash
@@ -93,7 +94,7 @@ Please note that all the steps mentioned here need to be performed in ***Windows
     ```
 ### 3.2 Demo Preparation
 
-1. Download the onnx models and test image/video package, and unzip it under **<path_to_RyzenAI-SW>/demo/multi-model-exec/ipu_modelsx4_demo/**. 
+Download the onnx models and test image/video package, and unzip it under **<path_to_RyzenAI-SW>/demo/multi-model-exec/ipu_modelsx4_demo/**. 
 
 
     [Download Package](https://www.xilinx.com/bin/public/openDownload?filename=resource_multi_model_demo.zip)
@@ -101,8 +102,8 @@ Please note that all the steps mentioned here need to be performed in ***Windows
  You should have the directory like this: 
  ```bash
 .
-├── generate_script.py
-├── modelsx4_screenshot.png
+├── ***.bat
+├── config
 ├── resource
 │   ├── RetinaFace_int.onnx
 │   ├── detection
@@ -116,13 +117,6 @@ Please note that all the steps mentioned here need to be performed in ***Windows
 │   ├── seg_512_288.avi
 │   └── to_video.py
 ```
-
-2. Generate the config files by running the comand:
-
-    ```bash
-    python generate_script.py
-    ```
-
 
 
 ## 4 Run The Demo
@@ -149,6 +143,6 @@ run_modelx4.bat
 
 ## 5 Know Issues
 
-- Python version version 3.9 is required if not "The code execution cannot proceed because python39.dll was not found. Reinstalling he programm may fix this problem"
-- If you find an exclamation mark on the icon of the AMD IPU device in the System Devices list in your Device Manager, it indicates that there is an issue with your driver installation, and the program may not function correctly.
+- Python version version 3.10 is required if not "The code execution cannot proceed because python39.dll was not found. Reinstalling he programm may fix this problem"
+- If you find an exclamation mark on the icon of the AMD NPU device in the System Devices list in your Device Manager, it indicates that there is an issue with your driver installation, and the program may not function correctly.
 - If this demo aborted with the 'glog.dll cannot be found' error, you need to use the command 'set PATH=C:<path-to-conda-glog>;%PATH%' to explicitly export the path to 'glog.dll'. 'glog.dll' is installed along with ANACONDA3. The recommended ANACONDA3 installer is 'Anaconda3-2023.07-2-Windows-x86_64'.

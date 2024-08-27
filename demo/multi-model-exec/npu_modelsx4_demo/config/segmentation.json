@@ -1,0 +1,31 @@
+{
+    "screen": {
+        "width": 1024,
+        "height": 640,
+        "split_channel_matrix_size": 1
+    },
+    "pipelines": [
+        {
+            "thread_num": 4,
+            "decode": {
+                "video_file_path": "resource\\seg_512_288.avi"
+            },
+            "model": {
+                "type": "segmentation",
+                "config": {
+                    "onnx_config": {
+                        "onnx_x": 1,
+                        "onnx_y": 1,
+                        "onnx_disable_spinning": false,
+                        "onnx_disable_spinning_between_run": false,
+                        "intra_op_thread_affinities": "0"
+                    },
+                    "onnx_model_path": "resource\\pointpainting-nus-FPN_int.onnx"
+                }
+            },
+            "sort": {
+                "channel_matrix_id": 0
+            }
+        }
+    ]
+}
