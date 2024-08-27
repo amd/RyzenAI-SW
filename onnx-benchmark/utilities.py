@@ -469,6 +469,7 @@ def ggquantize(args):
     newopset = 17
     original_model = onnx.load(input_model_path)
     opset_version = original_model.opset_import[0].version
+<<<<<<< HEAD
 
     # temporary fix: after conversion the opset is not updated to 17 but to 1
     if opset_version<11:
@@ -489,6 +490,20 @@ def ggquantize(args):
                 input_model_path = output_updated
             else:
                 ggprint("You chose not to update")
+=======
+    if opset_version<11:
+        ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
+        user_response = ask_update()
+        if user_response == 'y':
+            output_updated = f"{base_name}_opset17{extension}"
+            converted_model = version_converter.convert_version(original_model, newopset)
+            #print(f"The model after conversion:\n{converted_model}")
+            onnx.save(converted_model, output_updated)
+            print(f'The update model was saved with name {output_updated}')
+            input_model_path = output_updated
+        else:
+            print("You chose not to update")
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     # free memory
     del original_model
     gc.collect()

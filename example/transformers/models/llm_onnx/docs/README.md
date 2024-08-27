@@ -65,6 +65,8 @@ Use "prepare_model.py" script to export, optimize and quantize the LLMs. You can
 Check script usage
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 ```powershell
 cd %TRANSFORMERS_ROOT%\models\llm_onnx
 python prepare_model.py --help
@@ -72,6 +74,10 @@ python prepare_model.py --help
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 
 ```python prepare_model.py --help```
 

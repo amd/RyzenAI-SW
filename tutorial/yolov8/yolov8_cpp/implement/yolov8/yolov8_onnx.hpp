@@ -24,6 +24,8 @@
 #include <iostream>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 #include <numeric>  //accumulate
 =======
 #include <numeric> //accumulate
@@ -31,6 +33,12 @@
 =======
 #include <numeric> //accumulate
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+#include <numeric> //accumulate
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+#include <numeric> //accumulate
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <vector>
@@ -45,6 +53,8 @@ using namespace cv;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 static float overlap(float x1, float w1, float x2, float w2) {
 =======
 static float overlap(float x1, float w1, float x2, float w2)
@@ -54,11 +64,21 @@ static float overlap(float x1, float w1, float x2, float w2)
 static float overlap(float x1, float w1, float x2, float w2)
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+static float overlap(float x1, float w1, float x2, float w2)
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+static float overlap(float x1, float w1, float x2, float w2)
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   float left = max(x1 - w1 / 2.0, x2 - w2 / 2.0);
   float right = min(x1 + w1 / 2.0, x2 + w2 / 2.0);
   return right - left;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 static float cal_iou(vector<float> box, vector<float> truth) {
@@ -68,6 +88,10 @@ static float cal_iou(vector<float> box, vector<float> truth) {
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 static float cal_iou(vector<float> box, vector<float> truth)
 {
   float w = overlap(box[0], box[2], truth[0], truth[2]);
@@ -75,15 +99,23 @@ static float cal_iou(vector<float> box, vector<float> truth)
   if (w < 0 || h < 0)
     return 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 
   float inter_area = w * h;
   float union_area = box[2] * box[3] + truth[2] * truth[3] - inter_area;
   return inter_area * 1.0 / union_area;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 static void applyNMS(const vector<vector<float>>& boxes,
@@ -99,6 +131,10 @@ static void applyNMS(const vector<vector<float>>& boxes,
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 static void applyNMS(const vector<vector<float>> &boxes,
                      const vector<float> &scores, const float nms,
                      const float conf, vector<size_t> &res)
@@ -113,13 +149,21 @@ static void applyNMS(const vector<vector<float>> &boxes,
               [](const pair<float, size_t> &ls, const pair<float, size_t> &rs)
               {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
                 return ls.first > rs.first;
               });
   vector<size_t> ordered;
   transform(order.begin(), order.end(), back_inserter(ordered),
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
             [](auto& km) { return km.second; });
@@ -132,6 +176,10 @@ static void applyNMS(const vector<vector<float>> &boxes,
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
             [](auto &km)
             { return km.second; });
   vector<bool> exist_box(count, true);
@@ -144,15 +192,23 @@ static void applyNMS(const vector<vector<float>> &boxes,
     if (scores[i] < conf)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
       exist_box[i] = false;
       continue;
     }
     /* add a box as result */
     res.push_back(i);
     // cout << "nms push "<< i<<endl;
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     for (size_t _j = _i + 1; _j < count; ++_j) {
@@ -164,6 +220,10 @@ static void applyNMS(const vector<vector<float>> &boxes,
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     for (size_t _j = _i + 1; _j < count; ++_j)
     {
       size_t j = ordered[_j];
@@ -174,13 +234,21 @@ static void applyNMS(const vector<vector<float>> &boxes,
       if (ovr >= nms)
         exist_box[j] = false;
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     }
   }
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 static void letterbox(const cv::Mat input_image, cv::Mat& output_image,
@@ -189,14 +257,24 @@ static void letterbox(const cv::Mat input_image, cv::Mat& output_image,
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
                       const int height, const int width, float &scale,
                       int &left, int &top)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   cv::Mat image_tmp;
 
   scale = std::min(float(width) / input_image.cols,
@@ -208,6 +286,8 @@ static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
   if (input_image.size() != cv::Size(unpad_w, unpad_h)) {
 =======
   if (input_image.size() != cv::Size(unpad_w, unpad_h))
@@ -217,6 +297,14 @@ static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
   if (input_image.size() != cv::Size(unpad_w, unpad_h))
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  if (input_image.size() != cv::Size(unpad_w, unpad_h))
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  if (input_image.size() != cv::Size(unpad_w, unpad_h))
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     cv::resize(input_image, image_tmp, cv::Size(unpad_w, unpad_h),
                cv::INTER_LINEAR);
   }
@@ -236,6 +324,8 @@ static void letterbox(const cv::Mat input_image, cv::Mat &output_image,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 static vector<float> softmax(const std::vector<float>& input) {
 =======
 static vector<float> softmax(const std::vector<float> &input)
@@ -245,10 +335,20 @@ static vector<float> softmax(const std::vector<float> &input)
 static vector<float> softmax(const std::vector<float> &input)
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+static vector<float> softmax(const std::vector<float> &input)
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+static vector<float> softmax(const std::vector<float> &input)
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   auto output = std::vector<float>(input.size());
   std::transform(input.begin(), input.end(), output.begin(), expf);
   auto sum = accumulate(output.begin(), output.end(), 0.0f, std::plus<float>());
   std::transform(output.begin(), output.end(), output.begin(),
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                  [sum](float v) { return v / sum; });
@@ -259,6 +359,10 @@ static vector<float> conv(const vector<vector<float>>& input) {
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
                  [sum](float v)
                  { return v / sum; });
   return output;
@@ -267,13 +371,21 @@ static vector<float> conv(const vector<vector<float>>& input) {
 static vector<float> conv(const vector<vector<float>> &input)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   // input size is 4 x 16
   // kernel is 16 x 1, value is 0,1,...,15
   vector<float> output(4, 0.0f);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (int row = 0; row < 4; row++) {
@@ -281,20 +393,32 @@ static vector<float> conv(const vector<vector<float>> &input)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   for (int row = 0; row < 4; row++)
   {
     for (int col = 0; col < 16; col++)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
       output[row] += input[row][col] * col;
     }
   }
   return output;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 static vector<vector<float>> make_anchors(int w, int h) {
@@ -306,6 +430,10 @@ static vector<vector<float>> make_anchors(int w, int h) {
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 static vector<vector<float>> make_anchors(int w, int h)
 {
   vector<vector<float>> anchor_points;
@@ -316,9 +444,15 @@ static vector<vector<float>> make_anchors(int w, int h)
     for (int j = 0; j < h; ++j)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
       float sx = j + 0.5f;
       vector<float> anchor(2);
       anchor[0] = sx;
@@ -329,6 +463,8 @@ static vector<vector<float>> make_anchors(int w, int h)
   return anchor_points;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 static vector<float> dist2bbox(const vector<float>& distance,
@@ -343,12 +479,24 @@ static vector<float> dist2bbox(const vector<float> &distance,
                                const vector<float> &point, const float stride)
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+static vector<float> dist2bbox(const vector<float> &distance,
+                               const vector<float> &point, const float stride)
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+static vector<float> dist2bbox(const vector<float> &distance,
+                               const vector<float> &point, const float stride)
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   vector<float> box;
   box.resize(4);
   float x1 = point[0] - distance[0];
   float y1 = point[1] - distance[1];
   float x2 = point[0] + distance[2];
   float y2 = point[1] + distance[3];
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   box[0] = (x1 + x2) / 2.0f * stride;  // x_c
@@ -358,18 +506,30 @@ static vector<float> dist2bbox(const vector<float> &distance,
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   box[0] = (x1 + x2) / 2.0f * stride; // x_c
   box[1] = (y1 + y2) / 2.0f * stride; // y_c
   box[2] = (x2 - x1) * stride;        // width
   box[3] = (y2 - y1) * stride;        // height
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   return box;
 }
 
 // return value
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 struct Yolov8OnnxResult {
@@ -381,10 +541,20 @@ struct Yolov8OnnxResult
 struct Yolov8OnnxResult
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+struct Yolov8OnnxResult
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+struct Yolov8OnnxResult
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   /**
    *@struct BoundingBox
    *@brief Struct of detection result with an object.
    */
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   struct BoundingBox {
@@ -396,6 +566,14 @@ struct Yolov8OnnxResult
   struct BoundingBox
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  struct BoundingBox
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  struct BoundingBox
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     /// Classification.
     int label;
     /// Confidence. The value ranges from 0 to 1.
@@ -411,6 +589,8 @@ struct Yolov8OnnxResult
 // model class
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 class Yolov8Onnx : public OnnxTask {
  public:
   static std::unique_ptr<Yolov8Onnx> create(const std::string& model_name,
@@ -418,6 +598,10 @@ class Yolov8Onnx : public OnnxTask {
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 class Yolov8Onnx : public OnnxTask
 {
 public:
@@ -425,14 +609,22 @@ public:
                                             const float conf_thresh_)
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     // cout << "create" << endl;
     return std::unique_ptr<Yolov8Onnx>(
         new Yolov8Onnx(model_name, conf_thresh_));
   }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
  protected:
@@ -455,6 +647,10 @@ public:
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 protected:
   explicit Yolov8Onnx(const std::string &model_name, const float conf_thresh_);
   Yolov8Onnx(const Yolov8Onnx &) = delete;
@@ -473,15 +669,23 @@ private:
 
 private:
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   std::vector<float> input_tensor_values;
   std::vector<Ort::Value> input_tensors;
   std::vector<Ort::Value> output_tensors;
 
   int real_batch;
   int batch_size;
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   std::vector<float*> input_tensor_ptr;
@@ -494,6 +698,14 @@ private:
   std::vector<float *> input_tensor_ptr;
   std::vector<float *> output_tensor_ptr;
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  std::vector<float *> input_tensor_ptr;
+  std::vector<float *> output_tensor_ptr;
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  std::vector<float *> input_tensor_ptr;
+  std::vector<float *> output_tensor_ptr;
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   int output_tensor_size = 4;
   int channel = 0;
   int sHeight = 0;
@@ -512,6 +724,8 @@ private:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 void Yolov8Onnx::preprocess(const cv::Mat& image, int idx, float& scale,
                             int& left, int& top) {
 =======
@@ -524,6 +738,16 @@ void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
                             int &left, int &top)
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
+                            int &left, int &top)
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
+                            int &left, int &top)
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   cv::Mat resized_image;
   letterbox(image, resized_image, sHeight, sWidth, scale, left, top);
   set_input_image_rgb(resized_image,
@@ -536,6 +760,8 @@ void Yolov8Onnx::preprocess(const cv::Mat &image, int idx, float &scale,
 // preprocess
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 void Yolov8Onnx::preprocess(const std::vector<cv::Mat>& mats) {
 =======
 void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
@@ -545,11 +771,21 @@ void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
 void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   real_batch = std::min((int)input_shapes_[0][0], (int)mats.size());
   scales.resize(real_batch);
   left.resize(real_batch);
   top.resize(real_batch);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (auto i = 0; i < real_batch; ++i) {
@@ -561,6 +797,14 @@ void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
   for (auto i = 0; i < real_batch; ++i)
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  for (auto i = 0; i < real_batch; ++i)
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  for (auto i = 0; i < real_batch; ++i)
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     preprocess(mats[i], i, scales[i], left[i], top[i]);
   }
   return;
@@ -569,6 +813,8 @@ void Yolov8Onnx::preprocess(const std::vector<cv::Mat> &mats)
 inline float sigmoid(float src) { return (1.0f / (1.0f + exp(-src))); }
 
 // postprocess
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 Yolov8OnnxResult Yolov8Onnx::postprocess(int idx) {
@@ -580,10 +826,20 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
+{
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
+{
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   vector<vector<float>> boxes;
   int count = 0;
   vector<vector<vector<float>>> pre_output;
   __TIC__(DECODE)
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (int i = 1; i < output_tensor_size; i++) {
@@ -594,6 +850,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   for (int i = 1; i < output_tensor_size; i++)
   {
     int ca = output_shapes_[i][1];
@@ -602,9 +862,15 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     if (ENV_PARAM(ENABLE_YOLO_DEBUG))
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
       LOG(INFO) << "channel=" << ca << ", height=" << ha << ", width=" << wa
                 << ", stride=" << stride[i] << ", conf=" << conf_thresh
                 << ", idx=" << idx << endl;
@@ -615,6 +881,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     boxes.reserve(boxes.size() + sizeOut);
     auto conf_desigmoid = -logf(1.0f / conf_thresh - 1.0f);
     pre_output.reserve(pre_output.size() + sizeOut);
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 #define POS(C) ((C)*ha * wa + h * wa + w)
@@ -630,6 +898,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 #define POS(C) ((C) * ha * wa + h * wa + w)
     for (int h = 0; h < ha; ++h)
     {
@@ -645,9 +917,15 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
           for (auto m = 0; m < 16; m++)
           {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
             float value =
                 output_tensor_ptr[i][POS(t * 16 + m) + idx * ca * wa * ha];
             softmax_.emplace_back(value);
@@ -656,6 +934,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
         }
         auto distance = conv(pre_output_unit);
         auto dbox = dist2bbox(distance, anchor_points[h * wa + w], stride[i]);
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         for (auto m = 0; m < num_classes; ++m) {
@@ -667,6 +947,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
         for (auto m = 0; m < num_classes; ++m)
         {
           auto score = output_tensor_ptr[i][POS(64 + m) + idx * ca * wa * ha];
@@ -677,9 +961,15 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
             for (int j = 0; j < 4; j++)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
               box[j] = dbox[j];
             }
             float cls_score = 1.0 / (1 + exp(-1.0f * score));
@@ -692,6 +982,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
     }
   }
   __TOC__(DECODE)
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   auto compare = [=](vector<float>& lhs, vector<float>& rhs) {
@@ -708,6 +1000,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   auto compare = [=](vector<float> &lhs, vector<float> &rhs)
   {
     return lhs[5] > rhs[5];
@@ -725,9 +1021,15 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   else
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     std::sort(boxes.begin(), boxes.end(), compare);
   }
 
@@ -735,6 +1037,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   vector<vector<vector<float>>> boxes_for_nms(num_classes);
   vector<vector<float>> scores(num_classes);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (const auto& box : boxes) {
@@ -746,12 +1050,22 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   for (const auto &box : boxes)
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  for (const auto &box : boxes)
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  for (const auto &box : boxes)
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     boxes_for_nms[box[4]].push_back(box);
     scores[box[4]].push_back(box[5]);
   }
 
   __TIC__(NMS)
   vector<vector<float>> res;
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (auto i = 0; i < num_classes; i++) {
@@ -763,10 +1077,20 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   for (auto i = 0; i < num_classes; i++)
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  for (auto i = 0; i < num_classes; i++)
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  for (auto i = 0; i < num_classes; i++)
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     vector<size_t> result_k;
     applyNMS(boxes_for_nms[i], scores[i], nms_thresh, 0, result_k);
     res.reserve(res.size() + result_k.size());
     transform(result_k.begin(), result_k.end(), back_inserter(res),
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
               [&](auto& k) { return boxes_for_nms[i][k]; });
@@ -777,6 +1101,10 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
               [&](auto &k)
               { return boxes_for_nms[i][k]; });
   }
@@ -785,14 +1113,22 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   if (static_cast<int>(res.size()) > max_nms_num)
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     __TIC__(PSORT)
     std::partial_sort(res.begin(), res.begin() + max_nms_num, res.end(),
                       compare);
     __TOC__(PSORT)
     res.resize(max_nms_num);
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   } else {
@@ -806,6 +1142,16 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   else
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  }
+  else
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  }
+  else
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     __TIC__(SORT)
     std::sort(res.begin(), res.end(), compare);
     __TOC__(SORT)
@@ -813,6 +1159,8 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 
   __TIC__(BBOX)
   vector<Yolov8OnnxResult::BoundingBox> results;
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (const auto& r : res) {
@@ -824,6 +1172,14 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
   for (const auto &r : res)
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  for (const auto &r : res)
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  for (const auto &r : res)
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     Yolov8OnnxResult::BoundingBox result;
     result.score = r[5];
     result.label = r[4];
@@ -841,26 +1197,40 @@ Yolov8OnnxResult Yolov8Onnx::postprocess(int idx)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 std::vector<Yolov8OnnxResult> Yolov8Onnx::postprocess() {
   std::vector<Yolov8OnnxResult> ret;
   for (auto index = 0; index < (int)real_batch; ++index) {
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 std::vector<Yolov8OnnxResult> Yolov8Onnx::postprocess()
 {
   std::vector<Yolov8OnnxResult> ret;
   for (auto index = 0; index < (int)real_batch; ++index)
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     ret.emplace_back(postprocess(index));
   }
   return ret;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 static int calculate_product(const std::vector<int64_t>& v) {
@@ -876,6 +1246,10 @@ Yolov8Onnx::Yolov8Onnx(const std::string& model_name, const float conf_thresh_)
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 static int calculate_product(const std::vector<int64_t> &v)
 {
   int total = 1;
@@ -890,15 +1264,23 @@ Yolov8Onnx::Yolov8Onnx(const std::string &model_name, const float conf_thresh_)
   int total_number_elements = calculate_product(input_shapes_[0]);
   // cout << total_number_elements << endl;
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   std::vector<float> input_tensor_values_(total_number_elements);
   input_tensor_values_.swap(input_tensor_values);
 
   channel = input_shapes_[0][1];
   sHeight = input_shapes_[0][2];
   sWidth = input_shapes_[0][3];
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   if (ENV_PARAM(ENABLE_YOLO_DEBUG)) {
@@ -910,6 +1292,14 @@ Yolov8Onnx::Yolov8Onnx(const std::string &model_name, const float conf_thresh_)
   if (ENV_PARAM(ENABLE_YOLO_DEBUG))
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  if (ENV_PARAM(ENABLE_YOLO_DEBUG))
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  if (ENV_PARAM(ENABLE_YOLO_DEBUG))
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     LOG(INFO) << "channel=" << channel << ", height=" << sHeight
               << ", width=" << sWidth << endl;
   }
@@ -919,6 +1309,8 @@ Yolov8Onnx::Yolov8Onnx(const std::string &model_name, const float conf_thresh_)
   conf_thresh = conf_thresh_;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 Yolov8OnnxResult Yolov8Onnx::run(const cv::Mat& mats) {
@@ -941,6 +1333,10 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
 =======
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
 Yolov8OnnxResult Yolov8Onnx::run(const cv::Mat &mats)
 {
   return run(vector<cv::Mat>(1, mats))[0];
@@ -967,15 +1363,23 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
                                                             input_tensor_values.data(), input_tensor_values.size(),
                                                             input_shapes_[0].data(), input_shapes_[0].size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
   }
 
   __TOC__(preprocess)
 
   __TIC__(session_run)
   run_task(input_tensors, output_tensors);
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   for (int i = 1; i < output_tensor_size; i++) {
@@ -987,6 +1391,14 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
   for (int i = 1; i < output_tensor_size; i++)
   {
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+  for (int i = 1; i < output_tensor_size; i++)
+  {
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+  for (int i = 1; i < output_tensor_size; i++)
+  {
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     output_tensor_ptr[i] = output_tensors[i].GetTensorMutableData<float>();
   }
   __TOC__(session_run)
@@ -999,8 +1411,14 @@ std::vector<Yolov8OnnxResult> Yolov8Onnx::run(
 }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
 =======
 >>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
+=======
+>>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
+=======
+>>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
