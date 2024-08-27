@@ -1,0 +1,5 @@
+torch==1.13
+torchvision
+tqdm
+ipykernel
+matplotlib
