@@ -221,19 +221,6 @@ struct DecodeThread : public MyThread {
     auto& cap = *video_stream_.get();
     cv::Mat image;
     cap >> image;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    __TIC__(decode)
-=======
->>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
-=======
->>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
-=======
->>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
-=======
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     auto video_ended = image.empty();
     if (video_ended) {
       // loop the video
@@ -245,19 +232,6 @@ struct DecodeThread : public MyThread {
     if (queue_->size() > 0 && is_camera_ == true) {
       return 0;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    __TOC__(decode)
-=======
->>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
-=======
->>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
-=======
->>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
-=======
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     while (!queue_->push(FrameInfo{channel_id_, ++frame_id_, image},
                          std::chrono::milliseconds(500))) {
       if (is_stopped()) {
@@ -340,19 +314,6 @@ struct GuiThread : public MyThread {
         return 0;
       }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    __TIC__(display)
-=======
->>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
-=======
->>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
-=======
->>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
-=======
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     inactive_counter_ = 0;
     frames_[frame_info.channel_id].frame_info = frame_info;
     frames_[frame_info.channel_id].dirty = true;
@@ -384,19 +345,6 @@ struct GuiThread : public MyThread {
       }
     }
     clean_up_queue();
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    __TOC__(display)
-=======
->>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
-=======
->>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
-=======
->>>>>>> 5be83bf9 (fix for https://github.com/onnx/onnx/issues/6267)
-=======
->>>>>>> b02f64fa (Merge branch 'VitisAI:main' into main_ci_add)
     return 0;
   }
 
