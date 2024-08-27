@@ -6,6 +6,7 @@
 </table>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #  Yolov8 on Ryzen AI
 
 
@@ -13,13 +14,18 @@
 - Support:      AMD Ryzen 7040U, 7040HS series mobile processors with Windows 11 OS.
 - Last update:  4 Dec. 2023
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 #  Yolov8 cpp flow on Ryzen AI
 
 
 - Version:      Ryzen AI Software v1.2 
 - Support:      AMD Ryzen™ 7940HS, 7840HS, 7640HS, 7840U, 7640U, 8640U, 8640HS, 8645H, 8840U, 8840HS, 8845H, 8945H with Windows 11 OS.
 - Last update:  29 Jul. 2024
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 
 
 ## Table of Contents
@@ -31,12 +37,16 @@
 [3 Installation](#3-installation)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [4 Quantization](#4-quantization)
 
 [5 Implementation](#5-implementation)
 =======
 [4 Implementation](#4-implementation)
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+[4 Implementation](#4-implementation)
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 
 [License](#license)
 
@@ -49,6 +59,7 @@ In this Deep Learning(DL) tutorial, you will see how to deploy the Yolov8 detect
 
 ## 2 Prerequisites
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 - Linux server (GPU is preferred)
 - AMD Ryzen AI Laptop with Windows 11 OS
@@ -63,6 +74,8 @@ In this Deep Learning(DL) tutorial, you will see how to deploy the Yolov8 detect
 - IPU driver & IPU xclbin = 1.0 release 
 - voe package = 1.0 release
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 - AMD Ryzen AI Laptop with Windows 11 OS
 - Visual Studio 2022 (with Desktop dev c++ & MSVC v143-vs2022 x64/x86 Spectre-mitigated libs)
 - Anaconda or Miniconda
@@ -72,7 +85,10 @@ In this Deep Learning(DL) tutorial, you will see how to deploy the Yolov8 detect
 - python (version = 3.10)
 - NPU driver & NPU xclbin = 1.2 release 
 - voe package = 1.2 release
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 
 ## 3 Installation
 
@@ -85,10 +101,14 @@ There are some more libraries you need to install for the Yolov8 inference.
 #### Cmake
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ```Conda Prompt
 =======
 ```Anaconda Prompt
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+```Anaconda Prompt
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 # pip install cmake
 ```
 
@@ -109,6 +129,7 @@ Successfully installed cmake-3.27.4.1
 It is recommended to build OpenCV form source code and use static build. [Git](https://git-scm.com/download/win) is required to clone the repository.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Start a `Git Bash`. In the Git Bash, clone the repository
 
 ```Git Bash
@@ -123,6 +144,8 @@ Switch back to the `Conda Prompt`, and compile the OpenCV source code with cmake
 # cd mybuild
 # cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 16 2019" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\opencv' '-DCMAKE_PREFIX_PATH=.\opencv' -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_WITH_STATIC_CRT=OFF -B build -S ../
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 Start a `Anaconda Prompt`. In your workspace, clone the repository
 
 ```Anaconda Prompt
@@ -136,12 +159,16 @@ Then compile the OpenCV source code with cmake.
 # mkdir mybuild
 # cd mybuild
 # cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 17 2022" '-DCMAKE_INSTALL_PREFIX=C:\Program Files\opencv' '-DCMAKE_PREFIX_PATH=.\opencv' -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_WITH_STATIC_CRT=OFF -B build -S ../
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 # cmake --build build --config Release
 # cmake --install build --config Release
 # cd ../..
 ```
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 All the dependencies on the Ryzen AI laptop are installed completely. User could run a end to end Yolov8 deplomyment progress with the following ***Section 4***, which will start from the FP32 Yolov8 model. The whole progress will last for several hours or one day depending on the hardware computing ability. 
 
@@ -236,6 +263,8 @@ Switch back to the `Conda Prompt`, and compile the Yolov8 source code.
 ```Conda Prompt
 # cd RyzenAI-SW/tutorial/yolov8_e2e/implement
 =======
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 All the dependencies on the Ryzen AI laptop are installed completely. User could run a Yolov8 deplomyment progress in cpp with int8 Yolov8 pre-quantized model in the following ***Section 4***,
 
 ## 4 Implementation
@@ -252,7 +281,10 @@ Then compile the Yolov8 source code.
 
 ```Anaconda Prompt
 # cd RyzenAI-SW/tutorial/yolov8_cpp/implement
+<<<<<<< HEAD
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 # build.bat
 ```
 
@@ -260,6 +292,7 @@ The output will be generated as below.
 
 ```
 ......
+<<<<<<< HEAD
 <<<<<<< HEAD
     -- Installing: C:/Users/ibane/Desktop/voe-win_amd64-with_xcompiler_on-c07e419-latest/bin/camera_yolov8.exe
     -- Installing: C:/Users/ibane/Desktop/voe-win_amd64-with_xcompiler_on-c07e419-latest/bin/camera_yolov8_nx1x4.exe
@@ -269,6 +302,11 @@ The output will be generated as below.
     -- Installing: C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/camera_yolov8_nx1x4.exe
     -- Installing: C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/test_jpeg_yolov8.exe
 >>>>>>> d78b7488 (Merge branch 'dev' into unified_public)
+=======
+    -- Installing: C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/camera_yolov8.exe
+    -- Installing: C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/camera_yolov8_nx1x4.exe
+    -- Installing: C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/test_jpeg_yolov8.exe
+>>>>>>> f83a0188 (Merge pull request #94 from VitisAI/dev)
 ```
 
 ### Run with Image
