@@ -28,10 +28,11 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 .
 ├── CMakeLists.txt
 ├── README.md
-├── build.bat #easy build script
+├── build.bat 
+|—— lib #Dependencies lib
 └── src
     ├── CMakeLists.txt
-    ├── app  #ipu_multi_model app source code
+    ├── app  #npu_multi_model app source code
     ├── models
     ├── onnx # Onnx dependencies
     ├── processing
@@ -40,15 +41,13 @@ This example serves as a practical guide, illustrating the step-by-step procedur
 ## 3 How To Build:
 
 ### 3.1 Requirement
-1. Visual Studio 2019 or 2022 (with Desktop dev c++ )
+1. Visual Studio 2022 (with Desktop dev c++ )
 2. cmake (version >= 3.26)
-3. python (version >= 3.9) (Recommended for python 3.9.13 64bit)
-4. IPU driver & IPU xclbin reledease >= 20230823
-
+3. python (version = 3.10)
 
 
 ### 3.2 Clean Cache 
-When you replace the IPU driver or 1x4.xclbin, you need to clear the cache of the old compiled model, they are located in C:\temp\rd\vaip\\.cache, and delete everything under this folder.
+When you replace the NPU driver or 1x4.xclbin, you need to clear the cache of the old compiled model, they are located in C:\temp\rd\vaip\\.cache, and delete everything under this folder.
 
 ### 3.3 Prepare Conda Env
 About how to create conda env please refer to [Demo Readme](../../demo/multi-model-exec/README.md)
@@ -60,7 +59,7 @@ git clone https://github.com/opencv/opencv.git -b 4.6.0
 cd opencv
 mkdir mybuild
 cd mybuild
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G 'Visual Studio 16 2019' '-DCMAKE_INSTALL_PREFIX=C:\Program Files\opencv' '-DCMAKE_PREFIX_PATH=.\opencv' -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_WITH_STATIC_CRT=OFF -B build -S ../
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 17 2022" -DCMAKE_INSTALL_PREFIX="C:\Program Files\opencv" -DCMAKE_PREFIX_PATH=".\opencv" -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_WITH_STATIC_CRT=OFF -B build -S ../
 cmake --build build --config Release
 cmake --install build --config Release
 ``` 
@@ -70,7 +69,7 @@ git clone https://github.com/gflags/gflags.git
 cd gflags
 mkdir mybuild
 cd mybuild
-cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G 'Visual Studio 17 2022' '-DCMAKE_INSTALL_PREFIX=C:\Program Files\gflag'  -B build -S ../
+cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 17 2022" -DCMAKE_INSTALL_PREFIX="C:\Program Files\gflag"  -B build -S ../
 cmake --build build --config Release
 cmake --install build --config Release
 cd ../..
@@ -78,7 +77,7 @@ git clone https://github.com/google/glog.git
 cd glog
 mkdir mybuild
 cd mybuild
-cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G 'Visual Studio 17 2022' '-DCMAKE_INSTALL_PREFIX=C:\Program Files\glog'  -B build -S ../
+cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G "Visual Studio 17 2022" '-DCMAKE_INSTALL_PREFIX="C:\Program Files\glog"  -B build -S ../
 cmake --build build --config Release
 cmake --install build --config Release
 ```
@@ -102,7 +101,7 @@ python3 -m pip install pillow
   ```
 Output:
 ``` ......
-    -- Installing: ..../bin/ipu_multi_models.exe
+    -- Installing: ..../bin/npu_multi_models.exe
 ```
 
 
