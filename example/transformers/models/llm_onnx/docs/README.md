@@ -64,6 +64,10 @@ Use "prepare_model.py" script to export, optimize and quantize the LLMs. You can
 
 Check script usage
 
+```powershell
+cd %TRANSFORMERS_ROOT%\models\llm_onnx
+python prepare_model.py --help
+
 ```python prepare_model.py --help```
 
 #### Export, Optimize and quantize the model

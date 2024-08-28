@@ -8,10 +8,10 @@ on:
   pull_request:
     branches: [ "main" ]
     types: [opened, synchronize, reopened, ready_for_review]
-  
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  
+
 jobs:
   test-initial:
     runs-on: Ubuntu-22.04
