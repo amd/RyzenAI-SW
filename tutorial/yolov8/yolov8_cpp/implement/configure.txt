@@ -1,0 +1,14 @@
+xcompiler configure[12]
+=====================================================
+std::string debug_mode = performance
+bool disable_std_quant = 0
+std::uint32_t dpu_subgraph_num = 32
+bool dump_subgraph_ops = 0
+bool enable_fast_pm = 1
+bool enable_op_tensor_name_protection = 1
+bool enable_pdi = 1
+std::vector<std::string> fingerprint = [0x8000205000b2310]
+cannot printclass xir::Graph * __ptr64
+std::uint32_t opt_level = 0
+std::uint32_t profile = 0
+bool reserve_const_data = 0
