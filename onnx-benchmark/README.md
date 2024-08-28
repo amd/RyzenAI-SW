@@ -98,6 +98,23 @@ https://github.com/onnx/onnx/issues/6267
 pip install onnx==1.16.1
 ```
 
+In case of PHOENIX device:
+```
+conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix"
+conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix\1x4.xclbin"
+conda env config vars set XLNX_TARGET_NAME=AMD_AIE2_Nx4_Overlay
+conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
+conda deactivate
+conda activate ryzen-ai-1.2.0
+conda env config vars list
+```
+
+Downgrade onnx to 1.16.1 to resolve an issue with the 1.16.2 release
+https://github.com/onnx/onnx/issues/6267 
+```
+pip install onnx==1.16.1
+```
+
 
 ---
 
