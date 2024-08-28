@@ -129,23 +129,44 @@ Download the onnx models and test image/video package, and unzip it under **<pat
 ## 4 Run The Demo
 
 Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. You can load and run the models one by one: 
+
+```bash
+cd npu_modelsx4_demo
 run_mobile_net_v2.bat
+```
 
 ![MobilenetV2](images/mobilenet_V2.jpg)
 
+```bash
 run_resnet50.bat
+```
+
 ![Resnet50](images/resnet50.jpg)
+
+```bash
 run_retinaface.bat
+```
+
 ![Retinaface](images/retina.jpg)
+
+```bash
 run_segmentation.bat
+```
+
 ![Segmentation](images/segmentation.jpg)
 
+```bash
 run_yolovx.bat
+```
+
 ![yolox](images/yolox.jpg)
 
 or you can load and run multiple models at the same time: 
 
+```bash
 run_modelx4.bat
+```
+
 ![modelsx4](images/modelsx4.jpg)
 
 ## 5 Know Issues
