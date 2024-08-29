@@ -130,6 +130,8 @@ Download the onnx models and test image/video package, and unzip it under **<pat
 
 Please note that all the steps mentioned here need to be performed in ***Windows CMD Prompt***. You can load and run the models one by one: 
 
+Run the MobileNet V2 based classification model:
+
 ```bash
 cd npu_modelsx4_demo
 run_mobile_net_v2.bat
@@ -137,11 +139,15 @@ run_mobile_net_v2.bat
 
 ![MobilenetV2](images/mobilenet_V2.jpg)
 
+Run the ResNet50 based classification model:
+
 ```bash
 run_resnet50.bat
 ```
 
 ![Resnet50](images/resnet50.jpg)
+
+Run the RetinaFace model for face detection:
 
 ```bash
 run_retinaface.bat
@@ -149,11 +155,15 @@ run_retinaface.bat
 
 ![Retinaface](images/retina.jpg)
 
+Run the segmentation model:
+
 ```bash
 run_segmentation.bat
 ```
 
 ![Segmentation](images/segmentation.jpg)
+
+Run the YOLO based object detection model:
 
 ```bash
 run_yolovx.bat
@@ -161,7 +171,7 @@ run_yolovx.bat
 
 ![yolox](images/yolox.jpg)
 
-or you can load and run multiple models at the same time: 
+or you can load and run multiple models at the same time:
 
 ```bash
 run_modelx4.bat
