@@ -74,6 +74,8 @@ This is the demo of showing multiple AI models running concurrently on Ryzen AI.
 
 Make sure you have met all the requirements by following the [Installation Instructions](https://ryzenai.docs.amd.com/en/latest/inst.html#).
 
+For step-by-step procedure for installing dependencies and building the demo from the source code following the [Multi Model instructions](../../example/multi-model/README.md)
+
 Download the onnx models and test image/video package, and unzip it under **<path_to_RyzenAI-SW>/demo/multi-model-exec/npu_modelsx4_demo/**
 
 
