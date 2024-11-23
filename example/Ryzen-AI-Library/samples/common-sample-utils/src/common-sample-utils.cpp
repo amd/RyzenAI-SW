@@ -7,6 +7,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iomanip>
+#include <thread>
 
 using amd::cvml::sample::utils::CamRes;
 
@@ -14,57 +15,6 @@ namespace amd {
 namespace cvml {
 namespace sample {
 namespace utils {
-
-bool SetupCamera(int camera_index, const std::vector<CamRes>& res_list, cv::VideoCapture* camera) {
-  // list certain API preferences before CAP_ANY to try them first
-  // regardless of opencv's ordering
-  static const int camera_api_preference[] = {
-#ifdef _WIN32
-      cv::CAP_DSHOW, cv::CAP_MSMF,
-#endif
-      cv::CAP_ANY};
-
-  if (camera == nullptr) {
-    return false;
-  }
-
-  for (auto api : camera_api_preference) {
-    try {
-      camera->open(camera_index, api);
-      if (camera->isOpened()) {
-        break;
-      }
-    } catch (std::exception& e) {
-      std::cout << "SetupCamera exception(" << api << "): " << e.what() << std::endl;
-    }
-  }
-
-  if (camera->isOpened() != true) {
-    std::cout << "Failed to open camera device with id:" << camera_index << std::endl;
-    return false;
-  }
-
-  bool result = false;
-
-  for (auto res : res_list) {
-    camera->set(cv::CAP_PROP_FRAME_WIDTH, res.width);
-    camera->set(cv::CAP_PROP_FRAME_HEIGHT, res.height);
-    auto w = camera->get(cv::CAP_PROP_FRAME_WIDTH);
-    auto h = camera->get(cv::CAP_PROP_FRAME_HEIGHT);
-    if (w != res.width || h != res.height) {
-      std::cout << "Camera doesn't support " << res.width << "x" << res.height << std::endl;
-    } else {
-      std::cout << "Camera enabled at " << w << "x" << h << std::endl;
-      result = true;
-      break;
-    }
-  }
-  if (!result) {
-    std::cout << "No supported resolution for camera." << std::endl;
-    camera->release();
-  }
-  return result;
-}
 
 /**
  * Helper function to determine output display scale factor.
@@ -109,6 +59,25 @@ bool RunFeatureClass::GetSingleVideoFrame(uint32_t frame_id) {
   return true;
 }
 
+void RunFeatureClass::SetContextStreamingModeBySrc(amd::cvml::Context* context,
+                                                   const std::string& src_path) {
+  // assume camera index if a number is provided
+  const std::string input_str = src_path.empty() ? "0" : src_path;
+  std::string ext = static_cast<std::filesystem::path>(input_str).extension().string();
+  if (ext.length() == 0 && std::isdigit(input_str[0])) {
+    context->SetStreamingMode(amd::cvml::Context::StreamingMode::ONLINE_STREAMING);
+  } else {
+    // check if we can treat the input as an image
+    auto frame_rgb = cv::imread(input_str);
+    if (!frame_rgb.empty()) {
+      context->SetStreamingMode(amd::cvml::Context::StreamingMode::ONE_SHOT);
+    } else {
+      // assume the input is a video file
+      context->SetStreamingMode(amd::cvml::Context::StreamingMode::OFFLINE_STREAMING);
+    }
+  }
+}
+
 bool RunFeatureClass::RunFeatureStreaming() {
   bool user_exit = false;
 
@@ -117,6 +86,7 @@ bool RunFeatureClass::RunFeatureStreaming() {
   // set FPS to be the same as the input device/file, or 30FPS
   if (video_input_.isOpened()) {
     stream_fps_ = video_input_.get(cv::CAP_PROP_FPS);
+    if (is_camera_) stream_fps_ = 30.0f;
   }
 
   // ms time for stream_fps_
@@ -124,7 +94,8 @@ bool RunFeatureClass::RunFeatureStreaming() {
       std::chrono::milliseconds(static_cast<uint32_t>(1000 / stream_fps_));
 
   // record start time
-  std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+  // std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+  std::chrono::steady_clock::time_point start_time;
 
   //
   // Iterate over frames
@@ -132,6 +103,8 @@ bool RunFeatureClass::RunFeatureStreaming() {
   // so is good enough for a sample application.
   //
   for (frame_id = 1; GetSingleVideoFrame(frame_id - 1); ++frame_id) {
+    if (frame_id == 2) start_time = std::chrono::steady_clock::now();
+
     // Run feature and measure effective fps (execution time of a single feature call)
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     cv::Mat frame_out = Feature(frame_rgb_);
@@ -239,7 +212,8 @@ bool RunFeatureClass::RunFeatureStreaming() {
         std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
 
     // extra sleep to simulate expected FPS
-    if (elapsed_time < test_fps_period_ * frame_id) {
+    if (elapsed_time < test_fps_period_ * (frame_id - 1)) {
+      // std::cout << "Sleep triggered, printout" << std::endl;
       std::this_thread::sleep_for(test_fps_period_ * frame_id - elapsed_time);
     }
   }
@@ -279,7 +253,10 @@ void RunFeatureClass::RunFeature(const std::string& input, const std::string& ou
                                  std::vector<CamRes>* supported_res) {
   // attempt to open output file later if name specified
   open_output_file_ = output_file.size() > 0;
-  output_file_ = output_file;
+  if (open_output_file_) {
+    std::filesystem::path output_path(output_file);
+    output_file_ = std::filesystem::absolute(output_path).string();
+  }
   output_window_name_ = window_title;
 
   // default frame rate
@@ -297,11 +274,11 @@ void RunFeatureClass::RunFeature(const std::string& input, const std::string& ou
   std::string ext = static_cast<std::filesystem::path>(input_str).extension().string();
   bool is_image{false};
   bool is_video{false};
-  bool is_camera{false};
+  is_camera_ = false;
 
   // assume camera index if a number is provided
   if (ext.length() == 0 && std::isdigit(input_str[0])) {
-    is_camera = true;
+    is_camera_ = true;
   } else {
     // check if we can treat the input as an image
     frame_rgb_ = cv::imread(input_str);
@@ -314,7 +291,7 @@ void RunFeatureClass::RunFeature(const std::string& input, const std::string& ou
     }
   }
 
-  if (is_camera) {
+  if (is_camera_) {
     //
     // Camera
     //
@@ -354,6 +331,26 @@ void RunFeatureClass::RunFeature(const std::string& input, const std::string& ou
   }
 }
 
+std::vector<std::string> GetListOfFilesInDir(const std::filesystem::path& folder,
+                                             std::vector<std::string> supported_exts) {
+  std::vector<std::string> listOfFiles{};
+  if (std::filesystem::exists(folder) && std::filesystem::is_directory(folder)) {
+    for (const std::filesystem::directory_entry& iter :
+         std::filesystem::directory_iterator(folder)) {
+      if (iter.is_regular_file()) {
+        std::string ext = iter.path().extension().string();
+        if (std::find(supported_exts.begin(), supported_exts.end(), ext) !=
+            supported_exts.end()) {  // Add current file to list if extension is supported
+          listOfFiles.push_back(iter.path().string());
+        }
+      }
+    }
+  } else {
+    std::cout << "Error accessing folder " << folder.string() << std::endl;
+  }
+  return listOfFiles;
+}
+
 std::string CreateFolderWithTimestamp() {
   std::string file_save_path = GetTimestamp();
   namespace fs = std::filesystem;
@@ -365,10 +362,16 @@ std::string CreateFolderWithTimestamp() {
 
 std::string GetTimestamp() {
   std::string timestamp{};
+  std::stringstream mon_s, day_s, hour_s, min_s, sec_s;
+#ifdef _WIN32
   struct tm ltm;
   time_t now = time(0);
   localtime_s(&ltm, &now);
-  std::stringstream mon_s, day_s, hour_s, min_s, sec_s;
+#else
+  time_t now = time(&now);
+  struct tm ltm;
+  localtime_r(&now, &ltm);
+#endif
   mon_s << std::setw(2) << std::setfill('0') << (ltm.tm_mon + 1);
   day_s << std::setw(2) << std::setfill('0') << ltm.tm_mday;
   hour_s << std::setw(2) << std::setfill('0') << ltm.tm_hour;
@@ -383,14 +386,10 @@ void GetPlatformInformation() {
   amd::cvml::SupportedPlatformInformation info{};
   amd::cvml::Context::GetSupportedPlatformInformation(&info);
 
-  for (size_t i = 0; i < info.supported_platform_count; i++) {
-    std::cout << "supported APU devide-id: 0x" << std::hex << info.platform[i].device_id << std::dec
-              << std::endl;
-    std::cout << "required minimal-vulkan-driver-version: 0x" << std::hex
-              << info.platform[i].required_gpu_minimal_vulkan_driver_version << std::dec
-              << std::endl;
+  if (info.supported_platform_count > 0) {
+    std::cout << "Required minimam Vulkan driver version: 0x" << std::hex
+              << info.platform[0].required_gpu_minimal_vulkan_driver_version << std::endl;
   }
-  std::cout << "supported_platform_count=" << info.supported_platform_count << std::endl;
 }
 
 bool ParseArguments(int argc, char** const argv, std::string* input_str, std::string* output_file,
@@ -415,7 +414,7 @@ bool ParseArguments(int argc, char** const argv, std::string* input_str, std::st
         (void)e;
       }
       if (arg_help == nullptr) {
-        std::cout << "Usage: " << app_name << ".exe"
+        std::cout << "Usage: " << app_name
                   << " [-i input] [-o file]\n"
                      "    -i\tSpecify an input image/video file or camera device index\n"
                      "    -o\tSpecify output image/video file name\n";
@@ -469,9 +468,9 @@ void PutRectangle(cv::Mat* image, const cv::Rect& rect, const cv::Scalar& color)
   }
 }
 
-void PutText(cv::Mat* image, const std::string& display_text, const int text_row,
-             cv::Scalar text_color, const int center_x, const int text_height,
-             const bool fill_background, cv::Scalar background_color) {
+int PutText(cv::Mat* image, const std::string& display_text, const int text_row,
+            cv::Scalar text_color, const int override_x, const int text_height,
+            const bool fill_background, cv::Scalar background_color) {
   static int TEXT_HEIGHT = 30;     // hard coded text height, because getTextSize isn't reliable
   static int TEXT_BOX_OFFSET = 5;  // offset for background box
   static int TEXT_PADDING = 3;     // space between rows of text
@@ -480,7 +479,7 @@ void PutText(cv::Mat* image, const std::string& display_text, const int text_row
 
   if (image == nullptr || text_row < 0) {
     // silently return
-    return;
+    return -1;
   }
 
   double text_scale = TEXT_SCALE;
@@ -496,7 +495,7 @@ void PutText(cv::Mat* image, const std::string& display_text, const int text_row
   }
 
   // cppcheck-suppress knownConditionTrueFalse
-  int text_font = text_scale > 1.0 ? cv::FONT_HERSHEY_COMPLEX : cv::FONT_HERSHEY_DUPLEX;
+  int text_font = text_scale > 1.0 ? cv::FONT_HERSHEY_DUPLEX : cv::FONT_HERSHEY_PLAIN;
   int text_box_offset = static_cast<int>(TEXT_BOX_OFFSET * text_scale + 0.5);
   int text_padding = static_cast<int>(TEXT_PADDING * text_scale + 0.5);
   int text_thickness = static_cast<int>(TEXT_THICKNESS * text_scale);
@@ -505,14 +504,18 @@ void PutText(cv::Mat* image, const std::string& display_text, const int text_row
   auto text_size = cv::getTextSize(display_text, text_font, text_scale, text_thickness, nullptr);
 
   // constant left starting point for english text
-  int origin_x = TEXT_PADDING;
+  int org_x = TEXT_PADDING;
 
-  // handle text centering
-  if (center_x != 0) {
-    origin_x += center_x - text_size.width / 2;
+  if (override_x > 0) {
+    if (override_x & PUTTEXT::OVERRIDE_ABSOLUTE) {
+      org_x = override_x & ~(PUTTEXT::OVERRIDE_ABSOLUTE);
+    } else {
+      // handle text centering
+      org_x = override_x - text_size.width / 2;
+    }
   }
 
-  cv::Point2i origin = cv::Point2i(origin_x, (text_h + text_padding) * (text_row + 1));
+  cv::Point2i origin = cv::Point2i(org_x, (text_h + text_padding) * (text_row + 1));
 
   if (fill_background) {
     // draw rectangle on frame for each text
@@ -523,6 +526,7 @@ void PutText(cv::Mat* image, const std::string& display_text, const int text_row
 
   // actually display the text
   cv::putText(*image, display_text, origin, text_font, text_scale, text_color, text_thickness);
+  return org_x + text_size.width;
 }
 
 }  // namespace utils

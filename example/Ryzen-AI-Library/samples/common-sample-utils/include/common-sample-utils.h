@@ -1,10 +1,11 @@
 /*
- * Copyright (C) 2021-2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef SAMPLES_COMMON_SAMPLE_UTILS_INCLUDE_COMMON_SAMPLE_UTILS_H_
 #define SAMPLES_COMMON_SAMPLE_UTILS_INCLUDE_COMMON_SAMPLE_UTILS_H_
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,16 @@ typedef struct CamRes {
   int width;
   int height;
 } CamRes;
+
+/**
+ * Returns list of files in folder with specified file extensions (excludes subdirectories)
+ * @param folder path to folder
+ * @param supported_exts accepted file extensions
+ *
+ * @return list of filenames
+ */
+std::vector<std::string> GetListOfFilesInDir(const std::filesystem::path& folder,
+                                             std::vector<std::string> supported_exts);
 
 /**
  * Sets up the camera with the specified camera id according to the preferred resolution list
@@ -80,6 +91,16 @@ class RunFeatureClass {
   virtual cv::Mat Feature(const cv::Mat& input_frame_rgb) { return input_frame_rgb; }
 
   /**
+   * The input extension is used to establish streaming mode. If a camera index is
+   * passed then the streaming mode is set to be online.
+   *
+   * @param src_path: Uses the same semantics as RunFeature's input.
+   * Input file name, or "<camera index>" if camera desired
+   * @param context: CVML context being used in the sample
+   */
+  void SetContextStreamingModeBySrc(amd::cvml::Context* context, const std::string& src_path);
+
+  /**
    * Opens video source and executes the feature.
    *
    * This function throws exceptions on errors.
@@ -104,6 +125,7 @@ class RunFeatureClass {
                           std::vector<CamRes>* supported_res = nullptr);
 
  protected:
+  bool is_camera_;                ///< Whether input is camera
   cv::VideoCapture video_input_;  ///< OpenCV video capture device
   cv::VideoWriter video_output_;  ///< Video writer for main output
 
@@ -169,20 +191,33 @@ bool ParseArguments(int argc, char** const argv, std::string* input_str, std::st
 void PutRectangle(cv::Mat* image, const cv::Rect& rect, const cv::Scalar& color);
 
 /**
+ * Specify extra flags for PutText's override_x parameter.
+ */
+enum PUTTEXT {
+  /// Specify X center for PutText()
+  OVERRIDE_CENTER = 0x0,
+
+  /// Specify absolute X offset for PutText()
+  OVERRIDE_ABSOLUTE = 1 << (sizeof(int) * 8 - 2)
+};
+
+/**
  * Render text strings into the frame.
+ * To center text around a point, set override_x = PUTTEXT
  *
  * @param image Target image buffer
  * @param display_text String of text to render
  * @param row Zero-based row number to render text, assuming text console
  * @param text_color Color of text to render
- * @param center_x If non-zero, text will be centered around this point
+ * @param override_x If non-zero, change behavior based on PUTTEXT flags
  * @param text_height If non-zero, specifies text height as a percentage of the frame height
  * @param fill_background Whether or not an opaque background should be added
  * @param background_color Color of background, if specified
+ * @return End X value of the rendered text
  */
-void PutText(cv::Mat* image, const std::string& display_text, const int text_row,
-             cv::Scalar text_color, const int center_x, const int text_height,
-             const bool fill_background = false, cv::Scalar background_color = cv::Scalar(0, 0, 0));
+int PutText(cv::Mat* image, const std::string& display_text, const int text_row,
+            cv::Scalar text_color, const int override_x, const int text_height,
+            const bool fill_background = false, cv::Scalar background_color = cv::Scalar(0, 0, 0));
 
 }  // namespace utils
 }  // namespace sample

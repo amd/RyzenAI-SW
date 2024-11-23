@@ -3,7 +3,7 @@
  *
  * @file
  *
- * Definitions for CVML SDK Contexts and associated structures/functions.
+ * Definitions for SDK contexts and associated structures/functions.
  */
 
 #ifndef EDGEML_FEATURES_COMMON_FRAMEWORK_PUBLIC_INCLUDE_CVML_CONTEXT_H_
@@ -16,132 +16,188 @@ namespace amd {
 namespace cvml {
 
 /**
- * Maximal number of different platforms CVML SDK can support
+ * Maximum number of different platforms the SDK can support.
  */
 static const uint32_t MAX_SUPPORTED_PLATFORMS = 10;
 
 /**
- * Information of platforms supported by CVML SDK
+ * Structure of platforms supported by the SDK.
+ *
  * @see \a amd::cvml::Context
  */
-typedef struct SupportedPlatformInformation {
+struct SupportedPlatformInformation {
+  /**
+   * Structure describing a single supported platform.
+   */
   struct SupportedPlatform {
     /// Device ID of supported AMD APU
+    /// @deprecated Always returns -1
     int64_t device_id;
 
-    /// Required mininal vulkan driver version on supported AMD APU
+    /// Required minimum Vulkan driver version on supported AMD APU
     int64_t required_gpu_minimal_vulkan_driver_version;
-  } platform[MAX_SUPPORTED_PLATFORMS];
+  } platform[MAX_SUPPORTED_PLATFORMS];  ///< Array of supported platforms.
 
   /// Total number of supported AMD APU platforms.
+  /// @deprecated Always returns amd::cvml::MAX_SUPPORTED_PLATFORMS
   /// @see \a amd::cvml::MAX_SUPPORTED_PLATFORMS
   uint32_t supported_platform_count;
 
   /// Whether supported platform checking is enforced.
   bool checking_enforced;
-} SupportedPlatformInformation;
+};
 
 /**
- * Represents a context of a CVML SDK feature
- * Can be shared by multiple features of the CVML SDK.
+ * Execution context for Ryzen AI Library features.
+ *
+ * An appropriate context must be created by calling,
+ *
+ *     amd::cvml::CreateContext()
+ *
+ * before using any features in the Ryzen AI Library and provided to the
+ * feature constructor(s).
+ *
+ * The context can be shared by multiple features of the SDK.
  */
 class CVML_SDK_EXPORT Context {
   AMD_CVML_INTERFACE(Context);
 
  public:
   /**
-   * Releases the memory allocated by the context.
+   * Releases all resources for the context and destroys it.
    */
   virtual void Release() = 0;
 
   /**
    * Sets the verbosity of the log.
    *
-   * @param level CVML SDK feature log level
+   * @param level SDK feature log level
    */
-  virtual void SetLogLevel(CvmlLogger::LogLevels level) = 0;
+  virtual void SetLogLevel(Logger::LogLevels level) = 0;
 
   /**
-   * Gets the pointer to the cvml logger
+   * Gets the pointer to the logger object.
+   *
+   * @return Pointer to logger object
    */
-  virtual CvmlLogger* GetLogger() const = 0;
+  virtual Logger* GetLogger() const = 0;
 
   /**
-   * Get the Supported Platform Information object
+   * Get the Supported Platform Information object.
    *
    * @param info Pointer to structure for receiving platform information
-   * @return True on success
-   * @return False on failure
+   * @return true on success, false on failure
    */
   static bool GetSupportedPlatformInformation(amd::cvml::SupportedPlatformInformation* info);
 
   /**
-   * Defines the inference backends that can be supported by the CVML SDK.
+   * Defines the inference backends that can be supported by the SDK.
    *
    * These are provided to the \a SetInferenceBackend API function.
    */
   enum InferenceBackend {
-    AUTO,  ///< Allow the CVML SDK to select the hardware for inference operations
+    AUTO,  ///< Allow the SDK to select the hardware for inference operations
     GPU,   ///< Use GPU hardware for inference operations
     NPU,   ///< Use NPU hardware for inference operations
     CPU,   ///< Use CPU hardware for inference operations
-    ONNX,  ///< Use NPU hardware for ONNX inference operations
+    dGPU   ///< Use discrete GPU hardware, if available, for inference operations
   };
 
   /**
-   * Define input source streaming mode that can be supported by CVMLSDK
-   *
+   * Defines the source streaming mode for feature processing.
    */
   enum StreamingMode {
-    ONE_SHOT,          ///< Input source is image
-    ONLINE_STREAMING,  ///< Input source is video/audio file, or camera stream
-    OFFLINE_STREAMING  ///< Input source is image playback
+    ONE_SHOT,          ///< Features should expect to process independent images.
+    ONLINE_STREAMING,  ///< Input images are part of real-time streaming content.
+    OFFLINE_STREAMING  ///< Features are intended to process offline streaming content.
   };
 
   /**
    * Specifies the inference backend for subsequently created features.
    *
-   * This function does not affect any CVML features that were instantiated
-   * via the context before its call. If a CVML feature is unable to support
+   * This function does not affect any features that were instantiated
+   * via the context before its call. If a feature is unable to support
    * a specified inference backend, it will refuse to construct and an
    * exception will be thrown instead.
    *
    * @param inference_backend Desired hardware inference backend
+   * @return true if backend updated
    */
-  virtual void SetInferenceBackend(InferenceBackend inference_backend) = 0;
+  bool SetInferenceBackend(InferenceBackend inference_backend);
 
   /**
    * Returns the inference backend selection strategy for newly created features.
    *
    * @return Current hardware inference backend selection
    */
-  virtual InferenceBackend GetInferenceBackend(void) = 0;
+  InferenceBackend GetInferenceBackend(void);
 
   /**
-   * Returns StreamingMode of input source, an enum class
+   * Returns the current streaming mode.
    *
+   * See \a amd::cvml::Context::SetStreamingMode for more details.
+   *
+   * @return Currently configured streaming mode.
    */
-  virtual StreamingMode GetStreamingMode(void) = 0;
+  StreamingMode GetStreamingMode(void);
 
   /**
-   * Set input source type
-   *  0: one-shot image
-   *  1: online streaming mode (e.g. streaming video/audio, camera)
-   *  2: offline streaming model (e.g. image loop playback)
+   * Set the streaming mode for the context.
+   *
+   * The requested streaming mode is used to configure new features
+   * that are constructed against the context. Any features that
+   * were created before are not affected by changing streaming
+   * mode changes.
+   *
+   * See \a amd::cvml::Context::StreamingMode
+   *
+   * @param mode Desired streaming mode.
    */
-  virtual void SetStreamingMode(StreamingMode mode) = 0;
+  void SetStreamingMode(StreamingMode mode);
+
+  /**
+   * Return if NPU is available on platform
+   *
+   * @return true if NPU available
+   */
+  static bool IsNPUAvailable();
+
+  /**
+   * Return if iGPU is available on platform
+   *
+   * @return true if iGPU available
+   */
+  static bool IsiGPUAvailable();
+
+  /**
+   * Return if dGPU is available on platform
+   *
+   * @return true if dGPU available
+   */
+  static bool IsdGPUAvailable();
+
+  /**
+   * Get detected NPU driver version.
+   *
+   * @return NPU driver version, or 0 if not detected
+   */
+  uint32_t GetNPUDriverVersion();
+
+ public:
+  class Impl;
+  Impl* impl_;  ///< Pointer to context implementation
 };
 
 /**
- * API to Create CVML Context.
+ * Create a Ryzen AI context.
  *
  * @param log_level  Sets the log level. Default value is kINFO
- * @param logger External logger for cvml context. Default value is nullptr
- * @see \a amd::cvml::CvmlLogger
+ * @param logger External logger for the context. Default value is nullptr
+ * @see \a amd::cvml::Logger
  * @return Pointer to the created Context
  */
 CVML_SDK_EXPORT amd::cvml::Context* CreateContext(
-    CvmlLogger::LogLevels log_level = CvmlLogger::LogLevels::kINFO, CvmlLogger* logger = nullptr);
+    Logger::LogLevels log_level = Logger::LogLevels::kINFO, Logger* logger = nullptr);
 
 }  // namespace cvml
 }  // namespace amd

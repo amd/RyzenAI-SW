@@ -1,5 +1,5 @@
 /*!
- * Copyright (C) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
  *
  * @file
  *
@@ -57,7 +57,7 @@ struct CVML_SDK_EXPORT Rect {
    *
    * @param x X cordinate of top left corner
    * @param y Y cordinate of top left corner
-   * @param wdith Rectange width
+   * @param width Rectange width
    * @param height Rectange height
    */
   Rect(_Tp x, _Tp y, _Tp width, _Tp height) : x_(x), y_(y), width_(width), height_(height) {}
@@ -75,17 +75,13 @@ struct CVML_SDK_EXPORT Rect {
   _Tp height_;
 };
 
-// explicitly exporting template definition
-template struct CVML_SDK_EXPORT Rect<int>;
-template struct CVML_SDK_EXPORT Rect<float>;
-template struct CVML_SDK_EXPORT Rect<double>;
-
 typedef Rect<int> Rect_i;
 typedef Rect<float> Rect_f;
 typedef Rect<double> Rect_d;
+typedef Rect<uint32_t> Rect_u;
 
 /**
- * Point with integer values
+ * Structure for 2-dimensional Point values.
  */
 template <typename _Tp>
 struct CVML_SDK_EXPORT Point {
@@ -109,17 +105,12 @@ struct CVML_SDK_EXPORT Point {
   _Tp y_;
 };
 
-// explicitly exporting template definition
-template struct CVML_SDK_EXPORT Point<int>;
-template struct CVML_SDK_EXPORT Point<float>;
-template struct CVML_SDK_EXPORT Point<double>;
-
 typedef Point<int> Point2i;
 typedef Point<float> Point2f;
 typedef Point<double> Point2d;
 
 /**
- * Point with 3D values
+ * Structure for 3-dimensional Point values.
  */
 template <typename _Tp>
 struct CVML_SDK_EXPORT Point3 {
@@ -147,42 +138,36 @@ struct CVML_SDK_EXPORT Point3 {
   _Tp z_;
 };
 
-// explicitly exporting template definition
-template struct CVML_SDK_EXPORT Point3<int>;
-template struct CVML_SDK_EXPORT Point3<float>;
-template struct CVML_SDK_EXPORT Point3<double>;
-
 typedef Point3<int> Point3i;
 typedef Point3<float> Point3f;
 typedef Point3<double> Point3d;
 
 /**
- * Struct for bounding boxes at angles
+ * Structure for quadrilaterals at arbitrary angles.
  */
 template <typename _Tp>
-struct CVML_SDK_EXPORT BoundingQuad {
+struct CVML_SDK_EXPORT Quad {
   /**
    * Default constructor.
    */
-  BoundingQuad() = default;
+  Quad() = default;
 
   /**
-   * Initializing constructor using Points
+   * Initializing constructor using Points.
    *
    * @param top_left coordinates of top left point
    * @param top_right coordinates of top right point
    * @param bottom_left coordinates of bottom left point
    * @param bottom_right coordinates of bottom right point
    */
-  BoundingQuad(Point<_Tp> top_left, Point<_Tp> top_right, Point<_Tp> bottom_left,
-               Point<_Tp> bottom_right)
+  Quad(Point<_Tp> top_left, Point<_Tp> top_right, Point<_Tp> bottom_left, Point<_Tp> bottom_right)
       : top_left_(top_left),
         top_right_(top_right),
         bottom_left_(bottom_left),
         bottom_right_(bottom_right) {}
 
   /**
-   * Initializing contrustor using explict x and y values
+   * Initializing contructor using explict x and y values.
    *
    * @param x_tl top left x value
    * @param y_tl top left y value
@@ -193,7 +178,7 @@ struct CVML_SDK_EXPORT BoundingQuad {
    * @param x_br bottom right x value
    * @param y_br bottom right y value
    */
-  BoundingQuad(_Tp x_tl, _Tp y_tl, _Tp x_tr, _Tp y_tr, _Tp x_bl, _Tp y_bl, _Tp x_br, _Tp y_br)
+  Quad(_Tp x_tl, _Tp y_tl, _Tp x_tr, _Tp y_tr, _Tp x_bl, _Tp y_bl, _Tp x_br, _Tp y_br)
       : top_left_(Point<_Tp>(x_tl, y_tl)),
         top_right_(Point<_Tp>(x_tr, y_tr)),
         bottom_left_(Point<_Tp>(x_bl, y_bl)),
@@ -209,37 +194,41 @@ struct CVML_SDK_EXPORT BoundingQuad {
   Point<_Tp> bottom_right_;
 };
 
-// explicitly exporting template definition
-template struct CVML_SDK_EXPORT BoundingQuad<int>;
-template struct CVML_SDK_EXPORT BoundingQuad<float>;
-template struct CVML_SDK_EXPORT BoundingQuad<double>;
+/// Alias to older 'BoundingQuad' template definition.
+template <class T>
+using BoundingQuad = Quad<T>;
 
-typedef BoundingQuad<int> BoundingQuadi;
-typedef BoundingQuad<float> BoundingQuadf;
-typedef BoundingQuad<double> BoundingQuadd;
+typedef Quad<int> Quadi;
+typedef Quad<float> Quadf;
+typedef Quad<double> Quadd;
 
 /**
- * An Array class that can contain instances of classes T
+ * Fixed size array template class for multiple instances of class T.
  */
 template <class T>
 class CVML_SDK_EXPORT Array {
  public:
   /**
-   * Default constructor
-   **/
+   * Default constructor.
+   */
   Array() : v_(nullptr), size_(0) {}
 
   /**
-   * Move constructor
-   **/
+   * Move constructor.
+   *
+   * @param other Source array
+   */
   Array(Array&& other) noexcept : v_(std::move(other.v_)), size_(std::exchange(other.size_, 0)) {
     other.v_ = nullptr;
     other.size_ = 0;
   }
 
   /**
-   * Move assignment
-   **/
+   * Move assignment operator.
+   *
+   * @param other Source array
+   * @return Reference to updated object
+   */
   Array& operator=(Array&& other) noexcept {
     if (this != &other) {
       if (v_) delete[] v_;
@@ -252,24 +241,34 @@ class CVML_SDK_EXPORT Array {
   }
 
   /**
-   * Constructor that initilize required number of classes T
-   * throw an exception in case of error
-   **/
+   * Constructor that initilize required number of classes T.
+   *
+   * This function throws exceptions on errors.
+   *
+   * @param size Desired size of the array
+   */
   explicit Array(size_t size) : v_{new T[size]}, size_(size) {}
 
   /**
-   * Copy constructor
-   * throw an exception in case of error
-   **/
+   * Copy constructor.
+   *
+   * This function throws exceptions on errors.
+   *
+   * @param other Source array
+   */
   Array(const Array& other) : v_{new T[other.size()]}, size_(other.size()) {
     for (size_t i = 0; i < other.size(); i++)  // copy elements
       v_[i] = other[i];
   }
 
   /**
-   * assign operator
-   * throw an exception in case of error
-   **/
+   * Assignment operator.
+   *
+   * This operator throws exceptions on errors.
+   *
+   * @param other Source array
+   * @return Reference to updated object
+   */
   Array& operator=(const Array& other) {
     if (&other != this) {
       T* p = new T[other.size()];
@@ -284,7 +283,7 @@ class CVML_SDK_EXPORT Array {
   /**
    * Read only operator[] for const objects.
    *
-   * Throws exceptions on out-of-range subscript.
+   * This operator throws exceptions on out-of-range subscripts.
    *
    * @param i Index to array
    * @return Array value
@@ -297,7 +296,7 @@ class CVML_SDK_EXPORT Array {
   /**
    * operator[] for subscript access.
    *
-   * Throws exceptions on out-of-range subscript.
+   * This operator throws exceptions on out-of-range subscripts.
    *
    * @param i Index to array
    * @return Reference to array entry
@@ -308,7 +307,9 @@ class CVML_SDK_EXPORT Array {
   }
 
   /**
-   * Returns the size of the array
+   * Returns the size of the array.
+   *
+   * @return Current size of the array
    */
   size_t size() const { return size_; }
 
@@ -325,14 +326,8 @@ class CVML_SDK_EXPORT Array {
   size_t size_;  ///< Current size of the array
 };
 
-/// explicitly exporting template definition
-template class CVML_SDK_EXPORT Array<Point2i>;
-template class CVML_SDK_EXPORT Array<Point3i>;
-template class CVML_SDK_EXPORT Array<Point3f>;
-template class CVML_SDK_EXPORT Array<float>;
-
 /**
- * This structure represents face location and landmarks for a single person.
+ * Structure representing face location and landmarks for a single person.
  */
 struct CVML_SDK_EXPORT Face {
   /// Constructor
@@ -351,13 +346,16 @@ struct CVML_SDK_EXPORT Face {
   /// Facial landmarks are used to localize and represent important regions of the face, such as:
   /// mouth, eyes, eyebrows, nose
   Array<Point2i> landmarks_;
+
+  /// Get bounding box
+  Rect_i GetROI() { return face_; }
 };
 
 /// explicitly exporting template definition
 template class CVML_SDK_EXPORT Array<Face>;
 
 /**
- * This structure represents the landmarks and bounding box for a single person.
+ * Structure representing landmarks and bounding box for a single person.
  */
 struct Person {
   /// Bounding box for this person
@@ -371,6 +369,9 @@ struct Person {
 
   /// Detected landmark scores for this person
   Array<float> landmark_scores_;
+
+  /// Get bounding box
+  Rect_i GetROI() { return person_; }
 };
 
 }  // namespace cvml

@@ -18,7 +18,7 @@
     set PYTHONHOME=<path\to\conda>\envs\<your_env>
 	set PYTHONPATH=<path\to\conda>\envs\<your_env>
     ```
-4. Move ``vaip_config.json`` from ``path\to\ryzen-ai-sw-1.0\voe-4.0-win_amd64\`` to ``path\to\Ryzen-AI-Library-Public-Release\windows``
+4. Move ``vaip_config.json`` from ``path\to\ryzen-ai-sw-1.0\voe-4.0-win_amd64\`` to ``path\to\Ryzen-AI-Library-Public-Release\windows\onnx\vai``
 5. Navigate to the samples directory and run depth-estimation application:
     ```
     cvml-samples-depth-estimation.exe -i path\to\input -o path\to\output
@@ -38,7 +38,7 @@
     pip install numpy
     pip install voe-0.1.0-cp39-cp39-win_amd64.whl
     ```
-3. Move ``vaip_config.json`` from ``path\to\ryzen-ai-sw-1.0\voe-4.0-win_amd64\`` to ``path\to\Ryzen-AI-Library-Public-Release\windows``
+3. Move ``vaip_config.json`` from ``path\to\ryzen-ai-sw-1.0\voe-4.0-win_amd64\`` to ``path\to\Ryzen-AI-Library-Public-Release\windows\onnx\vai``
 
 4. Run RyzenAI sample
 

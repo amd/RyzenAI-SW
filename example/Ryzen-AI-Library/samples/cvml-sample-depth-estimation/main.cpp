@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
  */
 #include <common-sample-utils.h>
 #include <cvml-depth-estimation.h>
@@ -22,7 +22,6 @@ class DepthEstimationSample : public amd::cvml::sample::utils::RunFeatureClass {
   std::string input_str_{};    ///< frame source: image or video or camera
   std::string output_file_{};  ///< Output file path/name
   bool use_fp16_;              ///< depth output type
-  amd::cvml::DepthEstimation::DepthModelType de_model_{};  ///< Depth model to use
 
   /**
    * Post process depth map for opencv visualization.
@@ -64,7 +63,7 @@ cv::Mat DepthEstimationSample::Feature(const cv::Mat& frame_rgb) {
       depth_estimation_->GenerateDepthMap(input_frame_amd_image, &output_img);
   if (!depth_map_generated) {
     std::cout << "Failed to generate depth map" << std::endl;
-    throw std::exception("Failed to generate depth map!");
+    throw std::runtime_error("Failed to generate depth map!");
   }
   return DepthEstimationCvmlToOpenCV(&output_img);
 }
@@ -77,7 +76,7 @@ cv::Mat DepthEstimationSample::DepthEstimationCvmlToOpenCV(const Image* depth_ma
     float* depth_map_or_p =
         reinterpret_cast<float*>(reinterpret_cast<void*>(depth_map->GetBuffer()));
     if (depth_map_or_p == nullptr) {
-      throw std::exception("Failed to get depth map data!");
+      throw std::runtime_error("Failed to get depth map data!");
     }
     if (use_fp16_) {
       cv::Mat depth_map_or_mat_raw2 =
@@ -98,48 +97,6 @@ cv::Mat DepthEstimationSample::DepthEstimationCvmlToOpenCV(const Image* depth_ma
   return frame_out;
 }
 
-void PrintHelpMessage() {
-  std::cout << "Usage: cvml-sample-depth-estimation.exe [-i input image/video] [-o output "
-               "image/video] [-m depth model] [-h]"
-            << std::endl;
-  std::cout << "    -i\tSpecify an input image/video file or camera device index" << std::endl;
-  std::cout << "    -o\tSpecify output image/video file name" << std::endl;
-  std::cout << "    -m\tspecify depth estimation model. e.g. <fast/precise>. Optional. Fast "
-               "is the default"
-            << std::endl;
-  std::cout << "    -h\tshow usage" << std::endl;
-
-  std::cout << "Example 1: cvml-sample-depth-estimation.exe -i image.jpg" << std::endl;
-  std::cout << "Example 2: cvml-sample-depth-estimation.exe -i image.jpg -m precise" << std::endl;
-}
-
-bool ParseArguments(int argc, char** argv, DepthEstimationSample* local_data) {
-  std::string de_model_str;
-  for (int i = 1; i < argc; i++) {
-    if (std::string(argv[i]) == "-i" && ((i + 1) < argc)) {
-      local_data->input_str_ = argv[i + 1];
-    } else if (std::string(argv[i]) == "-o" && ((i + 1) < argc)) {
-      local_data->output_file_ = argv[i + 1];
-    } else if (std::string(argv[i]) == "-m" && ((i + 1) < argc)) {
-      de_model_str = argv[i + 1];
-    } else if (std::string(argv[i]) == "-h") {
-      PrintHelpMessage();
-      return false;
-    }
-  }
-
-  // choose depth model
-  if (de_model_str == "precise") {
-    local_data->de_model_ = amd::cvml::DepthEstimation::DepthModelType::Precise;
-    std::cout << "Running with precise Depth Estimation model" << std::endl;
-  } else {  // default
-    local_data->de_model_ = amd::cvml::DepthEstimation::DepthModelType::Fast;
-    std::cout << "Running with fast Depth Estimation model" << std::endl;
-  }
-
-  return true;
-}
-
 /**
  * Main entry point of the sample application.
  *
@@ -154,7 +111,8 @@ int main(int argc, char** argv) {
   de_sample.side_by_side_ = true;
 
   // parse command line arguments
-  if (!ParseArguments(argc, argv, &de_sample)) {
+  if (!amd::cvml::sample::utils::ParseArguments(argc, argv, &de_sample.input_str_,
+                                                &de_sample.output_file_)) {
     return -1;
   }
 
@@ -168,7 +126,7 @@ int main(int argc, char** argv) {
       context->SetInferenceBackend(amd::cvml::Context::InferenceBackend::AUTO);
 
       // initialize depth estimation class
-      amd::cvml::DepthEstimation depth_estimation(context, de_sample.de_model_);
+      amd::cvml::DepthEstimation depth_estimation(context);
 
       // execute main sample application loop with the created feature
       de_sample.depth_estimation_ = &depth_estimation;

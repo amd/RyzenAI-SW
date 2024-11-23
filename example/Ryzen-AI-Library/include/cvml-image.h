@@ -10,7 +10,6 @@
 #include "cvml-types.h"
 
 namespace amd {
-
 namespace cvml {
 
 class Context;
@@ -38,10 +37,11 @@ class CVML_SDK_EXPORT Image {
     kYUV420p,
     kYUYV422,
     kP010,
+    kUNDEFINED = -1
   };
 
   /**
-   * An enumeration of image data types
+   * Defines supported image data types.
    */
   enum DataType {
     kUint8,
@@ -54,7 +54,7 @@ class CVML_SDK_EXPORT Image {
   };
 
   /**
-   * A valid set of flags used to describe the image
+   * A valid set of flags used to describe the image.
    */
   enum Flags {
     /**
@@ -83,19 +83,20 @@ class CVML_SDK_EXPORT Image {
   };
 
   /**
-   * Construct a CVML Image class object
-   * @param format: Image format
-   * @param data_type: Image data type
-   * @param width: The pixel width of the image
-   * @param height: The pixel height of the image
-   * @param buffer: (optional): A pointer to the image data.
+   * Initializing constructor for image objects.
+   *
+   * @param format Image format
+   * @param data_type Image data type
+   * @param width The pixel width of the image
+   * @param height The pixel height of the image
+   * @param buffer (optional) A pointer to the image data.
    * If buffer is null, the data will be allocated by the CVML context specified via Map()
    * If buffer not null:
    *   - If Flags::kDeviceMemoryImport is not specified, the buffer is expected to be a host buffer.
    *   - If Flags::kDeviceMemoryImport is specified, the buffer shall point to a HANDLE/fd
    *     to a device local memory (for example, vulkan device local memory).
-   * @param stride: (optional) if stride is not specified, image will be stored continuously.
-   * @param flags: (optional): bit mask of Flags specifying the valid usage of the image.
+   * @param stride (optional) if stride is not specified, image will be stored continuously.
+   * @param flags (optional): bit mask of Flags specifying the valid usage of the image.
    * See Image::Flags for more information. Defaults to both source and target.
    * If not specified, the default value is Flags::kSource | Flags::kTarget
    */
@@ -119,28 +120,34 @@ class CVML_SDK_EXPORT Image {
   [[deprecated("Use GetFormat()/GetDataType().")]] ImageType GetImageType() const;
 
   /**
-   * @deprecated
-   * @return address fo the CVML Image buffer
+   * Get CPU pointer to the buffer.
+   * If the Image object was constructed without an existing buffer pointer,
+   * a new CPU buffer is allocated to back the object and returned by this
+   * function.
+   * @return Underlying CPU pointer for the Image buffer object
    */
   uint8_t* GetBuffer() const;
 
   /**
-   * Map CVML Image buffer using the specified CVML context
-   * @param context: CVML context to be associated with the image
-   * @param flags: flags for the operation
-   * @return address of the mapped CVML Image buffer
+   * @deprecated
+   * Map CVML Image buffer using the specified CVML context.
+   * This function is deprecated. Use GetBuffer() instead.
+   *
+   * @param context CVML context to be associated with the image
+   * @param flags Flags for the operation
+   * @return Address of the mapped CVML Image buffer
    */
   uint8_t* Map(Context* context, uint32_t flags = 0);
 
   /**
    * Get the width of the image.
-   * @return: The width of the image.
+   * @return The width of the image.
    */
   uint32_t GetWidth() const;
 
   /**
    * Get the height of the image.
-   * @return: The height of the image.
+   * @return The height of the image.
    */
   uint32_t GetHeight() const;
 
@@ -151,6 +158,12 @@ class CVML_SDK_EXPORT Image {
   Format GetFormat() const;
 
   /**
+   * Get the stride of the image.
+   * @return The stride (bytes per row) that the image was created with.
+   */
+  uint32_t GetStride() const;
+
+  /**
    * Get data type for this image.
    * @return The data type that the image was created with.
    */
@@ -158,6 +171,7 @@ class CVML_SDK_EXPORT Image {
 
   /**
    * Get the usage flag bit mask for this image.
+   *
    * @return The bit mask of flags that the image was created with.
    */
   uint32_t GetFlags() const;
@@ -166,10 +180,11 @@ class CVML_SDK_EXPORT Image {
    * Export the image so that it can be imported in a different device context
    * (for example, vulkan context). To make an image exportable, the image must
    * be created with Flags::kExport in constructor.
-   * @param handle: pointer to a handle the image wil be exported to.
+   *
+   * @param handle Pointer to a handle the image wil be exported to.
    * For windows, the pointer shall point to windows HANDLE struct.
    * For linux, the pointer shall point to file desriptor (int).
-   * @return Returns true on success, false on failure.
+   * @return true on success, false on failure.
    */
   bool Export(void* handle);
 
@@ -180,7 +195,7 @@ class CVML_SDK_EXPORT Image {
   Image& operator=(Image&&) noexcept = delete;
 
   class Impl;
-  Impl* impl_;
+  Impl* impl_;  ///< Implementation of Image interface.
 };
 
 }  // namespace cvml

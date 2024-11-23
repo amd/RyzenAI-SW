@@ -1,11 +1,19 @@
 //
-// Copyright (C) 2021-2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 
 #ifndef EDGEML_FEATURES_COMMON_FRAMEWORK_PUBLIC_INCLUDE_CVML_API_COMMON_H_
 #define EDGEML_FEATURES_COMMON_FRAMEWORK_PUBLIC_INCLUDE_CVML_API_COMMON_H_
 
 #include <inttypes.h>
+
+#ifndef WIN32
+#define CVML_SDK_EXPORT
+#define CVML_SDK_NO_EXPORT
+#define CVML_SDK_DEPRECATED
+#define CVML_SDK_DEPRECATED_EXPORT
+#define CVML_SDK_DEPRECATED_NO_EXPORT
+#else
 
 #ifdef CVML_SDK_STATIC_DEFINE
 #define CVML_SDK_EXPORT
@@ -38,6 +46,8 @@
 #define CVML_SDK_DEPRECATED_NO_EXPORT CVML_SDK_NO_EXPORT CVML_SDK_DEPRECATED
 #endif
 
+#endif
+
 #define AMD_CVML_INTERFACE(TypeName)             \
  public:                                         \
   virtual ~TypeName();                           \
@@ -48,58 +58,5 @@
   TypeName& operator=(const TypeName&) = delete; \
   TypeName(TypeName&&) noexcept = delete;        \
   TypeName& operator=(TypeName&&) noexcept = delete;
-
-namespace amd {
-namespace cvml {
-
-/**
- * Encapsulates success or failure of an API call.
- */
-template <typename R, typename F>
-struct Result {
-  R result; /**< result of running or building models*/
-  F error;  /**< error code*/
-  /**
-   * Implementation of operator bool for Result
-   */
-  explicit operator bool() const { return error == F::kSuccess; }
-  /**
-   * Implementation of operator-> for Result
-   */
-  R operator->() const { return result; }
-  /**
-   * Implementation of operator() for Result
-   */
-  R operator()() const { return result; }
-};
-
-/**
- * Result output due to success
- * @param r result to be returned from an successful operation
- * @return result object of success
- */
-template <typename R, typename F>
-const Result<R, F> Success(const R& r) {
-  Result<R, F> ret;
-  ret.result = r;
-  ret.error = F::kSuccess;
-  return ret;
-}
-
-/**
- * Result output due to failure
- * @param f error code from an failed operation
- * @return result object of failure
- */
-template <typename R, typename F>
-const Result<R, F> Error(F f) {
-  Result<R, F> ret;
-  ret.result = {};
-  ret.error = f;
-  return ret;
-}
-
-}  // namespace cvml
-}  // namespace amd
 
 #endif  // EDGEML_FEATURES_COMMON_FRAMEWORK_PUBLIC_INCLUDE_CVML_API_COMMON_H_
