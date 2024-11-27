@@ -1,17 +1,14 @@
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1>Ryzen™ AI Tutorials</h1>
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Tutorial </h1>
     </td>
  </tr>
 </table>
 
 #  Yolov8 cpp flow on Ryzen AI
 
-
 - Version:      Ryzen AI Software v1.2 
 - Support:      AMD Ryzen™ 7940HS, 7840HS, 7640HS, 7840U, 7640U, 8640U, 8640HS, 8645H, 8840U, 8840HS, 8845H, 8945H with Windows 11 OS.
-- Last update:  29 Jul. 2024
-
 
 ## Table of Contents
 
@@ -126,6 +123,8 @@ To validate your setup, the following command will do the inference with single 
 
 Please modify the ***conda env path*** in the batch file before execution.
 
+Copy the ***vaip_config.json*** file to <RyzenAI-SW-Home>/tutorial/yolov8__cpp/bin from the Ryzen AI installation folder.
+
 ```
 # run_jpeg.bat DetectionModel_int.onnx sample_yolov8.jpg
 ```
@@ -159,7 +158,7 @@ camera.bat
 
 Possible options to run the yolov8 demo.
 
-```
+```bash
 # camera.bat -h
 
 Options:

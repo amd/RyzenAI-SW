@@ -1,3 +1,0 @@
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/camera_yolov8.exe
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/camera_yolov8_nx1x4.exe
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/bin/test_jpeg_yolov8.exe

@@ -1,7 +1,0 @@
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/CMakeFiles/INSTALL.dir
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/yolov8/CMakeFiles/camera_yolov8.dir
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/yolov8/CMakeFiles/camera_yolov8_nx1x4.dir
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/yolov8/CMakeFiles/test_jpeg_yolov8.dir
-C:/Users/fanz/Documents/Workspace/RyzenAI-SW/tutorial/yolov8_cpp/implement/build/yolov8/CMakeFiles/INSTALL.dir

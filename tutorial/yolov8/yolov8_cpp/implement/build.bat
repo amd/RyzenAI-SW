@@ -4,14 +4,14 @@ set CMAKE_PREFIX_PATH=%cd%\..
 :: --------------------------------------------------------------
 :: Please reset the env below to your Ryzen AI installation path
 :: --------------------------------------------------------------
-set RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\1.2.0
+set RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\1.3.0
 
 set ONNXRUNTIME_ROOTDIR=%RYZEN_AI_INSTALLATION_PATH%/onnxruntime
 
 :: --------------------------------------------------------------
 :: Please reset the env below to your opencv installation path
 :: --------------------------------------------------------------
-set OpenCV_DIR=C:\Users\fanz\Downloads\NPU\dependencies\opencv\build
+set OpenCV_DIR=<OPENCV_BUILD_DIRECTORY>
 
 set buildType=Release
 set src=%cd%

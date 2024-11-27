@@ -1,4 +1,9 @@
-# Hello World Example
+<table class="sphinxhide" width="100%">
+ <tr width="100%">
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Tutorial </h1>
+    </td>
+ </tr>
+</table>
 
 ## Introduction
 This example demonstrates how to port a simple machine learning model to run on the AMD Ryzen AI Neural Processing Unit (NPU). Leveraging the NPU for inference can accelerate performance while offloading work from the CPU and GPU.
@@ -17,9 +22,17 @@ This folder contains the following files:
 
 Before running this example, ensure that you have followed the Ryzen AI Installation instructions found [here](https://ryzenai.docs.amd.com/en/latest/inst.html) and have activated the conda environment created during installation.
 
+Create a clone of the Ryzen AI installation conda environment to add required python packages
+
+```python
+set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.3.0
+conda create --name hello_world_env --clone %RYZEN_AI_CONDA_ENV_NAME%
+conda activate hello_world_env
+```
+
 Install the Python dependencies:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 

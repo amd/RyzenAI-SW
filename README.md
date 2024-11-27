@@ -1,4 +1,9 @@
-# Ryzen™ AI Software 
+<table class="sphinxhide" width="100%">
+ <tr width="100%">
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Software </h1>
+    </td>
+ </tr>
+</table>
 
 ## Introduction
 
@@ -32,7 +37,7 @@ To run the demos and examples in this repository, please follow the instructions
 
 - [A Getting Started Tutorial with a fine-tuned ResNet model](tutorial/getting_started_resnet)
 - [Hello World Jupyter Notebook Tutorial](tutorial/hello_world)
-- [Getting Started ResNet50 Tutorial on iGPU](iGPU/getting_started)
+- [Getting Started ResNet50 Tutorial on iGPU](example/iGPU/getting_started)
 
 
 
@@ -43,32 +48,24 @@ To run the demos and examples in this repository, please follow the instructions
 
 ## Examples
 
-- [Run Vitis AI ONNX Quantizer example](example/onnx_quantizer)
-- [Real-time object detection with Yolov8](example/yolov8)
-- [Run multiple concurrent AI applications with ONNXRuntime](example/multi-model)
-- [Run Ryzen AI Library example](example/Ryzen-AI-Library)
-- [Run ONNX end-to-end examples with custom pre/post-processing nodes running on IPU](https://github.com/amd/RyzenAI-SW/tree/main/example/onnx-e2e)
+- [Real-time object detection with Yolov8](tutorial/yolov8)
 - [RAG LLM Sample](example/transformers/models/rag)
 
 
 ## Demos
 
-- [Cloud-to-Client demo on Ryzen AI](demo/cloud-to-client)
-- [Multiple model concurrency demo on Ryzen AI](demo/multi-model-exec)
 - [NPU-GPU Pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
 
 ## Other Tutorials
 
-- [End-to-end Object Detection](tutorial/yolov8_e2e)
-- [Quantization for Ryzen AI](tutorial/RyzenAI_quant_tutorial)
+- [End-to-end Object Detection](tutorial/yolov8)
+- [Quark Quantization](tutorial/quark_quantization)
 
 
 ## Benchmarking 
 
 - [ONNX Benchmarking utilities](onnx-benchmark)
 
-
-  
 
 ## Reference
 

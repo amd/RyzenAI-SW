@@ -1,5 +1,0 @@
-add_subdirectory(yolovx)
-add_subdirectory(resnet50)
-add_subdirectory(segmentation)
-add_subdirectory(mobile_net_v2)
-add_subdirectory(retinaface)

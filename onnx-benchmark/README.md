@@ -56,65 +56,48 @@ Windows release supporting PHOENIX and STRIX devices.
 Pre requisite: have [Anaconda](https://docs.anaconda.com/free/anaconda/install/index.html) or Miniconda installed. 
 It is advisable to create two separate Conda environments, one for the external GPU EP (if you have one) and another for the VitisAI EP. The following guideline allows for the creation of a Conda environment with  CPU and VitisAI Execution Providers only.
 
-Follow the instructions from the official [RyzenAI 1.2 Installation](https://ryzenai.docs.amd.com/en/latest/inst.html).
+Follow the instructions from the official [RyzenAI 1.3.0 Installation](https://ryzenai.docs.amd.com/en/latest/inst.html).
 
 In the command below, please change the Conda environment name and installation path if you have altered them from the default settings.
 
-When the installation is completed, assuming that the generated Conda environment is named `ryzen-ai-1.2.0`, the following packages are needed for the benchmark:
 
-Assumes Anaconda prompt for these instructions.
+When the installation is completed, assuming for example that 
+* the generated Conda environment is named `ryzen-ai-1.3.0`,
+* the installation is placed in `"C:\ProgramFiles\ryzen-ai\1.3.0"` (note: the space between `Program Files` has been removed as it generates errors in some cases)
+```
+set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.3.0
+set RYZEN_AI_INSTALLATION_PATH=C:\ProgramFiles\RyzenAI\1.3.0
+```
 
+add some needed packages:
 ```
-conda activate ryzen-ai-1.2.0
-pip install pandas pyarrow matplotlib psutil keyboard pyperclip importlib-metadata
+conda activate %RYZEN_AI_CONDA_ENV_NAME%
+python -m pip install -r requirements-win.txt
 ```
-Finally, set some permanent variables. Assuming that the installation path is `C:\Program Files\RyzenAI\1.2.0\`:
+Set some permanent variables:
 
 In case of STRIX device:
 ```
-conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\strix"
-conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\strix\AMD_AIE2P_Nx4_Overlay.xclbin"
+conda env config vars set XLNX_VART_FIRMWARE="%RYZEN_AI_INSTALLATION_PATH%"\voe-4.0-win_amd64\xclbins\strix\AMD_AIE2P_Nx4_Overlay.xclbin
 conda env config vars set XLNX_TARGET_NAME=AMD_AIE2P_Nx4_Overlay
-conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
+conda env config vars set XCLBINHOME="%RYZEN_AI_INSTALLATION_PATH%"\voe-4.0-win_amd64\xclbins\strix
+conda env config vars set VAIP_CONFIG_HOME="%RYZEN_AI_INSTALLATION_PATH%"\voe-4.0-win_amd64
+
 conda deactivate
-conda activate ryzen-ai-1.2.0
+conda activate %RYZEN_AI_CONDA_ENV_NAME%
 conda env config vars list
 ```
-
 In case of PHOENIX device:
 ```
-conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix"
-conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix\1x4.xclbin"
+conda env config vars set XLNX_VART_FIRMWARE="%RYZEN_AI_INSTALLATION_PATH%"\voe-4.0-win_amd64\xclbins\phoenix\1x4.xclbin
 conda env config vars set XLNX_TARGET_NAME=AMD_AIE2_Nx4_Overlay
-conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
+conda env config vars set XCLBINHOME="%RYZEN_AI_INSTALLATION_PATH%"\voe-4.0-win_amd64\xclbins\phoenix
+conda env config vars set VAIP_CONFIG_HOME="%RYZEN_AI_INSTALLATION_PATH%"\voe-4.0-win_amd64
+
 conda deactivate
-conda activate ryzen-ai-1.2.0
+conda activate %RYZEN_AI_CONDA_ENV_NAME%
 conda env config vars list
 ```
-
-Downgrade onnx to 1.16.1 to resolve an issue with the 1.16.2 release
-https://github.com/onnx/onnx/issues/6267 
-```
-pip install onnx==1.16.1
-```
-
-In case of PHOENIX device:
-```
-conda env config vars set XCLBINHOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix"
-conda env config vars set XLNX_VART_FIRMWARE="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64\xclbins\phoenix\1x4.xclbin"
-conda env config vars set XLNX_TARGET_NAME=AMD_AIE2_Nx4_Overlay
-conda env config vars set VAIP_CONFIG_HOME="C:\Program Files\RyzenAI\1.2.0\voe-4.0-win_amd64"
-conda deactivate
-conda activate ryzen-ai-1.2.0
-conda env config vars list
-```
-
-Downgrade onnx to 1.16.1 to resolve an issue with the 1.16.2 release
-https://github.com/onnx/onnx/issues/6267 
-```
-pip install onnx==1.16.1
-```
-
 
 ---
 
@@ -127,73 +110,57 @@ The syntax to call the [performance_benchmark.py](performance_benchmark.py) scri
 
 ```
 usage: performance_benchmark.py 
-[-h] 
-[--batchsize BATCHSIZE] 
-[--calib CALIB] 
-[--config CONFIG] 
-[--core PHOENIX: {PHX_1x4,PHX_4x4}, STRIX:{STX_1x4,STX_4x4}] 
-[--execution_provider {CPU,VitisAIEP}] 
-[--infinite {0,1}]
-[--instance_count INSTANCE_COUNT] 
-[--intra_op_num_threads INTRA_OP_NUM_THREADS] 
-[--json JSON] 
-[--log_csv LOG_CSV] 
-[--min_interval MIN_INTERVAL] 
-[--model MODEL] 
-[--no_inference {0,1}] 
-[--num NUM] 
-[--num_calib NUM_CALIB] 
-[--renew {0,1}] 
-[--timelimit TIMELIMIT]     
-[--threads THREADS] 
-[--verbose {0,1,2}] 
-[--warmup WARMUP]
+[-h] [--batchsize BATCHSIZE] [--calib CALIB][--config CONFIG] [--core {STX_1x4,STX_4x4}] 
+[--execution_provider {CPU,VitisAIEP,iGPU,dGPU}] [--infinite {0,1}][--instance_count INSTANCE_COUNT] [--intra_op_num_threads INTRA_OP_NUM_THREADS] [--json JSON] [--log_csv LOG_CSV] [--min_interval MIN_INTERVAL] [--model MODEL][--no_inference {0,1}] [--nhwc {0,1}] [--num NUM] [--num_calib NUM_CALIB] [--profile {0,1}] [--renew {0,1}] [--timelimit TIMELIMIT] [--threads THREADS][--update_opset {0,1}] [--verbose {0,1,2}] [--warmup WARMUP]
+
 ```
 
 where all the parameters are checked in the [utilities.py](utilities.py) script:
 
-
 ```
-  -h, --help            show this help message and exit
-  --batchsize BATCHSIZE, -b BATCHSIZE
-                        batch size: number of images processed at the same time by the model. VitisAIEP supports batchsize = 1. Default is 1
-  --calib CALIB         path to Imagenet database, used for quantization with calibration. Default= .\Imagenet al
-  --config CONFIG, -c CONFIG
-                        path to config json file. Default= <release>\vaip_config.json
-  --core PHOENIX: {PHX_1x4,PHX_4x4}, STRIX:{STX_1x4,STX_4x4}
-                        Which core to use on PHOENIX or STRIX silicon. Possible values are 1x4 and 4x4. Default=STX_1x4
-  --execution_provider {CPU,VitisAIEP}, -e {CPU,VitisAIEP}
-                        Execution Provider selection. Default=CPU
-  --infinite {0,1}      if 1: Executing an infinite loop, when combined with a time limit, enables the test to run for a specified duration. Default=1
-  --instance_count INSTANCE_COUNT, -i INSTANCE_COUNT
-                        This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always
-                        equally divided per each instance count. Default=1
-  --intra_op_num_threads INTRA_OP_NUM_THREADS
-                        In general this parameter controls the total number of INTRA threads to use to run the model. INTRA = parallelize computation inside each operator. Specific for VitisAI     
-                        EP: number of CPU threads enabled when an operator is resolved by the CPU. Affects the performances but also the CPU power consumption. For best performance: set
-                        intra_op_num_threads to 0: INTRA Threads Total = Number of physical CPU Cores. For best power efficiency: set intra_op_num_threads to smallest number (>0) that sustains     
-                        the close to optimal performance (likely 1 for most cases of models running on DPU). Default=1
-  --json JSON           Path to the file of parameters.
-  --log_csv LOG_CSV, -k LOG_CSV
-                        If this option is set to 1, measurement data will appended to a CSV file. Default=0
-  --min_interval MIN_INTERVAL
-                        Minimum time interval (s) for running inferences. Default=0
-  --model MODEL, -m MODEL
-                        Path to the ONNX model
-  --no_inference {0,1}  When set to 1 the benchmark runs without inference for power measurements baseline. Default=0
-  --num NUM, -n NUM     The number of images loaded into memory and subsequently sent to the model. Default=100
-  --num_calib NUM_CALIB
-                        The number of images for calibration. Default=10
-  --renew {0,1}, -r {0,1}
-                        if set to 1 cancel the cache and recompile the model. Set to 0 to keep the old compiled file. Default=1
-  --timelimit TIMELIMIT, -l TIMELIMIT
-                        When used in conjunction with the --infinite option, it represents the maximum duration of the experiment. The default value is set to 10 seconds.
-  --threads THREADS, -t THREADS
-                        CPU threads. Default=1
-  --verbose {0,1,2}, -v {0,1,2}
-                        0 (default): no debug messages, 1: few debug messages, 2: all debug messages
-  --warmup WARMUP, -w WARMUP
-                        Perform warmup runs, default = 40
+-h, --help            show this help message and exit
+--batchsize BATCHSIZE, -b BATCHSIZE
+  batch size: number of images processed at the same time by the model. VitisAIEP supports batchsize = 1. Default is 1
+--calib CALIB         path to Imagenet database, used for quantization with calibration. Default= .\Imagenet al
+--config CONFIG, -c CONFIG
+  path to config json file. Default= <release>\vaip_config.json
+--core {STX_1x4,STX_4x4}
+  Which core to use with STRIX silicon. Default=STX_1x4
+--execution_provider {CPU,VitisAIEP,iGPU,dGPU}, -e {CPU,VitisAIEP,iGPU,dGPU}
+  Execution Provider selection. Default=CPU
+--infinite {0,1}      if 1: Executing an infinite loop, when combined with a time limit, enables the test to run for a specified duration. Default=1
+--instance_count INSTANCE_COUNT, -i INSTANCE_COUNT
+  This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally  
+  divided per each instance count. Default=1
+--intra_op_num_threads INTRA_OP_NUM_THREADS
+  In general this parameter controls the total number of INTRA threads to use to run the model. INTRA = parallelize computation inside each operator. Specific for VitisAI EP:  
+  number of CPU threads enabled when an operator is resolved by the CPU. Affects the performances but also the CPU power consumption. For best performance: set
+  intra_op_num_threads to 0: INTRA Threads Total = Number of physical CPU Cores. For best power efficiency: set intra_op_num_threads to smallest number (>0) that sustains the  
+  close to optimal performance (likely 1 for most cases of models running on DPU). Default=1
+--json JSON           Path to the file of parameters.
+--log_csv LOG_CSV, -k LOG_CSV
+  If this option is set to 1, measurement data will appended to a CSV file. Default=0
+--min_interval MIN_INTERVAL
+  Minimum time interval (s) for running inferences. Default=0
+--model MODEL, -m MODEL
+  Path to the ONNX model
+--no_inference {0,1}  When set to 1 the benchmark runs without inference for power measurements baseline. Default=0
+--nhwc {0,1}          When set to 1 enables the input tensor conversion from NCHW to NHWC. Default=0
+--num NUM, -n NUM     The number of images loaded into memory and subsequently sent to the model. Default=100
+--num_calib NUM_CALIB
+  The number of images for calibration. Default=10
+--profile {0,1}       if this option is set to 1 the ONNX profiler is enabled. Default = 0
+--renew {0,1}, -r {0,1}
+  if set to 1 cancel the cache and recompile the model. Set to 0 to keep the old compiled file. Default=1
+--timelimit TIMELIMIT, -l TIMELIMIT
+  When used in conjunction with the --infinite option, it represents the maximum duration of the experiment. The default value is set to 10 seconds.
+--threads THREADS, -t THREADS
+  CPU threads. Default=1
+--update_opset {0,1}  if set to 1 and the model has opset < 11, automatically update the model opset to 17. Default=0
+--verbose {0,1,2}, -v {0,1,2}
+  0 (default): no debug messages, 1: few debug messages, 2: all debug messages
+--warmup WARMUP, -w WARMUP
+  Perform warmup runs, default = 40
 
 ```
 
@@ -206,9 +173,14 @@ Each measurement is automatically saved in the file `report_performance.json`, a
 ###  3.3.1 <a name='AGUIforperformancebenchmarking'></a>GUI for performance benchmarking
 This user-friendly graphical interface is designed to assist users in composing command lines and launching programs with all parameters preset. All option defaults are preloaded. The GUI adapts and automatically updates the available options based on the detected processor (PHOENIX or STRIX).
 ```
-python gui_pb.py
+python test.py
 ```
-![GUI](./doc/gui_public.png)
+![GUI](./doc/cpu.png)!
+
+![GUI](./doc/compact.png)!
+
+![GUI](./doc/complete.png)!
+
 
 
 ###  3.3.2 <a name='PerformancewithasingleinstanceusingaCPU'></a>Performance with a single instance using a CPU

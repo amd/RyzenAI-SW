@@ -1,0 +1,9 @@
+numpy
+onnx
+onnxruntime>=1.17.0,<1.19.0
+onnxruntime_extensions
+Pillow
+protobuf
+rich
+torchvision
+timm

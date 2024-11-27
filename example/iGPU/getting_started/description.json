@@ -1,0 +1,44 @@
+{
+    "run_dir": ".",
+    "owner": "TBD",
+    "setup": [
+      "conda activate ryzen-ai-1.2.0",
+      "python -m pip install -r requirements.txt",
+      "python -m olive.workflows.run --config resnet50_config.json --setup",
+      "python -m olive.workflows.run --config resnet50_config.json",
+      "git clone https://github.com/opencv/opencv.git -b 4.6.0",
+      "cd opencv",
+      "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_CONFIGURATION_TYPES=Release -A x64 -T host=x64 -G \"Visual Studio 17 2022\" \"-DCMAKE_INSTALL_PREFIX=C:\\opencv\" \"-DCMAKE_PREFIX_PATH=C:\\opencv\" -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_WITH_STATIC_CRT=OFF -B build",
+      "cmake --build build --config Release",
+      "cmake --install build --config Release"
+    ],
+    "test_steps": [
+      {
+        "name": "igpu-getting-started-python",
+        "command": "python predict.py",
+        "run_type": [
+          "pr",
+          "daily"
+        ],
+        "devices": [
+          "phoenix",
+          "hpt",
+          "strix"
+        ]
+      },
+      {
+        "name": "igpu-getting-started-cpp",
+        "command": "cd cpp && compile.bat opencv\\build && run.bat",
+        "run_type": [
+          "pr",
+          "daily"
+        ],
+        "devices": [
+          "phoenix",
+          "hpt",
+          "strix"
+        ]
+      }
+    ],
+    "cleanup": []
+  }

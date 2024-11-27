@@ -10,7 +10,7 @@ from PIL import Image
 from pathlib import Path
 
 
-quantized_model_path = r'./models/resnet.qdq.U8S8.onnx'
+quantized_model_path = r'./models/resnet_quantized.onnx'
 model = onnx.load(quantized_model_path)
 
 
@@ -22,7 +22,7 @@ opt = parser.parse_args()
 providers = ['CPUExecutionProvider']
 provider_options = [{}]
 
-
+#NPU Setup
 if opt.ep == 'npu':
    providers = ['VitisAIExecutionProvider']
    cache_dir = Path(__file__).parent.resolve()

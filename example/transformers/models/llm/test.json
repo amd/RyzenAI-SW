@@ -1,0 +1,183 @@
+{
+  "owner": "sumitn",
+  "setup": [],
+  "test_steps": [
+    {
+      "name": "phi-2_decode-pergrp",
+      "command": "python run_awq.py --model_name microsoft/phi-2 --task decode --algorithm pergrp --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "phi-3_benchmark-pergrp",
+      "command": "python run_awq.py --model_name microsoft/Phi-3-mini-4k-instruct --task benchmark --algorithm pergrp --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "opt-1.3b-benchmark",
+      "command": "python run_awq.py --model_name facebook/opt-1.3b --task benchmark --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "opt-125m-benchmark",
+      "command": "python run_awq.py --model_name facebook/opt-125m  --target aie --task benchmark",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "opt-2.7b-benchmark",
+      "command": "python run_awq.py --model_name facebook/opt-2.7b  --target aie --task benchmark",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "opt-6.7b-benchmark",
+      "command": "python run_awq.py --model_name facebook/opt-6.7b  --target aie --task benchmark",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "llama-2-7b-benchmark-awqplus",
+      "command": "python run_awq.py --model_name llama-2-7b --task benchmark --algorithm awqplus --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "llama-2-7b-benchmark-awq",
+      "command": "python run_awq.py --model_name llama-2-7b --task benchmark --algorithm awq --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "llama-2-7b-chat-benchmark-awqplus",
+      "command": "python run_awq.py --model_name llama-2-7b-chat --task benchmark --algorithm awqplus --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "llama-2-7b-chat-benchmark-awq",
+      "command": "python run_awq.py --model_name llama-2-7b-chat --task benchmark --algorithm awq --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "Qwen1.5-7B-Chat-awq",
+      "command": "python run_awq.py --model_name Qwen/Qwen1.5-7B-Chat --algorithm awq --task benchmark --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "Qwen1.5-7B-Chat-awqplus",
+      "command": "python run_awq.py --model_name Qwen/Qwen1.5-7B-Chat --algorithm awqplus --task benchmark --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "Meta-Llama-3-8B-pergrp",
+      "command": "python run_awq.py --model_name meta-llama/Meta-Llama-3-8B --algorithm pergrp --task benchmark --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "Meta-Llama-3.1-8B-pergrp",
+      "command": "python run_awq.py --task decode --model_name NousResearch/Meta-Llama-3.1-8B --algorithm pergrp --group_size 32 --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "Meta-Llama-3.2-1B-pergrp",
+      "command": "python run_awq.py --model_name nltpt/Llama-3.2-1B --task decode --algorithm pergrp --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    },
+    {
+      "name": "Meta-Llama-3.2-3B-pergrp",
+      "command": "python run_awq.py --model_name nltpt/Llama-3.2-3B --task decode --algorithm pergrp --target aie",
+      "run_type": [
+        "daily"
+      ],
+      "devices": [
+        "phoenix",
+        "strix"
+      ]
+    }
+  ],
+  "cleanup": []
+}

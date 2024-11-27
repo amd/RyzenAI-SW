@@ -9,7 +9,8 @@ import onnx
 import onnxruntime
 from onnxruntime.quantization import CalibrationDataReader, QuantType, QuantFormat, CalibrationMethod, quantize_static
 
-import vai_q_onnx
+from quark.onnx.quantization.config import (Config, get_default_config)
+from quark.onnx import ModelQuantizer
 
 
 class CIFAR10DataSet:
@@ -75,7 +76,7 @@ def main():
     input_model_path = "models/resnet_trained_for_cifar10.onnx"
 
     # `output_model_path` is the path where the quantized model will be saved.
-    output_model_path = "models/resnet.qdq.U8S8.onnx"
+    output_model_path = "models/resnet_quantized.onnx"
 
     # `calibration_dataset_path` is the path to the dataset used for calibration during quantization.
     calibration_dataset_path = "data/"
@@ -83,29 +84,21 @@ def main():
     # `dr` (Data Reader) is an instance of ResNetDataReader, which is a utility class that 
     # reads the calibration dataset and prepares it for the quantization process.
     dr = resnet_calibration_reader(calibration_dataset_path)
+    
+    
+    #Quantization with Quark
+    
+    # Get quantization configuration
+    quant_config = get_default_config("XINT8")
+    config = Config(global_quant_config=quant_config)
+    print(f"The configuration for quantization is {config}")
 
-    # `quantize_static` is a function that applies static quantization to the model.
-    # The parameters of this function are:
-    # - `input_model_path`: the path to the original, unquantized model.
-    # - `output_model_path`: the path where the quantized model will be saved.
-    # - `dr`: an instance of a data reader utility, which provides data for model calibration.
-    # - `quant_format`: the format of quantization operators. Need to set to QDQ or QOperator.
-    # - `activation_type`: the data type of activation tensors after quantization. In this case, it's QUInt8 (Quantized Int 8).
-    # - `weight_type`: the data type of weight tensors after quantization. In this case, it's QInt8 (Quantized Int 8).
-    # - `enable_dpu`: (Boolean) determines whether to generate a quantized model that is suitable for the DPU. If set to True, the quantization process will create a model that is optimized for DPU computations.
-    # - `extra_options`: (Dict or None) Dictionary of additional options that can be passed to the quantization process. In this example, ``ActivationSymmetric`` is set to True i.e., calibration data for activations is symmetrized. 
-    vai_q_onnx.quantize_static(
-        input_model_path,
-        output_model_path,
-        dr,
-        quant_format=vai_q_onnx.QuantFormat.QDQ,
-        calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
-        activation_type=vai_q_onnx.QuantType.QUInt8,
-        weight_type=vai_q_onnx.QuantType.QInt8,
-        enable_dpu=True, 
-        extra_options={'ActivationSymmetric': True} 
-    )
-    print('Calibrated and quantized model saved at:', output_model_path)
+    # Create an ONNX quantizer
+    quantizer = ModelQuantizer(config)
+
+    # Quantize the ONNX model
+    quantizer.quantize_model(input_model_path, output_model_path, dr)
+    
 
 if __name__ == '__main__':
     main()

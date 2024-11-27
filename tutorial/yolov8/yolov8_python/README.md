@@ -7,20 +7,12 @@ Author: Fan Zhang, AMD-Xilinx
 
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> AIG - Technical Marketing </h1>
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Tutorial </h1>
     </td>
  </tr>
 </table>
 
 # Yolov8 Python Implementation with Webcam Input
-
-
-## Current Status
-
-- Last update:  29 July 2024
-- Author:       Fan Zhang
-- Release:      NPU driver (32.0.201.204), VOE ryzen-ai-1.2
-- Device:       (RyzenAI) HPT
 
 ## Contents
 
@@ -50,7 +42,7 @@ Before running this example, ensure that you have followed the Ryzen AI Installa
 
 >**:pushpin: NOTE:** If you can't find the kernel from the top-right dropdown menu, please exit the notebook and install it as below:
 
-```
+```python
 python -m ipykernel install --user --name [CONDA_ENV_NAME]
 ```
 

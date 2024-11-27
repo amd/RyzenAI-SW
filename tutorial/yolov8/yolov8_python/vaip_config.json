@@ -5,6 +5,97 @@
             "plugin": "vaip-pass_init"
         },
         {
+            "name": "fuse_resize_norm",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_resize_norm",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_softmax",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_softmax",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_topk",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_topk",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_decode_filter_boxes",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_decode_filter_boxes",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "vaip_pass_norm_k",
+            "plugin": "vaip-pass_norm_k",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "fuse_NMS",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": true,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_NMS",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_dynamic_dispatch",
+            "plugin": "vaip-pass_level1_dd",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "dd_compiler_pass_transformation",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "dd_compiler_pass_generation",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch_gen",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "dd_compiler_pass_transformation_2",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch_2",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "dd_compiler_pass_generation_2",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch_gen_2",
+                            "methodName": "rules"
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "name": "fuse_DPU",
             "plugin": "vaip-pass_level1_dpu",
             "passDpuParam": {
@@ -158,16 +249,771 @@
                 },
                 "minimum_num_of_conv": 2
             }
+        },
+        {
+            "name": "fuse_DPU_MHA",
+            "plugin": "vaip-pass_level1_dpu",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "convert_MHA",
+                        "plugin": "vaip-pass_convert_MHA",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_ending_blacklist_ops_to_unknown_op",
+                        "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+                        "disabled": false
+                    },
+                    {
+                        "name": "dynamic_input_batch",
+                        "plugin": "vaip-pass_dynamic_input_batch"
+                    },
+                    {
+                        "name": "create_const_op",
+                        "plugin": "vaip-pass_create_const_op"
+                    },
+                    {
+                        "name": "convert_split_to_xir",
+                        "plugin": "vaip-pass_convert_split_to_xir_op"
+                    },
+                    {
+                        "name": "to_xir",
+                        "plugin": "vaip-pass_to_xir_ops"
+                    },
+                    {
+                        "name": "convert_pad",
+                        "plugin": "vaip-pass_convert_pad",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_in_to_gn",
+                        "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "remove_extra_q_dq",
+                        "plugin": "vaip-pass_remove_extra_q_dq"
+                    },
+                    {
+                        "name": "merge_add_into_conv_bias",
+                        "plugin": "vaip-pass_merge_add_into_conv_bias"
+                    },
+                    {
+                        "name": "merge_fix",
+                        "plugin": "vaip-pass_merge_fix",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "layoutransform",
+                        "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+                    },
+                    {
+                        "name": "gc_after_layout_transform",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "fuse_transpose",
+                        "plugin": "vaip-pass_fuse_transpose",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "gc_after_fuse_transpose",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "remove_identity",
+                        "plugin": "vaip-pass_remove_identity",
+                        "logVerbosity": 1
+                    },
+                    {
+                        "name": "add_fix_after_const",
+                        "plugin": "vaip-pass_const_add_fix"
+                    },
+                    {
+                        "name": "const_fold_batchnorm_to_scale",
+                        "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+                    },
+                    {
+                        "name": "const_fold_transpose",
+                        "plugin": "vaip-pass_const_fold_transpose"
+                    },
+                    {
+                        "name": "merge_pad",
+                        "plugin": "vaip-pass_merge_pad"
+                    },
+                    {
+                        "name": "merge_hard_sigmoid",
+                        "plugin": "vaip-pass_merge_hard_sigmoid"
+                    },
+                    {
+                        "name": "merge_mul",
+                        "plugin": "vaip-pass_merge_mul",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "merge_consecutive_fix",
+                        "plugin": "vaip-pass_merge_consecutive_fix",
+                        "disabled": true,
+                        "enableLog": true,
+                        "logVerbosity": 1
+                    },
+                    {
+                        "_comment": "test case 110",
+                        "name": "convert_softmax_to_hard_softmax",
+                        "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+                        "disabled": true
+                    },
+                    {
+                        "name": "merge_fix_fix_transpose",
+                        "plugin": "vaip-pass_merge_fix_fix_transpose",
+                        "enableGc": true,
+                        "disabled": true
+                    },
+                    {
+                        "name": "final_gc",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    }
+                ],
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "dump_subgraph_ops": {
+                        "boolValue": false
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "disable_std_quant": {
+                        "boolValue": false
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    }
+                },
+                "minimum_num_of_conv": 2,
+                "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin"
+            }
+        },
+        {
+            "name": "vaiml_partition",
+            "plugin": "vaip-pass_vaiml_partition",
+            "vaiml_config": {
+                "vaiml_model_path": "vaiml_par_0",
+                "max_num_partitions": 200,
+                "device_name": "phx",
+                "debug": true
+            }
+        },
+        {
+            "name": "vaip_pass_dd_merge_dqcastgather",
+            "plugin": "vaip-pass_dd_merge_dqcastgather",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_qop",
+            "plugin": "vaip-pass_dd_merge_qop",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_dqop",
+            "plugin": "vaip-pass_dd_merge_dqop",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_qop_onnx",
+            "plugin": "vaip-pass_dd_merge_qop_onnx",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_dqop_onnx",
+            "plugin": "vaip-pass_dd_merge_dqop_onnx",
+            "enable_gc": true,
+            "disabled": false
+        }
+    ],
+    "mepTable": [
+        {
+            "modelName": "PSA",
+            "md5sumOnDisk": "356f009d5cb141881fe4c27d09b1f43b",
+            "md5sumInMemory": "ca42121518cca903f07262b8f2751a42",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_A",
+            "md5sumOnDisk": "17cbedd0695d097f1226797bee711710",
+            "md5sumInMemory": "74ded15705d2c958177604029a20a208",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_B",
+            "md5sumOnDisk": "ee58a2f6e0bbd99e9921731be4b0a15c",
+            "md5sumInMemory": "3ee8e6a8f08912a9a92a260b68447bb2",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_0",
+            "md5sumOnDisk": "da35c43876d1b21835a08320688a69d2",
+            "md5sumInMemory": "452a80b01d29ebc42559d59b42de03ca",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_1",
+            "md5sumOnDisk": "da35c43876d1b21835a08320688a69d2",
+            "md5sumInMemory": "4853206b53d2cae2a40aad448d73370c",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_2",
+            "md5sumOnDisk": "0abe0b0bbc8314b482f0737da3d831ad",
+            "md5sumInMemory": "ee7f757248851d28061617f87043805f",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_3",
+            "md5sumOnDisk": "a87968c033291ab04069feaafb5fd7df",
+            "md5sumInMemory": "19ef4a7ffa9c9ab3871ea3142db4a5db",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_4",
+            "md5sumOnDisk": "ab9c6f1bb23d04765708622f5e48c0da",
+            "md5sumInMemory": "4c54574f384ddf99ed01b09bd249ca8b",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "mmjbka",
+            "md5sumOnDisk": "da35c43876d1b21835a08320688a69d2",
+            "md5sumInMemory": "352de20cfd0a050f6083eb661237c6cc",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "mmjbka_MSFT",
+            "md5sumOnDisk": "F42BC6AC686C72B8CAA38DE28DFAA553",
+            "md5sumInMemory": "F42BC6AC686C72B8CAA38DE28DFAA553",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSA_1",
+            "md5sumOnDisk": "356f009d5cb141881fe4c27d09b1f43b",
+            "md5sumInMemory": "ee9a5fc4b79342b98049c4826983f18e",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "mmjbka_1",
+            "md5sumOnDisk": "da35c43876d1b21835a08320688a69d2",
+            "md5sumInMemory": "27b186167f3a3957b32141846bcf81f8",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSA_1.0.1_nchw",
+            "md5sumOnDisk": "356f009d5cb141881fe4c27d09b1f43b",
+            "md5sumInMemory": "bbea0a61a3df92f73df644d39bab7046",
+            "md5sumInMemoryWithIo": "92b1357557fa7ceaa73a48661bbe1ef8",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSA6.3",
+            "md5sumOnDisk": "b5e9f87a18d925e43f6e74ef34a299c3",
+            "md5sumInMemory": "bbea0a61a3df92f73df644d39bab7046",
+            "md5sumInMemoryWithIo": "92b1357557fa7ceaa73a48661bbe1ef8",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_A_1.0.1_nchw",
+            "md5sumOnDisk": "17cbedd0695d097f1226797bee711710",
+            "md5sumInMemory": "6cefe9e4244aa0f3f8dbf21d43789e86",
+            "md5sumInMemoryWithIo": "e3497d38e57aa72df6aec42833b784a8",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_B_1.0.1_nchw",
+            "md5sumOnDisk": "ee58a2f6e0bbd99e9921731be4b0a15c",
+            "md5sumInMemory": "48f349c792e8e2a7562e092968750947",
+            "md5sumInMemoryWithIo": "dc6c1b8774c65f20fcbaaae86cd05f8c",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "mmjbka_1.0.1_nchw",
+            "md5sumOnDisk": "da35c43876d1b21835a08320688a69d2",
+            "md5sumInMemory": "35527caf46c38e60ad74204a1d966847",
+            "md5sumInMemoryWithIo": "4b0f1adedf7f6e7f74b22dd8d1fb22fb",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_A_nhwc",
+            "md5sumOnDisk": "777bd69cc9e12b6e7868277e639f97e2",
+            "md5sumInMemory": "3a9abd050f70b09de3546f1d61e43c74",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_A_1.1.0_nhwc",
+            "md5sumOnDisk": "b9eb351ca7af65a2a43f99f41dda7dc2",
+            "md5sumInMemory": "e3f795258afe1d046f56fad0f8574864",
+            "md5sumInMemoryWithIo": "3af1b536b95d9eebe3190294e311f57a",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSO0_B_1.1.0_nhwc",
+            "md5sumOnDisk": "fa6d63ec0a7674cb9464020802e5f3ca",
+            "md5sumInMemory": "862aea9de93c2e711ec842f942d9b8b1",
+            "md5sumInMemoryWithIo": "b54766ff357e41c4ca538d017e126385",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "mmjbka_1.1.0_nhwc",
+            "md5sumOnDisk": "3a56581e403def2548e50c77808c4174",
+            "md5sumInMemory": "377a5a02ffbba68bc1fdd25b54f0f18b",
+            "md5sumInMemoryWithIo": "ac4f50ea2c10c863db4bfbd6ca024f6e",
+            "target": "RyzenAI_shell_config_1"
+        },
+        {
+            "modelName": "PSF",
+            "md5sumOnDisk": "d38670a70c72561cb3f718125829b5fa",
+            "md5sumInMemory": "2fbcab29de9dd547562c46319a225a9c",
+            "md5sumInMemoryWithIo": "5c07dc0856549dabc4d092763e1ce5cf",
+            "xclbin": "4x2_psf_model_a8w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSFv1.1",
+            "md5sumOnDisk": "c711cb8798e562011383bae4c5c91ce1",
+            "md5sumInMemory": "a394ffc0e58a8e841f5ae415c15a63e8",
+            "md5sumInMemoryWithIo": "037fca5fd1b0c7b195ef410c3e9b88df",
+            "xclbin": "4x2_psf_v1.1_model_a8w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSH",
+            "md5sumOnDisk": "e5fd1d2783dca2bdc9f40e4941e2a9b9",
+            "md5sumInMemory": "62099384a6af2956912b2d31a99be483",
+            "md5sumInMemoryWithIo": "b3a1041f9de14dae3b52e711d8de0037",
+            "xclbin": "4x2_psh_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSHv1.2",
+            "md5sumOnDisk": "08678ce4a4eab9eaa2cd8b3dcbdf5697",
+            "md5sumInMemory": "62099384a6af2956912b2d31a99be483",
+            "md5sumInMemoryWithIo": "b3a1041f9de14dae3b52e711d8de0037",
+            "xclbin": "4x2_psh_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mxpzi",
+            "md5sumOnDisk": "15d1515c86b40874ac954869798d0e77",
+            "md5sumInMemory": "546b8eca24af15302c647edb3e575d54",
+            "md5sumInMemoryWithIo": "9f9d91808166382b325459dfb88494c0",
+            "xclbin": "4x2_psj_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSIv1.1",
+            "md5sumOnDisk": "72651ec6ae2fe552dd0604527d73c1e5",
+            "md5sumInMemory": "0e3ff9de7ff3d7eddc7712316ca7ab11",
+            "md5sumInMemoryWithIo": "5a4479883ad7e7724442977a88a257e0",
+            "xclbin": "4x2_psi_integrated_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSIv1.2",
+            "md5sumOnDisk": "91aa788cdf570ebd5434bd7b8937feb2",
+            "md5sumInMemory": "6ed69ec59ba231b919877d12f81cabd3",
+            "xclbin": "4x2_psi_integrated_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSIv1.3",
+            "md5sumOnDisk": "028f6808733628e822b86c12d38df4b6",
+            "md5sumInMemory": "7af92f5ac4aefd28d0fd84a836322f5e",
+            "md5sumInMemoryWithIo": "2dc156817e5201dc51c39e821b9d5ec7",
+            "xclbin": "4x2_psi_integrated_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PSIv1.4",
+            "md5sumOnDisk": "96fefa03d63137796293448db34d78e4",
+            "md5sumInMemory": "7af92f5ac4aefd28d0fd84a836322f5e",
+            "md5sumInMemoryWithIo": "8f4fbd7e1475b7b470e77449211455f2",
+            "xclbin": "4x2_psi_integrated_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mtea0a",
+            "md5sumOnDisk": "4e17c61308b9170dda55586dee6c0751",
+            "md5sumInMemory": "58eb51eccd44a084b185159b67e2c1b6",
+            "md5sumInMemoryWithIo": "50c2fb23e40a0617f58ebcedbbfac359",
+            "xclbin": "4x2_psq_model_a8w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "m7h4xjg",
+            "md5sumOnDisk": "4e485de54588d95209560c0a29049b68",
+            "md5sumInMemory": "4c121cc7cd35dc04c30f46a94b2baf7a",
+            "md5sumInMemoryWithIo": "3223d1f84b9dd740f3a829ad9680469f",
+            "xclbin": "4x2_psq2_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-320",
+            "md5sumOnDisk": "4a6a777fc11158c1ca70ebdd6caae3fe",
+            "md5sumInMemory": "1bd58439b3a31d4e6edce0689e552ccf",
+            "md5sumInMemoryWithIo": "eb0cd98491be811c3acdf79d38981cd6",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-640",
+            "md5sumOnDisk": "67927fb103d7fcdd3eeca44475eac6df",
+            "md5sumInMemory": "9313ce55730e051e4d32eb4f9986f1f2",
+            "md5sumInMemoryWithIo": "3bea2158bc5ec0d4ee3954cd73de3986",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-1280",
+            "md5sumOnDisk": "dc4cfca432a4e09eb4275b55a485b126",
+            "md5sumInMemory": "1cf0b88f93d4d5d458e408abc0a4cf5d",
+            "md5sumInMemoryWithIo": "4abc5e4f8292dbe10da0f9eb12b0d1b4",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-2560",
+            "md5sumOnDisk": "de50b0722e512613188a39429e70ead7",
+            "md5sumInMemory": "5dc5872cd47b9da7f64b6855b1035595",
+            "md5sumInMemoryWithIo": "8e5b703bb200bc7d7ea7a415e3139385",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-320-v1.1",
+            "md5sumOnDisk": "e6b7d1656f92ca990c7ec94f8b17813d",
+            "md5sumInMemory": "d0d6cbd1d89f60347ab6c9453e35507e",
+            "md5sumInMemoryWithIo": "eb0cd98491be811c3acdf79d38981cd6",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-640-v1.1",
+            "md5sumOnDisk": "7d789256f2d568367974b7b74fe9de71",
+            "md5sumInMemory": "be1539116a956da222b7b678a369fbf6",
+            "md5sumInMemoryWithIo": "3bea2158bc5ec0d4ee3954cd73de3986",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-1280-v1.1",
+            "md5sumOnDisk": "b815ee6d465f51de249c4048aa2515cb",
+            "md5sumInMemory": "4333bedcd96799e4bc2fba9ec4746617",
+            "md5sumInMemoryWithIo": "4abc5e4f8292dbe10da0f9eb12b0d1b4",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mswbjvw-2560-v1.1",
+            "md5sumOnDisk": "5d0c439244e9cf46d45d7ce249c0a3e7",
+            "md5sumInMemory": "577399f309357fc62e307c38945ce770",
+            "md5sumInMemoryWithIo": "8e5b703bb200bc7d7ea7a415e3139385",
+            "xclbin": "4x2_pso2_model_a16w16_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "mzdk5",
+            "md5sumOnDisk": "0e94597db08d8e0fcd0e867b3ce2c686",
+            "md5sumInMemory": "f3b3206d1e984ce729cec3533287227e",
+            "md5sumInMemoryWithIo": "d61aa9b5c7af655c10b97533814c2244",
+            "xclbin": "4x4_psr_model_a16w8_qdq.xclbin",
+            "target": "RyzenAI_transformer_config_2"
+        },
+        {
+            "modelName": "PST_v1.1",
+            "md5sumOnDisk": "92358bd7e8a68ea9c6e9d327423069e3",
+            "md5sumInMemory": "67d78f48fd05ce03e3efb69212243d30",
+            "md5sumInMemoryWithIo": "a807ae1f05fc42e16d57d59186a414b4",
+            "target": "RyzenAI_transformer_cxx_pss_pst",
+            "modelCategory": "PST"
+        },
+        {
+            "modelName": "PSS_v1.1",
+            "md5sumOnDisk": "63a4651d48b4281ddf6a6a33ebad5fc7",
+            "md5sumInMemory": "60142dfa473572b34fbf476c37ebfa1b",
+            "md5sumInMemoryWithIo": "3c875c1144bcfa0dfd788b05116d589b",
+            "target": "RyzenAI_transformer_cxx_pss_pst",
+            "modelCategory": "PSS"
+        },
+        {
+            "modelName": "PSS",
+            "md5sumOnDisk": "5ad2857510b5646376f3f9348591b83e",
+            "md5sumInMemory": "03daf292839461b5dd16b97c66dee37d",
+            "md5sumInMemoryWithIo": "d7a01430b6509651f0293c0d5e265a2a",
+            "target": "RyzenAI_xcompiler_and_dd_config"
+        },
+        {
+            "modelName": "PST",
+            "md5sumOnDisk": "c8c2ab668b56daf7d2228e53c9a4f0db",
+            "md5sumInMemory": "62d1f9a68e9a1af013852ed3d1564d02",
+            "md5sumInMemoryWithIo": "4413357faa7c2f1ce6036f869f4d7e14",
+            "target": "RyzenAI_xcompiler_and_dd_config"
+        },
+        {
+            "modelName": "PSS_v1.0",
+            "md5sumOnDisk": "fbf3fd6e6bab35efba46b7e9060f2d62",
+            "md5sumInMemory": "03daf292839461b5dd16b97c66dee37d",
+            "md5sumInMemoryWithIo": "d7a01430b6509651f0293c0d5e265a2a",
+            "target": "RyzenAI_vision_config_3_mha"
+        },
+        {
+            "modelName": "PSS_nhwc",
+            "md5sumOnDisk": "1d46fbe6a09e79b36e21d985d937df3b",
+            "md5sumInMemory": "ccf646813e6e91ff09f9d4216047a6ec",
+            "md5sumInMemoryWithIo": "3c875c1144bcfa0dfd788b05116d589b",
+            "target": "RyzenAI_xcompiler_and_dd_config"
+        },
+        {
+            "modelName": "PST_nhwc",
+            "md5sumOnDisk": "02c8e157824d0c75289f2333b307a5a9",
+            "md5sumInMemory": "087423cf961c2df293d363abd712d5d7",
+            "md5sumInMemoryWithIo": "6512311dac77f235e3ef637287389419",
+            "target": "RyzenAI_xcompiler_and_dd_config"
+        },
+        {
+            "modelName": "GT_v1.2",
+            "md5sumOnDisk": "4daa45a72a36d731279b7c01e4545637",
+            "md5sumInMemory": "0fd6cc09fe78a6a5e4fb697c0e8670e9",
+            "target": "VAIML_config_0",
+            "xclbin": "4x4_gt_ht_00.xclbin"
+        },
+        {
+            "modelName": "GT_v1.3",
+            "md5sumOnDisk": "d799de8b1e1fa572daad06d7a49a7afe",
+            "md5sumInMemory": "97bcaa432a2c634a707dfc23bf222032",
+            "target": "VAIML_config_0",
+            "xclbin": "4x4_gt_ht_01.xclbin"
+        },
+        {
+            "modelName": "HT_v1.2",
+            "md5sumOnDisk": "01fa81ebc4c70ea06c2f4d28c16af389",
+            "md5sumInMemory": "6809517bbd0a7b44acc31942d410ca3a",
+            "md5sumInMemoryWithIo": "9731a32b64df8abdead6b6f370a293fc",
+            "target": "VAIML_config_0",
+            "xclbin": "4x4_gt_ht_01.xclbin"
         }
     ],
     "target": "RyzenAI_vision_config_1",
     "targets": [
+        {
+            "name": "VAIML_config_0",
+            "pass": [
+                "init",
+                "vaiml_partition",
+                "vaip_pass_dd_merge_dqcastgather",
+                "vaip_pass_dd_merge_qop",
+                "vaip_pass_dd_merge_dqop",
+                "vaip_pass_dd_merge_qop_onnx",
+                "vaip_pass_dd_merge_dqop_onnx"
+            ]
+        },
         {
             "name": "RyzenAI_vision_config_1",
             "pass": [
                 "init",
                 "fuse_DPU"
             ]
+        },
+        {
+            "name": "RyzenAI_shell_config_1",
+            "xclbin": "AMD_AIE2P_2x4x1_Overlay.xclbin",
+            "share_hw_context": true,
+            "pass": [
+                "init",
+                "fuse_DPU",
+                "vaip_pass_dd_merge_qop",
+                "vaip_pass_dd_merge_dqop",
+                "vaip_pass_dd_merge_qop_onnx",
+                "vaip_pass_dd_merge_dqop_onnx"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 3
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "enable_weights_prefetch": {
+                        "boolValue": true
+                    },
+                    "enable_cost_model_tiling": {
+                        "boolValue": true
+                    },
+                    "enable_mergesync": {
+                        "boolValue": true
+                    }
+                }
+            },
+            "graph_engine_qos_priority": 640
+        },
+        {
+            "name": "RyzenAI_vision_config_2",
+            "xclbin": "1x4.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 16
+                    },
+                    "opt_level": {
+                        "uintValue": 0
+                    },
+                    "dump_subgraph_ops": {
+                        "boolValue": false
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "disable_std_quant": {
+                        "boolValue": false
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_vision_config_3",
+            "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_vision_config_3_mha",
+            "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU_MHA"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_transformer_config_2",
+            "xclbin": "4x2_psf_model_a8w8_qdq.xclbin",
+            "pass": [
+                "init",
+                "fuse_dynamic_dispatch"
+            ]
+        },
+        {
+            "name": "RyzenAI_xcompiler_and_dd_config",
+            "xclbin": "2x4x2_pss_pst_model_mha_qdq.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU_MHA",
+                "fuse_dynamic_dispatch"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_transformer_cxx_pss_pst",
+            "xclbin": "2x4x2_pss_pst_4x2_psq_model_qdq.xclbin",
+            "share_hw_context": true,
+            "pass": [
+                "init",
+                "fuse_DPU_MHA",
+                "fuse_dynamic_dispatch_pss_pst"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    }
+                }
+            }
         }
-    ]
+    ],
+    "enable_cache_file_io_in_mem": true
 }

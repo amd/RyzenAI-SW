@@ -1,5 +1,4 @@
-# release 18 
-# STRIX and PHOENIX supported
+# release 19
 
 import pandas as pd
 import numpy as np
@@ -20,12 +19,14 @@ import csv
 from pathlib import Path
 import inspect
 import gc
+import textwrap
 
 from onnxruntime.quantization.calibrate import CalibrationDataReader
 import onnx
 from onnxruntime.quantization import CalibrationDataReader, QuantType, QuantFormat, CalibrationMethod
 from onnx import version_converter, helper
 from onnxruntime.quantization import shape_inference
+import onnx_tool
 import vai_q_onnx
 import random
 from PIL import Image
@@ -49,7 +50,6 @@ class Colors:
     BRIGHT_CYAN = "\033[96m"
     BRIGHT_WHITE = "\033[97m"
     DIMMERED_WHITE = "\033[90m"
-
 
 class DataReader:
     def __init__(self, calibration_folder, batch_size, target_size, inputname):
@@ -103,11 +103,10 @@ class DataReader:
 
     def reset(self):
         self.batch_index = 0
-
+    
     def get_next(self):
         # print(f'returned next data reader  {self.read_batch()["input"].shape}')
         return self.read_batch()
-
 
 def analyze_input_format(input_shape):
     order = "unknown"
@@ -122,7 +121,6 @@ def analyze_input_format(input_shape):
         print("Unknown input format")
         quit()   
     return order
-
 
 def appendcsv(measurement, args, csv_file="measurements.csv"):
     fieldnames = [
@@ -246,25 +244,13 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
                 "Memory": measurement["system"]["resources"]["Memory"],
                 "Swap_Memory": measurement["system"]["resources"]["Swap_Memory"],
                 "npu_driver": measurement["system"]["driver"]["npu"],
-                "xclbin_path": measurement["environment"]["xclbin"]["xclbin_path"],
-                "vaip": measurement["environment"]["xclbin"]["packages"]["vaip"][
-                    "version"
-                ],
-                "target_factory": measurement["environment"]["xclbin"]["packages"][
-                    "target_factory"
-                ]["version"],
-                "xcompiler": measurement["environment"]["xclbin"]["packages"][
-                    "xcompiler"
-                ]["version"],
-                "onnxruntime": measurement["environment"]["xclbin"]["packages"][
-                    "onnxrutnime"
-                ]["version"],
-                "graph_engine": measurement["environment"]["xclbin"]["packages"][
-                    "graph_engine"
-                ]["version"],
-                "xrt": measurement["environment"]["xclbin"]["packages"]["xrt"][
-                    "version"
-                ],
+                #"xclbin_path": measurement["environment"]["xclbin"]["xclbin_path"] if args.execution_provider == "VitisAIEP" else "",
+                #"vaip": measurement["environment"]["xclbin"]["packages"]["vaip"]["version"] if args.execution_provider == "VitisAIEP" else "",
+                #"target_factory": measurement["environment"]["xclbin"]["packages"]["target_factory"]["version"] if args.execution_provider == "VitisAIEP" else "",
+                #"xcompiler": measurement["environment"]["xclbin"]["packages"]["xcompiler"]["version"] if args.execution_provider == "VitisAIEP" else "",
+                #"onnxruntime": measurement["environment"]["xclbin"]["packages"]["onnxrutnime"]["version"] if args.execution_provider == "VitisAIEP" else "",
+                #"graph_engine": measurement["environment"]["xclbin"]["packages"]["graph_engine"]["version"] if args.execution_provider == "VitisAIEP" else "",
+                #"xrt": measurement["environment"]["xclbin"]["packages"]["xrt"]["version"] if args.execution_provider == "VitisAIEP" else "",
             }
         )
     ggprint(f"Data appended to {csv_file}")
@@ -283,7 +269,6 @@ def check_package_version(package_name):
         return version
     except importlib_metadata.PackageNotFoundError:
         return f"{package_name} not found"
-
 
 def check_env(release, args):
     data = [
@@ -308,9 +293,9 @@ def check_env(release, args):
             )
         )
 
-    package_name = "onnxruntime"
+    package_name = "onnx"
     version = check_package_version(package_name)
-    if version in ["1.17.0", "1.17.3"]:
+    if version in ["1.17.0"]:
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -322,7 +307,7 @@ def check_env(release, args):
     package_name = "onnxruntime-vitisai"
     version = check_package_version(package_name)
     fields = version.split('.')
-    if fields[0] == "1" and fields[1] == "17":
+    if fields[0] == "1" and fields[1] == "19":
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -337,7 +322,7 @@ def check_env(release, args):
     package_name = "voe"
     version = check_package_version(package_name)
     fields = version.split('.')
-    if fields[0] == "1" and fields[1] == "2":
+    if fields[0] == "1" and (fields[1] == "2" or fields[1] == "3"):
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -354,7 +339,6 @@ def check_env(release, args):
         formatted_column1 = column1.ljust(max_width)
         ggprint(f"{formatted_column1} {column2}")
     
-
 def check_args(args, defaults):
     assert args.num >= (
         args.batchsize * args.instance_count
@@ -370,13 +354,11 @@ def check_args(args, defaults):
             f"ERROR: Neither the default config path {defaults['config']} nor the provided config path {args.config} exists."
         )
 
-
 def check_silicon(expected, found):
     if expected != found:
         raise ValueError(f"Mismatch between {expected} xclbin and {found} driver")
     else:
         return expected
-
 
 def cancelcache(cache_path):
     ggprint(80*"-")
@@ -390,14 +372,12 @@ def cancelcache(cache_path):
     else:
         ggprint(f"{cache_path} does not exist or is not a directory")
 
-
 def dbprint(message):
     frame = inspect.currentframe()
     caller_frame = frame.f_back
     file_name = caller_frame.f_code.co_filename
     line_number = caller_frame.f_lineno
     print(Colors.BLUE + f"File: {file_name}, Line: {line_number} - {message}" + Colors.RESET)
-
 
 def DEF_setup(silicon):
     # default setup
@@ -410,13 +390,11 @@ def DEF_setup(silicon):
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
 
-
-def del_old_meas(measfile):
+def del_file(killme):
     # Check if the file exists before attempting to delete it
-    if os.path.exists(measfile):
-        os.remove(measfile)
+    if os.path.exists(killme):
+        os.remove(killme)
         #ggprint(f"Old measurement {measfile} deleted successfully")
-
 
 def detect_device():
     def get_driver_info(device_name):
@@ -440,6 +418,33 @@ def detect_device():
     #print(f'Device = {device}')
     return device   
 
+
+def extract_flops_mem_params(file_path):
+
+    delimiter_pattern = re.compile(r' {2,}')
+    column_name = "Forward_FLOPs"
+
+    with open(file_path, 'r') as file:
+        first_line = file.readline().strip()
+        last_line = file.readlines()[-1].strip()
+        columns = delimiter_pattern.split(first_line)
+
+        if column_name in columns:
+            column_number = columns.index(column_name)
+
+        else:
+            print(f"The column '{column_name}' was not found in the first row.")
+
+    columns = delimiter_pattern.split(last_line)
+    flops = int(columns[column_number].replace(',', ''))
+    mem = int(columns[column_number + 2].replace(',', ''))
+    params = int(columns[column_number + 4].replace(',', ''))
+
+    r = {"Forward_FLOPs": flops, "Memory": mem, "Params": params}
+    return r
+
+
+
 def get_driver_release_number(device_name):
     command = f'powershell -Command "Get-WmiObject Win32_PnPSignedDriver | Where-Object {{ $_.DeviceName -like \'*{device_name}*\' }} | Select-Object DeviceName, DriverVersion"'
     result = subprocess.run(command, capture_output=True, text=True, shell=True)
@@ -449,10 +454,8 @@ def get_driver_release_number(device_name):
         return
     return result.stdout.split("\n")[3].split(" ")[4].strip()
 
-
 def ggprint(linea):
     print(Colors.DIMMERED_WHITE + linea + Colors.RESET)
-
 
 def ggquantize(args):
     input_model_path = args.model
@@ -469,26 +472,18 @@ def ggquantize(args):
     newopset = 17
     original_model = onnx.load(input_model_path)
     opset_version = original_model.opset_import[0].version
-
-    # temporary fix: after conversion the opset is not updated to 17 but to 1
     if opset_version<11:
-        if opset_version==1 :
-            ggprint(f'[WARNING] The model opset version is 1, which seems unlikely. This might be the result of a previous opset conversion.')
+        ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
+        #user_response = ask_update()
+        #user_response = "n"
+        if args.update_opset == '1':
+            output_updated = f"{base_name}_opset17{extension}"
+            converted_model = version_converter.convert_version(original_model, newopset)
+            onnx.save(converted_model, output_updated)
+            print(f'The update model was saved with name {output_updated}')
+            input_model_path = output_updated
         else:
-            ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
-            user_response = ask_update()
-            if user_response == 'y':
-                output_updated = f"{base_name}_opset17{extension}"
-                converted_model = version_converter.convert_version(original_model, newopset)
-                #print(f"The model after conversion:\n{converted_model}")
-                onnx.save(converted_model, output_updated)
-                print(f'The update model was saved with name {output_updated}')
-                # verify opset
-                updated_model = onnx.load(output_updated)
-                ggprint(f"Updated model opset version: {updated_model.opset_import[0].version}")
-                input_model_path = output_updated
-            else:
-                ggprint("You chose not to update")
+            ggprint("You chose not to update")
     # free memory
     del original_model
     gc.collect()
@@ -517,8 +512,11 @@ def ggquantize(args):
             nchw_to_nhwc = False
             print("The input format is already NHWC - this is the optimal shape")
         elif order =="NCHW":
-            nchw_to_nhwc = True
-            print("The input format is NCHW - conversion to NHWC enabled")
+            print("The input format is NCHW - it is possible to convert to NHWC")
+            if args.nhwc=="1":
+                nchw_to_nhwc = True
+            else:
+                nchw_to_nhwc = False               
        
         # 3) prepare the calibration directory
         calib_dir = "calibration"
@@ -548,7 +546,7 @@ def ggquantize(args):
                 external_data_location= "./",
                 external_data_size_threshold= 1024
             )
-
+            
             vai_q_onnx.quantize_static(
                 preprocessed_model_path,
                 output_INT8_NHWC_model_path,
@@ -580,10 +578,9 @@ def ggquantize(args):
                 }
             )
 
-        print('Calibrated and quantized NHWC model saved at:', output_INT8_NHWC_model_path)
         print(Colors.RESET)
+        
         return output_INT8_NHWC_model_path
-
 
 def get_input_format(onnx_model_path):
     onnx_model = onnx.load(onnx_model_path)
@@ -593,9 +590,7 @@ def get_input_format(onnx_model_path):
         input_shapes.append(tuple(shape))
     return [input_node.name, input_shapes]
 
-
 def get_input_info(onnx_model_path):
-    input_info = {}
     # Load the ONNX model without loading it into memory
     with open(onnx_model_path, "rb") as f:
         model_proto = onnx.load(f)
@@ -606,6 +601,9 @@ def get_input_info(onnx_model_path):
         input_shape = [d.dim_value for d in first_input.type.tensor_type.shape.dim]
     return input_name, input_shape
 
+def tops_peak(device):
+    gp = {"STRIX": 50, "PHOENIX": 8, "HAWK": 14.4}
+    return gp[device]
 
 def initcsv(filename, R, C):
     data = np.full((R, C), np.nan)
@@ -613,7 +611,6 @@ def initcsv(filename, R, C):
         os.remove(filename)
     df = pd.DataFrame(data)
     df.to_csv(filename, index=False, header=False)
-
 
 def list_operators(onnx_model_path):
     # Load the ONNX model
@@ -626,7 +623,6 @@ def list_operators(onnx_model_path):
         #print("Operator:", node.op_type)
         oplist.append(node.op_type)
     return oplist
-
    
 def list_files_in_directory(directory):
     file_paths = []
@@ -634,7 +630,6 @@ def list_files_in_directory(directory):
         for file in files:
             file_paths.append(os.path.join(root, file))
     return file_paths
-
 
 def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     # dictionary of results
@@ -665,6 +660,8 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     measurement["results"]["energy mJ/frame"]["cpu"] = "N/A"
     measurement["results"]["energy mJ/frame"]["npu"] = "N/A"
     measurement["results"]["energy mJ/frame"]["mem"] = "N/A"
+
+    measurement["model"] = profile_model(args.model)
 
     measurement["vitisai"] = {}
     measurement["vitisai"]["all"] = 0
@@ -724,9 +721,9 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
         measurement["environment"]["xclbin"] = {}
         measurement["environment"]["xclbin"]["xclbin_path"] = xclbin_path
         cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
-        with open(os.path.join(cache_dir, r"modelcachekey\config.json"), "r") as json_file:
+        with open(os.path.join(cache_dir, r"modelcachekey\context.json"), "r") as json_file:
             data = json.load(json_file)
-        releases = data["version"]["versionInfos"]
+        releases = data["config"]["version"]["versionInfos"]
 
         measurement["environment"]["xclbin"]["packages"] = {
             release["packageName"]: {
@@ -817,6 +814,7 @@ def parse_args(device):
         choices=["CPU", "VitisAIEP", "iGPU", "dGPU"],
         help="Execution Provider selection. Default=CPU",
     )
+
     parser.add_argument(
         "--infinite",
         type=str,
@@ -824,6 +822,7 @@ def parse_args(device):
         choices=["0", "1"],
         help="if 1: Executing an infinite loop, when combined with a time limit, enables the test to run for a specified duration. Default=1",
     )
+    
     parser.add_argument(
         "--instance_count",
         "-i",
@@ -831,6 +830,7 @@ def parse_args(device):
         default=1,
         help="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1",
     )
+
     parser.add_argument(
         "--intra_op_num_threads", 
         type=int, 
@@ -843,6 +843,7 @@ def parse_args(device):
         type=str,
         help="Path to the file of parameters.",
     )
+
     parser.add_argument(
         "--log_csv",
         "-k",
@@ -850,12 +851,14 @@ def parse_args(device):
         default="0",
         help="If this option is set to 1, measurement data will appended to a CSV file. Default=0",
     )
+
     parser.add_argument(
         "--min_interval",
         type=float,
         default=0,
         help="Minimum time interval (s) for running inferences. Default=0",
     )
+
     parser.add_argument(
         "--model",
         "-m",
@@ -863,6 +866,7 @@ def parse_args(device):
         default="",
         help="Path to the ONNX model",
     )
+
     parser.add_argument(
         "--no_inference",
         type=str,
@@ -870,6 +874,15 @@ def parse_args(device):
         choices=["0", "1"],
         help="When set to 1 the benchmark runs without inference for power measurements baseline. Default=0",
     )
+
+    parser.add_argument(
+        "--nhwc",
+        type=str,
+        default="0",
+        choices=["0", "1"],
+        help="When set to 1 enables the input tensor conversion from NCHW to NHWC. Default=0",
+    )
+
     parser.add_argument(
         "--num", 
         "-n", 
@@ -883,6 +896,14 @@ def parse_args(device):
         type=int, 
         default=10, 
         help="The number of images for calibration. Default=10"
+    )
+
+    parser.add_argument(
+        "--profile",
+        type=str,
+        default="0",
+        choices=["0", "1"],
+        help="if this option is set to 1 the ONNX profiler is enabled. Default = 0",
     )
 
     parser.add_argument(
@@ -901,9 +922,19 @@ def parse_args(device):
         default=10,
         help="When used in conjunction with the --infinite option, it represents the maximum duration of the experiment. The default value is set to 10 seconds.",
     )
+
     parser.add_argument(
         "--threads", "-t", type=int, default=1, help="CPU threads. Default=1"
     )
+
+    parser.add_argument(
+        "--update_opset",
+        type=str,
+        default="0",
+        choices=["0", "1"],
+        help="if set to 1 and the model has opset < 11, automatically update the model opset to 17. Default=0",
+    )
+    
     parser.add_argument(
         "--verbose", "-v",
         type=str,
@@ -911,6 +942,7 @@ def parse_args(device):
         choices=["0", "1", "2"],
         help="0 (default): no debug messages, 1: few debug messages, 2: all debug messages"
     )
+
     parser.add_argument(
         "--warmup",
         "-w",
@@ -935,6 +967,24 @@ def parse_args(device):
     
     return args, defaults  
 
+
+def profile_model(modelpath):
+    #credits: https://github.com/ThanatosShinji/onnx-tool/blob/main/benchmark/examples.py
+    model_name = os.path.splitext(os.path.basename(modelpath))[0]
+    inputinfo = get_input_info(modelpath)
+    model_input = {inputinfo[0]: np.zeros(inputinfo[1])}
+
+    m = onnx_tool.Model(modelpath)
+    m.graph.shape_infer(model_input)  # update tensor shapes with new input tensor
+    m.graph.profile()
+
+    profileresult = "profile_" + model_name + ".txt"
+    m.graph.print_node_map(profileresult, metric="FLOPs")
+
+    fmp = extract_flops_mem_params(profileresult)
+    model_fmp = {"name":model_name} | fmp
+
+    return model_fmp
 
 def set_ZEN_env():
     os.environ["ZENDNN_LOG_OPTS"] = "ALL:0"
@@ -965,13 +1015,11 @@ def set_ZEN_env():
     os.environ["ZENDNN_MATMUL_ADD_FUSION_ENABLE"] = "1"
     os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-
 def show_help():
     print("Usage: python performance_benchmark.py <parameters list>")
     print("Please fill the parameters list. Use -h for help")
     print("i.e.:")
     print("python performance_benchmark.py --model resnet50_1_5_224x224-op13_NHWC_quantized.onnx --execution_provider VitisAIEP --num 2000 -i 4 -t 4 -p 1 -j demo.json -r 1")
-
 
 def save_result_json(results, filename):
     if filename=="use timestamp":
@@ -991,7 +1039,6 @@ def PHX_1x4_setup(silicon):
     ggprint(f"Path to xclbin_path = {xclbin_path}")
     ggprint(os.environ["XLNX_TARGET_NAME"])
 
-
 def PHX_4x4_setup(silicon):
     xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), '4x4.xclbin')
     os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
@@ -1001,7 +1048,6 @@ def PHX_4x4_setup(silicon):
     ggprint(f"Path to xclbin_path = {xclbin_path}")
     ggprint(os.environ["XLNX_TARGET_NAME"])
 
-
 def STX_1x4_setup(silicon):
     xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_Nx4_Overlay.xclbin')
     os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
@@ -1010,7 +1056,6 @@ def STX_1x4_setup(silicon):
     ggprint("Core selection")
     ggprint(f"Path to xclbin_path = {xclbin_path}")
     ggprint(os.environ["XLNX_TARGET_NAME"])
-
 
 def STX_4x4_setup(silicon):
     #xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_4x4_Overlay_CFG0.xclbin')
@@ -1022,7 +1067,6 @@ def STX_4x4_setup(silicon):
     ggprint(f"Path to xclbin_path = {xclbin_path}")
     ggprint(os.environ["XLNX_TARGET_NAME"])
 
-
 def set_engine_shape(case):
     switch_dict = {
         "PHX_1x4": PHX_1x4_setup,
@@ -1032,7 +1076,6 @@ def set_engine_shape(case):
     }
     action = switch_dict.get(case, DEF_setup)
     action("none")
-
 
 def SetCalibDir(source_directory, calib_dir, num_images_to_copy):
     if os.path.exists(calib_dir):
@@ -1060,3 +1103,10 @@ def SetCalibDir(source_directory, calib_dir, num_images_to_copy):
             shutil.copy(file, calib_dir)
             copied_images += 1
     return copied_images
+
+def tableprint(title, tabledata, tablew):
+    print("-" * tablew)
+    print(title.center(tablew))
+    colwidth=tablew//2
+    for row in tabledata:
+        print(f"{{:<{colwidth}}} {{:>{colwidth}}}".format(*row))

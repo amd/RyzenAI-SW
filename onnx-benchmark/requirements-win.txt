@@ -1,0 +1,12 @@
+pandas
+pyarrow
+matplotlib
+psutil
+keyboard
+pyperclip
+importlib-metadata
+onnx-tool
+onnx
+packaging
+pillow
+torchvision

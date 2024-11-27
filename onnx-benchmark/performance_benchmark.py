@@ -1,6 +1,6 @@
 # ready for public
 
-release = 18
+release = 19
 
 import os
 import onnxruntime as rt
@@ -13,6 +13,7 @@ import threading
 import math
 import subprocess
 import keyboard
+
 
 from utilities import *
 
@@ -27,28 +28,45 @@ finaltottime=[]
 def timed_inference(fn, output_names, input_dict_B):
     global latencies_sum
     global inferences
-    timed_inference_start = time.perf_counter()
-    output = fn(output_names, input_dict_B)
-    end = time.perf_counter()
-    latencies_sum += end - timed_inference_start
-    inferences += 1
-    if args.verbose == "2":
-        ggprint(f"end - timed_inference_start = {end - timed_inference_start}")
-        ggprint(f"num_completed_tasks = {inferences}")
+
+    if args.no_inference == "0":
+        timed_inference_start = time.perf_counter()
+        output = fn(output_names, input_dict_B)
+        end = time.perf_counter()
+        latencies_sum += end - timed_inference_start
+        inferences += 1
+        #if args.verbose == "2":
+        #    ggprint(f"end - timed_inference_start = {end - timed_inference_start}")
+        #    ggprint(f"num_completed_tasks = {inferences}")
+    
+    else:
+        # do almost nothing for the latency time, and keep the same code (redundant)
+        # doing this to maintain the experiment duration also in case of no inference (power baseline calculation)
+        timed_inference_start = time.perf_counter()
+        #while time.perf_counter() - timed_inference_start < args.min_interval:
+        #    pass
+        
+        time.sleep(args.min_interval)
+
+        end = time.perf_counter()
+        latencies_sum += end - timed_inference_start
+        inferences += 1
+        #if args.verbose == "2":
+        #    ggprint(f"end - timed_inference_start = {end - timed_inference_start}")
+        #    ggprint(f"num_completed_tasks = {inferences}")
+
 
 def process_task_queue(task_queue, session, output_names):
     while True:
         try:
             input_dict = task_queue.get(block=False)
         except queue.Empty:
-            if args.verbose == "2":
-                ggprint(f"Queue ended. Thread={threading.current_thread().ident} elapsed={latencies_sum} nct={inferences}")
+            #if args.verbose == "2":
+            #    ggprint(f"Queue ended. Thread={threading.current_thread().ident} elapsed={latencies_sum} nct={inferences}")
             break
         timed_inference(session.run, output_names, input_dict)
     
 def build_threads_pool(task_queue, threads, session, output_names):
-    #global inferences
-    #global latencies_sum
     thread_pool = []
     for i in range(threads):
         t = threading.Thread(target = process_task_queue, args = (task_queue, session, output_names))
@@ -61,8 +79,11 @@ def profile(args, num):
     latencies_sum = 0
     inferences = 0 
     so = rt.SessionOptions()
-    # Enable profiling by providing the profiling options
-    # so.enable_profiling = True
+    # Enable ONNX profiling by providing the profiling options
+    #if args.profile=="1":
+    #    so.enable_profiling = True
+    #else:
+    #    so.enable_profiling = False
 
     EP_List = []
 
@@ -71,7 +92,7 @@ def profile(args, num):
         args.threads = 1  # iGPU does not take advantage of async multi-threading
         ggprint("Check with Task Manager which GPU is used!")
         session = rt.InferenceSession(args.model, so, providers=providers)
-    if args.execution_provider == "dGPU":
+    elif args.execution_provider == "dGPU":
         # providers = ['DmlExecutionProvider', {'device_id':1}]
         providers = [("DmlExecutionProvider", {"device_id": 1})]
         ggprint("Check with Task Manager which GPU is used!")
@@ -92,10 +113,15 @@ def profile(args, num):
         session = rt.InferenceSession(args.model, so, providers=providers)
     elif args.execution_provider == "VitisAIEP":
         ggprint(f"config path = {args.config}")
+
+        # model preprocessing
         args.model = ggquantize(args)
-        
+
         EP_List.append("VitisAIExecutionProvider")
+        
+        # this is only valid for ryzenai
         cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
+        
         so.intra_op_num_threads = args.intra_op_num_threads
         
         provider_options = [
@@ -106,11 +132,16 @@ def profile(args, num):
                 "num_of_dpu_runners": args.instance_count,
             }
         ]
+        
+                #"ai_analyzer_visualization": True if args.profile=="1" else False,
+                #"ai_analyzer_profiling": True if args.profile=="1" else False
         session = rt.InferenceSession(
-            args.model, so, providers=EP_List, provider_options=provider_options
-        )
+            args.model, 
+            so, 
+            providers=EP_List, 
+            provider_options=provider_options
+        ) 
 
-    target_delay = args.min_interval
     input_nodes = session.get_inputs()
     output_nodes = session.get_outputs()
     output_names = [n.name for n in output_nodes]
@@ -127,7 +158,7 @@ def profile(args, num):
 
     # rounding number of images in the pool to a multiple of threads and batchsize
     num = (math.ceil(args.num / args.batchsize / args.threads)* args.batchsize *  args.threads)
-    r = range(int(num / args.batchsize))
+    num_bs = range(int(num / args.batchsize))
     ggprint(f"Executing {int(num/args.batchsize)} steps, with each step involving the inference of {args.batchsize} images")
 
     # fill the input data queue
@@ -140,57 +171,54 @@ def profile(args, num):
     )
 
     # build the single queue of dictionaries from where all threads will get the input data 
-    for i in r:
+    for i in num_bs:
         input_dict = {
             n.name: np.random.randn(*tensorshape).astype(
                 "float16" if "float16" in n.type else "float32"
             )
             for n in input_nodes
         }
-        if args.no_inference=="0":
-            task_queue.put(input_dict)
+        task_queue.put(input_dict)
 
     # Start profiling
     if args.infinite:
         ggprint("Infinite loop: Press q to Stop.")
     
     profile_start = time.perf_counter()
-    printonce = True
+
+    if args.no_inference=="1":
+        ggprint("Running without inference for power baseline")
+        ggprint("Remember to manually set the latency with --min_interval option [seconds]")
+    
     while True: 
-        if args.no_inference=="1":
-            if printonce:
-                printonce = False
-                ggprint("Running without inference for power baseline")
-        else:            
-            # Create a new queue and duplicate the contents of the original queue
-            task_queue_t = queue.Queue()
-            task_queue_t.queue.extend(task_queue.queue)            
-
-            thread_pool = build_threads_pool(
-                    task_queue_t,
-                    args.threads,
-                    session,
-                    output_names,
+        # else:            
+        # Create a new queue and duplicate the contents of the original queue
+        task_queue_t = queue.Queue()
+        task_queue_t.queue.extend(task_queue.queue)            
+        thread_pool = build_threads_pool(
+                task_queue_t,
+                args.threads,
+                session,
+                output_names,
                 )
-
-            # start measuring time
-            start = time.perf_counter()
-            # wait a minimum time
-            while time.perf_counter() - start < target_delay:
-                pass
-
-            # start the thread
-            # each thread creates a list of sessions of the same dimension of the data queue, then runs them.
-            for thread in thread_pool:
-                thread.start()
-            # wait for the thread to finish
-            for thread in thread_pool:
-                thread.join()
-            nctlist.append(inferences)
-            total_run_time = time.perf_counter() - start
-            
-            # list of time spent to process each set of images (args.num)
-            finaltottime.append(total_run_time)
+        # start measuring time
+        start = time.perf_counter()
+        # # wait a minimum time
+        # while time.perf_counter() - start < args.min_interval:
+        #     pass
+        # start the thread
+        # each thread creates a list of sessions of the same dimension of the data queue, then runs them.
+        for thread in thread_pool:
+            thread.start()
+        # wait for the thread to finish
+        for thread in thread_pool:
+            thread.join()
+        nctlist.append(inferences)
+        
+        total_run_time = time.perf_counter() - start
+        
+        # list of time spent to process each set of images (args.num)
+        finaltottime.append(total_run_time)
             
         if args.verbose == "1" or args.verbose == "2":
             ggprint(f'{len(nctlist)} - test time = {(time.perf_counter() - profile_start):.2f} / {args.timelimit:.2f} sec')
@@ -205,13 +233,8 @@ def profile(args, num):
             ggprint(f"\nLimit time {args.timelimit} s reached")
             break
     
-    if args.no_inference == "0":
-        lat_results = 1000 * latencies_sum / inferences    
-        thr_results = (inferences * args.batchsize) / sum(finaltottime)
-    else:
-        lat_results = 0    
-        thr_results = 0
-
+    lat_results = 1000 * latencies_sum / inferences    
+    thr_results = (inferences * args.batchsize) / sum(finaltottime)
     
     if args.verbose == "1" or args.verbose == "2":
         print("\n")
@@ -232,9 +255,12 @@ def profile(args, num):
         print("\n")
         print(f'average throughput = {thr_results:.2f} fps')
         
+
+    #if args.profile=="1":
+    #    profile_file = session.end_profiling()
+    #    ggprint(f"ONNX Profiler report saved to {profile_file}")
+
     return [thr_results, lat_results, inferences]
-        
-    # session.end_profiling()
 
 if __name__ == "__main__":
     device = detect_device()
@@ -242,17 +268,21 @@ if __name__ == "__main__":
 
     # environment control
     check_env(release, args) 
+    
     # imput parameters control
     check_args(args, defaults)
     # delete old measurement
-    del_old_meas("report_benchmark.json")
+    del_file("report_benchmark.json")
     
     # EP driven setup
     xclbin_path = ""
+    TABLEW=51
     if args.execution_provider == "VitisAIEP":
         os.environ['NUM_OF_DPU_RUNNERS'] = str(args.instance_count)
         os.environ['XLNX_ONNX_EP_VERBOSE'] = "0"
         os.environ['XLNX_ENABLE_STAT_LOG']= "0"
+        os.environ["XLNX_ONNX_EP_REPORT_FILE"] = "vitisai_ep_report.json"
+
         set_engine_shape(args.core)
         
         if args.renew == "1":
@@ -274,41 +304,59 @@ if __name__ == "__main__":
     # performance benchmark
     thr_results, lat_results, inferences = profile(args, args.num)
 
-    if args.no_inference == "0":
-        measurement = meas_init(
-            args, release, thr_results, lat_results, xclbin_path
-        )
+    if args.no_inference == "1":
+        ggprint("TESTING WITH NO INFERENCE FOR POWER BASELINE")
 
-        print(Colors.YELLOW + f"\nprofiling:  {args.model} running on {args.execution_provider}")
-        if (args.execution_provider == "VitisAIEP"): print(f"Instances (NPU runners)  = {args.instance_count}")
-        print(f"Threads                  = {args.threads}")
-        print(f"Batch size               = {args.batchsize}")
-        print("-" * 80)
-        print(f"Throughput:              = {thr_results:.2f} fps")
-        print(f"Average latency:         = {lat_results:.2f} ms")
-        print(f"Inferences:              = {inferences}")
-        print("-" * 80)
+    measurement = meas_init(
+        args, release, thr_results, lat_results, xclbin_path
+    )
+    
+    test_summary =  [["model", measurement['model']['name']],
+                    ["instances", args.instance_count if args.execution_provider == "VitisAIEP" else ""],
+                    ["threads", args.threads],
+                    ["core",  "VAIP_4x4" if os.path.basename(args.config) == "vitisai_config.json" else args.core]]       
+    performance  =  [["throughput", f"{thr_results:.2f} [fps]"],
+                    ["latency", f"{lat_results:.2f} [ms]"],
+                    ["inferences", inferences]]
+    
+    comp_efficency = measurement['model']['Forward_FLOPs']*thr_results/(tops_peak(device)*1e12)
+    efficency    = [["model", measurement['model']['name']],
+                    ["model operations", f"{measurement['model']['Forward_FLOPs']/1e6:.2f} [MFLOPs]"],
+                    ["device", device],
+                    ["theoretical compute peak", f"{tops_peak(device)} [TOPs]"],
+                    ["compute efficency", f"{comp_efficency*100:.2f}%"]]
+    measurement['model']['device'] = device
+    measurement['model']['core'] = args.core
+    measurement['model']['comp_peak'] = tops_peak(device)
+    measurement['model']['comp_efficency'] = comp_efficency*100
+    
+    print(Colors.YELLOW)
+    tableprint("TEST SUMMARY", test_summary, TABLEW)
+    tableprint("PERFORMANCE", performance, TABLEW)
+    tableprint("EFFICENCY", efficency, TABLEW)
+    
+    
+    if args.execution_provider == "VitisAIEP":
+        cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))       
+        try:
+            with open(os.path.join(cache_dir, r"modelcachekey\vitisai_ep_report.json"), "r") as json_file:
+                vitisaireport = json.load(json_file)
+        except Exception as e:
+            print(f"Error loading JSON file: {e}")
+        
+        measurement["vitisai"]['all'] = vitisaireport['deviceStat'][0]['nodeNum']
+        vitisai_ep_report = [["total nodes", f"{vitisaireport['deviceStat'][0]['nodeNum']}"]]
+        for i, device in enumerate(vitisaireport["deviceStat"][1:]):
+            vitisai_ep_report.append([f"{device['name']}", f"{device['nodeNum']}"])
+            measurement["vitisai"][device['name']] = device['nodeNum']
+        
+        tableprint("NODES DISTRIBUTION", vitisai_ep_report, TABLEW)
+    
 
+    print(Colors.RESET)
+    save_result_json(measurement, "report_performance.json")
+    if args.log_csv=="1":
+        appendcsv(measurement, args)
+    if args.profile=="1":
+        ggprint("The AI Analyzer results can be reviewed running aianalyzer . --port=8087")
 
-        if args.execution_provider == "VitisAIEP":
-            cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
-            try:
-                with open(os.path.join(cache_dir, r"modelcachekey\vitisai_ep_report.json"), "r") as json_file:
-                    vitisaireport = json.load(json_file)
-            except Exception as e:
-                print(f"Error loading JSON file: {e}")
-            
-            print(f"Total nodes {vitisaireport['deviceStat'][0]['nodeNum']}")
-            measurement["vitisai"]['all'] = vitisaireport['deviceStat'][0]['nodeNum']
-            for i, device in enumerate(vitisaireport["deviceStat"][1:]):
-                print(f"{device['nodeNum']} nodes assigned to {device['name']}")
-                measurement["vitisai"][device['name']] = device['nodeNum']
-
-        print(Colors.RESET)
-
-        save_result_json(measurement, "report_performance.json")
-        if args.log_csv=="1":
-            appendcsv(measurement, args)
-    else:
-        print(Colors.YELLOW + "Test with no inference (for power baseline estimation) completed")
-        print(Colors.RESET)

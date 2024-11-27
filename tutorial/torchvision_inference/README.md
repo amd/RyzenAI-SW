@@ -1,26 +1,16 @@
 <!--
 Copyright © 2024 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
-
-Author: Fan Zhang, AMD-Xilinx
 -->
 
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> AIG - Technical Marketing </h1>
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Tutorial </h1>
     </td>
  </tr>
 </table>
 
 # Torchvision Models End-to-End Inference with Ryzen AI
-
-
-## Current Status
-
-- Last update:  29 July 2024
-- Author:       Fan Zhang
-- Release:      NPU driver (32.0.201.204), VOE ryzen-ai-1.2
-- Device:       (RyzenAI) HPT
 
 ## Contents
 
@@ -41,13 +31,14 @@ Before running this example, ensure that you have followed the Ryzen AI Installa
 
 ### Jupyter Notebook
 
-1. Launch the Jupyter Notebook.
-2. Ensure that you've pointed the Jupyter Notebook to the correct Python environment. To do this, in the top-right corner of the notebook, click "Select Kernel" and provide the path to the conda environment.
-3. Run all the cells in the notebook.
+1. Copy the ***vaip_config.json*** file to here from the Ryzen AI installation folder.
+2. Launch the Jupyter Notebook.
+3. Ensure that you've pointed the Jupyter Notebook to the correct Python environment. To do this, in the top-right corner of the notebook, click "Select Kernel" and provide the path to the conda environment.
+4. Run all the cells in the notebook.
 
 >**:pushpin: NOTE:** If you can't find the kernel from the top-right dropdown menu, please exit the notebook and install it as below:
 
-```
+```python
 python -m ipykernel install --user --name [CONDA_ENV_NAME]
 ```
 
