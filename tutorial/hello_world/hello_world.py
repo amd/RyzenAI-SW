@@ -121,12 +121,19 @@ cpu_total = timer() - start
 command = r'pnputil /enum-devices /bus PCI /deviceids '
 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = process.communicate()
+
+# Decode with error handling
+try:
+    stdout = stdout.decode('utf-8', errors='ignore')
+except Exception as e:
+    # Log error message and return an empty string
+    print(f"An error occurred while decoding output: {e}")
 # Check for supported Hardware IDs
 apu_type = ''
-if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
-if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
-if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
-if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout: apu_type = 'PHX/HPT'
+if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout: apu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout: apu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout: apu_type = 'STX'
 
 print(f"APU Type: {apu_type}")
 
