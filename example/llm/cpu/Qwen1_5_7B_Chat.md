@@ -57,7 +57,7 @@ lemonade -i Qwen/Qwen1.5-7B-Chat huggingface-load --device cpu --dtype bfloat16 
 To measure the model's time-to-first-token (TTFT) and tokens/second with a sequence length of 1024 and 64 output tokens:
 
 ```bash
-lemonade -i Qwen/Qwen1.5-7B-Chat huggingface-load --device cpu --dtype bfloat16 huggingface-bench --warmup-iterations 10 --iterations 20 --prompt 1024 --output-tokens 64
+lemonade -i Qwen/Qwen1.5-7B-Chat huggingface-load --device cpu --dtype bfloat16 huggingface-bench --warmup-iterations 5 --iterations 10 --prompt 1024 --output-tokens 64
 ```
 
 ## Task Performance
@@ -65,7 +65,7 @@ lemonade -i Qwen/Qwen1.5-7B-Chat huggingface-load --device cpu --dtype bfloat16 
 To measure the model's accuracy on the [MMLU test](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/mmlu_accuracy.md) `management` subject, run:
 
 ```bash
-lemonade -i Qwen/Qwen1.5-7B-Chat huggingface-load --device cpu --dtype bfloat16 accuracy-mmlu --tests astronomy philosophy management
+lemonade -i Qwen/Qwen1.5-7B-Chat huggingface-load --device cpu --dtype bfloat16 accuracy-mmlu --tests management
 ```
 
 # Application Integration
