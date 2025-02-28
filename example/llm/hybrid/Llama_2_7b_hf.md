@@ -18,7 +18,17 @@ To get started with the `lemonade` SDK in a Python environment, follow these ins
 
 You only need to do this once per computer:
 
-1. Make sure your system has the [Ryzen AI 1.3 driver](https://ryzenai.docs.amd.com/en/latest/inst.html#install-npu-drivers) installed.
+1. Make sure your system has the Ryzen AI 1.3 driver installed:
+    - Download the [NPU driver installation package](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=NPU_RAI1.3.zip).
+
+    - Install the NPU drivers by following these steps:
+
+        - Extract the downloaded `NPU_RAI1.3.zip` zip file.
+        - Open a terminal in administrator mode and execute the `.
+pu_sw_installer.exe` exe file.
+
+    - Ensure that NPU MCDM driver (Version:32.0.203.237 or 32.0.203.240) is correctly installed by opening `Device Manager` -> `Neural processors` -> `NPU Compute Accelerator Device`.
+
 1. [Download and install miniconda for Windows](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe). 
 1. Launch a terminal and call `conda init`
 
