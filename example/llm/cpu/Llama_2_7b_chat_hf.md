@@ -120,9 +120,7 @@ for new_text in streamer:
 thread.join()
 ```
 
-## Application Example
 
-See the [Chat Demo](https://github.com/onnx/turnkeyml/blob/main/examples/lemonade/demos/chat/chat_hybrid.py) for an example application that demonstrates streaming, multi-threading, and response interruption.
 
 # Server Interface (REST API)
 
