@@ -78,6 +78,24 @@ The hybrid examples are built on top of OnnxRuntime GenAI (OGA), while the CPU b
     <td class="tg-cell">🟢</td><!--cpu validation-->
     <td class="tg-cell"><a href="hybrid/Llama_3_1_8B.md">Link</a></td><!--hybrid Example-->
     <td class="tg-cell">🟢</td><!--hybrid validation-->
+  </tr><tr>
+        <td class="tg-cell-nowrap"><a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B">DeepSeek-R1-Distill-Qwen-1.5B</a></td><!--Model-->
+        <td class="tg-cell"><a href="cpu/DeepSeek_R1_Distill_Qwen_1_5B.md">Link</a></td><!--cpu Example-->
+    <td class="tg-cell">🟢</td><!--cpu validation-->
+    <td class="tg-cell"></td><!--hybrid Example-->
+    <td class="tg-cell"></td><!--hybrid validation-->
+  </tr><tr>
+        <td class="tg-cell-nowrap"><a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B">DeepSeek-R1-Distill-Qwen-7B</a></td><!--Model-->
+        <td class="tg-cell"><a href="cpu/DeepSeek_R1_Distill_Qwen_7B.md">Link</a></td><!--cpu Example-->
+    <td class="tg-cell">🟢</td><!--cpu validation-->
+    <td class="tg-cell"></td><!--hybrid Example-->
+    <td class="tg-cell"></td><!--hybrid validation-->
+  </tr><tr>
+        <td class="tg-cell-nowrap"><a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B">DeepSeek-R1-Distill-Llama-8B</a></td><!--Model-->
+        <td class="tg-cell"><a href="cpu/DeepSeek_R1_Distill_Llama_8B.md">Link</a></td><!--cpu Example-->
+    <td class="tg-cell">🟢</td><!--cpu validation-->
+    <td class="tg-cell"></td><!--hybrid Example-->
+    <td class="tg-cell"></td><!--hybrid validation-->
   </tr>
 </tbody></table>
 
