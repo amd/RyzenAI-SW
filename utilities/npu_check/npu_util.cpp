@@ -3,20 +3,20 @@ MIT License
 
 Copyright (c) 2023, Advanced Micro Devices, Inc. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-software and associated documentation files (the "Software"), to deal in the Software 
-without restriction, including without limitation the rights to use, copy, modify, 
-merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
 persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice (including the next paragraph) shall 
+The above copyright notice and this permission notice (including the next paragraph) shall
 be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 ************************************************************************************/
 
@@ -37,10 +37,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 namespace npu_util {
 
-    std::string DriverVersionToString(DWORDLONG ver) {
+    std::string DriverHexToString(DWORDLONG ver) {
         std::stringstream string_stream;
         string_stream << ((ver >> 48) & 0xffff) << "." << ((ver >> 32) & 0xffff) << "." << ((ver >> 16) & 0xffff) << "." << ((ver >> 0) & 0xffff);
         return string_stream.str();
+    }
+
+    DWORDLONG DriverNumberToHex(DWORDLONG a, DWORDLONG b, DWORDLONG c, DWORDLONG d) {
+        DWORDLONG ver = ((a & 0xffff) << 48) | ((b & 0xffff) << 32) | ((c & 0xffff) << 16) | ((d & 0xffff) << 0) ;
+        return ver;
     }
 
     // Extract NPU information
@@ -51,7 +56,7 @@ namespace npu_util {
         std::lock_guard<std::mutex> guard(function_mutex);
 
         NPUInfo npu_info;
-        npu_info.device_id = -1; 
+        npu_info.device_id = -1;
         npu_info.device_name = "";
         npu_info.driver_version_number = -1;
         npu_info.driver_version_string = "";
@@ -108,7 +113,7 @@ namespace npu_util {
                                     DriverInfoData.cbSize = sizeof(SP_DRVINFO_DATA);
                                     if (SetupDiEnumDriverInfo(deviceInfoSet, &deviceInfoData, SPDIT_COMPATDRIVER, 0, &DriverInfoData)) {
                                         npu_info.driver_version_number = DriverInfoData.DriverVersion;
-                                        npu_info.driver_version_string = DriverVersionToString(DriverInfoData.DriverVersion).c_str();
+                                        npu_info.driver_version_string = DriverHexToString(DriverInfoData.DriverVersion).c_str();
                                     }
                                 }
                                 SetupDiDestroyDriverInfoList(deviceInfoSet, &deviceInfoData, SPDIT_COMPATDRIVER);
@@ -136,39 +141,53 @@ namespace npu_util {
 
         // Check if supported NPU is present
         if (info.device_id==-1) {
-            info.check = Status::NPU_UNRECOGNIZED; 
+            info.check = Status::NPU_UNRECOGNIZED;
             return info;
         }
 
         // Check if minimum version of driver is installed
         if (info.driver_version_number<min_driver_version) {
-            info.check = Status::DRIVER_TOO_OLD; 
-            return info;            
+            info.check = Status::DRIVER_TOO_OLD;
+            return info;
         }
 
         // Check for 3 yr EP/driver compatibility window
         std::chrono::year_month_day current_date{std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())};;
         if (current_date>max_date) {
-            info.check = Status::EP_TOO_OLD; 
-            return info;              
+            info.check = Status::EP_TOO_OLD;
+            return info;
         }
 
-        info.check = Status::OK; 
+        info.check = Status::OK;
         return info;
     }
 
     NPUInfo checkCompatibility_RAI_1_2()
     {
         // Min driver: 32.0.201.204
-        // Max date  : 2027-07-30 (3 yrs after 2024-07-29, release date of RyzenAI 1.2)
-        return checkCompatibility(0x20000000c900cc, { std::chrono::July / 30 / 2027 });
+        // Max date  : 2027-07-30 (3 yrs after the release date of RyzenAI 1.2)
+        return checkCompatibility(DriverNumberToHex(32,0,201,204), { std::chrono::July / 30 / 2027 });
     }
 
     NPUInfo checkCompatibility_RAI_1_3()
     {
-        // Min driver: 32.0.201.237
-        // Max date  : 2027-11-26 (3 yrs after 2024-11-25, release date of RyzenAI 1.3)
-        return checkCompatibility(0x20000000c900ed, { std::chrono::November / 26 / 2027 });
+        // Min driver: 32.0.203.237
+        // Max date  : 2027-11-26 (3 yrs after the release date of RyzenAI 1.3)
+        return checkCompatibility(DriverNumberToHex(32,0,203,237), { std::chrono::November / 26 / 2027 });
     }
-   
+
+    NPUInfo checkCompatibility_RAI_1_3_1()
+    {
+        // Min driver: 32.0.203.242
+        // Max date  : 2028-01-17 (3 yrs after the release date of RyzenAI 1.3)
+        return checkCompatibility(DriverNumberToHex(32,0,203,242), { std::chrono::January / 15 / 2028 });
+    }
+
+    NPUInfo checkCompatibility_RAI_1_4()
+    {
+        // Min driver: 32.0.203.257 (May change before the release)
+        // Max date  : 2028-03-25   (Will change before the release)
+        return checkCompatibility(DriverNumberToHex(32,0,203,257), { std::chrono::March / 25 / 2028 });
+    }
+
 } // npu_util

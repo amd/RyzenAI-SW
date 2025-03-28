@@ -9,18 +9,18 @@
 
 ### Introduction
 
-In this tutorial we will provide step by step guide for quantization of CNN models using [Quark](https://quark.docs.amd.com/latest/index.html) quantization API. **Quark** for ONNX leverages the power of the ONNX Runtime Quantization tool, providing a robust and flexible solution for quantizing ONNX models. We will demonstrate how to quantize and run the [ResNet50](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet50-v1-12.onnx) model ONNX Runtime on Ryzen AI PCs.
+In this tutorial we will provide step by step guide for quantization of CNN models using [AMD Quark](https://quark.docs.amd.com/latest/index.html) quantization API. **Quark** for ONNX leverages the power of the ONNX Runtime Quantization tool, providing a robust and flexible solution for quantizing ONNX models. We will demonstrate how to quantize and run the [ResNet50](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet50-v1-12.onnx) model ONNX Runtime on Ryzen AI PCs.
 
 ### Setup Environment
 
-Install Quark API using the installation instructions from [Quark installer](https://quark.docs.amd.com/latest/install.html)
+Install Quark API using the installation instructions from [AMD Quark installer](https://quark.docs.amd.com/latest/install.html)
 
 Create a clone of the Ryzen AI installation conda environment to add required python packages
 
 ### Create and Activate Conda Environment
 
 ```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.3.0
+set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.4.0
 conda create --name quark_quantization --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate quark_quantization
 ```
@@ -29,23 +29,23 @@ Add python packages needed for the tutorial:
 
 ```bash
 pip install -r requirement.txt
-``` 
+```
 
 Input model
 -----------
 
-Download the pre-trained float ONNX models for [ResNet50](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet50-v1-12.onnx) 
+Download the pre-trained float ONNX models for [ResNet50](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet50-v1-12.onnx)
 
 ```python
-input_model_path = "models\\resnet50.onnx"  
-output_model_path = "models\\resnet50_quant.onnx" 
+input_model_path = "models\\resnet50.onnx"
+output_model_path = "models\\resnet50_quant.onnx"
 ```
 
 Alternatively you can use the python script to download the pre-trained ResNet50 model
 
 ```python
 cd models
-python download_ResNet.py 
+python download_ResNet.py
 ```
 
 ImageNet Dataset
@@ -107,8 +107,8 @@ from quark.onnx import ModelQuantizer
 quantizer = ModelQuantizer(config)
 
 # Quantize the ONNX model
-quant_model = quantizer.quantize_model(model_input = input_model_path, 
-                                       model_output = output_model_path, 
+quant_model = quantizer.quantize_model(model_input = input_model_path,
+                                       model_output = output_model_path,
                                        calibration_data_path = None)
 ```
 
@@ -127,7 +127,7 @@ Model Evaluation
 Print the original and quantized models accuracy
 
 ```python
-from utils import evaluate_onnx_model  
+from utils import evaluate_onnx_model
 
 print("Model Accuracy:")
 top1_acc, top5_acc = evaluate_onnx_model(input_model_path, imagenet_data_path='calib_data')
@@ -150,15 +150,15 @@ python quark_quantize.py --quantize --evaluate
 
 ResNet50: Using ``XINT8`` configuration
 
-<div align="center">  
+<div align="center">
 
 | ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |  
-| INT8 (CPU)    |  24.46 MB  | 78.1%          | 95.6%          |  
-| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |
+| INT8 (CPU)    |  24.46 MB  | 78.1%          | 95.6%          |
+| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |
 
-</div>  
+</div>
 
 
 
@@ -212,7 +212,7 @@ Evaluate the inference performance of the float and quantized models on CPU and 
 python quark_quantize.py --quantize --evaluate --benchmark
 ```
 
-<div align="center"> 
+<div align="center">
 
 | ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy | Inference Time |
 |---------------|------------|----------------|----------------|----------------|
@@ -220,7 +220,7 @@ python quark_quantize.py --quantize --evaluate --benchmark
 | INT8 (CPU)    |  24.46 MB  | 78.1%          | 95.6%          | 34.45 ms       |
 | INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |  5.74 ms       |
 
-</div> 
+</div>
 
 Advancted Quantization Tools
 ----------------------------

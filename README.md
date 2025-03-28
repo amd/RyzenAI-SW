@@ -13,62 +13,66 @@ This repository contains the demos, examples and tutorials, demonstrating usage 
 
 Follow the instructions at [Ryzen™ AI Software](https://ryzenai.docs.amd.com/en/latest/inst.html) for installation.
 
-## Git LFS and Instructions to clone: 
+## Git LFS and Instructions to clone:
 
- Due to the presence of large files in some examples/tutorials, Git Large File Storage (LFS) has been configured in this repository. Follow the instructions below to ensure Git LFS is properly set up: 
+ Due to the presence of large files in some examples/tutorials, Git Large File Storage (LFS) has been configured in this repository. Follow the instructions below to ensure Git LFS is properly set up:
  - Install Git LFS by downloading it from the [official website](https://git-lfs.com/)
  - After installation, run the following command in your terminal to set up Git LFS on your machine:
 ```
  git lfs install
 ```
- - Clone the repository (or a fork of it): 
+ - Clone the repository (or a fork of it):
 ```
 git clone https://github.com/amd/RyzenAI-SW.git
 ```
-- Pull the actual LFS files: 
+- Pull the actual LFS files:
 ```
 git lfs pull
 ```
 
-To run the demos and examples in this repository, please follow the instructions of README.md in each directory. 
+To run the demos and examples in this repository, please follow the instructions of README.md in each directory.
 
 
 ## Getting Started Tutorials
 
-- [A Getting Started Tutorial with a fine-tuned ResNet model](tutorial/getting_started_resnet)
-- [Hello World Jupyter Notebook Tutorial](tutorial/hello_world)
-- [Getting Started ResNet50 Tutorial on iGPU](example/iGPU/getting_started)
-
-
+- [Getting started tutorial with a fine-tuned ResNet model](tutorial/getting_started_resnet)
+- [Hello world jupyter notebook tutorial](tutorial/hello_world)
+- [Getting started ResNet50 example on iGPU](example/iGPU/getting_started)
 
 ## LLM Flow
 
-- [LLMs on RyzenAI with Pytorch](example/transformers)
+- [LLMs on RyzenAI with ONNX Runtime GenAI API](example/llm/oga_api)
 
 
 ## Examples
 
+- BF16 Model Examples
+  - [Finetuned DistilBERT for Text Classification](example/DistilBERT_text_classification_bf16)
+  - [Image classification](example/image_classification)
+  - [Text Embedding Model Alibaba-NLP/gte-large-en-v1.5](example/gte-large-en-v1.5-bf16)
 - [Real-time object detection with Yolov8](tutorial/yolov8)
-- [RAG LLM Sample](example/transformers/models/rag)
 
 
 ## Demos
 
-- [NPU-GPU Pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
+- [NPU-GPU pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
+- [Run multiple concurrent AI applications with ONNX Runtime](demo/multi_model)
+
 
 ## Other Tutorials
 
-- [End-to-end Object Detection](tutorial/yolov8)
-- [Quark Quantization](tutorial/quark_quantization)
+- [AMD Quark Quantization](tutorial/quark_quantization)
+- [Run Ryzen AI CVML library application](Ryzen-AI-CVML-Library)
+- [Torchvision models End-to-End inference with Ryzen AI](tutorial/torchvision_inference)
 
 
-## Benchmarking 
+## Benchmarking
 
-- [ONNX Benchmarking utilities](onnx-benchmark)
+- [ONNX benchmark utilities](onnx-benchmark)
 
 
 ## Reference
 
 - [Ryzen™ AI Developer Guide](https://ryzenai.docs.amd.com/en/latest)
-- [ONNXRuntime Vitis-AI EP](https://onnxruntime.ai/docs/execution-providers/Vitis-AI-ExecutionProvider.html)
+- [ONNX Runtime Vitis-AI EP](https://onnxruntime.ai/docs/execution-providers/Vitis-AI-ExecutionProvider.html)
 - [AMD AI Developer Forum](https://community.amd.com/t5/ai/ct-p/amd_ai)

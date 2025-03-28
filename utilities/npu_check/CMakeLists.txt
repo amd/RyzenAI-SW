@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.13)
 project("npu_util" VERSION 1.0.0.0)
 
 add_executable(npu_util npu_util.cpp example.cpp)
-    
+
 set(CMAKE_DEBUG_POSTFIX "-d")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -19,6 +19,3 @@ install(FILES
     CONFIGURATIONS ${CMAKE_BUILD_TYPE}
     DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}
 )
-
-
-         

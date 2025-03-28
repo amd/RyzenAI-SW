@@ -14,41 +14,41 @@ This tutorials takes [MobileNetV2](https://github.com/onnx/models/blob/main/vali
 ImageNet Dataset
 ----------------
 
-Please ensure to setup the validation and calibration datase using the instruction from [Quark Quantization Tutorial](./onnx/cnn_quant_readme.md)
+Please ensure to setup the validation and calibration datase using the instruction from [AMD Quark Quantization Tutorial](quark_quant_readme.md)
 
 
 Model Evaluation
 ----------------
 
-MobileNet: Using ``XINT8`` configuration, we see a drop of ~3% in the Top-1 accuracy. Optimized models like MobileNetV2 tend to be more difficult to quantize. To bridge the gap between float and quantized accuracy of the model, we can use some advanced quantization configurations or techniques. 
+MobileNet: Using ``XINT8`` configuration, we see a drop of ~3% in the Top-1 accuracy. Optimized models like MobileNetV2 tend to be more difficult to quantize. To bridge the gap between float and quantized accuracy of the model, we can use some advanced quantization configurations or techniques.
 
 ```python
-python advanced_quark_quantize.py --model_input models/mobilenetv2.onnx --model_output models/mobilenetv2_quant.onnx 
+python advanced_quark_quantize.py --model_input models/mobilenetv2.onnx --model_output models/mobilenetv2_quant.onnx
 ```
 
 <div align="center">
 
 | MobileNetV2   | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  13.34 MB  | 71.3%          | 90.6%          |  
-| INT8 (CPU)    |   3.44 MB  | 64.0%          | 86.5%          |  
-| INT8 (NPU)    |   3.44 MB  | 63.7%          | 87.0%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  13.34 MB  | 71.3%          | 90.6%          |
+| INT8 (CPU)    |   3.44 MB  | 64.0%          | 86.5%          |
+| INT8 (NPU)    |   3.44 MB  | 63.7%          | 87.0%          |
 
 </div>
 
 ResNet50: Using ``XINT8`` configuration
 
 ```python
-python advanced_quark_quantize.py --model_input models/resnet50.onnx --model_output models/resnet50_quant.onnx 
+python advanced_quark_quantize.py --model_input models/resnet50.onnx --model_output models/resnet50_quant.onnx
 ```
 
 <div align="center">
 
 | ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |  
-| INT8 (CPU)    |  24.46 MB  | 77.3%          | 94.9%          |  
-| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |
+| INT8 (CPU)    |  24.46 MB  | 77.3%          | 94.9%          |
+| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |
 
 </div>
 
@@ -66,7 +66,7 @@ INT8_CNN_ACCURATE_CONFIG = QuantizationConfig(calibrate_method=CalibrationMethod
                                                   'FastFinetune': DEFAULT_ADAROUND_PARAMS
                                               })
 config = Config(global_quant_config=INT8_CNN_ACCURATE_CONFIG)
-``` 
+```
 
 MobileNet: Using ``INT8_CNN_ACCURATE`` configuration, which improve the accuracy of the model through ``Fast Fine-tuning`` and ``Histogram Percentile`` based techniques.
 
@@ -77,10 +77,10 @@ python advanced_quark_quantize.py --model_input models/mobilenetv2.onnx --model_
 <div align="center">
 
 | MobileNetV2   | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  13.32     | 71.3%          | 90.6%          |  
-| INT8 (CPU)    |   3.43     | 70.5%          | 90.3%          |  
-| INT8 (NPU)    |   3.43     | 69.6%          | 89.4%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  13.32     | 71.3%          | 90.6%          |
+| INT8 (CPU)    |   3.43     | 70.5%          | 90.3%          |
+| INT8 (NPU)    |   3.43     | 69.6%          | 89.4%          |
 
 </div>
 
@@ -93,10 +93,10 @@ python advanced_quark_quantize.py --model_input models/resnet50.onnx --model_out
 <div align="center">
 
 | ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |  
-| INT8 (CPU)    |  24.46 MB  | 79.3%          | 96.2%          |  
-| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          | 
+|---------------|------------|----------------|----------------|
+| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |
+| INT8 (CPU)    |  24.46 MB  | 79.3%          | 96.2%          |
+| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |
 
 </div>
 
@@ -113,7 +113,7 @@ INT8_CLE_CONFIG = QuantizationConfig(calibrate_method=PowerOfTwoMethod.MinMSE,
                                     extra_options={'ActivationSymmetric': True})
 
 config = Config(global_quant_config=INT8_CLE_CONFIG)
-``` 
+```
 
 MobileNet: Using ``Cross Layer Equalization`` configuration
 
@@ -124,8 +124,8 @@ python advanced_quark_quantize.py --model_input models/mobilenetv2.onnx --model_
 <div align="center">
 
 | MobileNetV2   | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  13.32     | 71.3%          | 90.6%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  13.32     | 71.3%          | 90.6%          |
 | INT8 (CPU)    |   3.43     | 62.7%          | 85.4%          |
 | INT8 (NPU)    |   3.43     | 63.7%          | 86.4%          |
 
@@ -140,8 +140,8 @@ python advanced_quark_quantize.py --model_input models/resnet50.onnx --model_out
 <div align="center">
 
 | ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |
 | INT8 (CPU)    |  24.46 MB  | 77.7%          | 95.7%          |
 | INT8 (NPU)    |  24.46 MB  | 78.2%          | 95.6%          |
 

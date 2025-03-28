@@ -7,7 +7,6 @@ import numpy as np
 import onnx
 import shutil
 from timeit import default_timer as timer
-import vai_q_onnx
 
 torch.manual_seed(0)
 
@@ -24,18 +23,18 @@ class SmallModel(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         x = self.relu(x)
-        
+
         x = self.conv2(x)
-        x = self.relu(x) 
-        
+        x = self.relu(x)
+
         x = self.conv3(x)
-        x = self.relu(x) 
-        
+        x = self.relu(x)
+
         x = self.conv4(x)
-        x = self.relu(x) 
-        
+        x = self.relu(x)
+
         x = torch.add(x, 1)
-        
+
         return x
 
 # Instantiate the model
@@ -69,6 +68,8 @@ torch.onnx.export(
     )
 
 # Quantize Model
+from quark.onnx.quantization.config import Config, get_default_config
+from quark.onnx import ModelQuantizer
 
 # `input_model_path` is the path to the original, unquantized ONNX model.
 input_model_path = "models/helloworld.onnx"
@@ -76,20 +77,22 @@ input_model_path = "models/helloworld.onnx"
 # `output_model_path` is the path where the quantized model will be saved.
 output_model_path = "models/helloworld_quantized.onnx"
 
-vai_q_onnx.quantize_static(
-    input_model_path,
-    output_model_path,
-    calibration_data_reader=None,
-    quant_format=vai_q_onnx.QuantFormat.QDQ,
-    calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
-    activation_type=vai_q_onnx.QuantType.QUInt8,
-    weight_type=vai_q_onnx.QuantType.QInt8,
-    enable_ipu_cnn=True,
-    extra_options={'ActivationSymmetric':True}
-)
+# Use default quantization configuration
+quant_config = get_default_config("XINT8")
+quant_config.extra_options["UseRandomData"] = True
+# Defines the quantization configuration for the whole model
+config = Config(global_quant_config=quant_config)
+print("The configuration of the quantization is {}".format(config))
+
+# Create an ONNX Quantizer
+quantizer = ModelQuantizer(config)
+
+# Quantize the ONNX model
+quant_model = quantizer.quantize_model(model_input = input_model_path,
+                                       model_output = output_model_path,
+                                       calibration_data_path = None)
 
 print('Calibrated and quantized model saved at:', output_model_path)
-
 
 # Run Model on CPU Run
 

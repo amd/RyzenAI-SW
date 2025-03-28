@@ -1,3 +1,0 @@
-bin/vaip_config.json
-bin/onnxruntime.dll
-bin/onnxruntime_vitisai_ep.dll

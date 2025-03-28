@@ -25,7 +25,7 @@ Before running this example, ensure that you have followed the Ryzen AI Installa
 Create a clone of the Ryzen AI installation conda environment to add required python packages
 
 ```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.3.0
+set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.4.0
 conda create --name hello_world_env --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate hello_world_env
 ```

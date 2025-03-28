@@ -27,7 +27,7 @@ This folder contains the following files:
 
 Before running this example, ensure that you have followed the Ryzen AI Installation instructions found [here](https://ryzenai.docs.amd.com/en/latest/inst.html) and that you have activated the conda environment created during installation.
 
-## Running the Example
+## Running the classification.ipynb
 
 ### Jupyter Notebook
 
@@ -40,6 +40,35 @@ Before running this example, ensure that you have followed the Ryzen AI Installa
 
 ```python
 python -m ipykernel install --user --name [CONDA_ENV_NAME]
+```
+
+## Running the classification.py
+
+To run the classification.py script, follow these steps:
+
+**Step 1:** Ensure Environment Setup
+Before running the script, ensure you have activated the Ryzen AI conda environment
+```sh
+conda activate ryzen-ai-1.3.1
+```
+**Step 2:** Download the Dataset.
+To obtain the calibration dataset, visit the ImageNet dataset repository on [Hugging Face](https://huggingface.co/datasets/imagenet-1k/tree/main/data).
+You need to register on Hugging Face and download the following file:
+**val_images.tar.gz**.
+
+This file contains a subset of ImageNet images used specifically for calibration.
+
+Once downloaded, move the file to your working directory and run the following commands to extract the dataset into the calib_data directory.
+
+```sh
+mkdir calib_data
+tar -xzf calib_images.tar.gz -C calib_data
+```
+
+**Step 3:** Run the Quark-Based Example
+To execute the hello_world_quark.py script, use the following command:
+```sh
+python classification.py
 ```
 
 ## License

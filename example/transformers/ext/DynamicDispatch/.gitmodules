@@ -1,3 +1,0 @@
-[submodule "ext/dd_helper"]
-	path = ext/dd_helper
-	url = https://gitenterprise.xilinx.com/VitisAI/dd_helper.git

@@ -180,7 +180,6 @@ int main(int argc, char* argv[]) {
     int64_t batch_number = 1;
     auto model_name = strconverter.from_bytes(std::string(argv[optind]));
     cout << "model name:" << std::string(argv[optind]) << endl;
-    auto json_config = std::string(argv[optind + 2]);
     auto ep = std::string(argv[optind + 1]);
     if (!isValidEP(ep)) {
         std::cerr << "Error: Choose from one of the available EP options: cpu, npu.\n";
@@ -190,13 +189,12 @@ int main(int argc, char* argv[]) {
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "resnet_cifar");
     auto session_options = Ort::SessionOptions();
 
-    auto config_key = std::string{ "config_file" };
     auto cache_dir = std::filesystem::current_path().string();
 
     if (ep == "npu")
     {
         auto options =
-            std::unordered_map<std::string, std::string>{ {config_key, json_config}, {"cacheDir", cache_dir}, {"cacheKey", "modelcachekey"} };
+            std::unordered_map<std::string, std::string>{ {"cacheDir", cache_dir}, {"cacheKey", "modelcachekey"} };
         try {
             session_options.AppendExecutionProvider_VitisAI(options);
         }

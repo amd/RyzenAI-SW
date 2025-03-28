@@ -673,7 +673,8 @@ def plot_images(
             for j, box in enumerate(boxes.T.tolist()):
                 c = classes[j]
                 color = colors(c)
-                c = names[c] if names else c
+                names2=names.split('\n')
+                c = names2[c] if names2 else c
                 if labels or conf[j] > 0.25:  # 0.25 conf thresh
                     label = f"{c}" if labels else f"{c} {conf[j]:.1f}"
                     annotator.box_label(box, label, color=color)

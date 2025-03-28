@@ -1,0 +1,11 @@
+pandas
+pyarrow
+matplotlib
+psutil
+keyboard
+pyperclip
+importlib-metadata
+packaging
+pillow
+torchvision
+tabulate

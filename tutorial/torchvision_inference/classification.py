@@ -1,69 +1,68 @@
-# -------------------------------------------------------------------------
+﻿# -------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 # --------------------------------------------------------------------------
 
-# Get model from torchvision
+# Import necessary libraries
 import os
 import torch
-from torch.utils.data import DataLoader
-
+import torch.nn as nn
 import torchvision
-from torchvision.models import resnet50, ResNet50_Weights
-import torchvision.transforms as transforms 
-
-import onnx
-import onnxruntime
-from onnxruntime.quantization import CalibrationDataReader, QuantType, QuantFormat, CalibrationMethod, quantize_static
-
-import numpy as np 
-import json
-import time
 import subprocess
+import onnxruntime
+import numpy as np
+import onnx
+import shutil
+import time 
+from timeit import default_timer as timer
+from quark.onnx import ModelQuantizer  
+from quark.onnx.quantization.config import Config, get_default_config  
+from utils_custom import ImageDataReader, evaluate_onnx_model 
+import json  
 
-import vai_q_onnx
-from classification_utils import get_directories
+# ---------------- Model Setup ---------------- #
 
+# Define directories
+models_dir = "models"
+os.makedirs(models_dir, exist_ok=True)
 
-_, models_dir = get_directories()
+# Load pre-trained ResNet50 model
+model = torchvision.models.resnet50(weights="IMAGENET1K_V2")
 
-## load model from torchvision
-model = resnet50(weights="IMAGENET1K_V2")
-
-## Save the model
+# Save the model
 model.to("cpu")
-torch.save(model, str(models_dir / "resnet50.pt"))
+torch.save(model, os.path.join(models_dir, "resnet50.pt"))
 
-# Export to ONNX
+# Export model to ONNX
 dummy_inputs = torch.randn(1, 3, 224, 224)
 input_names = ['input']
 output_names = ['output']
 dynamic_axes = {'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
-tmp_model_path = str(models_dir / "resnet50.onnx")
+tmp_model_path = os.path.join(models_dir, "resnet50.onnx")
 
-## Call export function
 torch.onnx.export(
-        model,
-        dummy_inputs,
-        tmp_model_path,
-        export_params=True,
-        opset_version=13,  # Recommended opset
-        input_names=input_names,
-        output_names=output_names,
-        dynamic_axes=dynamic_axes,
-    )
+    model,
+    dummy_inputs,
+    tmp_model_path,
+    export_params=True,
+    opset_version=13,  # Recommended opset
+    input_names=input_names,
+    output_names=output_names,
+    dynamic_axes=dynamic_axes,
+)
 
-# Quantize the model
+print(f" Model exported to ONNX at: {tmp_model_path}")
 
-## Modify the datapath to imagenet folder
-data_dir = "imagenet"
+# ---------------- Quark Quantization ---------------- #
 
-## `input_model_path` is the path to the original, unquantized ONNX model.
-input_model_path = "models/resnet50.onnx"
+# Define dataset directory
+calib_dir = "calib_data" 
 
-## `output_model_path` is the path where the quantized model will be saved.
-output_model_path = "models/resnet50_quantized.onnx"
+# Set input & output ONNX model paths
+input_model_path = tmp_model_path
+output_model_path = os.path.join(models_dir, "resnet50_quantized.onnx")
 
+# Preprocessing transformations
 preprocess = torchvision.transforms.Compose([
     torchvision.transforms.Resize(256),
     torchvision.transforms.CenterCrop(224),
@@ -71,43 +70,33 @@ preprocess = torchvision.transforms.Compose([
     torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-calib_dir = os.path.join(data_dir, 'calib_data')
+# Load dataset
 calib_dataset = torchvision.datasets.ImageFolder(root=calib_dir, transform=preprocess)
 
-class ClassificationCalibrationDataReader(CalibrationDataReader):
-    def __init__(self, calib_dir: str, batch_size: int = 1):
-        super().__init__()
-        self.iterator = iter(DataLoader(calib_dir, batch_size))
+#Data set 
+num_calib_data = 600  
+calib_dataset = torch.utils.data.Subset(calib_dataset, range(num_calib_data))
 
-    def get_next(self) -> dict:
-        try:
-            images, labels = next(self.iterator)
-            return {"input": images.numpy()}
-        except Exception:
-            return None
+# Define DataLoader for Calibration
+calibration_dataloader = torch.utils.data.DataLoader(calib_dataset, batch_size=10, shuffle=False)
 
+# Configure Quark Quantization
+quant_config = get_default_config("XINT8")  # Use XINT8 quantization  
+config = Config(global_quant_config=quant_config)
 
-def classification_calibration_reader(calib_dir, batch_size=1):
-    return ClassificationCalibrationDataReader(calib_dir, batch_size=batch_size)
+# Create an ONNX Quantizer  
+quantizer = ModelQuantizer(config)  
 
-dr = classification_calibration_reader(calib_dataset)
-
-vai_q_onnx.quantize_static(
-    input_model_path,
-    output_model_path,
-    dr,
-    quant_format=vai_q_onnx.QuantFormat.QDQ,
-    calibrate_method=vai_q_onnx.PowerOfTwoMethod.MinMSE,
-    activation_type=vai_q_onnx.QuantType.QUInt8,
-    weight_type=vai_q_onnx.QuantType.QInt8,
-    enable_ipu_cnn=True, 
-    extra_options={'ActivationSymmetric': True} 
+# Perform Quark Quantization  
+quant_model = quantizer.quantize_model(
+    model_input=input_model_path,   
+    model_output=output_model_path,   
+    calibration_data_reader=ImageDataReader(calibration_dataloader)  # Use ImageDataReader from utils_custom
 )
-print('Calibrated and quantized model saved at:', output_model_path)
 
+print(f" Quark Quantized model saved at: {output_model_path}")
 
-
-# preprocessing
+# ---------------- Inference & Evaluation ---------------- #
 
 from PIL import Image
 
@@ -116,17 +105,17 @@ def load_labels(path):
         data = json.load(f)
     return np.asarray(data)
 
-def preprocess(input):
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+def preprocess_image(input):
+    normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
   
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize((224, 224)),
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Resize((224, 224)),
         normalize,
     ])
     img_tensor = transform(input).unsqueeze(0)
     return img_tensor.numpy()
-    
+
 def softmax(x):
     x = x.reshape(-1)
     e_x = np.exp(x - np.max(x))
@@ -134,39 +123,35 @@ def softmax(x):
 
 def postprocess(result):
     return softmax(np.array(result)).tolist()
+
 labels = load_labels('data/imagenet-simple-labels.json')
 image = Image.open('data/dog.jpg')
 
 print("Image size: ", image.size)
-input_data = preprocess(image)
+input_data = preprocess_image(image)
 
-# CPU inference
-
-# Specify the path to the quantized ONNX Model
-onnx_model_path = "models/resnet50_quantized.onnx"
-
+# Run inference on CPU
+onnx_model_path = output_model_path
 cpu_options = onnxruntime.SessionOptions()
 
-# Create Inference Session to run the quantized model on the CPU
 cpu_session = onnxruntime.InferenceSession(
     onnx_model_path,
-    providers = ['CPUExecutionProvider'],
+    providers=['CPUExecutionProvider'],
     sess_options=cpu_options,
 )
-start = time.time()
+
+start = timer()
 cpu_outputs = cpu_session.run(None, {'input': input_data})
-end = time.time()
+end = timer()
 
 cpu_results = postprocess(cpu_outputs)
 inference_time = np.round((end - start) * 1000, 2)
 idx = np.argmax(cpu_results)
 
 print('----------------------------------------')
-print('Final top prediction is: ' + labels[idx])
+print(f'Final top prediction is: {labels[idx]}')
 print('----------------------------------------')
-
-print('----------------------------------------')
-print('Inference time: ' + str(inference_time) + " ms")
+print(f'Inference time: {inference_time} ms')
 print('----------------------------------------')
 
 sort_idx = np.flip(np.squeeze(np.argsort(cpu_results)))

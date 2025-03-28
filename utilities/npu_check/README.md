@@ -27,15 +27,21 @@ namespace npu_util {
     // Checks whether the system configuration is compatible for VitisAI EP 1.3
     NPUInfo checkCompatibility_RAI_1_3();
 
+    // Checks whether the system configuration is compatible for VitisAI EP 1.3.1
+    NPUInfo checkCompatibility_RAI_1_3_1();
+
+    // Checks whether the system configuration is compatible for VitisAI EP 1.4
+    NPUInfo checkCompatibility_RAI_1_4();
+
 }
 ```
 
-The `checkCompatibility_RAI_1_2()` and `checkCompatibility_RAI_1_3()` implement compatibility checks for specific versions of the VitisAI EP. These APIs return a `NPUInfo` struct containing various information about the environment.
+The APIs implement compatibility checks for specific versions of the VitisAI EP. These APIs return a `NPUInfo` struct containing various information about the environment.
 
 The `check` field of the `NPUInfo` struct is set to `Status::OK` if the following conditions are met:
  - The system has a supported AMD NPU
  - NPU drivers are installed, and the version satisfies the minimum version required by the VitisAI EP being used.
- - The current date is less than 3 years after the release of the VitisAI EP being used. 
+ - The current date is less than 3 years after the release of the VitisAI EP being used.
 
 If the `check` field is set to a value other than `Status::OK`, the application should not use the VitisAI EP.
 

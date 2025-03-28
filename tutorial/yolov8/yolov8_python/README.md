@@ -18,7 +18,8 @@ Author: Fan Zhang, AMD-Xilinx
 
 This folder contains the following files:
 
-- `yolov8.ipynb`: Jupyter Notebook demonstrating how to grab a classificatioin model from torchvision and port it to run on the Ryzen AI Neural Processing Unit (NPU)
+- `yolov8_webcam.ipynb`: Jupyter Notebook showing how to grab a object detection model from torchvision and run it on RyzenAI using onnxruntime. Inference is run with a single frame on CPU, iGPU and NPU. Finally, continuous inference is accelerated on NPU for the video input from a webcam.
+- `yolov8_video.ipynb`: Jupyter Notebook showing how to grab a object detection model from torchvision and run it on RyzenAI using onnxruntime. Inferece is acceleated with NPU for the input from a video file. The output is the display of the video annotated with bounding boxes of the detected objects.
 - `yolov8_utils.py`: This is a Python file contains some sub-functions.
 - `README.md`: This file provides an overview of the folder's contents.
 - `requirements.txt`: This file contains the necessary dependencies and packages required to run the code in this folder.

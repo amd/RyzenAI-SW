@@ -1,0 +1,34 @@
+{
+    "screen": {
+        "width": 1024,
+        "height": 640,
+        "split_channel_matrix_size": 1
+    },
+    "pipelines": [
+        {
+            "thread_num": 4,
+            "decode": {
+                 "video_file_path": "resource\\detection",
+                "repeat_frame_per_image":30
+
+            },
+            "model": {
+                "type": "mobile_net_v2",
+                "config": {
+                    "onnx_config": {
+                        "onnx_x": 1,
+                        "onnx_y": 1,
+                        "onnx_disable_spinning": false,
+                        "onnx_disable_spinning_between_run": false,
+                        "intra_op_thread_affinities": "0"
+                    },
+                    "onnx_model_path": "resource\\mobilenetv2_1.4_int.onnx",
+                    "confidence_threshold": 0.3
+                }
+            },
+            "sort": {
+                "channel_matrix_id": 0
+            }
+        }
+    ]
+}
