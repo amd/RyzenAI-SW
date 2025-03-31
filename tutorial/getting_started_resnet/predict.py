@@ -27,7 +27,6 @@ if opt.ep == 'npu':
    providers = ['VitisAIExecutionProvider']
    cache_dir = Path(__file__).parent.resolve()
    provider_options = [{
-                'config_file': 'vaip_config.json',
                 'cacheDir': str(cache_dir),
                 'cacheKey': 'modelcachekey'
             }]
