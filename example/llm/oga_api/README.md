@@ -35,7 +35,7 @@ AMD provides a set of pre-optimized LLMs ready to be deployed with Ryzen AI Soft
 
 ## Run Models using C++ and Python Onnxruntime GenAI API
 
-- The steps for deploying the pre-optimized models using Python or C++ APIs for the Hybrid execution mode of LLMs, which leverages both the NPU and GPU can be found in the Official Ryzen AI Software 1.4 documantion page here - https://ryzenai.docs.amd.com/en/develop/hybrid_oga.html
+- The steps for deploying the pre-optimized models using Python or C++ APIs for the Hybrid execution mode of LLMs, which leverages both the NPU and GPU can be found in the Official Ryzen AI Software 1.4 documantion page here - https://ryzenai.docs.amd.com/en/latest/hybrid_oga.html
 
 # Copyright
 
