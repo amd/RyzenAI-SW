@@ -1,0 +1,10 @@
+transformers==4.48.0
+datasets==3.2.0
+trl==0.13.0
+evaluate
+peft==0.14.0
+bert_score
+wandb
+nltk
+onnxruntime_genai==0.6.0
+numpy==1.26.0
