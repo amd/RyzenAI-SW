@@ -1,6 +1,6 @@
 # Ryzen AI LLM Lemonade Examples
 
-The following table contains a curated list of LLMs that have been validated with the [Lemonade SDK](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/README.md) on Ryzen AI hybrid execution mode, along with CPU implementations of those same checkpoints. 
+The following table contains a curated list of LLMs that have been validated with the [Lemonade SDK](https://github.com/lemonade-sdk/lemonade) on Ryzen AI hybrid execution mode, along with CPU implementations of those same checkpoints. 
 
 The hybrid examples are built on top of OnnxRuntime GenAI (OGA), while the CPU baseline is built on top of Hugging Face (HF) ``transformers``. Validation is defined as running all commands in the example page successfully.
 
