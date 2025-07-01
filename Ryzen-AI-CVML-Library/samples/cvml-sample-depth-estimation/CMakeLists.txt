@@ -1,4 +1,4 @@
-# Copyright (C) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 
 set(PROJECT_NAME cvml-sample-depth-estimation)
 project(${PROJECT_NAME})
@@ -10,7 +10,7 @@ find_package(OpenCV REQUIRED PATHS ${OPENCV_INSTALL_ROOT})
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 #
-# Find Ryzen AI library (also sets include directories)
+# Find Ryzen AI CVML library (also sets include directories)
 #
 if (NOT DEFINED AMD_CVML_SDK_ROOT)
     set(AMD_CVML_SDK_ROOT ../..)

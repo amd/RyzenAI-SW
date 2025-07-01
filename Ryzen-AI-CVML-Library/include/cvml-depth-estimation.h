@@ -46,9 +46,11 @@ class CVML_SDK_EXPORT DepthEstimation {
 
  public:
   /**
-   * Constructor for the Depth Estimation feature.
+   * Constructor for DepthEstimation feature.
    *
-   * @param context Pointer to CVML SDK context
+   * Creates a Depth Estimation feature object against the provided CVML context.
+   * This function throws exceptions on errors.
+   * @param context CVML context
    */
   explicit DepthEstimation(Context* context);
 
@@ -83,6 +85,7 @@ class CVML_SDK_EXPORT DepthEstimation {
    *
    * @return Image type of the depth estimation output (ImageType)
    */
+  [[deprecated("Output type is determined by the provided output image buffer")]]
   ImageType GetOutputType() const;
 
   class Impl;

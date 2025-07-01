@@ -1,9 +1,8 @@
-# release 20
+# release 21
 
 import pandas as pd
 import numpy as np
 import os
-import pandas as pd
 import matplotlib.pyplot as plt
 import shutil
 import argparse
@@ -21,8 +20,8 @@ import inspect
 import gc
 import textwrap
 
-import onnx
 import onnxruntime
+import onnx
 from onnx import version_converter, helper
 import onnx_tool
 import random
@@ -363,7 +362,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
         "p_core",
         "p_execution_provider",
         "p_infinite",
-        "p_instance_count",
+        #"p_instance_count",
         "p_intra_op_num_threads",
         "p_json",
         "p_min_interval",
@@ -429,7 +428,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
                 "p_core": args.core,
                 "p_execution_provider": args.execution_provider,
                 "p_infinite": args.infinite,
-                "p_instance_count": args.instance_count,
+                #"p_instance_count": args.instance_count,
                 "p_intra_op_num_threads": args.intra_op_num_threads,
                 "p_json": args.json,
                 "p_min_interval": args.min_interval,
@@ -477,12 +476,12 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
                 "Swap_Memory": measurement["system"]["resources"]["Swap_Memory"],
                 "npu_driver": measurement["system"]["driver"]["npu"],
                 "xclbin_path": measurement["environment"]["xclbin"]["xclbin_path"] if args.execution_provider == "VitisAIEP" else "",
-                "vaip": measurement["environment"]["xclbin"]["packages"]["vaip"]["version"],
-                "target_factory": measurement["environment"]["xclbin"]["packages"]["target_factory"]["version"],
+                #"vaip": measurement["environment"]["xclbin"]["packages"]["vaip"]["version"],
+                #"target_factory": measurement["environment"]["xclbin"]["packages"]["target_factory"]["version"],
                 "xcompiler": measurement["environment"]["xclbin"]["packages"]["xcompiler"]["version"],
-                "onnxruntime": measurement["environment"]["xclbin"]["packages"]["onnxrutnime"]["version"],
-                "graph_engine": measurement["environment"]["xclbin"]["packages"]["graph_engine"]["version"],
-                "xrt": measurement["environment"]["xclbin"]["packages"]["xrt"]["version"],
+                #"onnxruntime": measurement["environment"]["xclbin"]["packages"]["onnxrutnime"]["version"],
+                #"graph_engine": measurement["environment"]["xclbin"]["packages"]["graph_engine"]["version"],
+                #"xrt": measurement["environment"]["xclbin"]["packages"]["xrt"]["version"],
             }
         )
     ggprint(f"Data appended to {csv_file}")
@@ -535,28 +534,12 @@ def check_env(release, args):
     ggprint("Preliminary environment check")
 
     required_vars = [
-        "RYZEN_AI_CONDA_ENV_NAME",
         "RYZEN_AI_INSTALLATION_PATH",
-        "DEVICE",
-        "VAIP_CONFIG_HOME"
     ]
     missing_vars = [var for var in required_vars if os.getenv(var) is None]
     if missing_vars:
         ggprint(f"Error: Missing environment variables: {', '.join(missing_vars)}")
-        ggprint("Please run `set_env.bat` to set up the required environment variables.")
         sys.exit(1)
-
-    expected_env = os.getenv("RYZEN_AI_CONDA_ENV_NAME")
-    actual_env = os.getenv("CONDA_DEFAULT_ENV")
-
-    if actual_env != expected_env:
-        ggprint(f"Error: Conda environment '{expected_env}' is required but '{actual_env}' is currently active.")
-        ggprint(f"Please activate the correct environment using:")
-        ggprint(f"    conda activate {expected_env}")
-        sys.exit(1)
-
-    ggprint("All checks passed. Environment is correctly set up.")
-
 
     if sys.version_info.major == 3 and sys.version_info.minor == 10:
         data.append(
@@ -576,7 +559,7 @@ def check_env(release, args):
     package_name = "onnxruntime-vitisai"
     version = check_package_version(package_name)
     fields = version.split('.')
-    if fields[0] == "1" and fields[1] in ["19", "20"]:
+    if fields[0] == "1" and fields[1] in ["21","22"]:
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -591,7 +574,7 @@ def check_env(release, args):
     package_name = "voe"
     version = check_package_version(package_name)
     fields = version.split('.')
-    if fields[0] == "1" and (fields[1] == "4"):
+    if fields[0] == "1" and (fields[1] == "5"):
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -634,13 +617,14 @@ def check_env(release, args):
     
 def check_args(args, defaults):
     assert args.num >= (
-        args.batchsize * args.instance_count
-    ), "runs must be greater than batches*instance-count"
+        #args.batchsize * args.instance_count
+        args.batchsize
+    ), "runs must be greater than batches"
 
-    total_cpu = os.cpu_count()
-    if args.instance_count > total_cpu:
-        args.instance_count = total_cpu
-        ggprint(f"Limiting instance count to max cpu count ({total_cpu})")
+    #total_cpu = os.cpu_count()
+    #if args.instance_count > total_cpu:
+    #    args.instance_count = total_cpu
+    #    ggprint(f"Limiting instance count to max cpu count ({total_cpu})")
 
     if args.execution_provider == "VitisAIEP":
         assert os.path.exists(defaults['config']) or os.path.exists(args.config), (
@@ -689,29 +673,6 @@ def del_file(killme):
     if os.path.exists(killme):
         os.remove(killme)
         #ggprint(f"Old measurement {measfile} deleted successfully")
-
-def detect_device():
-    def get_driver_info(device_name):
-        # PowerShell command to get device details
-        command = f'powershell -Command "Get-WmiObject Win32_PnPEntity | Where-Object {{ $_.Name -like \'*{device_name}*\' }} | Select-Object Name, DeviceID"'
-        result = subprocess.run(command, capture_output=True, text=True, shell=True)
-        device_info = result.stdout.strip()
-    
-        return device_info
-
-    device_name = "NPU Compute Accelerator Device"
-    device_info = get_driver_info(device_name)
-    #print("Device Info:\n", device_info)
-
-    if "17F0" in device_info:
-        device = "strix"
-    elif "1502" in device_info:
-        device = "phoenix"
-    else: device = "ERROR Device Unknown"
-
-    #print(f'Device = {device}')
-    return device   
-
 
 def extract_flops_mem_params(file_path):
 
@@ -764,7 +725,7 @@ def ggprint(linea):
 def ggquantize(args):
     input_model_path = args.model
     calib_data_folder = args.calib
-
+ 
     base_name, extension = os.path.splitext(input_model_path)
 
     # OPSET update to 17
@@ -773,17 +734,18 @@ def ggquantize(args):
     # Apply the version conversion on the original model
 
     # Preprocessing: load the model to be converted.   
-    newopset = 17
+    newopset = 20
     original_model = onnx.load(input_model_path)
     opset_version = original_model.opset_import[0].version
     if opset_version<11:
         ggprint(f'The model OPSET is {opset_version} and should be updated to {newopset}')
         if args.update_opset == '1':
-            output_updated = f"{base_name}_opset17{extension}"
+            output_updated = f"{base_name}_opset{newopset}{extension}"
             converted_model = version_converter.convert_version(original_model, newopset)
             onnx.save(converted_model, output_updated)
             ggprint(f'The update model was saved with name {output_updated}')
             input_model_path = output_updated
+            base_name, extension = os.path.splitext(input_model_path)
         else:
             ggprint("You opted not to update")
     # free memory
@@ -826,64 +788,51 @@ def ggquantize(args):
         else:
             return "UNKNOWN"
     
-    precision = detect_onnx_precision(input_model_path)
-    print(f"The ONNX model precision is: {precision}")
+    datatype = detect_onnx_precision(input_model_path)
+    ggprint(f"The ONNX model data type is: {datatype}")
    
     #output_INT8_NHWC_model_path = f"{base_name}_int8{extension}"
     
-    
-    if precision in ["BF16", "INT8"]:
+    if datatype in ["BF16", "INT8"]:
         return input_model_path
     else:
-        quantized_output_model= f"{base_name}_{args.quarkpreset}{extension}"
-        if args.renew == "1":
-            cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(quantized_output_model))
-            cancelcache(cache_dir)
+        if args.autoquant=="1":
+            quantized_output_model= f"{base_name}_{args.quarkpreset}{extension}"
+            if args.renew == "1":
+                cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(quantized_output_model))
+                cancelcache(cache_dir)
 
-        print(Colors.MAGENTA)
-        
-        # NCHW or NHWC? we want NHWC (Channel last)
-        input_name, input_shape = get_input_info(input_model_path)
-        print(f"Model Input Name: {input_name}, Model Input Shape: {input_shape}")
+            print(Colors.MAGENTA)
+            # NCHW or NHWC? we want NHWC (Channel last)
+            input_name, input_shape = get_input_info(input_model_path)
+            print(f"Model Input Name: {input_name}, Model Input Shape: {input_shape}")
 
-        order = analyze_input_format(input_shape)
-        if order == "NHWC":
-            nchw_to_nhwc = False
-            print("The input format is already NHWC - this is the optimal shape")
-            # calibration images are OK
-            # model is OK
-        elif order =="NCHW":
-            nchw_to_nhwc = True
-            print("The input format is NCHW - conversion to NHWC enabled")
-            # calibration images will be transposed
-            # model will be turned to NHWC
-       
-        # 3) prepare the calibration directory
-        #calib_dir = "calibration"
-        
-        #copied_images = SetCalibDir(imagenet_directory, calib_dir, args.num_calib)
-        #print(f"Successfully copied {copied_images} RGB images to {calib_dir}")
+            order = analyze_input_format(input_shape)
+            if order == "NHWC":
+                nchw_to_nhwc = False
+                print("The input format is already NHWC - this is the optimal shape")
+                # calibration images are OK
+                # model is OK
+            elif order =="NCHW":
+                nchw_to_nhwc = True
+                print("The input format is NCHW - conversion to NHWC enabled")
+                # calibration images will be transposed
+                # model will be turned to NHWC
 
-        # Data Reader is a utility class that reads the calibration dataset and prepares it for the quantization process.
-        #data_reader = DataReader( calibration_folder=calibration_dataset_path, batch_size=1, target_size=input_shape, inputname=input_name)
-        
-        data_reader =ImageDataReader(calib_data_folder, input_model_path, args.num_calib, 1, order)
+            data_reader =ImageDataReader(calib_data_folder, input_model_path, args.num_calib, 1, order)
+            quant_config = get_default_config(args.quarkpreset)
+            quant_config.convert_nchw_to_nhwc= nchw_to_nhwc
+            config = Config(global_quant_config=quant_config)
+            quantizer = ModelQuantizer(config)
+            quantizer.quantize_model(input_model_path, quantized_output_model, data_reader)
+            print(f'Quark quantized model {quantized_output_model} saved')
+            print(Colors.RESET)
+            return quantized_output_model
+        else:
+            ggprint("[WARNING] the model is in FP32 data: please select CPU EP or quantize it first.")
+            sys.exit(1)
+            
 
-
-        
-        quant_config = get_default_config(args.quarkpreset)
-        
-        quant_config.convert_nchw_to_nhwc= nchw_to_nhwc
-
-        config = Config(global_quant_config=quant_config)
-        quantizer = ModelQuantizer(config)
-        
-        quantizer.quantize_model(input_model_path, quantized_output_model, data_reader)
-        
-        print(f'Quark quantized model {quantized_output_model} saved')
-        print(Colors.RESET)
-
-        return quantized_output_model
 
 def get_input_format(onnx_model_path):
     onnx_model = onnx.load(onnx_model_path)
@@ -1117,13 +1066,14 @@ def parse_cpp_res(file_path):
                 data[current_model]['throughput'] = throughput
         return data
 
-def parse_args(device):
+def parse_args(apu_type):
 
-    def_config_path = os.path.join(os.environ.get('VAIP_CONFIG_HOME'), 'vaip_config.json')
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']    
+    config_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'vaip_config.json')
 
     defaults = {
         'calib': ".\\images",
-        'config': def_config_path,
+        'config': config_file,
         'core': "STX_1x4",
         'execution_provider': 'CPU',
     }
@@ -1148,24 +1098,24 @@ def parse_args(device):
         default=defaults['config'],
         help="path to config json file. Default= <release>/vaip_config.json",
     )
-
-    if device=="strix":
+    
+    if apu_type=="STX":
         parser.add_argument(
             "--core",
-            default="STX_1x4",
+            default="STX_4x4",
             type=str,
-            choices=["STX_1x4","STX_4x4"],
-            help="Which core to use with STRIX silicon. Default=STX_1x4",
+            choices=["STX_4x4"],
+            help="Which core to use with STRIX silicon. Default=STX_4x4",
         )
-    elif device=="phoenix" or device=="hawk":
+    elif apu_type=="PHX/HPT":
         parser.add_argument(
             "--core",
-            default="PHX_1x4",
+            default="PHX_4x4",
             type=str,
-            choices=["PHX_1x4","PHX_4x4"],
-            help="Which core to use with PHOENIX silicon. Default=PHX_1x4",
+            choices=["PHX_4x4"],
+            help="Which core to use with PHOENIX silicon. Default=PHX_4x4",
         )
-
+    
     parser.add_argument(
         "--cpp",
         type=str,
@@ -1191,13 +1141,14 @@ def parse_args(device):
         help="if 1: Executing an infinite loop, when combined with a time limit, enables the test to run for a specified duration. Default=1",
     )
     
-    parser.add_argument(
-        "--instance_count",
-        "-i",
-        type=int,
-        default=1,
-        help="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1",
-    )
+    # This parameter has been disabled and hardcoded to 1 in release 21
+    #parser.add_argument(
+    #    "--instance_count",
+    #    "-i",
+    #    type=int,
+    #    default=1,
+    #    help="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1",
+    #)
 
     parser.add_argument(
         "--intra_op_num_threads", 
@@ -1281,6 +1232,14 @@ def parse_args(device):
         default="1",
         choices=["0", "1"],
         help="if set to 1 cancel the cache and recompile the model. Set to 0 to keep the old compiled file. Default=1",
+    )
+    
+    parser.add_argument(
+        "--autoquant",
+        type=str,
+        default="0",
+        choices=["0", "1"],
+        help="if set to 1 enables auto-quantization with Quark. If the model is FP32 and this option is set to 0, the model is sent to the CPU. Default=0",
     )
     
     parser.add_argument(
@@ -1528,22 +1487,21 @@ def plotenergy_hwinfo(npu, cpu, apu, recordfilename):
     plt.savefig(save_filepath, dpi=300, bbox_inches='tight')
 
 def PHX_1x4_setup(silicon):
-    xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), '1x4.xclbin')
-    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '1x4.xclbin')  
     os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_Nx4_Overlay"
     ggprint(80*"-")
-    ggprint("Core selection")
-    ggprint(f"Path to xclbin_path = {xclbin_path}")
-    ggprint(os.environ["XLNX_TARGET_NAME"])
+    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
+    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
+
 
 def PHX_4x4_setup(silicon):
-    xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), '4x4.xclbin')
-    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')  
     os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_4x4_Overlay"
     ggprint(80*"-")
-    ggprint("Core selection")
-    ggprint(f"Path to xclbin_path = {xclbin_path}")
-    ggprint(os.environ["XLNX_TARGET_NAME"])
+    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
+    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
 
 def profile_model(modelpath):
     #credits: https://github.com/ThanatosShinji/onnx-tool/blob/main/benchmark/examples.py
@@ -1562,7 +1520,6 @@ def profile_model(modelpath):
     model_fmp = {"name":model_name} | fmp
 
     return model_fmp
-
 
 def set_ZEN_env():
     os.environ["ZENDNN_LOG_OPTS"] = "ALL:0"
@@ -1609,23 +1566,20 @@ def save_result_json(results, filename):
     ggprint(f"Data saved in {filename}")
 
 def STX_1x4_setup(silicon):
-    xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_Nx4_Overlay.xclbin')
-    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_Nx4_Overlay.xclbin')  
     os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_Nx4_Overlay"
     ggprint(80*"-")
-    ggprint("Core selection")
-    ggprint(f"Path to xclbin_path = {xclbin_path}")
-    ggprint(os.environ["XLNX_TARGET_NAME"])
+    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
+    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
 
 def STX_4x4_setup(silicon):
-    #xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_4x4_Overlay_CFG0.xclbin')
-    xclbin_path = os.path.join(os.environ.get('XCLBINHOME'), 'AMD_AIE2P_4x4_Overlay.xclbin')
-    os.environ['XLNX_VART_FIRMWARE'] = str(xclbin_path)       
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')  
     os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_4x4_Overlay"
     ggprint(80*"-")
-    ggprint("Core selection")
-    ggprint(f"Path to xclbin_path = {xclbin_path}")
-    ggprint(os.environ["XLNX_TARGET_NAME"])
+    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
+    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
 
 def set_engine_shape(case):
     switch_dict = {
@@ -1751,7 +1705,7 @@ def time_violin(filename, relevant_cols, title, xlabel, ylabel):
     plt.savefig(save_filepath, dpi=300, bbox_inches='tight')
 
 def tops_peak(device):
-    gp = {"strix": 50, "strix_50tops": 50, "strix_55tops": 55, "phoenix": 8, "hawk": 14.4}
+    gp = {"strix_50tops": 50, "strix_55tops": 55, "phoenix": 8, "hawk": 14.4}
     return gp[device]
 
 def _preprocess_images(images_folder: str,
@@ -1853,4 +1807,46 @@ class ImageDataReader(CalibrationDataReader):
 
     def reset(self):
         self.enum_data = None
+
+
+def get_apu_info():
+    # Run pnputil as a subprocess to enumerate PCI devices
+    command = r'pnputil /enum-devices /bus PCI /deviceids '
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    # Check for supported Hardware IDs
+    apu_type = ''
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): apu_type = 'KRK'
+    return apu_type
+
+def set_environment_variable(apu_type):
+
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    os.environ['XLNX_ENABLE_CACHE']='1'
+    os.environ['XLNX_ONNX_EP_REPORT_FILE']='vitisai_ep_report.json'
+
+    match apu_type:
+        case 'PHX/HPT':
+            print("Setting environment for PHX/HPT")
+            os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
+            os.environ['NUM_OF_DPU_RUNNERS']='1'
+            os.environ['XLNX_TARGET_NAME']='AMD_AIE2_4x4_Overlay'
+        case ('STX' | 'KRK'):
+            print("Setting environment for STX")
+            os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
+            os.environ['NUM_OF_DPU_RUNNERS']='1'
+            os.environ['XLNX_TARGET_NAME']='AMD_AIE2P_4x4_Overlay'
+        case _:
+            print("Unrecognized APU type. Exiting.")
+            exit()
+    # print('XLNX_VART_FIRMWARE=', os.environ['XLNX_VART_FIRMWARE'])
+    # print('NUM_OF_DPU_RUNNERS=', os.environ['NUM_OF_DPU_RUNNERS'])
+    # print('XLNX_TARGET_NAME=', os.environ['XLNX_TARGET_NAME'])
+    # print('XLNX_ENABLE_CACHE=', os.environ['XLNX_ENABLE_CACHE'])
+
+
 

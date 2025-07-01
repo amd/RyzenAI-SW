@@ -45,21 +45,13 @@ def main(args):
                     'cacheDir': str(cache_dir),
                     'cacheKey': 'modelcachekey'
                 }]
-    if args.device == 'CPU':
+    if args.device == 'cpu':
         # Run the float model on CPU
         session = ort.InferenceSession(model.SerializeToString(), providers=provider)
         print('Benchmarking model on CPU:')
         benchmark_model(session)
-        # Run the BF16 model on CPU and Register BF16 operations
-        # import onnxruntime
-        # from quark.onnx import get_library_path
-        # sess_options = onnxruntime.SessionOptions()
-        # sess_options.register_custom_ops_library(get_library_path(device='cpu'))
-        # session = onnxruntime.InferenceSession(input_model_path, sess_options, providers=provider)
-        # session = onnxruntime.InferenceSession(bf16_model.SerializeToString(), sess_options, providers=provider)
-        # print('Benchmarking CPU BF16 model:')
-        # benchmark_model(session)
-    elif args.device == 'NPU':
+    
+    elif args.device == 'npu':
         # Run quantized model on NPU
         quant_model = onnx.load(input_model_path)
         provider = ['VitisAIExecutionProvider']

@@ -14,9 +14,16 @@ This is an example showing how to run the ResNet50 model from PyTorch on AMD's i
 Create a clone of the Ryzen AI installation conda environment to add required python packages
 
 ```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-1.3.0
+set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name igpu-example --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate igpu-example
+```
+
+Set RyzenAI Environment variable
+
+```bash
+# Default location of RyzenAI software installation
+set RYZEN_AI_INSTALLATION_PATH=<Path to RyzenAI Installation>
 ```
 
 ## Install Olive 

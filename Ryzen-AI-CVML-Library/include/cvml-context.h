@@ -1,5 +1,5 @@
 /*!
- * Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2021-2025 Advanced Micro Devices, Inc. All rights reserved.
  *
  * @file
  *
@@ -48,14 +48,14 @@ struct SupportedPlatformInformation {
 };
 
 /**
- * Execution context for Ryzen AI Library features.
+ * Execution context for Ryzen AI CVML library features.
  *
  * An appropriate context must be created by calling,
  *
  *     amd::cvml::CreateContext()
  *
- * before using any features in the Ryzen AI Library and provided to the
- * feature constructor(s).
+ * before using any features in the Ryzen AI CVML library and provided
+ * to the feature constructor(s).
  *
  * The context can be shared by multiple features of the SDK.
  */
@@ -154,6 +154,35 @@ class CVML_SDK_EXPORT_CORE Context {
    * @param mode Desired streaming mode.
    */
   void SetStreamingMode(StreamingMode mode);
+
+  /**
+   * Get current CVML 'nice' setting.
+   *
+   * See \a amd::cvml::Context::SetNiceMode() for more details.
+   *
+   * @return true if 'nice' request is currently enabled
+   */
+  bool GetNiceMode();
+
+  /**
+   * Set current CVML 'nice' settings.
+   *
+   * If enabled, the CVML 'nice' mode directs underlying inference
+   * engines to run in a lower scheduling priority or more power
+   * efficient mode if possible. The setting is applied to all
+   * CVML features that were instantiated with the current context
+   * and may be changed at any time.
+   *
+   * This setting provides a hint to the underlying inference
+   * execution framework but does not guarantee lower priority
+   * execution or more power efficient inference. Applications may
+   * enable this setting of the use case is tolerant to occasionally
+   * longer inference latencies as a tradeoff for potentially reducing
+   * power consumption.
+   *
+   * @param nice_mode Set to true to enable 'niceness' for subsequent features
+   */
+  void SetNiceMode(bool nice_mode);
 
   /**
    * Return if NPU is available on platform

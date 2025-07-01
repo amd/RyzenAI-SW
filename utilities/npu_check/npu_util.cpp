@@ -23,9 +23,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 // compile using: /std:c++latest
 
 #pragma comment(lib, "setupapi.lib")
+#pragma comment(lib, "dxgi")
 
 #include <chrono>
-#include <vector>
 #include <mutex>
 
 #include <Windows.h>
@@ -46,6 +46,32 @@ namespace npu_util {
     DWORDLONG DriverNumberToHex(DWORDLONG a, DWORDLONG b, DWORDLONG c, DWORDLONG d) {
         DWORDLONG ver = ((a & 0xffff) << 48) | ((b & 0xffff) << 32) | ((c & 0xffff) << 16) | ((d & 0xffff) << 0) ;
         return ver;
+    }
+
+    // Return a vector of DXGI adapter descriptions
+    std::vector<DXGI_ADAPTER_DESC> enumerateDXGIAdapters()
+    {
+        std::vector<DXGI_ADAPTER_DESC> adapterDescriptions;
+
+        IDXGIFactory* pFactory = nullptr;
+        HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&pFactory);
+        if (FAILED(hr)) {
+            std::cerr << "Failed to create DXGI Factory." << std::endl;
+            return adapterDescriptions;
+        }
+
+        UINT i = 0;
+        IDXGIAdapter* pAdapter = nullptr;
+        while (pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
+            DXGI_ADAPTER_DESC desc;
+            pAdapter->GetDesc(&desc);
+            adapterDescriptions.push_back(desc);
+            pAdapter->Release();
+            ++i;
+        }
+        pFactory->Release();
+
+        return adapterDescriptions;
     }
 
     // Extract NPU information
@@ -185,9 +211,23 @@ namespace npu_util {
 
     NPUInfo checkCompatibility_RAI_1_4()
     {
-        // Min driver: 32.0.203.257 (May change before the release)
-        // Max date  : 2028-03-25   (Will change before the release)
-        return checkCompatibility(DriverNumberToHex(32,0,203,257), { std::chrono::March / 25 / 2028 });
+        // Min driver: 32.0.203.257
+        // Max date  : 2028-03-28 (3 yrs after the release date of RyzenAI 1.4)
+        return checkCompatibility(DriverNumberToHex(32,0,203,257), { std::chrono::March / 28 / 2028 });
+    }
+
+    NPUInfo checkCompatibility_RAI_1_4_1()
+    {
+        // Min driver: 32.0.203.259
+        // Max date  : 2028-05-12 (3 yrs after the release date of RyzenAI 1.4.1)
+        return checkCompatibility(DriverNumberToHex(32,0,203,259), { std::chrono::May / 12 / 2028 });
+    }
+
+    NPUInfo checkCompatibility_RAI_1_5()
+    {
+        // Min driver: 32.0.203.280
+        // Max date  : 2028-06-28 (3 yrs after the release date of RyzenAI 1.5)
+        return checkCompatibility(DriverNumberToHex(32,0,203,280), { std::chrono::June / 28 / 2028 });
     }
 
 } // npu_util

@@ -20,8 +20,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 ************************************************************************************/
 
-#include <iostream>
-
 #include "npu_util.h"
 
 void print_info(npu_util::NPUInfo &info)
@@ -76,6 +74,10 @@ int main()
 
     std::cout << "System compatibility check for VitisAI EP 1.4..." << std::endl;
     info = npu_util::checkCompatibility_RAI_1_4();
+    print_info(info);
+
+    std::cout << "System compatibility check for VitisAI EP 1.4.1..." << std::endl;
+    info = npu_util::checkCompatibility_RAI_1_4_1();
     print_info(info);
 
     return 0;

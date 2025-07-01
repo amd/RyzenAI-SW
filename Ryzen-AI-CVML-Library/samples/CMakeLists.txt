@@ -1,6 +1,6 @@
-# Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2021-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
-# To compile all the Ryzen AI sample applications, execute the following
+# To compile all the Ryzen AI CVML sample applications, execute the following
 # commands from the samples folder,
 #
 # For Windows
@@ -17,7 +17,7 @@
 #
 
 #
-# Build the sample apps inside CVML SDK release
+# Build the sample apps inside Ryzen AI CVML release
 #
 cmake_minimum_required(VERSION 3.18)
 project(cvml-sdk-samples)
@@ -45,7 +45,7 @@ if (NOT OpenCV_FOUND)
 endif()
 
 #
-# Find Ryzen AI library (also sets include directories)
+# Find Ryzen AI CVML library (also sets include directories)
 #
 if (NOT DEFINED AMD_CVML_SDK_ROOT)
     set(AMD_CVML_SDK_ROOT ..)

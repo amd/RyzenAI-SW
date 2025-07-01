@@ -11,9 +11,15 @@ This Ryzen AI example demonstrates how to run the ``distilbert-base-uncased-fine
 
 For more details, refer to the Hugging Face Model Card: [distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert/distilbert-base-uncased-finetuned-sst-2-english)
 
+## Setup Instructions
+
+Activate the conda environment created by the RyzenAI installer
+
+```bash
+conda activate <env_name>
+```
 
 ## Deployment Steps
-
 
 The following steps outline how to deploy the model on an NPU:
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include "common-sample-utils.h"
@@ -156,6 +156,8 @@ bool SetupCamera(int camera_index, const std::vector<CamRes>& res_list, cv::Vide
   static const int camera_api_preference[] = {
 #ifdef _WIN32
       cv::CAP_DSHOW, cv::CAP_MSMF,
+#else
+      cv::CAP_V4L2,
 #endif
       cv::CAP_ANY};
 

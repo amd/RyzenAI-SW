@@ -49,7 +49,7 @@ To run the classification.py script, follow these steps:
 **Step 1:** Ensure Environment Setup
 Before running the script, ensure you have activated the Ryzen AI conda environment
 ```sh
-conda activate ryzen-ai-1.3.1
+conda activate ryzen-ai-<version>
 ```
 **Step 2:** Download the Dataset.
 To obtain the calibration dataset, visit the ImageNet dataset repository on [Hugging Face](https://huggingface.co/datasets/imagenet-1k/tree/main/data).

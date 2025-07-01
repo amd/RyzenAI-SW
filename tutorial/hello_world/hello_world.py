@@ -125,33 +125,26 @@ command = r'pnputil /enum-devices /bus PCI /deviceids '
 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = process.communicate()
 # Check for supported Hardware IDs
-apu_type = ''
-if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
-if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
-if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
-if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
+npu_type = ''
+if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): npu_type = 'PHX/HPT'
+if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): npu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): npu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): npu_type = 'STX'
 
-print(f"APU Type: {apu_type}")
+print(f"APU Type: {npu_type}")
 
 install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
-match apu_type:
+xclbin_file = ''
+match npu_type:
     case 'PHX/HPT':
-        print("Setting environment for PHX/HPT")
-        os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '1x4.xclbin')
-        os.environ['NUM_OF_DPU_RUNNERS']='1'
-        os.environ['XLNX_TARGET_NAME']='AMD_AIE2_Nx4_Overlay'
+        print("Setting xclbin file for PHX/HPT")
+        xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
     case 'STX':
-        print("Setting environment for STX")
-        os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_Nx4_Overlay.xclbin')
-        os.environ['NUM_OF_DPU_RUNNERS']='1'
-        os.environ['XLNX_TARGET_NAME']='AMD_AIE2_Nx4_Overlay'
+        print("Setting xclbin file for STX")
+        xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
     case _:
         print("Unrecognized APU type. Exiting.")
         exit()
-print('XLNX_VART_FIRMWARE=', os.environ['XLNX_VART_FIRMWARE'])
-print('NUM_OF_DPU_RUNNERS=', os.environ['NUM_OF_DPU_RUNNERS'])
-print('XLNX_TARGET_NAME=', os.environ['XLNX_TARGET_NAME'])
-
 
 # We want to make sure we compile everytime, otherwise the tools will use the cached version
 # Get the current working directory
@@ -181,7 +174,9 @@ aie_session = onnxruntime.InferenceSession(
     sess_options=aie_options,
     provider_options = [{'config_file': config_file_path,
                          'cacheDir': cache_directory,
-                         'cacheKey': 'hello_cache'}]
+                         'cacheKey': 'hello_cache',
+                         'xclbin': xclbin_file
+                        }]
 )
 
 # Run Inference

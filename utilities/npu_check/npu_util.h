@@ -23,9 +23,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 #pragma once
 
 #include <string>
+#include <iostream>
+#include <vector>
+
+#include <dxgi.h>
 
 #include <Windows.h>
-
 
 namespace npu_util {
 
@@ -45,6 +48,9 @@ namespace npu_util {
         Status check;
     };
 
+    // Return a vector of DXGI adapter descriptions
+    std::vector<DXGI_ADAPTER_DESC> enumerateDXGIAdapters();
+
     // Checks whether the system configuration is compatible for VitisAI EP 1.2
     NPUInfo checkCompatibility_RAI_1_2();
 
@@ -56,6 +62,12 @@ namespace npu_util {
 
     // Checks whether the system configuration is compatible for VitisAI EP 1.4
     NPUInfo checkCompatibility_RAI_1_4();
+
+    // Checks whether the system configuration is compatible for VitisAI EP 1.4.1
+    NPUInfo checkCompatibility_RAI_1_4_1();
+
+    // Checks whether the system configuration is compatible for VitisAI EP 1.5
+    NPUInfo checkCompatibility_RAI_1_5();
 
 } // npu_util
 

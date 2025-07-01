@@ -1,98 +1,136 @@
-import os  
-import shutil  
+import os
+import subprocess
+import shutil
 
-import onnxruntime as ort  
-import numpy as np  
-from torchvision import datasets, transforms  
-from torch.utils.data import DataLoader  
-from tqdm import tqdm  
+import onnxruntime as ort
+import numpy as np
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 from pathlib import Path
 
-def reorganize_imagenet_val(val_dir, mapping_file, output_dir):  
-    # Read the mapping file  
-    with open(mapping_file, 'r') as f:  
-        lines = f.readlines()  
-  
-    # Create output directory if it doesn't exist  
-    os.makedirs(output_dir, exist_ok=True)  
-  
-    # Process each line in the mapping file  
-    for line in lines:  
-        image_name, class_label = line.strip().split()  
-          
-        # Create class directory if it doesn't exist  
-        class_dir = os.path.join(output_dir, class_label)  
-        os.makedirs(class_dir, exist_ok=True)  
-          
-        # Move the image to the class directory  
-        src = os.path.join(val_dir, image_name)  
-        dst = os.path.join(class_dir, image_name)  
-        shutil.move(src, dst)  
-  
-# Example usage  
-# reorganize_imagenet_val('path/to/val_images', 'path/to/mapping_file.txt', 'path/to/output_dir')  
+def get_npu_info():
+    # Run pnputil as a subprocess to enumerate PCI devices
+    command = r'pnputil /enum-devices /bus PCI /deviceids '
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    # Check for supported Hardware IDs
+    npu_type = ''
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): npu_type = 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): npu_type = 'KRK'
+    return npu_type
 
-def evaluate_onnx_model(onnx_model_path, imagenet_data_path, batch_size=1, device='cpu'):  
+def get_xclbin(npu_device):
+    xclbin_file = ''
+    if npu_device == 'STX' or npu_device=='KRK':
+        xclbin_file = '{}\\voe-4.0-win_amd64\\xclbins\\strix\\AMD_AIE2P_4x4_Overlay.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
+    if npu_device == 'PHX/HPT':
+        xclbin_file = '{}\\voe-4.0-win_amd64\\xclbins\\phoenix\\4x4.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
+    return xclbin_file
+
+def reorganize_imagenet_val(val_dir, mapping_file, output_dir):
+    # Read the mapping file
+    with open(mapping_file, 'r') as f:
+        lines = f.readlines()
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Process each line in the mapping file
+    for line in lines:
+        image_name, class_label = line.strip().split()
+
+        # Create class directory if it doesn't exist
+        class_dir = os.path.join(output_dir, class_label)
+        os.makedirs(class_dir, exist_ok=True)
+
+        # Move the image to the class directory
+        src = os.path.join(val_dir, image_name)
+        dst = os.path.join(class_dir, image_name)
+        shutil.move(src, dst)
+
+# Example usage
+# reorganize_imagenet_val('path/to/val_images', 'path/to/mapping_file.txt', 'path/to/output_dir')
+def get_apu_info():
+    # Run pnputil as a subprocess to enumerate PCI devices
+    command = r'pnputil /enum-devices /bus PCI /deviceids '
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    # Check for supported Hardware IDs
+    apu_type = ''
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): apu_type = 'KRK'
+    return apu_type
+
+def evaluate_onnx_model(onnx_model_path, imagenet_data_path, batch_size=1, device='cpu'):
     # Load the ONNX model
     if device == 'npu':
+        npu_device = get_apu_info()
         provider = ['VitisAIExecutionProvider']
         cache_dir = Path(__file__).parent.resolve()
         print(cache_dir)
         provider_options = [{
                         'config_file': 'vaip_config.json',
-                        'cacheDir': str(cache_dir),
-                        'cacheKey': 'modelcachekey'
+                        'cache_dir': str(cache_dir),
+                        'cache_key': 'modelcachekey',
+                        'xclbin': get_xclbin(npu_device)
                     }]
 
         session = ort.InferenceSession(onnx_model_path, providers=provider,
                                        provider_options=provider_options)
     else:
-        session = ort.InferenceSession(onnx_model_path)  
-    
-    input_name = session.get_inputs()[0].name  
-  
-    # Define the preprocessing transformations  
-    preprocess = transforms.Compose([  
-        transforms.Resize(256),  
-        transforms.CenterCrop(224),  
-        transforms.ToTensor(),  
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),  
-    ])  
-  
-    # Load the ImageNet validation dataset  
-    imagenet_data = datasets.ImageFolder(root=imagenet_data_path, transform=preprocess)  
-    data_loader = DataLoader(imagenet_data, batch_size=batch_size, shuffle=False)  
-  
-    top1_correct = 0  
-    top5_correct = 0  
-    total = 0  
-  
-    # Evaluate the model  
-    for images, labels in tqdm(data_loader, desc="Evaluating"):  
-        # Run inference  
-        outputs = session.run(None, {input_name: images.numpy()})  
-        outputs = outputs[0]  
-  
-        # Calculate top-1 and top-5 predictions  
-        top1_predictions = np.argmax(outputs, axis=1)  
-        top5_predictions = np.argsort(outputs, axis=1)[:, -5:]  
-  
-        # Update top-1 accuracy  
-        top1_correct += (top1_predictions == labels.numpy()).sum()  
-  
-        # Update top-5 accuracy  
-        for i, label in enumerate(labels.numpy()):  
-            if label in top5_predictions[i]:  
-                top5_correct += 1  
-  
-        total += labels.size(0)  
-  
-    top1_accuracy = top1_correct / total  
-    top5_accuracy = top5_correct / total  
-  
-    return top1_accuracy, top5_accuracy 
+        session = ort.InferenceSession(onnx_model_path)
 
-#    print(f"Accuracy: {accuracy * 100:.2f}%") 
+    input_name = session.get_inputs()[0].name
+
+    # Define the preprocessing transformations
+    preprocess = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    # Load the ImageNet validation dataset
+    imagenet_data = datasets.ImageFolder(root=imagenet_data_path, transform=preprocess)
+    data_loader = DataLoader(imagenet_data, batch_size=batch_size, shuffle=False)
+
+    top1_correct = 0
+    top5_correct = 0
+    total = 0
+
+    # Evaluate the model
+    for images, labels in tqdm(data_loader, desc="Evaluating"):
+        # Run inference
+        outputs = session.run(None, {input_name: images.numpy()})
+        outputs = outputs[0]
+
+        # Calculate top-1 and top-5 predictions
+        top1_predictions = np.argmax(outputs, axis=1)
+        top5_predictions = np.argsort(outputs, axis=1)[:, -5:]
+
+        # Update top-1 accuracy
+        top1_correct += (top1_predictions == labels.numpy()).sum()
+
+        # Update top-5 accuracy
+        for i, label in enumerate(labels.numpy()):
+            if label in top5_predictions[i]:
+                top5_correct += 1
+
+        total += labels.size(0)
+
+    top1_accuracy = top1_correct / total
+    top5_accuracy = top5_correct / total
+
+    return top1_accuracy, top5_accuracy
+
+#    print(f"Accuracy: {accuracy * 100:.2f}%")
 import numpy
 from PIL import Image
 import onnxruntime
@@ -196,7 +234,7 @@ def getAccuracy_top1(preds: Union[torch.tensor, list], targets: Union[torch.tens
 
 global model_name
 model_name = "resnet50"
-    
+
 global calibration_dataset_path
 calibration_dataset_path = "calib_data"
 

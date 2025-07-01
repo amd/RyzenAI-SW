@@ -39,7 +39,7 @@ from power_utils_filtered import *
 import random
 from ort_util_img2img import get_ort_pipeline_sd
 import collections
-
+from npu_gpu_utils import get_apu_info
 
 def make_parser():
     parser = argparse.ArgumentParser("onnxruntime inference sample")
@@ -474,8 +474,20 @@ if __name__ == "__main__":
 
     print("Number of frames = ", dataset.frames)
     if args.npu:
+        npu_device = get_apu_info()
+        print('RYZEN_AI_INSTALLATION_PATH:', os.environ["RYZEN_AI_INSTALLATION_PATH"])
+
+        xclbin_path = ''
+        if npu_device == 'STX':
+          xclbin_path = '{}\\voe-4.0-win_amd64\\xclbins\\strix\\AMD_AIE2P_4x4_Overlay.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
+        if npu_device == 'PHX':
+          xclbin_path = '{}\\voe-4.0-win_amd64\\xclbins\\phoenix\\4x4.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
+        print('XCLBIN_PATH:', xclbin_path)
+
         providers = ["VitisAIExecutionProvider"]
-        provider_options = [{"config_file": args.provider_config}]
+        #cache_dir = Path(__file__).parent.resolve()
+        provider_options = [{"config_file": args.provider_config,
+                             "xclbin": xclbin_path}]
 
     else:
         providers = ["CPUExecutionProvider"]

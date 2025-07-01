@@ -13,12 +13,13 @@ import onnxruntime
 import numpy as np
 import onnx
 import shutil
-import time 
+import time
 from timeit import default_timer as timer
-from quark.onnx import ModelQuantizer  
-from quark.onnx.quantization.config import Config, get_default_config  
-from utils_custom import ImageDataReader, evaluate_onnx_model 
-import json  
+from quark.onnx import ModelQuantizer
+from quark.onnx.quantization.config import Config, get_default_config
+from utils_custom import ImageDataReader, evaluate_onnx_model
+import json
+from classification_utils import calib_data_formatting
 
 # ---------------- Model Setup ---------------- #
 
@@ -56,7 +57,10 @@ print(f" Model exported to ONNX at: {tmp_model_path}")
 # ---------------- Quark Quantization ---------------- #
 
 # Define dataset directory
-calib_dir = "calib_data" 
+calib_dir = "calib_data"
+# fomat val_images and store it in calib_data for calibeeration.
+os.makedirs(calib_dir, exist_ok=True)
+calib_data_formatting()
 
 # Set input & output ONNX model paths
 input_model_path = tmp_model_path
@@ -73,28 +77,29 @@ preprocess = torchvision.transforms.Compose([
 # Load dataset
 calib_dataset = torchvision.datasets.ImageFolder(root=calib_dir, transform=preprocess)
 
-#Data set 
-num_calib_data = 600  
+#Data set
+num_calib_data = 600
 calib_dataset = torch.utils.data.Subset(calib_dataset, range(num_calib_data))
 
 # Define DataLoader for Calibration
 calibration_dataloader = torch.utils.data.DataLoader(calib_dataset, batch_size=10, shuffle=False)
 
 # Configure Quark Quantization
-quant_config = get_default_config("XINT8")  # Use XINT8 quantization  
+quant_config = get_default_config("XINT8")  # Use XINT8 quantization
 config = Config(global_quant_config=quant_config)
 
-# Create an ONNX Quantizer  
-quantizer = ModelQuantizer(config)  
+# Create an ONNX Quantizer
+quantizer = ModelQuantizer(config)
 
-# Perform Quark Quantization  
+# Perform Quark Quantization
 quant_model = quantizer.quantize_model(
-    model_input=input_model_path,   
-    model_output=output_model_path,   
+    model_input=input_model_path,
+    model_output=output_model_path,
     calibration_data_reader=ImageDataReader(calibration_dataloader)  # Use ImageDataReader from utils_custom
 )
 
 print(f" Quark Quantized model saved at: {output_model_path}")
+
 
 # ---------------- Inference & Evaluation ---------------- #
 
@@ -107,7 +112,7 @@ def load_labels(path):
 
 def preprocess_image(input):
     normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-  
+
     transform = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Resize((224, 224)),
@@ -187,7 +192,7 @@ print('----------------------------------------')
 sort_idx = np.flip(np.squeeze(np.argsort(dml_results)))
 print('------------ Top 5 labels are: ----------------------------')
 print(labels[sort_idx[:5]])
-print('-----------------------------------------------------------') 
+print('-----------------------------------------------------------')
 
 #NPU inference
 
@@ -197,38 +202,31 @@ command = r'pnputil /enum-devices /bus PCI /deviceids '
 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = process.communicate()
 # Check for supported Hardware IDs
-apu_type = ''
-if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
-if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
-if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
-if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
+npu_type = ''
+if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): npu_type = 'PHX/HPT'
+if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): npu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): npu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): npu_type = 'STX'
 
-print(f"APU Type: {apu_type}")
+print(f"NPU Type: {npu_type}")
 
 install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
-match apu_type:
+match npu_type:
     case 'PHX/HPT':
         print("Setting environment for PHX/HPT")
-        os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '1x4.xclbin')
-        os.environ['NUM_OF_DPU_RUNNERS']='1'
-        os.environ['XLNX_TARGET_NAME']='AMD_AIE2_Nx4_Overlay'
+        xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
     case 'STX':
         print("Setting environment for STX")
-        os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_Nx4_Overlay.xclbin')
-        os.environ['NUM_OF_DPU_RUNNERS']='1'
-        os.environ['XLNX_TARGET_NAME']='AMD_AIE2_Nx4_Overlay'
+        xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
     case _:
         print("Unrecognized APU type. Exiting.")
         exit()
-print('XLNX_VART_FIRMWARE=', os.environ['XLNX_VART_FIRMWARE'])
-print('NUM_OF_DPU_RUNNERS=', os.environ['NUM_OF_DPU_RUNNERS'])
-print('XLNX_TARGET_NAME=', os.environ['XLNX_TARGET_NAME'])
-
 
 ## Point to the config file path used for the VitisAI Execution Provider
 config_file_path = "./vaip_config.json"
 provider_options = [{
               'config_file': config_file_path,
+              'xclbin': xclbin_file,
               'ai_analyzer_visualization': True,
               'ai_analyzer_profiling': True,
           }]
