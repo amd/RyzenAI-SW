@@ -1,9 +1,9 @@
-# Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2021-2025 Advanced Micro Devices, Inc. All rights reserved.
 
 find_package(OpenCV REQUIRED PATHS ${OPENCV_INSTALL_ROOT})
 
 #
-# Find Ryzen AI library (also sets include directories)
+# Find Ryzen AI CVML library (also sets include directories)
 #
 if (NOT DEFINED AMD_CVML_SDK_ROOT)
     set(AMD_CVML_SDK_ROOT ../..)

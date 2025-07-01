@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2021-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef SAMPLES_COMMON_SAMPLE_UTILS_INCLUDE_COMMON_SAMPLE_UTILS_H_
@@ -115,16 +115,16 @@ class RunFeatureClass {
                           std::vector<CamRes>* supported_res = nullptr);
 
  protected:
-  bool is_camera_;                ///< Whether input is camera
+  bool is_camera_{false};         ///< Whether input is camera
   cv::VideoCapture video_input_;  ///< OpenCV video capture device
   cv::VideoWriter video_output_;  ///< Video writer for main output
 
-  bool open_output_file_;             ///< Whether to attempt opening output file
+  bool open_output_file_{false};      ///< Whether to attempt opening output file
   std::string output_file_{};         ///< Output file name for \a RunFeatureStreaming
   std::string output_window_name_{};  ///< Output window name for \a RunFeatureStreaming
 
-  cv::Mat frame_rgb_;  ///< Input RGB frame data
-  double stream_fps_;  ///< Video/camera input frame rate
+  cv::Mat frame_rgb_;     ///< Input RGB frame data
+  double stream_fps_{0};  ///< Video/camera input frame rate
 
  protected:
   /**

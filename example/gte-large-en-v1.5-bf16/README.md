@@ -24,7 +24,7 @@ The following steps outline how to deploy the model on an NPU:
 Activate the conda environment created by the RyzenAI installer
 
 ```bash
-    conda activate <env_name>
+conda activate <env_name>
 ```
 
 ## Download the GTE model
@@ -32,7 +32,7 @@ Activate the conda environment created by the RyzenAI installer
 Download the model from Huggingface and convert to ONNX format
 
 ```bash
-    python download_model.py --model_name "Alibaba-NLP/gte-large-en-v1.5" --output_dir "models"
+python download_model.py --model_name "Alibaba-NLP/gte-large-en-v1.5" --output_dir "models"
 ```
 
 The script ``download_model.py`` downloads the model from the Hugging Face checkpoint using the model name ``Alibaba-NLP/gte-large-en-v1.5`` and converts it to ONNX format.
@@ -44,7 +44,7 @@ ONNX models will be saved as: ``models/gte-large-en-v1.5.onnx``
 Convert the GTE model from FP32 to BF16 using AMD Quark quantization
 
 ```bash
-    python quark_quantize.py --model_path "models/gte-large-en-v1.5.onnx" --output_dir "models"
+python quark_quantize.py --model_path "models/gte-large-en-v1.5.onnx" --output_dir "models"
 ```
 
 During quantization, AMD Quark converts both weights and activations to the BF16 format. In this example, random data is used for the calibration process.
@@ -66,7 +66,7 @@ For more details about the BF16 quantization refer to [AMD Quark BF16 Tutorial](
 Compile and run the quantized BF16 model on NPU
 
 ```bash
-    python run.py --model_path "models/gte-large-en-v1.5-bf16.onnx"
+python run.py --model_path "models/gte-large-en-v1.5-bf16.onnx"
 ```
 
 The ONNX Runtime Vitis AI Execution Provider compiles and runs the model on an NPU. The first-time compilation may take some time, but the compiled model is cached and used for subsequent runs.

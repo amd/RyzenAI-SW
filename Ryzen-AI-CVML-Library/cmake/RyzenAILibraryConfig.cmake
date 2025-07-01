@@ -23,7 +23,7 @@ if (${PLATFORM} MATCHES "windows")
     file(GLOB RyzenAILibrary_LIBS ${PREFIX}/${PLATFORM}/*.lib)
 else()
     file(GLOB RyzenAILibrary_LIBS ${PREFIX}/${PLATFORM}/*.so)
-    list(FILTER RyzenAILibrary_LIBS EXCLUDE REGEX ".*graphlib.so")
+    add_link_options(-Wl,--as-needed)
 endif()
 
 # generate output variables for find_package

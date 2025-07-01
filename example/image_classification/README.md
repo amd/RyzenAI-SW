@@ -19,6 +19,15 @@ The following steps outline how to deploy the BF16 model on an NPU:
 
 ## Setup Model and Dataset
 
+Setup Instructions
+--------------
+
+Activate the conda environment created by the RyzenAI installer
+
+```bash
+conda activate <env_name>
+```
+
 ResNet50 Model
 --------------
 

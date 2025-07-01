@@ -52,6 +52,7 @@ python advanced_quark_quantize.py --model_input models/resnet50.onnx --model_out
 
 </div>
 
+
 ### Fast Fine Tuning
 
 Fast fine-tuning involves adjusting a pre-trained model to enhance its accuracy after quantization. This approach helps recover accuracy lost during quantization, making the model more suitable for deployment.

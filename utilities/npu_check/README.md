@@ -21,6 +21,9 @@ namespace npu_util {
         Status check;
     };
 
+    // Return a vector of DXGI adapter descriptions to see which GPUs can be used
+    std::vector<DXGI_ADAPTER_DESC> enumerateDXGIAdapters();
+
     // Checks whether the system configuration is compatible for VitisAI EP 1.2
     NPUInfo checkCompatibility_RAI_1_2();
 
@@ -32,6 +35,9 @@ namespace npu_util {
 
     // Checks whether the system configuration is compatible for VitisAI EP 1.4
     NPUInfo checkCompatibility_RAI_1_4();
+
+    // Checks whether the system configuration is compatible for VitisAI EP 1.4.1
+    NPUInfo checkCompatibility_RAI_1_4_1();
 
 }
 ```
@@ -50,6 +56,7 @@ The `device_id` field contains the NPU device ID. This value should be used by t
  - 0x17F0 -> STX/KRK
 
 The `npu_util.cpp` file must be compiled with the `/std:c++latest` option.
+
 
 ## Disclaimer
 

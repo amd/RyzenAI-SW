@@ -7,6 +7,7 @@ import pyperclip
 import os
 import onnx
 import sys
+from utilities import *
 
 def show_frame(selected_frame):
     """Show the selected frame and hide the others."""
@@ -98,8 +99,9 @@ def update_advance_visibility(*args):
         if entry2_ep.getvalue() == "VitisAIEP": 
             entry1_model.show()
             entry2_ep.show()
-            entry3_core.show()
-            entry4_instance_count.show()
+            #entry3_core.show()
+            #entry4_instance_count.show()
+            entry4_autoquant.show()
             entry5_threads.show()
             entry6_renew.show()
             entry7_config.show()
@@ -312,40 +314,9 @@ class CustomFolderEntry:
         """Aggiunge una trace allo StringVar."""
         self.var.trace_add(mode, callback)
 
-
-# Required environment variables
-required_vars = [
-    "RYZEN_AI_CONDA_ENV_NAME",
-    "RYZEN_AI_INSTALLATION_PATH",
-    "DEVICE",
-    "VAIP_CONFIG_HOME"
-]
-
-# Check if all required environment variables are set
-missing_vars = [var for var in required_vars if os.getenv(var) is None]
-
-if missing_vars:
-    print(f"Error: Missing environment variables: {', '.join(missing_vars)}")
-    print("Please run `set_env.bat` to set up the required environment variables.")
-    sys.exit(1)
-
-# Get the expected Conda environment name
-expected_env = os.getenv("RYZEN_AI_CONDA_ENV_NAME")
-
-# Check the actual Conda environment
-actual_env = os.getenv("CONDA_DEFAULT_ENV")
-
-if actual_env != expected_env:
-    print(f"Error: Conda environment '{expected_env}' is required but '{actual_env}' is currently active.")
-    print(f"Please activate the correct environment using:")
-    print(f"    conda activate {expected_env}")
-    sys.exit(1)
-
-print("All checks passed. Environment is correctly set up.")
-
 # Create the main window
 root = tk.Tk()
-root.title("AIG-SAIS ONNX Benchmark")
+root.title("ONNX CNN Benchmark")
 
 # Create a dictionary to store the frames
 frames = {}
@@ -399,8 +370,9 @@ def update_vitisaiep_visibility(*args):
     if entry2_ep.getvalue() == "VitisAIEP":
         entry1_model.show()
         entry2_ep.show()
-        entry3_core.show()
-        entry4_instance_count.show()
+        #entry3_core.show()
+        #entry4_instance_count.show()
+        entry4_autoquant.show()
         entry5_threads.show()
         entry6_renew.show()
         entry7_config.show()
@@ -435,44 +407,56 @@ def update_vitisaiep_visibility(*args):
 entry2_ep.add_trace("write", update_vitisaiep_visibility)
 
 # Core selection
+apu_type =  get_apu_info()
 dchoices=[]
 ddefault=""
-device = os.getenv("DEVICE").lower()
-if device == "strix_50tops":
-    dchoices=["STX_1x4", "STX_4x4"]
-    ddefault="STX_1x4"
-if device == "strix_55tops":
-    dchoices=["STX_1x4", "STX_4x4"]
-    ddefault="STX_1x4"
-if device == "phoenix":
-    dchoices=["PHX_1x4", "PHX_4x4"]
-    ddefault="PHX_1x4"
-elif device == "hawk":
-    dchoices=["PHX_1x4", "PHX_4x4"]
-    ddefault="PHX_1x4"
 
-entry3_core = CustomOptionMenu(
-    parent=frame_0,
-    row=3,
-    column=0,
-    columnspan=2,
-    choices=dchoices,
-    default=ddefault,
-    label_text="--core",
-    info_text="Which core to use with STRIX silicon. Default=1x4"
-)
-custom_option_menus.append(entry3_core)
+if apu_type == "STX":
+    dchoices=["STX_1x4", "STX_4x4"]
+    ddefault="STX_1x4"
+elif apu_type == "PHX/HPT":
+    dchoices=["PHX_1x4", "PHX_4x4"]
+    ddefault="PHX_1x4"
+else:
+    print(f"Device {apu_type} not supported.")
+    sys.exit(1)
+
+#entry3_core = CustomOptionMenu(
+#    parent=frame_0,
+#    row=3,
+#    column=0,
+#    columnspan=2,
+#    choices=dchoices,
+#    default=ddefault,
+#    label_text="--core",
+#    info_text="Which core to use with STRIX silicon. Default=1x4"
+#)
+#custom_option_menus.append(entry3_core)
 
 # DPU runners
-entry4_instance_count = simpleentry(
+# this option has been disabled with RyzenAI 1.5.0
+#entry4_instance_count = simpleentry(
+#    parent=frame_0,
+#    row=4,
+#    column=0,
+#    columnspan=2,
+#    default="1",
+#    label_text="--instance_count",
+#    info_text="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1"
+#)
+
+# enable auto quantization
+entry4_autoquant = CustomOptionMenu(
     parent=frame_0,
     row=4,
     column=0,
     columnspan=2,
-    default="1",
-    label_text="--instance_count",
-    info_text="This parameter governs the parallelism of job execution. When the Vitis AI EP is selected, this parameter controls the number of DPU runners. The workload is always equally divided per each instance count. Default=1"
+    choices=["0","1"],
+    default="0",
+    label_text="--autoquant",
+    info_text="if set to 1 enables auto-quantization with Quark. If the model is FP32 and this option is set to 0, the model is sent to the CPU. Default=0"
 )
+custom_option_menus.append(entry4_autoquant)
 
 # Threads
 entry5_threads = simpleentry(

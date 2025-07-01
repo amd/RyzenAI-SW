@@ -1,0 +1,1050 @@
+{
+    "passes": [
+        {
+            "name": "init",
+            "plugin": "vaip-pass_init"
+        },
+        {
+            "name": "fuse_resize_norm",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_resize_norm",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_softmax",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_softmax",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_topk",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_topk",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_decode_filter_boxes",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": false,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_decode_filter_boxes",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "vaip_pass_norm_k",
+            "plugin": "vaip-pass_norm_k",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "fuse_NMS",
+            "plugin": "vaip-pass_py_ext",
+            "disabled": true,
+            "pyExt": {
+                "moduleName": "voe.passes.fuse_NMS",
+                "methodName": "rules"
+            }
+        },
+        {
+            "name": "fuse_dynamic_dispatch",
+            "plugin": "vaip-pass_level1_dd",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "dd_compiler_pass_transformation",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "dd_compiler_pass_generation",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch_gen",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "dd_compiler_pass_transformation_2",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch_2",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "dd_compiler_pass_generation_2",
+                        "plugin": "vaip-pass_py_ext",
+                        "pyExt": {
+                            "moduleName": "voe.passes.dynamic_dispatch_gen_2",
+                            "methodName": "rules"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "fuse_DPU",
+            "plugin": "vaip-pass_level1_dpu",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "convert_ending_blacklist_ops_to_unknown_op",
+                        "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+                        "disabled": false
+                    },
+                    {
+                        "name": "npu_checker",
+                        "plugin": "vaip-pass_npu_checker"
+                    },
+                    {
+                        "name": "dynamic_input_batch",
+                        "plugin": "vaip-pass_dynamic_input_batch"
+                    },
+                    {
+                        "name": "create_const_op",
+                        "plugin": "vaip-pass_create_const_op"
+                    },
+                    {
+                        "name": "convert_split_to_xir",
+                        "plugin": "vaip-pass_convert_split_to_xir_op"
+                    },
+                    {
+                        "name": "to_xir",
+                        "plugin": "vaip-pass_to_xir_ops"
+                    },
+                    {
+                        "name": "convert_pad",
+                        "plugin": "vaip-pass_convert_pad",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_in_to_gn",
+                        "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "remove_extra_q_dq",
+                        "plugin": "vaip-pass_remove_extra_q_dq"
+                    },
+                    {
+                        "name": "merge_add_into_conv_bias",
+                        "plugin": "vaip-pass_merge_add_into_conv_bias"
+                    },
+                    {
+                        "name": "merge_fix",
+                        "plugin": "vaip-pass_merge_fix",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "layoutransform",
+                        "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+                    },
+                    {
+                        "name": "gc_after_layout_transform",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "fuse_transpose",
+                        "plugin": "vaip-pass_fuse_transpose",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "gc_after_fuse_transpose",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "remove_identity",
+                        "plugin": "vaip-pass_remove_identity",
+                        "logVerbosity": 1
+                    },
+                    {
+                        "name": "add_fix_after_const",
+                        "plugin": "vaip-pass_const_add_fix"
+                    },
+                    {
+                        "name": "remove_reshape_fix",
+                        "plugin": "vaip-pass_py_ext",
+                        "disabled": true,
+                        "pyExt": {
+                            "moduleName": "voe.passes.remove_reshape_fix",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "const_fold_batchnorm_to_scale",
+                        "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+                    },
+                    {
+                        "name": "const_fold_transpose",
+                        "plugin": "vaip-pass_const_fold_transpose"
+                    },
+                    {
+                        "name": "merge_pad",
+                        "plugin": "vaip-pass_merge_pad"
+                    },
+                    {
+                        "name": "merge_hard_sigmoid",
+                        "plugin": "vaip-pass_merge_hard_sigmoid"
+                    },
+                    {
+                        "name": "merge_mul",
+                        "plugin": "vaip-pass_merge_mul",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "merge_consecutive_fix",
+                        "plugin": "vaip-pass_merge_consecutive_fix",
+                        "disabled": true,
+                        "enableLog": true,
+                        "logVerbosity": 1
+                    },
+                    {
+                        "_comment": "test case 110",
+                        "name": "convert_softmax_to_hard_softmax",
+                        "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+                        "disabled": true
+                    },
+                    {
+                        "name": "merge_fix_fix_transpose",
+                        "plugin": "vaip-pass_merge_fix_fix_transpose",
+                        "enableGc": true,
+                        "disabled": true
+                    },
+                    {
+                        "name": "final_gc",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    }
+                ],
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 32
+                    },
+                    "opt_level": {
+                        "uintValue": 0
+                    },
+                    "dump_subgraph_ops": {
+                        "boolValue": false
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "disable_std_quant": {
+                        "boolValue": false
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    }
+                },
+                "minimum_num_of_conv": 2,
+                "debug": false
+            }
+        },
+        {
+            "name": "fuse_DPU_VAIML-x2.0",
+            "plugin": "vaip-pass_level1_dpu",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "convert_ending_blacklist_ops_to_unknown_op",
+                        "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+                        "disabled": false
+                    },
+                    {
+                        "name": "npu_checker",
+                        "plugin": "vaip-pass_npu_checker"
+                    },
+                    {
+                        "name": "dynamic_input_batch",
+                        "plugin": "vaip-pass_dynamic_input_batch"
+                    },
+                    {
+                        "name": "create_const_op",
+                        "plugin": "vaip-pass_create_const_op"
+                    },
+                    {
+                        "name": "convert_split_to_xir",
+                        "plugin": "vaip-pass_convert_split_to_xir_op"
+                    },
+                    {
+                        "name": "to_xir",
+                        "plugin": "vaip-pass_to_xir_ops"
+                    },
+                    {
+                        "name": "convert_pad",
+                        "plugin": "vaip-pass_convert_pad",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_in_to_gn",
+                        "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "remove_extra_q_dq",
+                        "plugin": "vaip-pass_remove_extra_q_dq"
+                    },
+                    {
+                        "name": "merge_add_into_conv_bias",
+                        "plugin": "vaip-pass_merge_add_into_conv_bias"
+                    },
+                    {
+                        "name": "merge_fix",
+                        "plugin": "vaip-pass_merge_fix",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "layoutransform",
+                        "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+                    },
+                    {
+                        "name": "gc_after_layout_transform",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "fuse_transpose",
+                        "plugin": "vaip-pass_fuse_transpose",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "gc_after_fuse_transpose",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "remove_identity",
+                        "plugin": "vaip-pass_remove_identity",
+                        "logVerbosity": 1
+                    },
+                    {
+                        "name": "add_fix_after_const",
+                        "plugin": "vaip-pass_const_add_fix"
+                    },
+                    {
+                        "name": "remove_reshape_fix",
+                        "plugin": "vaip-pass_py_ext",
+                        "disabled": true,
+                        "pyExt": {
+                            "moduleName": "voe.passes.remove_reshape_fix",
+                            "methodName": "rules"
+                        }
+                    },
+                    {
+                        "name": "const_fold_batchnorm_to_scale",
+                        "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+                    },
+                    {
+                        "name": "const_fold_transpose",
+                        "plugin": "vaip-pass_const_fold_transpose"
+                    },
+                    {
+                        "name": "merge_pad",
+                        "plugin": "vaip-pass_merge_pad"
+                    },
+                    {
+                        "name": "merge_hard_sigmoid",
+                        "plugin": "vaip-pass_merge_hard_sigmoid"
+                    },
+                    {
+                        "name": "merge_mul",
+                        "plugin": "vaip-pass_merge_mul",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "merge_consecutive_fix",
+                        "plugin": "vaip-pass_merge_consecutive_fix",
+                        "disabled": true,
+                        "enableLog": true,
+                        "logVerbosity": 1
+                    },
+                    {
+                        "_comment": "test case 110",
+                        "name": "convert_softmax_to_hard_softmax",
+                        "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+                        "disabled": true
+                    },
+                    {
+                        "name": "merge_fix_fix_transpose",
+                        "plugin": "vaip-pass_merge_fix_fix_transpose",
+                        "enableGc": true,
+                        "disabled": true
+                    },
+                    {
+                        "name": "final_gc",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    }
+                ],
+                "xcompilerAttrs": {
+                    "dpu_subgraph_num": {
+                        "uintValue": 32
+                    },
+                    "debug_mode": {
+                        "stringValue": "function"
+                    },
+                    "enable_call_aie": {
+                        "boolValue": true
+                    },
+                    "enable_cost_model_tiling": {
+                        "boolValue": true
+                    },
+                    "enable_mt_fusion": {
+                        "boolValue": true
+                    },
+                    "enable_merge_requantize": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    },
+                    "enable_weights_prefetch": {
+                        "boolValue": true
+                    },
+                    "remove_call_aiecompiler_cache": {
+                        "boolValue": true
+                    },
+                    "target": {
+                        "stringValues": [
+                            "AMD_AIE2P_2x4x4_CMC_Overlay"
+                        ]
+                    },
+                    "enable_control_optimization": {
+                        "boolValue": true
+                    }
+                },
+                "minimum_num_of_conv": 2,
+                "debug": false
+            }
+        },
+        {
+            "name": "fuse_DPU_MHA",
+            "plugin": "vaip-pass_level1_dpu",
+            "passDpuParam": {
+                "subPass": [
+                    {
+                        "name": "convert_MHA",
+                        "plugin": "vaip-pass_convert_MHA",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_ending_blacklist_ops_to_unknown_op",
+                        "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+                        "disabled": false
+                    },
+                    {
+                        "name": "dynamic_input_batch",
+                        "plugin": "vaip-pass_dynamic_input_batch"
+                    },
+                    {
+                        "name": "create_const_op",
+                        "plugin": "vaip-pass_create_const_op"
+                    },
+                    {
+                        "name": "convert_split_to_xir",
+                        "plugin": "vaip-pass_convert_split_to_xir_op"
+                    },
+                    {
+                        "name": "to_xir",
+                        "plugin": "vaip-pass_to_xir_ops"
+                    },
+                    {
+                        "name": "convert_pad",
+                        "plugin": "vaip-pass_convert_pad",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "convert_in_to_gn",
+                        "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "remove_extra_q_dq",
+                        "plugin": "vaip-pass_remove_extra_q_dq"
+                    },
+                    {
+                        "name": "merge_add_into_conv_bias",
+                        "plugin": "vaip-pass_merge_add_into_conv_bias"
+                    },
+                    {
+                        "name": "merge_fix",
+                        "plugin": "vaip-pass_merge_fix",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "layoutransform",
+                        "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+                    },
+                    {
+                        "name": "gc_after_layout_transform",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "fuse_transpose",
+                        "plugin": "vaip-pass_fuse_transpose",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "gc_after_fuse_transpose",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    },
+                    {
+                        "name": "remove_identity",
+                        "plugin": "vaip-pass_remove_identity",
+                        "logVerbosity": 1
+                    },
+                    {
+                        "name": "add_fix_after_const",
+                        "plugin": "vaip-pass_const_add_fix"
+                    },
+                    {
+                        "name": "const_fold_batchnorm_to_scale",
+                        "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+                    },
+                    {
+                        "name": "const_fold_transpose",
+                        "plugin": "vaip-pass_const_fold_transpose"
+                    },
+                    {
+                        "name": "merge_pad",
+                        "plugin": "vaip-pass_merge_pad"
+                    },
+                    {
+                        "name": "merge_hard_sigmoid",
+                        "plugin": "vaip-pass_merge_hard_sigmoid"
+                    },
+                    {
+                        "name": "merge_mul",
+                        "plugin": "vaip-pass_merge_mul",
+                        "enableGc": true
+                    },
+                    {
+                        "name": "merge_consecutive_fix",
+                        "plugin": "vaip-pass_merge_consecutive_fix",
+                        "disabled": true,
+                        "enableLog": true,
+                        "logVerbosity": 1
+                    },
+                    {
+                        "_comment": "test case 110",
+                        "name": "convert_softmax_to_hard_softmax",
+                        "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+                        "disabled": true
+                    },
+                    {
+                        "name": "merge_fix_fix_transpose",
+                        "plugin": "vaip-pass_merge_fix_fix_transpose",
+                        "enableGc": true,
+                        "disabled": true
+                    },
+                    {
+                        "name": "final_gc",
+                        "plugin": "vaip-pass_remove_isolated_node"
+                    }
+                ],
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "dump_subgraph_ops": {
+                        "boolValue": false
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "disable_std_quant": {
+                        "boolValue": false
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    }
+                },
+                "minimum_num_of_conv": 2,
+                "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin"
+            }
+        },
+        {
+            "name": "vaiml",
+            "plugin": "vaip-pass_vaiml",
+            "pass_vaiml_param": {
+                "subPass": [
+                    {
+                        "name": "fuse_DPU",
+                        "plugin": "vaip-pass_level1_dpu",
+                        "passDpuParam": {
+                            "subPass": [
+                                {
+                                    "name": "convert_ending_blacklist_ops_to_unknown_op",
+                                    "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+                                    "disabled": false
+                                },
+                                {
+                                    "name": "dynamic_input_batch",
+                                    "plugin": "vaip-pass_dynamic_input_batch"
+                                },
+                                {
+                                    "name": "create_const_op",
+                                    "plugin": "vaip-pass_create_const_op"
+                                },
+                                {
+                                    "name": "convert_split_to_xir",
+                                    "plugin": "vaip-pass_convert_split_to_xir_op"
+                                },
+                                {
+                                    "name": "to_xir",
+                                    "plugin": "vaip-pass_to_xir_ops"
+                                },
+                                {
+                                    "name": "convert_pad",
+                                    "plugin": "vaip-pass_convert_pad",
+                                    "enableGc": true
+                                },
+                                {
+                                    "name": "convert_in_to_gn",
+                                    "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+                                    "enableGc": true
+                                },
+                                {
+                                    "name": "remove_extra_q_dq",
+                                    "plugin": "vaip-pass_remove_extra_q_dq"
+                                },
+                                {
+                                    "name": "merge_add_into_conv_bias",
+                                    "plugin": "vaip-pass_merge_add_into_conv_bias"
+                                },
+                                {
+                                    "name": "merge_fix",
+                                    "plugin": "vaip-pass_merge_fix",
+                                    "enableGc": true
+                                },
+                                {
+                                    "name": "layoutransform",
+                                    "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+                                },
+                                {
+                                    "name": "gc_after_layout_transform",
+                                    "plugin": "vaip-pass_remove_isolated_node"
+                                },
+                                {
+                                    "name": "fuse_transpose",
+                                    "plugin": "vaip-pass_fuse_transpose",
+                                    "enableGc": true
+                                },
+                                {
+                                    "name": "gc_after_fuse_transpose",
+                                    "plugin": "vaip-pass_remove_isolated_node"
+                                },
+                                {
+                                    "name": "remove_identity",
+                                    "plugin": "vaip-pass_remove_identity",
+                                    "logVerbosity": 1
+                                },
+                                {
+                                    "name": "add_fix_after_const",
+                                    "plugin": "vaip-pass_const_add_fix"
+                                },
+                                {
+                                    "name": "remove_reshape_fix",
+                                    "plugin": "vaip-pass_py_ext",
+                                    "disabled": true,
+                                    "pyExt": {
+                                        "moduleName": "voe.passes.remove_reshape_fix",
+                                        "methodName": "rules"
+                                    }
+                                },
+                                {
+                                    "name": "const_fold_batchnorm_to_scale",
+                                    "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+                                },
+                                {
+                                    "name": "const_fold_transpose",
+                                    "plugin": "vaip-pass_const_fold_transpose"
+                                },
+                                {
+                                    "name": "merge_pad",
+                                    "plugin": "vaip-pass_merge_pad"
+                                },
+                                {
+                                    "name": "merge_hard_sigmoid",
+                                    "plugin": "vaip-pass_merge_hard_sigmoid"
+                                },
+                                {
+                                    "name": "merge_mul",
+                                    "plugin": "vaip-pass_merge_mul",
+                                    "enableGc": true
+                                },
+                                {
+                                    "name": "merge_consecutive_fix",
+                                    "plugin": "vaip-pass_merge_consecutive_fix",
+                                    "disabled": true,
+                                    "enableLog": true,
+                                    "logVerbosity": 1
+                                },
+                                {
+                                    "_comment": "test case 110",
+                                    "name": "convert_softmax_to_hard_softmax",
+                                    "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+                                    "disabled": true
+                                },
+                                {
+                                    "name": "merge_fix_fix_transpose",
+                                    "plugin": "vaip-pass_merge_fix_fix_transpose",
+                                    "enableGc": true,
+                                    "disabled": true
+                                },
+                                {
+                                    "name": "final_gc",
+                                    "plugin": "vaip-pass_remove_isolated_node"
+                                }
+                            ],
+                            "xcompilerAttrs": {
+                                "debug_mode": {
+                                    "stringValue": "performance"
+                                },
+                                "dpu_subgraph_num": {
+                                    "uintValue": 32
+                                },
+                                "opt_level": {
+                                    "uintValue": 0
+                                },
+                                "dump_subgraph_ops": {
+                                    "boolValue": false
+                                },
+                                "profile": {
+                                    "uintValue": 0
+                                },
+                                "disable_std_quant": {
+                                    "boolValue": false
+                                },
+                                "enable_fast_pm": {
+                                    "boolValue": true
+                                }
+                            },
+                            "minimum_num_of_conv": 2,
+                            "debug": false
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "vaiml_partition",
+            "plugin": "vaip-pass_vaiml_partition",
+            "vaiml_config": {
+                "vaiml_model_path": "vaiml_par_0",
+                "max_num_partitions": 200,
+                "device_name": "phx",
+                "debug": true
+            }
+        },
+        {
+            "name": "vaip_pass_dd_merge_dqcastgather",
+            "plugin": "vaip-pass_dd_merge_dqcastgather",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_qop",
+            "plugin": "vaip-pass_dd_merge_qop",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_dqop",
+            "plugin": "vaip-pass_dd_merge_dqop",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_qop_onnx",
+            "plugin": "vaip-pass_dd_merge_qop_onnx",
+            "enable_gc": true,
+            "disabled": false
+        },
+        {
+            "name": "vaip_pass_dd_merge_dqop_onnx",
+            "plugin": "vaip-pass_dd_merge_dqop_onnx",
+            "enable_gc": true,
+            "disabled": false
+        }
+    ],
+    "mepTable": [
+        {
+            "modelName": "a3",
+            "md5sumOnDisk": "73ecb2594935fb9bd02707930610f29e",
+            "md5sumInMemory": "f59151f8b67a7b8f1a8bcc7798558c33",
+            "md5sumInMemoryWithIo": "39b422f40bcb60bbd20be835097256c2",
+            "target": "VAIML-x2.0-a3"
+        },
+        {
+            "modelName": "DeepLabV3",
+            "md5sumOnDisk": "10a644c6da6b1121f807794506b7e5cc",
+            "md5sumInMemory": "849608d568bbc54380833c9446299989",
+            "md5sumInMemoryWithIo": "99f39afbf868542fb575023123c98001",
+            "target": "VAIML-x2.0-Procyon"
+        },
+        {
+            "modelName": "inceptionv4",
+            "md5sumOnDisk": "42c48a7086ba34889699862d98844e62",
+            "md5sumInMemory": "591d2dc2a27f04111e1b14fbf4222d51",
+            "md5sumInMemoryWithIo": "3d6d80d6c60811089ced3bf6abb42cdc",
+            "target": "VAIML-x2.0-Procyon"
+        },
+        {
+            "modelName": "MobileNet_V3",
+            "md5sumOnDisk": "5bbc61c013f20b6563c62523100fa2ee",
+            "md5sumInMemory": "0bcec05d638535092032784dcca2cce3",
+            "md5sumInMemoryWithIo": "1506de83ac617b0903613ca420061e84",
+            "target": "VAIML-x2.0-Procyon"
+        },
+        {
+            "modelName": "ResNet50",
+            "md5sumOnDisk": "c22b773b35f2ce62932578cc5eec867b",
+            "md5sumInMemory": "b307088b2bf693c51d8ea399247d8139",
+            "md5sumInMemoryWithIo": "1bea49f637b8f9f0ec80bc44c6d841bb",
+            "target": "VAIML-x2.0-Procyon"
+        },
+        {
+            "modelName": "YoloV3",
+            "md5sumOnDisk": "2657be600da90313ca9d32c03bd11835",
+            "md5sumInMemory": "7646f3796c4d98cfa53650482148734a",
+            "md5sumInMemoryWithIo": "14b71beebb0c98f291bdda3e7843cb1a",
+            "target": "VAIML-x2.0-Procyon"
+        }
+    ],
+    "target": "RyzenAI_vision_config_1",
+    "targets": [
+        {
+            "name": "RyzenAI_vision_config_1",
+            "pass": [
+                "init",
+                "vaiml"
+            ]
+        },
+        {
+            "name": "RyzenAI_shell_config_1",
+            "xclbin": "AMD_AIE2P_2x4x1_Overlay.xclbin",
+            "share_hw_context": true,
+            "pass": [
+                "init",
+                "fuse_DPU",
+                "vaip_pass_dd_merge_qop",
+                "vaip_pass_dd_merge_dqop",
+                "vaip_pass_dd_merge_qop_onnx",
+                "vaip_pass_dd_merge_dqop_onnx"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 3
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "enable_weights_prefetch": {
+                        "boolValue": true
+                    },
+                    "enable_cost_model_tiling": {
+                        "boolValue": true
+                    },
+                    "enable_mergesync": {
+                        "boolValue": true
+                    }
+                }
+            },
+            "graph_engine_qos_priority": 640
+        },
+        {
+            "name": "RyzenAI_vision_config_2",
+            "xclbin": "1x4.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 16
+                    },
+                    "opt_level": {
+                        "uintValue": 0
+                    },
+                    "dump_subgraph_ops": {
+                        "boolValue": false
+                    },
+                    "profile": {
+                        "uintValue": 0
+                    },
+                    "disable_std_quant": {
+                        "boolValue": false
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_vision_config_3",
+            "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_vision_config_3_mha",
+            "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU_MHA"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_transformer_config_2",
+            "xclbin": "4x2_psf_model_a8w8_qdq.xclbin",
+            "pass": [
+                "init",
+                "fuse_dynamic_dispatch"
+            ]
+        },
+        {
+            "name": "RyzenAI_xcompiler_and_dd_config",
+            "xclbin": "2x4x2_pss_pst_model_mha_qdq.xclbin",
+            "pass": [
+                "init",
+                "fuse_DPU_MHA",
+                "fuse_dynamic_dispatch"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    }
+                }
+            }
+        },
+        {
+            "name": "RyzenAI_transformer_cxx_pss_pst",
+            "xclbin": "2x4x2_pss_pst_4x2_psq_model_qdq.xclbin",
+            "share_hw_context": true,
+            "pass": [
+                "init",
+                "fuse_DPU_MHA",
+                "fuse_dynamic_dispatch_pss_pst"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "debug_mode": {
+                        "stringValue": "performance"
+                    },
+                    "dpu_subgraph_num": {
+                        "uintValue": 1000
+                    },
+                    "opt_level": {
+                        "uintValue": 65536
+                    },
+                    "enable_fast_pm": {
+                        "boolValue": true
+                    },
+                    "advanced_opt": {
+                        "boolValue": true
+                    }
+                }
+            }
+        },
+        {
+            "name": "VAIML-x2.0-a3",
+            "pass": [
+                "init",
+                "fuse_DPU_VAIML-x2.0"
+            ]
+        },
+        {
+            "name": "VAIML-x2.0-Procyon",
+            "pass": [
+                "init",
+                "fuse_DPU_VAIML-x2.0"
+            ],
+            "target_opts": {
+                "xcompilerAttrs": {
+                    "enable_mergesync": {
+                        "boolValue": true
+                    },
+                    "enable_qdq_force_xint": {
+                        "boolValue": true
+                    }
+                }
+            }
+        }
+    ],
+    "enable_cache_file_io_in_mem": true
+}

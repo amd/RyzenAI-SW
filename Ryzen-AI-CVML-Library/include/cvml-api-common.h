@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2021-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 
 #ifndef EDGEML_FEATURES_COMMON_FRAMEWORK_PUBLIC_INCLUDE_CVML_API_COMMON_H_
@@ -7,7 +7,7 @@
 
 #include <inttypes.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #define CVML_SDK_EXPORT
 #define CVML_SDK_EXPORT_CORE
 #define CVML_SDK_NO_EXPORT

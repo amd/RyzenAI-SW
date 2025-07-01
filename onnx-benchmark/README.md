@@ -18,7 +18,7 @@ Author: AMD-Xilinx
 
 - [RYZENAI-ONNX-CNNs-BENCHMARK](#ryzenai-onnx-cnns-benchmark)
 - [1 Introduction](#1-introduction)
-  - [1.1 Notes for release 20](#11-notes-for-release-20)
+  - [1.1 Notes for release 21](#11-notes-for-release-21)
 - [2 Setup](#2-setup)
   - [2.1 Install Procedure](#21-install-procedure)
 - [3 Performances Measurement](#3-performances-measurement)
@@ -28,7 +28,6 @@ Author: AMD-Xilinx
     - [3.2.2 Performance with a single instance using a CPU](#322-performance-with-a-single-instance-using-a-cpu)
     - [3.2.3 Performance with a single instance utilizing NPU and model quantization:](#323-performance-with-a-single-instance-utilizing-npu-and-model-quantization)
     - [3.2.4 Performance with single instance with NPU](#324-performance-with-single-instance-with-npu)
-    - [3.2.5 Increase the number of instances to improve throughput.](#325-increase-the-number-of-instances-to-improve-throughput)
     - [3.2.6 Best Latency: performance with one instance of 4x4 core](#326-best-latency-performance-with-one-instance-of-4x4-core)
     - [3.2.7 Performance with single instance with CPU at 30fps fixed rate](#327-performance-with-single-instance-with-cpu-at-30fps-fixed-rate)
     - [3.2.8 File of parameters](#328-file-of-parameters)
@@ -36,7 +35,7 @@ Author: AMD-Xilinx
 
 
 # <a name='Title'></a>RYZENAI-ONNX-CNNs-BENCHMARK
-Notes for Release 20
+Notes for Release 21
 
 # 1 <a name='Introduction'></a>Introduction
 The NPU benchmark tool is designed to measure the performance of ONNX-based Convolutional Neural Network (CNN) inference models. Ryzen AI processors combine Ryzen processor cores (CPU) with an AMD Radeon™ graphics engine (GPU) and a dedicated AI engine (NPU).
@@ -47,47 +46,31 @@ The 'performance_benchmark.py' tool is capable of reporting:
 
 NOTE: This tool has undergone primary testing on the Ryzen processor named "STRIX". 
 
-## 1.1 <a name='Notesforthisrelease'></a>Notes for release 20
-* This release is compatible with RyzenAI 1.4.0.
+## 1.1 <a name='Notesforthisrelease'></a>Notes for release 21
+* This release is compatible with RyzenAI 1.5.0
 * Windows release includes support for PHOENIX and STRIX devices
 * Simplified graphical user interface: only necessary options are shown, which are dynamically added or removed as needed.
-* Quark is now the official quantizer.
+* The official quantizer is Quark
 * Supports power analysis with HWINFO if installed.
+* due to some changes in the way parallelism is supported in the Ryzen-AI 1.5.0 version, performance may be lower compared to previous versions. We are working to adapt the tool to the new methods, which now involve temporal parallelism instead of spatial parallelism. For this reason, the ability to select multiple NPU instances is temporarily disabled.
+* only the 4x4 core (latency optimized) is supported in this release
+* For FP32 models, if the Execution Provider is VitisAI, the user can choose to quantize the model and run it on VitisAIEP, or leave it in FP32 format—in which case it will automatically run on the CPU.
 
 # 2 <a name='Setup'></a>Setup
 ##  2.1 <a name='InstallProcedure'></a>Install Procedure
-Run the following commands only once. For subsequent uses, the environment will be ready, and you’ll just need to activate the Conda environment and set the environment variables with `set_env.bat`.
-
 Pre requisite: have [Anaconda](https://docs.anaconda.com/free/anaconda/install/index.html) or Miniconda installed. 
 
-Run the RyzenAI 1.4.0 installer.
+Run the RyzenAI 1.5.0 installer.
 
 Edit the environment variables in set_env.bat, or run
-```
-python setupenv.py
-```
 
-<p align="center">
-  <img src="./doc/setupenv.png" alt="setupenv" width="400">
-</p>
+Activate the conda environment `ryzen-ai-1.5.0`.
 
-
-for example:
-* the generated Conda environment is named `ryzen-ai-1.4.0`, 
-* the installation is placed in `"C:\Program Files\ryzen-ai\1.4.0"` 
-* the device is STRIX
-
-Optional: If HWINFO is installed, the benchmark tool will run it during the test, simultaneously measuring both power consumption and performance. 
-
-setupenv.py generates the batch file set_env.bat, which must be run once for each new terminal session.
-
-```
-set_env.bat
-```
+Run `set_env.bat`, in case of usage of HWINFO (power measurements), or VAIML compiler (16 bits quantized models). 
 
 Add some needed packages:
 ```
-conda activate %RYZEN_AI_CONDA_ENV_NAME%
+conda activate ryzen-ai-1.5.0
 python -m pip install -r requirements-win.txt
 ```
 
@@ -135,7 +118,7 @@ python performance_benchmark.py --model ./models/resnet50/resnet50_fp32.onnx --t
 To ensure smooth execution of this example, it is advisable to download a set of Imagenet pictures in advance, typically around 100 images should suffice. When the VitisAI EP is chosen and the model is in FP32 format, the tool endeavors to quantize the model before conducting tests. It is imperative to specify the path to a folder containing images using the ```--calib ...``` parameter. Additionally, ```--num_images 10``` randomly selects and copies ten images from the dataset into a calibration folder.
 
 ```
-python performance_benchmark.py --model ./models/resnet50/resnet50_fp32.onnx --config "C:\Program Files\RyzenAI\1.4.0\voe-4.0-win_amd64\vaip_config.json" --timelimit 10 --num 100 --calib ./Imagenet_small --num_calib 10 --execution_provider VitisAIEP --core STX_1x4 --renew 1 --infinite 1 --quarkpreset XINT8
+python performance_benchmark.py --model ./models/resnet50/resnet50_fp32.onnx --timelimit 10 --num 100 --execution_provider VitisAIEP --renew 1 
 ```
 
 A new model will be generated in the same folder as the original FP32 model and then used for inference.
@@ -151,25 +134,11 @@ This experiment involves repeatedly performing inferences on a batch of 100 imag
 python performance_benchmark.py -m .\models\resnet50\resnet50_fp32_qdq.onnx -n 100 -e VitisAIEP
 ```
 
-###  3.2.5 <a name='PerformancewithfourinstanceswithNPUandforcerecompiling'></a>Increase the number of instances to improve throughput. 
-The NPU 4 rows x 4 columns core is optimized for latency. The 1 row x 4 columns core is optimized for throughput and flexibility.
-The best throughput is achieved when 16 instances of 1x4 are used. It is recommended to use at least 16 threads for optimal performance. Fore PHOENIX, no more than 4 instances can be used.
-In this STRIX experiment, we employ 16 models operating in parallel, as opposed to just one as seen in previous examples.
-Force recompiling: if the model has already been compiled and the cache is present, the compiler will reuse the cached model to save time. However, if configuration files, xclbin, or the Anaconda environment have changed, it is necessary to clear the cache to recompile the model.
-Please use the option ```-renew 1``` to clear the cache.
-```
-python performance_benchmark.py --model ./models/resnet50/resnet50_fp32_XINT8.onnx --instance_count 16 --threads 16 --config "C:\Program Files\RyzenAI\1.4.0\voe-4.0-win_amd64\vaip_config.json" --timelimit 10 --num 100 --execution_provider VitisAIEP --core STX_1x4 --renew 1
-```
-
-<p align="center">
-  <img src="./doc/16instances.png" alt="16 instances" width="400">
-</p>
-
 ###  3.2.6 <a name='PerformancewithwithNPUoneinstanceof4x4core'></a>Best Latency: performance with one instance of 4x4 core
 The NPU four rows x four columns core is optimized for latency. The one row x four columns core is optimized for throughput and flexibility.
 In this STRIX example, the 4x4 core is used ```--core STX_4x4```. If you have been following the sequence of experiments, previously the model was compiled for the default STX_1x4 core configuration. Therefore, the cache needs to be cleared using ```-r 1```, and the model needs to be recompiled for the new core configuration.
 ```
-python performance_benchmark.py --model ./models/resnet50/resnet50_fp32_XINT8.onnx --instance_count 1 --threads 1 --config "C:\Program Files\RyzenAI\1.4.0\voe-4.0-win_amd64\vaip_config.json" --timelimit 10 --num 100 --execution_provider VitisAIEP --core STX_4x4 --renew 1
+python performance_benchmark.py --model ./models/resnet50/resnet50_fp32_XINT8.onnx  --timelimit 10 --num 100 --intra_op_num_threads 0 --execution_provider VitisAIEP --renew 1 --power "no power" --update_opset 0
 ```
 
 <p align="center">
@@ -185,7 +154,7 @@ python performance_benchmark.py -m .\models\resnet50\resnet50_fp32.onnx -n 100 -
 ###  3.2.8 <a name='Fileofparameters'></a>File of parameters
 As the number of input parameters increases, it can become convenient to supply a file containing all of them. This method aids in consistently reproducing the same experiment. For instance, the two cases below are optimized for either low latency or high throughput. The file of parameters overrides all other parameters.
 ```
-python performance_benchmark.py --json ./test/STX_resnet50_high_throughput.json
+python performance_benchmark.py --json ./test/STX_resnet50_low_latency.json
 ```
 
 # 4 Power analysis

@@ -1,6 +1,6 @@
 # Accelerate Finetuned LLMs Locally on NPU + iGPU Ryzen AI Processor
 
-This repo provides supplemental code to the AMD Blog [Accelerate Finetuned LLMs Locally on NPU + iGPU Ryzen AI processor](https://www.amd.com/fr/developer/resources/technical-articles/accelerate-llms-locally-on-amd-ryzen-ai-npu-and-igpu.html). Code is provided for LoRA finetuning on MI300X and then running inference of finetuned model on Ryzen AI. 
+This repo provides supplemental code to the AMD Blog [Accelerate Finetuned LLMs Locally on NPU + iGPU Ryzen AI processor](https://www.amd.com/en/developer/resources/technical-articles/accelerate-llms-locally-on-amd-ryzen-ai-npu-and-igpu.html). Code is provided for LoRA finetuning on MI300X and then running inference of finetuned model on Ryzen AI. 
 
 # Finetuning LLMs
 

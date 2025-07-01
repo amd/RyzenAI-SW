@@ -1,6 +1,7 @@
-release = 20
+release = 21
 
 import os
+import onnxruntime as rt
 import numpy as np
 import time
 from pathlib import Path
@@ -10,8 +11,6 @@ import threading
 import math
 import subprocess
 import keyboard
-import onnx
-import onnxruntime as rt
 
 from utilities import *
 #from utilities_internal import *
@@ -93,20 +92,26 @@ def profile(args, num):
     elif args.execution_provider == "VitisAIEP":
         ggprint(f"config path = {args.config}")
         args.model = ggquantize(args)
+
         EP_List.append("VitisAIExecutionProvider")
         
         # this is only valid for ryzenai
+
         cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(args.model))
-        
+        #cache_dir = Path(__file__).parent.resolve()
+
         so.intra_op_num_threads = args.intra_op_num_threads
         
         # options in case of ryzen ai compiler
         provider_options = [
             {
-                "config_file": args.config,
-                "cacheDir": str(cache_dir),
-                "cacheKey": "modelcachekey",
-                "num_of_dpu_runners": args.instance_count,
+                'config_file': args.config,
+                'enable_cache_file_io_in_mem':0,
+                'cacheDir': str(cache_dir),
+                'cacheKey': 'modelcachekey',
+                'xclbin': os.environ['XLNX_VART_FIRMWARE'],
+                'target':'xcompiler',
+                'num_of_dpu_runners': '1',
             }
         ]
 
@@ -244,14 +249,19 @@ def profile(args, num):
     # session.end_profiling()
 
 if __name__ == "__main__":
-    #device = detect_device()
-    device = os.getenv("DEVICE").lower()
-    args, defaults = parse_args(device)
+    # Get APU type info: PHX/STX/HPT
+    apu_type = get_apu_info()
+    # set environment variables: XLNX_VART_FIRMWARE and NUM_OF_DPU_RUNNERS
+    set_environment_variable(apu_type)
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    config_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'vaip_config.json') 
+   
+    args, defaults = parse_args(apu_type)
     
     pm = PowerMeter(tool=args.power, suffix="_meas")
 
     # environment control
-    # check_env(release, args) 
+    check_env(release, args) 
     # imput parameters control
     check_args(args, defaults)
     # delete old measurement
@@ -261,9 +271,10 @@ if __name__ == "__main__":
     xclbin_path = ""
     TABLEW=51
     if args.execution_provider == "VitisAIEP":
-        os.environ['NUM_OF_DPU_RUNNERS'] = str(args.instance_count)
-        os.environ['XLNX_ONNX_EP_VERBOSE'] = "0"
-        os.environ['XLNX_ENABLE_STAT_LOG']= "0"
+        #os.environ['NUM_OF_DPU_RUNNERS'] = str(args.instance_count)
+        os.environ['NUM_OF_DPU_RUNNERS'] = '1'
+        os.environ['XLNX_ONNX_EP_VERBOSE'] = '0'
+        os.environ['XLNX_ENABLE_STAT_LOG']= '0'
         set_engine_shape(args.core)
         
         if args.renew == "1":
@@ -295,7 +306,7 @@ if __name__ == "__main__":
         )
        
         test_summary =  [["model", measurement['model']['name']],
-                        ["instances", args.instance_count if args.execution_provider == "VitisAIEP" else ""],
+                        #["instances", args.instance_count if args.execution_provider == "VitisAIEP" else ""],
                         ["threads", args.threads],
                         ["core",  "VAIP_4x4" if os.path.basename(args.config) == "vitisai_config.json" else args.core]]       
 
@@ -304,21 +315,22 @@ if __name__ == "__main__":
                         ["inferences", inferences]]
                         #["inferences", inferences if args.cpp == "0" else "N/A"]]
         
-        comp_efficency = measurement['model']['Forward_FLOPs']*thr_results/(tops_peak(device)*1e12)
-        efficency    = [["model", measurement['model']['name']],
-                        ["model operations", f"{measurement['model']['Forward_FLOPs']/1e6:.2f} [MFLOPs]"],
-                        ["device", device],
-                        ["theoretical compute peak", f"{tops_peak(device)} [TOPs]"],
-                        ["compute efficency", f"{comp_efficency*100:.2f}%"]]
-        measurement['model']['device'] = device
+        # disabled efficency report ...
+        #comp_efficency = measurement['model']['Forward_FLOPs']*thr_results/(tops_peak(device)*1e12)
+        #efficency    = [["model", measurement['model']['name']],
+        #                ["model operations", f"{measurement['model']['Forward_FLOPs']/1e6:.2f} [MFLOPs]"],
+        #                ["device", device],
+        #                ["theoretical compute peak", f"{tops_peak(device)} [TOPs]"],
+        #                ["compute efficency", f"{comp_efficency*100:.2f}%"]]
+        measurement['model']['device'] = apu_type
         measurement['model']['core'] = args.core
-        measurement['model']['comp_peak'] = tops_peak(device)
-        measurement['model']['comp_efficency'] = comp_efficency*100
+        #measurement['model']['comp_peak'] = tops_peak(apu_type)
+        #measurement['model']['comp_efficency'] = comp_efficency*100
         
         print(Colors.YELLOW)
         tableprint("TEST SUMMARY", test_summary, TABLEW)
         tableprint("PERFORMANCE", performance, TABLEW)
-        tableprint("EFFICENCY", efficency, TABLEW)
+        #tableprint("EFFICENCY", efficency, TABLEW)
 
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         if args.power in ["AGM", "BOTH"]:           
@@ -423,6 +435,14 @@ if __name__ == "__main__":
                     vitisaireport = json.load(json_file)
             except Exception as e:
                 print(f"Error loading JSON file: {e}")
+                vitisaireport = {
+                    "deviceStat": [
+                        {"nodeNum": "N/A"},                  
+                        {"name":    "CPU", "nodeNum": "N/A"},
+                        {"name":    "NPU", "nodeNum": "N/A"},
+                    ]
+                }
+
             
             measurement["vitisai"]['all'] = vitisaireport['deviceStat'][0]['nodeNum']
             vitisai_ep_report = [["total nodes", f"{vitisaireport['deviceStat'][0]['nodeNum']}"]]

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 #include <common-sample-utils.h>
 #include <cvml-depth-estimation.h>
@@ -22,7 +22,6 @@ class DepthEstimationSample : public amd::cvml::sample::utils::RunFeatureClass {
   std::string input_str_{};  ///< frame source: image or video or camera
   // cppcheck-suppress duplInheritedMember
   std::string output_file_{};  ///< Output file path/name
-  bool use_fp16_;              ///< depth output type
 
   /**
    * Post process depth map for opencv visualization.
@@ -52,7 +51,6 @@ cv::Mat DepthEstimationSample::Feature(const cv::Mat& frame_rgb) {
 
   Image input_frame_amd_image(amd::cvml::Image::Format::kRGB, amd::cvml::Image::DataType::kUint8,
                               frame_rgb.cols, frame_rgb.rows, frame_rgb.data);
-  use_fp16_ = (depth_estimation_->GetOutputType() == amd::cvml::ImageType::kGrayScaleFloat16);
 
   // Create destination output
   amd::cvml::Image output_img(amd::cvml::Image::Format::kGrayScale,
@@ -79,17 +77,9 @@ cv::Mat DepthEstimationSample::DepthEstimationCvmlToOpenCV(const Image* depth_ma
     if (depth_map_or_p == nullptr) {
       throw std::runtime_error("Failed to get depth map data!");
     }
-    if (use_fp16_) {
-      cv::Mat depth_map_or_mat_raw2 =
-          cv::Mat{static_cast<int>(depth_map->GetHeight()), static_cast<int>(depth_map->GetWidth()),
-                  CV_16FC1, depth_map_or_p};
-
-      depth_map_or_mat_raw2.convertTo(depth_map_or_mat_raw, CV_32FC1);
-    } else {
-      depth_map_or_mat_raw =
-          cv::Mat{static_cast<int>(depth_map->GetHeight()), static_cast<int>(depth_map->GetWidth()),
-                  CV_32FC1, depth_map_or_p};
-    }
+    depth_map_or_mat_raw =
+        cv::Mat{static_cast<int>(depth_map->GetHeight()), static_cast<int>(depth_map->GetWidth()),
+                CV_32FC1, depth_map_or_p};
     cv::Mat tmp;
     depth_map_or_mat_raw.convertTo(tmp, CV_8U, 255);
     cv::cvtColor(tmp, frame_out, cv::COLOR_GRAY2RGB);
