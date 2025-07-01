@@ -76,8 +76,8 @@ int main()
     info = npu_util::checkCompatibility_RAI_1_4();
     print_info(info);
 
-    std::cout << "System compatibility check for VitisAI EP 1.4.1..." << std::endl;
-    info = npu_util::checkCompatibility_RAI_1_4_1();
+    std::cout << "System compatibility check for VitisAI EP 1.5..." << std::endl;
+    info = npu_util::checkCompatibility_RAI_1_5();
     print_info(info);
 
     return 0;

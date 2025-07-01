@@ -205,29 +205,29 @@ namespace npu_util {
     NPUInfo checkCompatibility_RAI_1_3_1()
     {
         // Min driver: 32.0.203.242
-        // Max date  : 2028-01-17 (3 yrs after the release date of RyzenAI 1.3)
-        return checkCompatibility(DriverNumberToHex(32,0,203,242), { std::chrono::January / 15 / 2028 });
+        // Max date  : 2028-01-17 (3 yrs after the release date of RyzenAI 1.3.1)
+        return checkCompatibility(DriverNumberToHex(32,0,203,242), { std::chrono::January / 17 / 2028 });
     }
 
     NPUInfo checkCompatibility_RAI_1_4()
     {
         // Min driver: 32.0.203.257
-        // Max date  : 2028-03-28 (3 yrs after the release date of RyzenAI 1.4)
-        return checkCompatibility(DriverNumberToHex(32,0,203,257), { std::chrono::March / 28 / 2028 });
+        // Max date  : 2028-03-25 (3 yrs after the release date of RyzenAI 1.4)
+        return checkCompatibility(DriverNumberToHex(32,0,203,257), { std::chrono::March / 25 / 2028 });
     }
 
     NPUInfo checkCompatibility_RAI_1_4_1()
     {
         // Min driver: 32.0.203.259
-        // Max date  : 2028-05-12 (3 yrs after the release date of RyzenAI 1.4.1)
-        return checkCompatibility(DriverNumberToHex(32,0,203,259), { std::chrono::May / 12 / 2028 });
+        // Max date  : 2028-05-13 (3 yrs after the release date of RyzenAI 1.4.1)
+        return checkCompatibility(DriverNumberToHex(32,0,203,259), { std::chrono::May / 13 / 2028 });
     }
 
     NPUInfo checkCompatibility_RAI_1_5()
     {
         // Min driver: 32.0.203.280
-        // Max date  : 2028-06-28 (3 yrs after the release date of RyzenAI 1.5)
-        return checkCompatibility(DriverNumberToHex(32,0,203,280), { std::chrono::June / 28 / 2028 });
+        // Max date  : 2028-07-01 (3 yrs after the release date of RyzenAI 1.5)
+        return checkCompatibility(DriverNumberToHex(32,0,203,280), { std::chrono::July / 1 / 2028 });
     }
 
 } // npu_util
