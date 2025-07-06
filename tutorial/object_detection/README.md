@@ -137,12 +137,12 @@ python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_d
 
 ## Modification
 
-The model uses concat operations to combine the `confidence` and `bounding boxes' as shown in the below in yolov8m ONNX model
+The model uses concat operations to combine the `confidence` and `bounding boxes` as shown in the below in yolov8m ONNX model. This leads to significant degradation in confidence values, missing most of the bounding boxes.
 
 ![image](results/yolov8m_quantized_concat_node.png)
 
 
-We need skip the post-processing sub-graph to improve the accuracy of the `XINT8` quantized model. Shown below in the post-processing sub-graph yolov8m model.
+We need to skip the post-processing sub-graph to improve the accuracy of the `XINT8` quantized model. Shown below in the post-processing sub-graph yolov8m model.
 
 ![image](results/yolov8m_skip_nodes.png)
 
