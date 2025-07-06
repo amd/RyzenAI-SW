@@ -77,8 +77,16 @@ python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image tes
 
 The `BF16` quantized model accuracy is evaluated on COCO dataset
 
+Use the `prepare_data.py` script to download the COCO dataset
+
 ```bash
-python run_inference --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco
+python prepare_data.py
+```
+
+Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-bf16` to measure accuracy metrics on CPU/NPU respectively.
+
+```bash
+python run_inference --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
 ```
 
 <div align="center">
@@ -129,12 +137,12 @@ python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_d
 
 ## Modification
 
-The model uses concat operations to combine the `confidence` and `bounding boxes' as shown in the below in yolov8m ONNX model
+The model uses concat operations to combine the `confidence` and `bounding boxes` as shown in the below in yolov8m ONNX model. This leads to significant degradation in confidence values, missing most of the bounding boxes.
 
 ![image](results/yolov8m_quantized_concat_node.png)
 
 
-We need skip the post-processing sub-graph to improve the accuracy of the `XINT8` quantized model. Shown below in the post-processing sub-graph yolov8m model.
+We need to skip the post-processing sub-graph to improve the accuracy of the `XINT8` quantized model. Shown below in the post-processing sub-graph yolov8m model.
 
 ![image](results/yolov8m_skip_nodes.png)
 
@@ -160,6 +168,14 @@ Sample outputs generated using `XINT8` quantized model with skipped nodes.
 ### Evaluate the model accuracy
 
 The `XINT8` quantized model accuracy is evaluated on COCO dataset
+
+Use the `prepare_data.py` script to download the COCO dataset
+
+```bash
+python prepare_data.py
+```
+
+Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-int8` to measure accuracy metrics on CPU/NPU respectively.
 
 ```bash
 python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_dataset datasets\coco --device npu-int8
