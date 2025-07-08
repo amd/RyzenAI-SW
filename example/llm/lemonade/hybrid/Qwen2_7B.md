@@ -4,7 +4,7 @@ This guide contains all of the instructions necessary to get started with the mo
 
 Hybrid execution mode optimally partitions the model such that different operations are scheduled on NPU vs. iGPU. This minimizes time-to-first-token (TTFT) in the prefill-phase and maximizes token generation (tokens per second, TPS) in the decode phase.
 
-The commands and scripts in this guide leverage the [Lemonade SDK](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/README.md), which provides everything you need to get up and running with LLMs on the OnnxRuntime GenAI (OGA) framework.
+The commands and scripts in this guide leverage the [Lemonade SDK](https://github.com/lemonade-sdk/lemonade), which provides everything you need to get up and running with LLMs on the OnnxRuntime GenAI (OGA) framework.
 
 # Checkpoint
 
@@ -12,7 +12,7 @@ The Ryzen AI Hybrid implementation of [`Qwen/Qwen2-7B`](https://huggingface.co/Q
 
 # Setup
 
-To get started with the [Lemonade SDK](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/README.md) in a Python environment, follow these instructions.
+To get started with the [Lemonade SDK](https://github.com/lemonade-sdk/lemonade) in a Python environment, follow these instructions.
 
 ### System-level pre-requisites
 
@@ -36,9 +36,9 @@ To create and set up an environment, run these commands in your terminal:
     conda activate ryzenai-llm
     ```
 
-3. Install ONNX TurnkeyML to get access to the LLM tools and APIs.
+3. Install the Lemonade SDK to get access to the LLM tools and APIs.
     ```bash
-    pip install turnkeyml[llm-oga-hybrid]
+    pip install lemonade-sdk[llm-oga-hybrid]
     ```
 
 4. Install support for Ryzen AI Hybrid LLMs.
@@ -68,7 +68,7 @@ lemonade -i amd/Qwen2-7B-awq-uint4-asym-g128-lmhead-fp16-onnx-hybrid oga-load --
 
 ## Task Performance
 
-To measure the model's accuracy on the [MMLU test](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/mmlu_accuracy.md) `management` subject, run:
+To measure the model's accuracy on the [MMLU test](https://github.com/lemonade-sdk/lemonade/blob/main/docs/mmlu_accuracy.md) `management` subject, run:
 
 ```bash
 lemonade -i amd/Qwen2-7B-awq-uint4-asym-g128-lmhead-fp16-onnx-hybrid oga-load --device hybrid --dtype int4 accuracy-mmlu --tests management
@@ -126,7 +126,7 @@ thread.join()
 
 ## Application Example
 
-See the [Chat Demo](https://github.com/onnx/turnkeyml/blob/main/examples/lemonade/demos/chat/chat_hybrid.py) for an example application that demonstrates streaming, multi-threading, and response interruption.
+See the [Chat Demo](https://github.com/lemonade-sdk/lemonade/blob/main/examples/demos/chat/chat_hybrid.py) for an example application that demonstrates streaming, multi-threading, and response interruption.
 
 # Server Interface (REST API)
 
@@ -144,7 +144,7 @@ This guide provided instructions for testing and deploying an LLM on a target de
 
 - Visit the [Lemonade LLM examples table](../README.md) to learn how to do this for any of the supported combinations of LLM and device.
 - Visit the [overall Ryzen AI LLM documentation](https://ryzenai.docs.amd.com/en/latest/llm/overview.html#) to learn about other deployment options, such as native C++ libraries.
-- Visit the [Lemonade SDK repository](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/README.md) to learn about more tools and features.
+- Visit the [Lemonade SDK repository](https://github.com/lemonade-sdk/lemonade) to learn about more tools and features.
 
 # Copyright
 
