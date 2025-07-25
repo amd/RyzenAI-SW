@@ -17,7 +17,7 @@ CHUNK_SIZE = 1600  # 0.1 sec chunks
 
 class WhisperONNX:
     def __init__(self, encoder_path, decoder_path,
-                 tokenizer_dir=None,encoder_providers=None, decoder_providers=None):
+                 tokenizer_dir=None, encoder_providers=None, decoder_providers=None):
 
         self.encoder = ort.InferenceSession(encoder_path, providers=encoder_providers)
         self.decoder = ort.InferenceSession(decoder_path, providers=decoder_providers)
