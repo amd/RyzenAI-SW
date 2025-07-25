@@ -1,0 +1,5 @@
+{
+    "batch_size": "1",
+    "encoder_sequence_length / 2": "1500",
+    "decoder_sequence_length": "180"
+}

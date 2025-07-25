@@ -1,0 +1,20 @@
+{
+    "passes": [
+        {
+            "name": "init",
+            "plugin": "vaip-pass_init"
+        },
+        {
+            "name": "vaiml_partition",
+            "plugin": "vaip-pass_vaiml_partition",
+            "vaiml_config": {
+                "optimize_level": 2,
+                "logging_level": "info",
+                "no_failsafe": true,
+                "experiment_features": [
+                    "InsertGatherFront"
+                ]
+            }
+        }
+    ]
+}

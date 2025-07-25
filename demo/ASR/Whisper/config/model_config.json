@@ -1,0 +1,58 @@
+{
+  "whisper": {
+    "base": {
+      "npu": {
+        "encoder": {
+          "cache_key": "whisper_base_encoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_encoder.json"
+        },
+        "decoder": {
+          "cache_key": "whisper_base_decoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_decoder.json"
+        }
+      },
+      "cpu": {
+        "encoder": {},
+        "decoder": {}
+      }
+    },
+    "small": {
+      "npu": {
+        "encoder": {
+          "cache_key": "whisper_small_encoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_encoder.json"
+        },
+        "decoder": {
+          "cache_key": "whisper_small_decoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_decoder.json"
+        }
+      },
+      "cpu": {
+        "encoder": {},
+        "decoder": {}
+      }
+    },
+    "medium": {
+      "npu": {
+        "encoder": {
+          "cache_key": "whisper_medium_encoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_encoder.json"
+        },
+        "decoder": {
+          "cache_key": "whisper_medium_decoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_decoder.json"
+        }
+      },
+      "cpu": {
+        "encoder": {},
+        "decoder": {}
+      }
+    }
+  }
+}
