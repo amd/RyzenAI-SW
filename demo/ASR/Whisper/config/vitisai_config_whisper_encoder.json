@@ -1,0 +1,15 @@
+{
+    "passes": [
+        {
+            "name": "init",
+            "plugin": "vaip-pass_init"
+        },
+        {
+            "name": "vaiml_partition",
+            "plugin": "vaip-pass_vaiml_partition",
+            "vaiml_config": {
+                "optimize_level": 2
+            }
+        }
+    ]
+}
