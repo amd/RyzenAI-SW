@@ -1,0 +1,12 @@
+langchain
+langchain-core
+langchain-community
+argparse
+pydantic
+unstructured
+python-docx
+faiss-cpu
+sentence-transformers
+python-docx
+gradio
+tiktoken
