@@ -26,7 +26,7 @@ args = parser.parse_args()
 
 
 if args.gradio:
-    gradio_launch_app(dataset_path=r"./Dataset", model_path= r"path/to/llm") #update this path
+    gradio_launch_app(dataset_path=r"./Dataset", model_path= r"C:\huggingface") #update this path
     exit()
 
 # --- Paths ---
@@ -36,7 +36,7 @@ faiss_index_path = "faiss_index"
 
 # --- Embedding Model ---
 print("Using ONNX embedding model on VitisAI NPU...")
-embedding_model = custom_embeddings(model_path="bge-large-en-v1.5.onnx", tokenizer_name="BAAI/bge-large-en-v1.5")
+embedding_model = custom_embeddings(model_path="./custom_embedding/bge-large-en-v1.5.onnx", tokenizer_name="BAAI/bge-large-en-v1.5")
 
 # --- Load or Build FAISS Index ---
 if os.path.exists(os.path.join(faiss_index_path, "index.faiss")) and os.path.exists(os.path.join(faiss_index_path, "index.pkl")):
@@ -70,7 +70,7 @@ else:
 retriever = vectorstore.as_retriever(search_type='similarity',search_kwargs={"k": 3})
 print("Number of vectors:", vectorstore.index.ntotal)
 
-llm = custom_llm(model_path=r"path/to/llm")   #update this path
+llm = custom_llm(model_path=r"C:\huggingface")   #update this path
 # llm = custom_llm(model_path=r"C:\Users\akumar23\RAG-repo-xilinx\model")   # Example 
 
 template = PromptTemplate.from_template("""<|system|>

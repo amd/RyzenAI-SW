@@ -1,3 +1,12 @@
+# Windows changed DLL path reference policy since Python 3.8
+# Add the directory containing the DLLs to the DLL search path
+import os
+
+# check current python version
+import sys
+if sys.version_info >= (3, 8):
+    os.add_dll_directory(r"C:\Program Files\RyzenAI\1.5.1\deployment") # add path to your model dependent runtime DLLs
+
 import warnings
 import time
 from typing import Any, Dict, List, Optional
