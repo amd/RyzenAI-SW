@@ -45,7 +45,7 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
 
    ```bash
    git clone https://github.com/amd/RyzenAI-SW.git
-   cd RyzenAI-SW/example/ASR/Whisper-AI
+   cd RyzenAI-SW/demo/ASR/Whisper
    ```
 
 4. **Install dependencies**
