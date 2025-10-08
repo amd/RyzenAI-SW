@@ -20,13 +20,13 @@ This example supports:
 - **Audio file transcription** – load your own `.wav` files for instant speech-to-text
 
 ## Prerequisites
-**Step 1:**  Install the `ryzen-ai-1.5.1` Conda environment using [RyzenAI Documentation](https://ryzenai.docs.amd.com/en/latest/inst.html#). 
+**Step 1:**  Install the latest Conda environment using [RyzenAI Documentation](https://ryzenai.docs.amd.com/en/latest/inst.html#). 
 Ensure the SDK and driver are installed. 
 
 **Step 2:** Export Hugging face Whisper model to onnx and set static shape as mentioned below:
 1. Activate conda environment:
 ```bash
-   conda activate ryzen-ai-1.5.1
+   conda activate ryzen-ai-<version>
 ```
 2. Clone the repository and navigate to the Whisper-AI directory:
 ```bash
@@ -69,7 +69,7 @@ The `params.json` file defines the static shapes used to convert a dynamic Whisp
 
 **Note:** The final static ONNX models are stored in `.\exported_model_directory\encoder_model.onnx` and `.\exported_model_directory\decoder_model.onnx`.
 
-### Whsiper ONNX Inference and Evaluation
+## Whisper ONNX Inference and Evaluation
 
 The `run_whisper.py` script performs speech-to-text transcription using a Whisper-base model exported to ONNX format. It supports transcribing audio from WAV files or a live microphone stream and can evaluate model accuracy on a labeled dataset using WER and CER metrics. The script runs the encoder and decoder models via ONNX Runtime, with support for both CPU and NPU backends, and includes chunk-based processing for long audio inputs.
 
@@ -112,6 +112,25 @@ Command to run transcription using `.wav` file or microphone:
     --device <cpu|npu> \
     --input <audio_files\.wav|"mic">
 ```
+
+### Expected Output
+
+Run the above command with sample audio file and observe the expected Model output below
+
+--input audio_files\61-52s.wav
+
+```bash
+Transcription: Also, there was a stripling page who turned into a maze with so sweet a lady, sir. 
+And in some manner, I do think she died. But then the picture was gone as quickly as it came. 
+Sister Nell, do you hear these models? Take your place and let us see what the crystal can show to you, like is not young, Master. 
+Though I am an old man. With all rant the opening of the tent to see what might be a miss. 
+But Master Will, who peeped out first, needed no more than one glance. 
+Mistress Fitzsooth to the rear of the Ted cries of "A knotting ham! A knotting ham!" before them fled the stroller and his three sons, capless and tear away.
+"What is that tumult and rioting?" cried out the squire, authoritatively, and he blew twice on the silver whistle which hung at his belt.
+
+```
+
+### Model Evaluation
 
 To evaluate model performance, we provide an eval_dataset directory containing sample audio from the LibriSpeech dataset. You can run the following command to generate a detailed report including WER, and CER metrics:
 ```bash

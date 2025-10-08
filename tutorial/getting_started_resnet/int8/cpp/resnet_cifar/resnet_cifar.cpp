@@ -194,7 +194,7 @@ int main(int argc, char* argv[]) {
     if (ep == "npu")
     {
         auto options =
-            std::unordered_map<std::string, std::string>{ {"cacheDir", cache_dir}, {"cacheKey", "modelcachekey"} };
+            std::unordered_map<std::string, std::string>{ {"cacheDir", cache_dir}, {"cacheKey", "modelcachekey_c++"},{"log_level", "info"},{"enable_cache_file_io_in_mem", "0"} };
         try {
             session_options.AppendExecutionProvider_VitisAI(options);
         }

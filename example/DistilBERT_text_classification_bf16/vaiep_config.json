@@ -1,15 +1,25 @@
 {
-    "passes": [
+ "passes": [
+     {
+         "name": "init",
+         "plugin": "vaip-pass_init"
+     },
+     {
+         "name": "vaiml_partition",
+         "plugin": "vaip-pass_vaiml_partition",
+         "vaiml_config": {
+             "preferred_data_storage": "unvectorized"
+         }
+     }
+ ],
+ "target": "VAIML",
+    "targets": [
         {
-            "name": "init",
-            "plugin": "vaip-pass_init"
-        },
-        {
-            "name": "vaiml_partition",
-            "plugin": "vaip-pass_vaiml_partition",
-            "vaiml_config": {
-                             "preferred_data_storage": "unvectorized"
-                            }
+            "name": "VAIML",
+            "pass": [
+                "init",
+                "vaiml_partition"
+            ]
         }
     ]
 }

@@ -46,7 +46,7 @@ torch.onnx.export(
     dummy_inputs,
     tmp_model_path,
     export_params=True,
-    opset_version=13,  # Recommended opset
+    opset_version=17,  # Recommended opset
     input_names=input_names,
     output_names=output_names,
     dynamic_axes=dynamic_axes,
@@ -213,23 +213,24 @@ print(f"NPU Type: {npu_type}")
 install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
 match npu_type:
     case 'PHX/HPT':
-        print("Setting environment for PHX/HPT")
+        print("Setting provider options for PHX/HPT")
         xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
-    case 'STX':
-        print("Setting environment for STX")
-        xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
-    case _:
-        print("Unrecognized APU type. Exiting.")
-        exit()
-
-## Point to the config file path used for the VitisAI Execution Provider
-config_file_path = "./vaip_config.json"
-provider_options = [{
-              'config_file': config_file_path,
+        provider_options = [{
+              'target': 'X1',
               'xclbin': xclbin_file,
               'ai_analyzer_visualization': True,
               'ai_analyzer_profiling': True,
+        }]
+    case 'STX':
+        print("Setting provider options for STX")
+        xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
+        provider_options = [{
+              'ai_analyzer_visualization': True,
+              'ai_analyzer_profiling': True,
           }]
+    case _:
+        print("Unrecognized APU type. Exiting.")
+        exit()
 
 npu_session = onnxruntime.InferenceSession(
     onnx_model_path,

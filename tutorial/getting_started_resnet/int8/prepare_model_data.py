@@ -124,7 +124,7 @@ def export_to_onnx(model, models_dir):
             dummy_inputs,
             tmp_model_path,
             export_params=True,
-            opset_version=13,
+            opset_version=17,
             input_names=input_names,
             output_names=output_names,
             dynamic_axes=dynamic_axes,

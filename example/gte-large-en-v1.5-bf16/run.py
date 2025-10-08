@@ -13,7 +13,7 @@ def main(args):
    npu_session = ort.InferenceSession(
         model_path,
         providers=["VitisAIExecutionProvider"],
-        provider_options=[{"config_file": "vaiml_config.json",
+        provider_options=[{"config_file": "vitisai_config.json",
                            "cache_dir": "./",
                            "cacheKey": "modelcachekey"}],
     )

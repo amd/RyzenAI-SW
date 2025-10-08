@@ -3,16 +3,14 @@
 set(FEATURE_NAME cvml-sample-face-mesh)
 project(${FEATURE_NAME})
 
-find_package(OpenCV REQUIRED PATHS ${OPENCV_INSTALL_ROOT})
+list(APPEND CMAKE_MODULE_PATH ${OPENCV_INSTALL_ROOT} ${AMD_CVML_SDK_ROOT} "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 
-if (NOT DEFINED AMD_CVML_SDK_ROOT)
-    set(AMD_CVML_SDK_ROOT ../..)
-endif()
-find_package(RyzenAILibrary REQUIRED PATHS ${AMD_CVML_SDK_ROOT})
+find_package(OpenCV REQUIRED)
+find_package(RyzenAILibrary REQUIRED)
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-include_directories(${AMD_CVML_SDK_ROOT}/include ${OpenCV_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../common-sample-utils/include)
+include_directories(${OpenCV_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../common-sample-utils/include)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

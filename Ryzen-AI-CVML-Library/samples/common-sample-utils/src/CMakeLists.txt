@@ -1,13 +1,12 @@
 # Copyright (C) 2021-2025 Advanced Micro Devices, Inc. All rights reserved.
 
-find_package(OpenCV REQUIRED PATHS ${OPENCV_INSTALL_ROOT})
+list(APPEND CMAKE_MODULE_PATH ${OPENCV_INSTALL_ROOT} ${AMD_CVML_SDK_ROOT} "${CMAKE_CURRENT_SOURCE_DIR}/../../..")
+
+find_package(OpenCV REQUIRED)
 
 #
 # Find Ryzen AI CVML library (also sets include directories)
 #
-if (NOT DEFINED AMD_CVML_SDK_ROOT)
-    set(AMD_CVML_SDK_ROOT ../..)
-endif()
 find_package(RyzenAILibrary REQUIRED PATHS ${AMD_CVML_SDK_ROOT})
 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)

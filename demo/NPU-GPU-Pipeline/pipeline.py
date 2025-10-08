@@ -476,18 +476,18 @@ if __name__ == "__main__":
     if args.npu:
         npu_device = get_apu_info()
         print('RYZEN_AI_INSTALLATION_PATH:', os.environ["RYZEN_AI_INSTALLATION_PATH"])
-
-        xclbin_path = ''
-        if npu_device == 'STX':
-          xclbin_path = '{}\\voe-4.0-win_amd64\\xclbins\\strix\\AMD_AIE2P_4x4_Overlay.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
+        provider_options = [{}]
         if npu_device == 'PHX':
-          xclbin_path = '{}\\voe-4.0-win_amd64\\xclbins\\phoenix\\4x4.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
-        print('XCLBIN_PATH:', xclbin_path)
+            xclbin_path = '{}\\voe-4.0-win_amd64\\xclbins\\phoenix\\4x4.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
+            provider_options = [{
+                        "target": "X1",
+                        "xclbin": xclbin_path
+                        }]
+            print('XCLBIN_PATH:', xclbin_path)
 
         providers = ["VitisAIExecutionProvider"]
         #cache_dir = Path(__file__).parent.resolve()
-        provider_options = [{"config_file": args.provider_config,
-                             "xclbin": xclbin_path}]
+
 
     else:
         providers = ["CPUExecutionProvider"]

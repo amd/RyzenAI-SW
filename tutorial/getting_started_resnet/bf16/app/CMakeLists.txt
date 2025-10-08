@@ -57,11 +57,12 @@ list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/onnxruntime_provi
 list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/onnxruntime_providers_vitisai.dll")
 list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/onnxruntime_vitisai_ep.dll")
 list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/dyn_dispatch_core.dll")
-list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/flexmlrt.dll")
 list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/libutf8_validity.dll")
 list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/ryzenai_onnx_utils.dll")
 list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/zlib.dll")
-list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/xaiengine.dll")
+list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/zstd.dll")
+list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/abseil_dll.dll")
+list(APPEND dll_list "${RYZEN_AI_INSTALLATION_PATH}/deployment/aiecompiler_client.dll")
 
 foreach(DLL_FILE ${dll_list})
   add_custom_command(

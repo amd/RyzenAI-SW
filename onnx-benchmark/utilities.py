@@ -1,4 +1,4 @@
-# release 21
+# release 22
 
 import pandas as pd
 import numpy as np
@@ -22,16 +22,22 @@ import textwrap
 
 import onnxruntime
 import onnx
-from onnx import version_converter, helper
+from onnx import version_converter, helper, shape_inference
 import onnx_tool
 import random
+import urllib.request
 from PIL import Image
-
+from typing import Protocol, Any, Dict, List, Mapping, Sequence, Tuple, Union, Optional
 
 #import quark.onnx.quantization.config.custom_config as customconfig
 from onnxruntime.quantization.calibrate import CalibrationDataReader
 from quark.onnx.quantization.config import Config, get_default_config
 from quark.onnx import ModelQuantizer
+
+class DynamicInputError(RuntimeError):
+    """Raised when a model contains unsupported dynamic input dimensions."""
+    pass
+
 
 class Colors:
     RESET = "\033[0m"
@@ -53,6 +59,7 @@ class Colors:
     BRIGHT_WHITE = "\033[97m"
     DIMMERED_WHITE = "\033[90m"
 
+'''
 class DataReader:
     def __init__(self, calibration_folder, batch_size, target_size, inputname):
         self.calibration_folder = calibration_folder
@@ -109,6 +116,7 @@ class DataReader:
     def get_next(self):
         # print(f'returned next data reader  {self.read_batch()["input"].shape}')
         return self.read_batch()
+'''
 
 class PowerMeter:
     def __init__(self, tool="AGM", resdir="results", suffix="log"):
@@ -302,11 +310,16 @@ class PowerMeter:
     def plotme(self,csvfile):
         try:
             data = pd.read_csv(csvfile)
+
+            # Compute average power
             self.avepower = data["APU Power"].mean()
 
-            time = data["Time"].values
-            power = data["APU Power"].values
-            self.energy = np.trapz(power, time)  # Energy in Joules (Watt-seconds)
+            # Convert to numpy arrays (float) so trapz sees the right types
+            time_vals  = data["Time"].to_numpy(dtype=float)
+            power_vals = data["APU Power"].to_numpy(dtype=float)
+
+            # Compute energy (integral of power over time)
+            self.energy = np.trapz(y=power_vals, x=time_vals)
 
             # Plot the graph (Power vs. Time)
             plt.figure(figsize=(10, 6))
@@ -478,7 +491,7 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
                 "xclbin_path": measurement["environment"]["xclbin"]["xclbin_path"] if args.execution_provider == "VitisAIEP" else "",
                 #"vaip": measurement["environment"]["xclbin"]["packages"]["vaip"]["version"],
                 #"target_factory": measurement["environment"]["xclbin"]["packages"]["target_factory"]["version"],
-                "xcompiler": measurement["environment"]["xclbin"]["packages"]["xcompiler"]["version"],
+                #"xcompiler": measurement["environment"]["xclbin"]["packages"]["xcompiler"]["version"],
                 #"onnxruntime": measurement["environment"]["xclbin"]["packages"]["onnxrutnime"]["version"],
                 #"graph_engine": measurement["environment"]["xclbin"]["packages"]["graph_engine"]["version"],
                 #"xrt": measurement["environment"]["xclbin"]["packages"]["xrt"]["version"],
@@ -486,36 +499,6 @@ def appendcsv(measurement, args, csv_file="measurements.csv"):
         )
     ggprint(f"Data appended to {csv_file}")
 
-
-def cpptestrun(args, device):
-    # example: cpptest .\models\resnet50\resnet50_fp32_qdq.onnx .\vaip_config_opt.json 30 STRIX STX_1x4
-    modelpath=args.model
-    modelpath=modelpath.replace("/", "\\")
-    configpath=args.config
-    configpath=configpath.replace("/", "\\")
-    command = f'cpptest.bat {modelpath} {configpath} {args.timelimit} {device} {args.core}'
-    dbprint(command)
-    result = subprocess.run(command, capture_output=True, text=True, shell=True)
-    info = result.stdout.strip()
-
-def cpptestconfig(args):
-    # file containing the model path, the vaip_config.json path, the test length
-    # patch to workaround unsupported paths with spaces
-    modelfile=r"..\models\tempmodel.onnx"
-    compilerconfig=r"..\xclbin\tempconfig.json"
-    file_content = textwrap.dedent("""\
-        """)
-
-    file_content += f"{modelfile}\n"
-    file_content += f"{compilerconfig}\n"
-    file_content += f"{args.timelimit}\n"
-
-    # Specify the file path and name
-    file_path = ".\\export_cpp\\files\\tool_v1\\modelconfigtime.txt"
-
-    # Write the content to the .bat file
-    with open(file_path, "w") as file:
-        file.write(file_content)
 
 def check_package_version(package_name):
     try:
@@ -541,7 +524,10 @@ def check_env(release, args):
         ggprint(f"Error: Missing environment variables: {', '.join(missing_vars)}")
         sys.exit(1)
 
-    if sys.version_info.major == 3 and sys.version_info.minor == 10:
+    if (
+        sys.version_info.major == 3
+        and 10 <= sys.version_info.minor <= 12
+    ):
         data.append(
             (
                 f"Python version {sys.version_info.major}.{sys.version_info.minor}",
@@ -552,14 +538,14 @@ def check_env(release, args):
         data.append(
             (
                 f"Python version {sys.version_info.major}.{sys.version_info.minor}",
-                Colors.RED + "please update python" + Colors.RESET,
+                Colors.RED + "please use Python 3.10-3.12" + Colors.RESET,
             )
         )
 
     package_name = "onnxruntime-vitisai"
     version = check_package_version(package_name)
     fields = version.split('.')
-    if fields[0] == "1" and fields[1] in ["21","22"]:
+    if fields[0] == "1" and fields[1] in ["21","22","23"]:
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -574,7 +560,7 @@ def check_env(release, args):
     package_name = "voe"
     version = check_package_version(package_name)
     fields = version.split('.')
-    if fields[0] == "1" and (fields[1] == "5"):
+    if fields[0] == "1" and (fields[1] == "6"):
         data.append(
             (f"{package_name} version: {version}", Colors.GREEN + "OK" + Colors.RESET)
         )
@@ -650,22 +636,11 @@ def cancelcache(cache_path):
         ggprint(f"{cache_path} does not exist or is not a directory")
 
 
-def def_setup(silicon):
-    # default setup
-    try:
-        result = subprocess.check_output(
-            "conda env config vars list", shell=True, text=True
-        )
-        ggprint("Using default setup")
-        #ggprint(result)
-    except subprocess.CalledProcessError as e:
-        ggprint(f"Error: {e}")
-
 def dbprint(message):
     frame = inspect.currentframe()
-    caller_frame = frame.f_back
-    file_name = caller_frame.f_code.co_filename
-    line_number = caller_frame.f_lineno
+    caller_frame = frame.f_back # type: ignore
+    file_name = caller_frame.f_code.co_filename # type: ignore
+    line_number = caller_frame.f_lineno # type: ignore
     print(Colors.BLUE + f"File: {file_name}, Line: {line_number} - {message}" + Colors.RESET)
 
 def del_file(killme):
@@ -674,29 +649,262 @@ def del_file(killme):
         os.remove(killme)
         #ggprint(f"Old measurement {measfile} deleted successfully")
 
-def extract_flops_mem_params(file_path):
 
+def extract_flops_mem_params(file_path):
     delimiter_pattern = re.compile(r' {2,}')
     column_name = "Forward_FLOPs"
 
-    with open(file_path, 'r') as file:
-        first_line = file.readline().strip()
-        last_line = file.readlines()[-1].strip()
-        columns = delimiter_pattern.split(first_line)
+    # Read all non-empty lines
+    with open(file_path, 'r') as f:
+        lines = [line.strip() for line in f if line.strip()]
+        if len(lines) < 2:
+            raise ValueError(f"{file_path} must have at least a header and one data row")
 
-        if column_name in columns:
-            column_number = columns.index(column_name)
+    # Parse header
+    header_cols = delimiter_pattern.split(lines[0])
+    if column_name not in header_cols:
+        raise ValueError(f"The column '{column_name}' was not found in the header of {file_path}")
 
-        else:
-            ggprint(f"The column '{column_name}' was not found in the first row.")
+    column_number = header_cols.index(column_name)
 
-    columns = delimiter_pattern.split(last_line)
-    flops = int(columns[column_number].replace(',', ''))
-    mem = int(columns[column_number + 2].replace(',', ''))
-    params = int(columns[column_number + 4].replace(',', ''))
+    # Parse the last line of data
+    data_cols = delimiter_pattern.split(lines[-1])
+    try:
+        flops  = int(data_cols[column_number    ].replace(',', ''))
+        mem    = int(data_cols[column_number + 2].replace(',', ''))
+        params = int(data_cols[column_number + 4].replace(',', ''))
+    except (IndexError, ValueError) as e:
+        raise ValueError(f"Failed to parse data columns at index {column_number} in {file_path}") from e
 
-    r = {"Forward_FLOPs": flops, "Memory": mem, "Params": params}
-    return r
+    return {
+        "Forward_FLOPs": flops,
+        "Memory":        mem,
+        "Params":        params,
+    }
+
+
+def _choose_model(candidates: List[Path]) -> Path:
+    """Select the largest ONNX (by file size) to avoid auxiliary artifacts."""
+    if not candidates:
+        raise ValueError("No candidates provided")
+    ordered = sorted(((p.stat().st_size, p) for p in candidates), key=lambda item: (-item[0], str(item[1])))
+    return ordered[0][1]
+
+
+def _find_onnx_in_dir(directory: Path) -> List[Path]:
+    """Return all .onnx files under the directory tree, sorted lexicographically."""
+    return sorted(directory.rglob('*.onnx'))
+
+
+def _download_onnx(url: str, out_path: Path) -> None:
+    """Download an ONNX model atomically and perform a minimal size sanity check."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = out_path.with_suffix(out_path.suffix + '.part')
+    ggprint(f"[Downloader] Fetching: {url}")
+    urllib.request.urlretrieve(url, tmp)
+    if tmp.stat().st_size < 10_000:
+        tmp.unlink(missing_ok=True)
+        raise RuntimeError(f"Downloaded file looks too small: {url}")
+    tmp.replace(out_path)
+
+
+KNOWN_DOWNLOADABLE_MODELS: Dict[str, Dict[str, str]] = {
+        'resnet50': {
+            'subdir': 'resnet50',
+            'filename': 'resnet50-v2-7.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v2-7.onnx',
+        },
+        'resnet50-v2-7': {
+            'subdir': 'resnet50',
+            'filename': 'resnet50-v2-7.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v2-7.onnx',
+        },
+        'resnet50v2': {
+            'subdir': 'resnet50',
+            'filename': 'resnet50-v2-7.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v2-7.onnx',
+        },
+        'resnet50-v1-7': {
+            'subdir': 'resnet50',
+            'filename': 'resnet50-v1-7.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v1-7.onnx',
+        },
+        'resnet50v1': {
+            'subdir': 'resnet50',
+            'filename': 'resnet50-v1-7.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v1-7.onnx',
+        },
+        'mobilenetv2': {
+            'subdir': 'mobilenetv2',
+            'filename': 'mobilenetv2-12.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/mobilenet/model/mobilenetv2-12.onnx',
+        },
+        'mobilenetv2-12': {
+            'subdir': 'mobilenetv2',
+            'filename': 'mobilenetv2-12.onnx',
+            'url': 'https://github.com/onnx/models/raw/main/validated/vision/classification/mobilenet/model/mobilenetv2-12.onnx',
+        },
+    }
+
+def get_downloadable_model_selectors() -> List[str]:
+    """Return the list of model selectors with built-in download support."""
+    return sorted(KNOWN_DOWNLOADABLE_MODELS.keys())
+
+def ensure_model_exists(
+    model_selector: Optional[str],
+    model_path: Optional[str],
+    models_root: str = 'models',
+    overwrite: bool = False,
+) -> Path:
+    """Resolve an ONNX path from either an explicit path or a named selector, downloading if needed."""
+
+    if model_path:
+        candidate = Path(model_path)
+        if candidate.is_file():
+            return candidate
+        if candidate.is_dir():
+            matches = _find_onnx_in_dir(candidate)
+            if not matches:
+                raise FileNotFoundError(
+        f"No local model found for selector '{selector}', and no downloader is configured for it.\n"
+        f"- Put the model under './{models_root}/{selector}/' as a .onnx file, OR\n"
+        f"- Use --model_path to point to a specific .onnx file or directory, OR\n"
+        f"- Extend 'KNOWN_DOWNLOADABLE_MODELS' in ensure_model_exists() with a URL for this selector."
+    )
+
+    selector = (model_selector or '').strip()
+    if not selector:
+        raise ValueError("Either --model_path must be provided or --model selector must be set.")
+
+    selector_dir = Path(models_root) / selector
+    if selector_dir.is_dir():
+        matches = _find_onnx_in_dir(selector_dir)
+        if matches and not overwrite:
+            return _choose_model(matches)
+
+
+
+    sel_norm = selector.lower()
+    if sel_norm in KNOWN_DOWNLOADABLE_MODELS:
+        info = KNOWN_DOWNLOADABLE_MODELS[sel_norm]
+        out_dir = Path(models_root) / info['subdir']
+        out_path = out_dir / info['filename']
+        if overwrite or not out_path.exists():
+            _download_onnx(info['url'], out_path)
+        return out_path
+
+    raise FileNotFoundError(
+        f"No local model found for selector '{selector}', and no downloader is configured for it.\n"
+        f"- Put the model under './{models_root}/{selector}/' as a .onnx file, OR\n"
+        f"- Use --model_path to point to a specific .onnx file or directory, OR\n"
+        f"- Extend 'KNOWN_DOWNLOADABLE_MODELS' in ensure_model_exists() with a URL for this selector."
+    )
+
+
+def _describe_dim(dim) -> str:
+    if dim.HasField('dim_value') and dim.dim_value > 0:
+        return str(dim.dim_value)
+    if dim.HasField('dim_param') and dim.dim_param:
+        return dim.dim_param
+    return '?'
+
+
+
+def remove_batchnorm_spatial_attribute(model_path: Union[str, Path]) -> bool:
+    """Drop the legacy 'spatial' attribute from BatchNormalization nodes.
+
+    Returns True when the file is rewritten."""
+    mp = Path(model_path)
+    if not mp.exists():
+        raise FileNotFoundError(mp)
+
+    model = onnx.load(mp.as_posix())
+    changed = False
+
+    for node in model.graph.node:
+        if node.op_type != 'BatchNormalization':
+            continue
+        keep = [attr for attr in node.attribute if attr.name != 'spatial']
+        if len(keep) != len(node.attribute):
+            node.ClearField('attribute')
+            node.attribute.extend(keep)
+            changed = True
+
+    if changed:
+        onnx.save(model, mp.as_posix())
+        ggprint(f"[INFO] Removed deprecated 'spatial' attribute from BatchNormalization nodes in {mp.name}.")
+
+    return changed
+
+
+def fix_model_batch1(model_path: str, out_path: Optional[str] = None) -> str:
+    """Force batch dimension to 1 when dynamic while rejecting other dynamic shapes."""
+    mp = Path(model_path)
+    outp = Path(out_path) if out_path else mp.with_name(mp.stem + '_BS1' + mp.suffix)
+
+    model = onnx.load(mp.as_posix())
+    init_names = {init.name for init in model.graph.initializer}
+
+    batch_fixed = False
+
+    for value in model.graph.input:
+        if value.name in init_names:
+            continue
+        ttype = value.type.tensor_type
+        if not ttype.HasField('shape'):
+            continue
+        dims = list(ttype.shape.dim)
+        if not dims:
+            continue
+
+        found_non_batch_dynamic = []
+        batch_is_dynamic = False
+
+        for idx, dim in enumerate(dims):
+            has_param = dim.HasField('dim_param') and bool(dim.dim_param)
+            has_value = dim.HasField('dim_value')
+            dim_value = dim.dim_value if has_value else None
+            is_dynamic = False
+
+            if has_param:
+                is_dynamic = True
+            elif has_value and dim_value is not None and dim_value <= 0:
+                is_dynamic = True
+            elif (not has_param) and (not has_value):
+                is_dynamic = True
+
+            if is_dynamic:
+                if idx == 0:
+                    batch_is_dynamic = True
+                else:
+                    found_non_batch_dynamic.append((idx, _describe_dim(dim)))
+
+        if found_non_batch_dynamic:
+            pretty = ', '.join(f"dim[{idx}]={desc}" for idx, desc in found_non_batch_dynamic)
+            raise DynamicInputError(
+                f"Input '{value.name}' has unsupported dynamic dimensions ({pretty}). "
+                "Only fixed input shapes are supported."
+            )
+
+        if batch_is_dynamic:
+            d0 = dims[0]
+            d0.ClearField('dim_param')
+            d0.dim_value = 1
+            batch_fixed = True
+            ggprint("[WARN] Detected dynamic batch dimension. Only fixed shapes are supported; forcing batch size to 1.")
+
+    if not batch_fixed:
+        return mp.as_posix()
+
+    try:
+        model = shape_inference.infer_shapes(model)
+    except Exception:
+        pass
+
+    onnx.save(model, outp.as_posix())
+    ggprint(f"[INFO] Saved batch-size-adjusted model to {outp.as_posix()}")
+    return outp.as_posix()
+
 
 
 def get_driver_release_number(device_name):
@@ -723,7 +931,7 @@ def ggprint(linea):
     print(Colors.DIMMERED_WHITE + linea + Colors.RESET)
 
 def ggquantize(args):
-    input_model_path = args.model
+    input_model_path = getattr(args, "model_path", None) or args.model
     calib_data_folder = args.calib
  
     base_name, extension = os.path.splitext(input_model_path)
@@ -790,13 +998,13 @@ def ggquantize(args):
     
     datatype = detect_onnx_precision(input_model_path)
     ggprint(f"The ONNX model data type is: {datatype}")
-   
-    #output_INT8_NHWC_model_path = f"{base_name}_int8{extension}"
-    
-    if datatype in ["BF16", "INT8"]:
+      
+    if datatype in ["INT8"]:
+        remove_batchnorm_spatial_attribute(input_model_path)
         return input_model_path
-    else:
+    elif datatype in ["BF16", "FP32"]:
         if args.autoquant=="1":
+            ggprint("Quantizing to INT8 with Quark")
             quantized_output_model= f"{base_name}_{args.quarkpreset}{extension}"
             if args.renew == "1":
                 cache_dir = os.path.join(Path(__file__).parent.resolve(), "cache", os.path.basename(quantized_output_model))
@@ -804,54 +1012,99 @@ def ggquantize(args):
 
             print(Colors.MAGENTA)
             # NCHW or NHWC? we want NHWC (Channel last)
-            input_name, input_shape = get_input_info(input_model_path)
-            print(f"Model Input Name: {input_name}, Model Input Shape: {input_shape}")
+            nchw_to_nhwc = True
+            input_name, input_shape, numinputs = get_input_info(input_model_path)
+            if numinputs==1:
+                print(f"Model Input Name: {input_name}, Model Input Shape: {input_shape}")
 
-            order = analyze_input_format(input_shape)
-            if order == "NHWC":
-                nchw_to_nhwc = False
-                print("The input format is already NHWC - this is the optimal shape")
-                # calibration images are OK
-                # model is OK
-            elif order =="NCHW":
-                nchw_to_nhwc = True
-                print("The input format is NCHW - conversion to NHWC enabled")
-                # calibration images will be transposed
-                # model will be turned to NHWC
+                order = analyze_input_format(input_shape)
+                if order == "NHWC":
+                    nchw_to_nhwc = False
+                    print("The input format is already NHWC - this is the optimal shape")
+                    # calibration images are OK
+                    # model is OK
+                elif order =="NCHW":
+                    nchw_to_nhwc = True
+                    print("The input format is NCHW - conversion to NHWC enabled")
+                    # calibration images will be transposed
+                    # model will be turned to NHWC
 
-            data_reader =ImageDataReader(calib_data_folder, input_model_path, args.num_calib, 1, order)
-            quant_config = get_default_config(args.quarkpreset)
-            quant_config.convert_nchw_to_nhwc= nchw_to_nhwc
-            config = Config(global_quant_config=quant_config)
-            quantizer = ModelQuantizer(config)
-            quantizer.quantize_model(input_model_path, quantized_output_model, data_reader)
-            print(f'Quark quantized model {quantized_output_model} saved')
-            print(Colors.RESET)
-            return quantized_output_model
+                data_reader =ImageDataReader(calib_data_folder, input_model_path, args.num_calib, 1, order)
+                quant_config = get_default_config(args.quarkpreset)
+                quant_config.convert_nchw_to_nhwc= nchw_to_nhwc
+                config = Config(global_quant_config=quant_config)
+                quantizer = ModelQuantizer(config)
+                quantizer.quantize_model(input_model_path, quantized_output_model, data_reader)
+                remove_batchnorm_spatial_attribute(quantized_output_model)
+                print(f'Quark quantized model {quantized_output_model} saved')
+                print(Colors.RESET)
+                return quantized_output_model
+            else:
+                ggprint(f'Auto quantization is not yet supported for multiple inputs models')
+                ggprint(Colors.RESET)
+                sys.exit(1)
+
         else:
-            ggprint("[WARNING] the model is in FP32 data: please select CPU EP or quantize it first.")
-            sys.exit(1)
-            
+            ggprint("[WARNING] VAIML will compile the model")
+            remove_batchnorm_spatial_attribute(input_model_path)
+            return input_model_path
+    else:
+        ggprint("[ERROR] unknown model data type")
+        sys.exit(1)        
 
+# def get_input_format(onnx_model_path):
+#     onnx_model = onnx.load(onnx_model_path)
+#     input_shapes = []
+#     for input_node in onnx_model.graph.input:
+#         shape = [dim.dim_value or dim.dim_param for dim in input_node.type.tensor_type.shape.dim]
+#         input_shapes.append(tuple(shape))
+#     return [input_node.name, input_shapes]
+# Replaced by more solid:
+def get_input_format(onnx_model_path: str) -> Tuple[List[str], List[Tuple[int, ...]]]:
+    model = onnx.load(onnx_model_path)
 
-def get_input_format(onnx_model_path):
-    onnx_model = onnx.load(onnx_model_path)
-    input_shapes = []
-    for input_node in onnx_model.graph.input:
-        shape = [dim.dim_value or dim.dim_param for dim in input_node.type.tensor_type.shape.dim]
-        input_shapes.append(tuple(shape))
-    return [input_node.name, input_shapes]
+    input_names:  List[str]                = []
+    input_shapes: List[Tuple[int, ...]]    = []
+
+    for node in model.graph.input:
+        input_names.append(node.name)
+        shape = tuple(
+            dim.dim_value if dim.dim_value > 0 else -1
+            for dim in node.type.tensor_type.shape.dim
+        )
+        input_shapes.append(shape)
+
+    if not input_names:
+        raise ValueError(f"No inputs found in {onnx_model_path}")
+
+    return input_names, input_shapes
+
 
 def get_input_info(onnx_model_path):
-    # Load the ONNX model without loading it into memory
-    with open(onnx_model_path, "rb") as f:
-        model_proto = onnx.load(f)
-
-        # Get the first input node in the graph
-        first_input = model_proto.graph.input[0]
-        input_name = first_input.name
-        input_shape = [d.dim_value for d in first_input.type.tensor_type.shape.dim]
-    return input_name, input_shape
+    # Load the ONNX model
+    model = onnx.load(onnx_model_path)
+    
+    # Build a set of all initializer names (these aren’t true graph inputs)
+    init_names = {init.name for init in model.graph.initializer}
+    
+    # Filter out those from the graph.input list
+    real_inputs = [
+        inp for inp in model.graph.input
+        if inp.name not in init_names
+    ]
+    
+    # How many “real” inputs we have
+    num_inputs = len(real_inputs)
+    
+    # Grab name & shape of the first real input (if any)
+    if num_inputs > 0:
+        first = real_inputs[0]
+        input_name  = first.name
+        input_shape = [dim.dim_value for dim in first.type.tensor_type.shape.dim]
+    else:
+        input_name, input_shape = None, []
+    
+    return input_name, input_shape, num_inputs
 
 
 def initcsv(filename, R, C):
@@ -905,7 +1158,7 @@ def log_battery_percentage(start_time, timestamp, resdir):
         writer.writerow([elapsed_time, battery_percentage])
 
 
-def meas_init(args, release, total_throughput, average_latency, xclbin_path):
+def meas_init(args, release, total_throughput, average_latency, xclbin_path, model_input):
     # dictionary of results
     measurement = {}
     measurement["run"] = {}
@@ -935,12 +1188,12 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
     measurement["results"]["energy mJ/frame"]["npu"] = "N/A"
     measurement["results"]["energy mJ/frame"]["mem"] = "N/A"
 
-    measurement["model"] = profile_model(args.model)
+    #measurement["model"] = profile_model(args.model, model_input)
+    measurement["model"] = args.model
 
     measurement["vitisai"] = {}
     measurement["vitisai"]["all"] = 0
     measurement["vitisai"]["CPU"] = 0
-    measurement["vitisai"]["DPU"] = 0
 
     measurement["system"] = {}
     measurement["system"]["frequency"] = {}
@@ -1007,14 +1260,15 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
             }
             for release in releases
         }
-
+    
+    conda_list = ""
     try:
-        output = subprocess.check_output("conda list", shell=True, text=True)
+        conda_list = subprocess.check_output("conda list", shell=True, text=True)
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
     package_info = {}
     # Parse the output to extract package names and versions
-    lines = output.strip().split("\n")
+    lines = conda_list.strip().split("\n")
     for line in lines[3:]:  # Skip the first 3 lines which contain header information
         parts = re.split(r"\s+", line.strip())
         if len(parts) >= 2:
@@ -1032,7 +1286,7 @@ def meas_init(args, release, total_throughput, average_latency, xclbin_path):
 
     return measurement
 
-def medians(filename):
+def getmedians(filename):
     df = pd.read_csv(filename)
     if "Time" in df.columns:
         df = df.drop(columns=["Time"])
@@ -1085,6 +1339,14 @@ def parse_args(apu_type):
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--batchsize", "-b", type=int, default=1, help="batch size: number of images processed at the same time by the model. VitisAIEP supports batchsize = 1. Default is 1")
+    parser.add_argument(
+        "--force_batch",
+        type=int,
+        default=1,
+        choices=[0, 1],
+        help="If set to 1 (default) rewrite inputs to force batch=1 when the model uses dynamic batches.",
+    )
+
     parser.add_argument(
         "--calib",
         type=str,
@@ -1176,6 +1438,14 @@ def parse_args(apu_type):
         type=float,
         default=0,
         help="Minimum time interval (s) for running inferences. Default=0",
+    )
+
+    parser.add_argument(
+        "--model_path",
+        "-mp",
+        type=str,
+        default="",
+        help="Explicit path to an ONNX model (file or directory). Overrides --model selector when provided.",
     )
 
     parser.add_argument(
@@ -1486,40 +1756,12 @@ def plotenergy_hwinfo(npu, cpu, apu, recordfilename):
     save_filepath = recordfilename.replace("_meas", "energy").rsplit(".", 1)[0] + ".png"
     plt.savefig(save_filepath, dpi=300, bbox_inches='tight')
 
-def PHX_1x4_setup(silicon):
-    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
-    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '1x4.xclbin')  
-    os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_Nx4_Overlay"
-    ggprint(80*"-")
-    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
-    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
 
-
-def PHX_4x4_setup(silicon):
-    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
-    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')  
-    os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2_4x4_Overlay"
-    ggprint(80*"-")
-    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
-    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
-
-def profile_model(modelpath):
+def profile_model(modelpath, model_input):
     #credits: https://github.com/ThanatosShinji/onnx-tool/blob/main/benchmark/examples.py
-    model_name = os.path.splitext(os.path.basename(modelpath))[0]
-    inputinfo = get_input_info(modelpath)
-    model_input = {inputinfo[0]: np.zeros(inputinfo[1])}
+    # function removed for now
+    quit()
 
-    m = onnx_tool.Model(modelpath)
-    m.graph.shape_infer(model_input)  # update tensor shapes with new input tensor
-    m.graph.profile()
-
-    profileresult = "profile_" + model_name + ".txt"
-    m.graph.print_node_map(profileresult, metric="FLOPs")
-
-    fmp = extract_flops_mem_params(profileresult)
-    model_fmp = {"name":model_name} | fmp
-
-    return model_fmp
 
 def set_ZEN_env():
     os.environ["ZENDNN_LOG_OPTS"] = "ALL:0"
@@ -1565,31 +1807,6 @@ def save_result_json(results, filename):
         json.dump(results, file_json, indent=4)
     ggprint(f"Data saved in {filename}")
 
-def STX_1x4_setup(silicon):
-    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
-    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_Nx4_Overlay.xclbin')  
-    os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_Nx4_Overlay"
-    ggprint(80*"-")
-    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
-    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
-
-def STX_4x4_setup(silicon):
-    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
-    os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')  
-    os.environ["XLNX_TARGET_NAME"] = "AMD_AIE2P_4x4_Overlay"
-    ggprint(80*"-")
-    ggprint(f"XLNX_VART_FIRMWARE = {os.environ['XLNX_VART_FIRMWARE']}")
-    ggprint(f"XLNX_TARGET_NAME = {os.environ['XLNX_TARGET_NAME']}")
-
-def set_engine_shape(case):
-    switch_dict = {
-        "PHX_1x4": PHX_1x4_setup,
-        "PHX_4x4": PHX_4x4_setup,
-        "STX_1x4": STX_1x4_setup,
-        "STX_4x4": STX_4x4_setup,
-    }
-    action = switch_dict.get(case, def_setup)
-    action("none")
 
 def SetCalibDir(source_directory, calib_dir, num_images_to_copy):
     if os.path.exists(calib_dir):
@@ -1661,7 +1878,7 @@ def time_violin(filename, relevant_cols, title, xlabel, ylabel):
     df = pd.read_csv(filename)
     fig, axs = plt.subplots(2, 1, figsize=(16, 6))
 
-    medi = medians(filename)
+    medi = getmedians(filename)
 
     for meas in relevant_cols:
         axs[0].plot(df["Time"], df[meas], label=meas)
@@ -1793,13 +2010,29 @@ class ImageDataReader(CalibrationDataReader):
         self.order = order
 
 
-    def get_next(self):
+    #def get_next(self):
+    #    if self.enum_data is None:
+    #        self.enum_data = iter([{
+    #            self.input_name: nhwc_data
+    #        } for nhwc_data in self.nhwc_data_list])
+    #    return next(self.enum_data, None)
+    #Replaced with more robust:
+    def get_next(self) -> Dict[str, Any]:
+        """
+        Returns the next input batch as a dict,
+        or {} when there is no more data.
+        """
         if self.enum_data is None:
-            self.enum_data = iter([{
-                self.input_name: nhwc_data
-            } for nhwc_data in self.nhwc_data_list])
-        return next(self.enum_data, None)
-
+            # build your list of dicts only once
+            self.enum_data = iter(
+                [{self.input_name: batch} 
+                 for batch in self.nhwc_data_list]
+            )
+        
+        try:
+            return next(self.enum_data)
+        except StopIteration:
+            return {}   # always a dict, so type matches the base class
 
     def rewind(self):
         self.enum_data = None
@@ -1807,7 +2040,6 @@ class ImageDataReader(CalibrationDataReader):
 
     def reset(self):
         self.enum_data = None
-
 
 def get_apu_info():
     # Run pnputil as a subprocess to enumerate PCI devices
@@ -1824,29 +2056,123 @@ def get_apu_info():
     return apu_type
 
 def set_environment_variable(apu_type):
-
     install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
     os.environ['XLNX_ENABLE_CACHE']='1'
     os.environ['XLNX_ONNX_EP_REPORT_FILE']='vitisai_ep_report.json'
 
     match apu_type:
         case 'PHX/HPT':
-            print("Setting environment for PHX/HPT")
+            ggprint("Setting environment for PHX/HPT")
             os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
             os.environ['NUM_OF_DPU_RUNNERS']='1'
             os.environ['XLNX_TARGET_NAME']='AMD_AIE2_4x4_Overlay'
         case ('STX' | 'KRK'):
-            print("Setting environment for STX")
+            ggprint("Setting environment for STX")
             os.environ['XLNX_VART_FIRMWARE']= os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
             os.environ['NUM_OF_DPU_RUNNERS']='1'
             os.environ['XLNX_TARGET_NAME']='AMD_AIE2P_4x4_Overlay'
         case _:
-            print("Unrecognized APU type. Exiting.")
-            exit()
-    # print('XLNX_VART_FIRMWARE=', os.environ['XLNX_VART_FIRMWARE'])
-    # print('NUM_OF_DPU_RUNNERS=', os.environ['NUM_OF_DPU_RUNNERS'])
-    # print('XLNX_TARGET_NAME=', os.environ['XLNX_TARGET_NAME'])
-    # print('XLNX_ENABLE_CACHE=', os.environ['XLNX_ENABLE_CACHE'])
+            ggprint("Unrecognized APU type. Exiting.")
+            sys.exit(1)
+
+# Build a map of ONNX element names → NumPy dtypes,
+# safely handling bfloat16 on NumPy <1.20
+def _make_type_map():
+    m = {
+        'float':   np.float32,
+        'double':  np.float64,
+        'float16': np.float16,
+        'int64':   np.int64,
+        'int32':   np.int32,
+        'int16':   np.int16,
+        'int8':    np.int8,
+        'uint8':   np.uint8,
+        'bool':    np.bool_
+    }
+    try:
+        m['bfloat16'] = np.dtype('bfloat16')
+    except TypeError:
+        # fallback when numpy doesn't support bfloat16
+        m['bfloat16'] = np.float32
+    return m
+
+_TYPE_MAP = _make_type_map()
 
 
+
+
+class SessionLike(Protocol):
+    def get_inputs(self) -> Sequence[Any]: ...
+    def get_outputs(self) -> Sequence[Any]: ...
+    def run(self, output_names: Sequence[str], input_feed: Mapping[str, Any]) -> Sequence[Any]: ...
+
+
+class DummySession:
+    def get_inputs(self) -> Sequence[Any]:
+        return []
+
+    def get_outputs(self) -> Sequence[Any]:
+        return []
+
+    def run(
+        self,
+        output_names: Sequence[str],
+        input_feed: Mapping[str, Any],
+    ) -> Sequence[Any]:
+        # return an empty sequence to signal “no outputs”
+        return []
+
+def generate_dummy_inputs(session, orig_im_size=(480, 640)):
+    """
+    For each ONNX input, make a dummy NumPy array
+    (dynamic dims → 1) with matching dtype.
+    Special-cases 'orig_im_size' to use the provided tuple.
+    """
+    dummy_inputs = {}
+    print("-" * 80)
+    print("Model inputs inspection:")
+    
+    for inp in session.get_inputs():
+        name = inp.name
+
+        # Special-case orig_im_size
+        if name == "orig_im_size":
+            array = np.array(orig_im_size, dtype=np.int64)
+            dummy_inputs[name] = array
+            shape_str = str(list(array.shape))
+            print(f"{name:<30}  {shape_str:<15}  {array.dtype}")
+            continue
+
+        # Build shape, replacing dynamic dims (None or str) with 1
+        shape = []
+        for d in inp.shape:
+            if isinstance(d, int):
+                shape.append(d)
+            else:
+                # dynamic dimension: replace with 1
+                shape.append(1)
+
+        # Determine numpy dtype
+        elem = inp.type
+        elem = elem[elem.find('(') + 1 : elem.find(')')]
+        np_dtype = _TYPE_MAP.get(elem, np.float32)
+
+        # Build the dummy array
+        if np.issubdtype(np_dtype, np.floating):
+            array = np.random.randn(*shape).astype(np_dtype)
+        elif np.issubdtype(np_dtype, np.integer):
+            array = np.random.randint(0, 10, size=shape, dtype=np_dtype)
+        elif np_dtype == np.bool_:
+            array = (np.random.rand(*shape) > 0.5)
+        else:
+            array = np.zeros(shape, dtype=np_dtype)
+
+        dummy_inputs[name] = array
+        print(f"{name:<30}  {str(shape):<15}  {np_dtype}")
+
+    return dummy_inputs
+
+# Example usage
+# session = ort.InferenceSession("model_dynamic.onnx")
+# inputs = generate_dummy_inputs(session, orig_im_size=(16, 16))
 
