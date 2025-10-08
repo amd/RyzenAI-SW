@@ -42,7 +42,7 @@ To run the demos and examples in this repository, please follow the instructions
 ## LLM Flow
 
 - [LLMs on RyzenAI with ONNX Runtime GenAI API](example/llm/oga_api)
-
+- [ONNX Runtime GenAI(OGA)‑based RAG LLM](example/llm/RAG-OGA)
 
 ## Examples
 
