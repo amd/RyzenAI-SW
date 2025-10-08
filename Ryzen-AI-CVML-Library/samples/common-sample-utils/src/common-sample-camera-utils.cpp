@@ -232,6 +232,7 @@ bool SetupCamera(int camera_index, const std::vector<CamRes>& res_list, cv::Vide
 #else
     camera->set(cv::CAP_PROP_FRAME_WIDTH, res.width);
     camera->set(cv::CAP_PROP_FRAME_HEIGHT, res.height);
+    camera->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
     camera->set(cv::CAP_PROP_FPS, 30);
     auto w = camera->get(cv::CAP_PROP_FRAME_WIDTH);
     auto h = camera->get(cv::CAP_PROP_FRAME_HEIGHT);

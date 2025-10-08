@@ -1,3 +1,10 @@
+<table class="sphinxhide" width="100%">
+ <tr width="100%">
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Object Detection with Yolov8m </h1>
+    </td>
+ </tr>
+</table>
+
 # Introduction
 
 In this tutorial we will using yolov8m model for object detection, including preparing, quantization and deploying a `BF16` and `XINT8` model using RyzenAI Software.
@@ -6,37 +13,12 @@ In this tutorial we will using yolov8m model for object detection, including pre
 
 The following steps outline how to deploy the quantized model on an NPU:
 
-- Download the yolov8m model from the Ultralytics and save it as ONNX (Optset 17) model
+- Download the yolov8m model from the Ultralytics and export it to ONNX (Optset 17) model
 - Quantize the model to `BF16` or `XINT8` using the AMD Quark Quantization API
 - Compile and run the model on NPU using ONNX Runtime with the Vitis AI Execution Provider
 
 
-## Download and export the model
-
-Python code to download the model from ultralytics
-
-```python
-from ultralytics import YOLO
-
-def export_yolov8m_to_onnx():
-    model = YOLO("yolov8m.pt")
-    print("Number of classes:", model.model.nc)
-    model.export(format="onnx", opset=17)  # Exports to yolov8m.onnx
-    print("YOLOv8m exported to yolov8m.onnx")
-
-if __name__ == "__main__":
-    export_yolov8m_to_onnx()
-```
-Command to download and export the model from `.pt` to `.onnx`
-
-```bash
-cd models
-python export_to_onnx.py
-```
-
-*Note:* If asked to update the Ultralytics package, it will upgrade the onnx-runtime. To run on NPU, ensure you create a new clone with existing environment created by RyzenAI software installer.
-
-### Create and Activate Conda Environment
+## Create and Activate Conda Environment
 
 ```python
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
@@ -48,7 +30,16 @@ Install the required python packages for the tutorial:
 
 ```bash
 pip install -r requirements.txt
-``` 
+```
+
+## Download and export the model
+
+Download the PyTorch model [yolov8m.pt](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8m.pt) from Ultralytics. Use the python script to export the model from `yolov8m.pt` to `yolov8m.onnx`. The script assumes the `yolov8m.pt` is in the models directory. 
+
+```python
+cd models
+python export_to_onnx.py
+```
 
 ## Model Quantization and Compilation
 
@@ -189,5 +180,29 @@ python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_d
 | XINT8 (CPU)   |       38.2               |     52.3             |      41.8            |
 | XINT8 (NPU)   |       38.1               |     52.2             |      41.6            |
 
+
+</div>
+
+
+## Evaluate the Model Performance across formats
+
+Evaluate the Performance of Model across Float32 (CPU), BF16 and XINT8. Model is benchmarked across 100 inference runs and we measure  
+1) Latency - Average time for each Inference run on CPU/NPU
+2) Frames per Second - Indicates how many individual images, or frames, are inferred per second 
+
+Use `--benchmark` option while running the Model
+
+```bash
+python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16 --benchmark
+```
+
+
+<div align="center">
+
+|  Yolov8m      | Avg time for each Inference (Latency) |  Frames per Second (FPS)| 
+|---------------|---------------------------------------|-------------------------|
+| Float32 (CPU) |       0.486 sec                       |     2.1                 |
+| BF16    (NPU) |       0.075 sec                       |     13.4                |
+| XINT8   (NPU) |       0.021 sec                       |     48.2                |
 
 </div>

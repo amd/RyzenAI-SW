@@ -167,16 +167,19 @@ install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
 config_file_path = os.path.join(install_dir, 'voe-4.0-win_amd64', 'vaip_config.json') # Path to the NPU config file
 
 aie_options = onnxruntime.SessionOptions()
+provider_options = [{}]
+if npu_type == 'PHX/HPT':
+    # For PHX/HPT devices, xclbin is required
+    provider_options = [{
+                    'target': 'X1',
+                    'xclbin': xclbin_file
+                    }]
 
 aie_session = onnxruntime.InferenceSession(
     model.SerializeToString(),
     providers=['VitisAIExecutionProvider'],
     sess_options=aie_options,
-    provider_options = [{'config_file': config_file_path,
-                         'cacheDir': cache_directory,
-                         'cacheKey': 'hello_cache',
-                         'xclbin': xclbin_file
-                        }]
+    provider_options = provider_options
 )
 
 # Run Inference

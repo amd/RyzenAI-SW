@@ -26,13 +26,12 @@ args = parser.parse_args()
 
 
 if args.gradio:
-    gradio_launch_app(dataset_path=r"./Dataset", model_path= r"path/to/llm") #update this path
+    gradio_launch_app(dataset_path=r"./Dataset", model_path= r"./model") #update this path
     exit()
 
 # --- Paths ---
-
-dataset_path = r"./Dataset" #update this path
-faiss_index_path = "faiss_index"
+dataset_path = r"./Dataset"     #update this path
+faiss_index_path = "./faiss_index"
 
 # --- Embedding Model ---
 print("Using ONNX embedding model on VitisAI NPU...")
@@ -70,8 +69,7 @@ else:
 retriever = vectorstore.as_retriever(search_type='similarity',search_kwargs={"k": 3})
 print("Number of vectors:", vectorstore.index.ntotal)
 
-llm = custom_llm(model_path=r"path/to/llm")   #update this path
-# llm = custom_llm(model_path=r"C:\Users\akumar23\RAG-repo-xilinx\model")   # Example 
+llm = custom_llm(model_path=r"./model")   # update this with LLM model path
 
 template = PromptTemplate.from_template("""<|system|>
 Using the information contained in the context,

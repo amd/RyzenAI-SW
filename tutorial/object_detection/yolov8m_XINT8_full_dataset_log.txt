@@ -1,0 +1,116 @@
+Evaluating model: C:\Users\dwchenna\github\dwchenna\RyzenAI-SW\tutorial\object_detection\models\yolov8m_XINT8.onnx
+loading annotations into memory...
+Done (t=0.53s)
+creating index...
+index created!
+{'stride': '32', 'onnx.infer': 'onnxruntime.quant', 'date': '2025-05-21T23:12:53.672766', 'description': 'Ultralytics YOLOv8m model trained on coco.yaml', 'author': 'Ultralytics', 'version': '8.3.115', 'license': 'AGPL-3.0 License (https://ultralytics.com/license)', 'docs': 'https://docs.ultralytics.com', 'task': 'detect', 'batch': '1', 'imgsz': '[640, 640]', 'names': "{0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}", 'args': "{'batch': 1, 'half': False, 'dynamic': False, 'simplify': True, 'opset': 17, 'nms': False}", 'channels': '3'}
+detections saved to: C:\Users\dwchenna\github\dwchenna\RyzenAI-SW\tutorial\object_detection\runs\onnx-predict\yolov8m_XINT8-instances_val2017-iou=0.50\pred.json
+Loading and preparing results...
+DONE (t=0.28s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=8.97s).
+Accumulating evaluation results...
+DONE (t=1.63s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.382
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.523
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.418
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.223
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.435
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.499
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.308
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.447
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.455
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.262
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.512
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.596
+
+Per-category AP (IoU=0.5:0.95, area=all):
+person               AP: 0.532
+bicycle              AP: 0.313
+car                  AP: 0.406
+motorcycle           AP: 0.410
+airplane             AP: 0.665
+bus                  AP: 0.629
+train                AP: 0.639
+truck                AP: 0.314
+boat                 AP: 0.211
+traffic light        AP: 0.234
+fire hydrant         AP: 0.663
+stop sign            AP: 0.627
+parking meter        AP: 0.413
+bench                AP: 0.252
+bird                 AP: 0.324
+cat                  AP: 0.605
+dog                  AP: 0.557
+horse                AP: 0.597
+sheep                AP: 0.506
+cow                  AP: 0.530
+elephant             AP: 0.604
+bear                 AP: 0.560
+zebra                AP: 0.653
+giraffe              AP: 0.720
+backpack             AP: 0.112
+umbrella             AP: 0.387
+handbag              AP: 0.125
+tie                  AP: 0.308
+suitcase             AP: 0.325
+frisbee              AP: 0.613
+skis                 AP: 0.206
+snowboard            AP: 0.326
+sports ball          AP: 0.397
+kite                 AP: 0.361
+baseball bat         AP: 0.321
+baseball glove       AP: 0.345
+skateboard           AP: 0.542
+surfboard            AP: 0.333
+tennis racket        AP: 0.518
+bottle               AP: 0.342
+wine glass           AP: 0.316
+cup                  AP: 0.395
+fork                 AP: 0.329
+knife                AP: 0.170
+spoon                AP: 0.145
+bowl                 AP: 0.366
+banana               AP: 0.200
+apple                AP: 0.126
+sandwich             AP: 0.247
+orange               AP: 0.244
+broccoli             AP: 0.151
+carrot               AP: 0.156
+hot dog              AP: 0.276
+pizza                AP: 0.518
+donut                AP: 0.394
+cake                 AP: 0.319
+chair                AP: 0.282
+couch                AP: 0.351
+potted plant         AP: 0.255
+bed                  AP: 0.309
+dining table         AP: 0.224
+toilet               AP: 0.570
+tv                   AP: 0.508
+laptop               AP: 0.609
+mouse                AP: 0.592
+remote               AP: 0.255
+keyboard             AP: 0.492
+cell phone           AP: 0.287
+microwave            AP: 0.559
+oven                 AP: 0.334
+toaster              AP: 0.331
+sink                 AP: 0.362
+refrigerator         AP: 0.539
+book                 AP: 0.093
+clock                AP: 0.481
+vase                 AP: 0.329
+scissors             AP: 0.242
+teddy bear           AP: 0.410
+hair drier           AP: 0.040
+toothbrush           AP: 0.259
+
+Main COCO Metrics:
+mAP     (AP@[IoU=0.50:0.95]): 38.2
+mAP50   (AP@IoU=0.50)       : 52.3
+mAP75   (AP@IoU=0.75)       : 41.8
+COCO evaluation results saved to: C:\Users\dwchenna\github\dwchenna\RyzenAI-SW\tutorial\object_detection\runs\onnx-predict\yolov8m_XINT8-instances_val2017-iou=0.50\coco-metrics.json

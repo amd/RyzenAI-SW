@@ -7,7 +7,7 @@ custom_ops_path = os.path.abspath("./onnx_custom_ops.dll")
 print(custom_ops_path)
 
 # Path to the config file
-config_path = "../model/genai_config.json"  # Adjust if needed
+config_path = "./model/genai_config.json"  # Adjust if needed
 
 # Load the existing config
 with open(config_path, "r") as f:

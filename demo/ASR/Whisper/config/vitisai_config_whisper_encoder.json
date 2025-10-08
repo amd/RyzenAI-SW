@@ -11,5 +11,15 @@
                 "optimize_level": 2
             }
         }
+    ],
+    "target": "VAIML",
+    "targets": [
+        {
+           "name": "VAIML",
+           "pass": [
+               "init",
+               "vaiml_partition"
+           ]
+        }
     ]
 }
