@@ -38,6 +38,7 @@ To run the demos and examples in this repository, please follow the instructions
 - [Getting started tutorial with a fine-tuned ResNet model](tutorial/getting_started_resnet)
 - [Hello world jupyter notebook tutorial](tutorial/hello_world)
 - [Getting started ResNet50 example on iGPU](example/iGPU/getting_started)
+- [Getting started ResNet50 tutorial on Linux](tutorial/linux)
 
 ## LLM Flow
 
