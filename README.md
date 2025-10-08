@@ -56,7 +56,7 @@ To run the demos and examples in this repository, please follow the instructions
 ## Demos
 
 - [NPU-GPU pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
-
+- [Automatic Speech Recognition using OpenAI Whisper](demo/ASR/Whisper)
 
 ## Other Tutorials
 
