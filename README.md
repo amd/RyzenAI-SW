@@ -51,12 +51,13 @@ To run the demos and examples in this repository, please follow the instructions
   - [Image classification](example/image_classification)
   - [Text Embedding Model Alibaba-NLP/gte-large-en-v1.5](example/gte-large-en-v1.5-bf16)
 - [Object detection with Yolov8](tutorial/object_detection)
+- [Automatic Speech Recognition: Step by Step guide to run Whisper-base on NPU](example/ASR/Whisper-AI) 
 
 
 ## Demos
 
 - [NPU-GPU pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
-- [Automatic Speech Recognition using OpenAI Whisper](demo/ASR/Whisper)
+- [Automatic Speech Recognition using OpenAI Whisper (small, medium, large)](demo/ASR/Whisper)
 
 ## Other Tutorials
 
