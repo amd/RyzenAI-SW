@@ -16,7 +16,6 @@ For more details, refer to the Hugging Face Model Card: https://huggingface.co/A
 The following steps outline how to deploy the model on an NPU:
 
 - Download the model from Hugging Face and convert it to ONNX (Opset 17).
-- Quantize the model to BF16 using the AMD Quark Quantizer.
 - Compile and run the model on an NPU using ONNX Runtime with the Vitis AI Execution Provider.
 
 ## Setup Instructions
@@ -25,6 +24,7 @@ Activate the conda environment created by the RyzenAI installer
 
 ```bash
 conda activate <env_name>
+cd <RyzenAI-SW>\example\gte-large-en-v1.5-bf16
 ```
 
 ## Download the GTE model
@@ -39,59 +39,38 @@ The script ``download_model.py`` downloads the model from the Hugging Face check
 
 ONNX models will be saved as: ``models/gte-large-en-v1.5.onnx``
 
-## Model Quantize
-
-Convert the GTE model from FP32 to BF16 using AMD Quark quantization
-
-```bash
-python quark_quantize.py --model_path "models/gte-large-en-v1.5.onnx" --output_dir "models"
-```
-
-During quantization, AMD Quark converts both weights and activations to the BF16 format. In this example, random data is used for the calibration process.
-The quantized BF16 model is saved as: ``model/gte-large-en-v1.5-bf16.onnx``
-
-```python
-    # Use default quantization configuration
-    quant_config = get_default_config("BF16")
-    quant_config.extra_options["BF16QDQToCast"] = True
-    config = Config(global_quant_config=quant_config)
-    config.global_quant_config.extra_options["UseRandomData"] = True
-    print("The configuration of the quantization is {}".format(config))
-```
-For more details about the BF16 quantization refer to [AMD Quark BF16 Tutorial](https://quark.docs.amd.com/latest/supported_accelerators/ryzenai/tutorial_convert_fp32_or_fp16_to_bf16.html)
-
 
 ## Run the model on NPU
 
-Compile and run the quantized BF16 model on NPU
+Compile and run the FP32 model on NPU
 
 ```bash
-python run.py --model_path "models/gte-large-en-v1.5-bf16.onnx"
+python run.py --model_path "models/gte-large-en-v1.5.onnx"
 ```
 
 The ONNX Runtime Vitis AI Execution Provider compiles and runs the model on an NPU. The first-time compilation may take some time, but the compiled model is cached and used for subsequent runs.
 
-- BF16-specific configuration file is passed by the ``config_file`` provider option.
+- Configuration file is passed by the ``config_file`` provider option.
 - Model cache is saved in directory specified by the ``cache_dir`` and ``cache_key`` provider options.
 
 ```python
    npu_session = ort.InferenceSession(
         model_path,
         providers=["VitisAIExecutionProvider"],
-        provider_options=[{"config_file": "vaiml_config.json",
+        provider_options=[{"config_file": "vitisai_config.json",
                            "cache_dir": str(cache_dir),
                            "cacheKey": "modelcachekey"}],
     )
 ```
 
-After a successful run, the model outputs the number of operatoins offloaded to CPU/NPU. The results from the text encoder are compared with CPU results.
+After a successful run, the model outputs the number of operations offloaded to CPU/NPU. The results from the text encoder are compared with CPU results.
 
 ### Sample Output
 
 ```bash
 Result: Out of all operators, some will get offloaded to CPU and rest on NPU.
-[Vitis AI EP] No. of Operators :   CPU    94  VAIML  3456
-[Vitis AI EP] No. of Subgraphs : VAIML     1
+[Vitis AI EP] No. of Operators :   CPU     7  VAIML  1178
+[Vitis AI EP] No. of Subgraphs :   NPU     1 Actually running on NPU  1
 
 Model compiled Successfully
 Creating NPU session
@@ -114,5 +93,5 @@ CPU Embeddings
   -0.26171875]
  [-0.07324219 -0.0456543  -1.0625     ...  0.33203125 -0.55078125
    0.64453125]]
-Mean Absolute Error between CPU and NPU Embeddings:  0.018886302
+Mean Absolute Error between CPU and NPU Embeddings:  0.016811986
 ```

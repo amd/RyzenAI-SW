@@ -7,5 +7,7 @@ pyperclip
 importlib-metadata
 packaging
 pillow
+torch
 torchvision
 tabulate
+numpy==1.26.4

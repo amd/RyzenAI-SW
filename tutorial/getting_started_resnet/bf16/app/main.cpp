@@ -28,7 +28,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 // CIFAR-10 class labels
 const std::vector<std::string> CIFAR10_CLASSES = {
-    "airplane", "automobile", "bird", "cat", "deer", 
+    "airplane", "automobile", "bird", "cat", "deer",
     "dog", "frog", "horse", "ship", "truck"
 };
 
@@ -100,23 +100,23 @@ std::vector<float> load_cifar_image(const std::string& filename) {
         std::generate(random_image.begin(), random_image.end(), [&] { return (float)(rand() % 256) / 255.0f; });
         return random_image;
     }
-    
+
     // CIFAR-10 binary format: 1 byte label + 3072 bytes image data (32x32x3)
     // Skip the label byte if present
     uint8_t label;
     file.read(reinterpret_cast<char*>(&label), 1);
-    
+
     std::vector<uint8_t> buffer(3 * 32 * 32);
     file.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
     file.close();
-    
+
     // Convert to float and normalize [0, 255] -> [0, 1]
     // CIFAR-10 format is: all red pixels, then all green pixels, then all blue pixels
     std::vector<float> image(3 * 32 * 32);
     for (size_t i = 0; i < buffer.size(); ++i) {
         image[i] = static_cast<float>(buffer[i]) / 255.0f;
     }
-    
+
     return image;
 }
 
@@ -124,18 +124,18 @@ std::vector<float> load_cifar_image(const std::string& filename) {
 int get_predicted_class(Ort::Value& output_tensor) {
     auto shape = output_tensor.GetTensorTypeAndShapeInfo().GetShape();
     auto output_ptr = output_tensor.GetTensorMutableData<float>();
-    
+
     // Find the index with maximum probability
     int predicted_class = 0;
     float max_prob = output_ptr[0];
-    
+
     for (int i = 1; i < shape[1]; ++i) {
         if (output_ptr[i] > max_prob) {
             max_prob = output_ptr[i];
             predicted_class = i;
         }
     }
-    
+
     return predicted_class;
 }
 
@@ -143,33 +143,51 @@ int get_predicted_class(Ort::Value& output_tensor) {
 void print_top_predictions(Ort::Value& output_tensor, int top_k = 3) {
     auto shape = output_tensor.GetTensorTypeAndShapeInfo().GetShape();
     auto output_ptr = output_tensor.GetTensorMutableData<float>();
-    
+
+    // Apply softmax to output to get probabilities
+    std::vector<float> logits(shape[1]);
+    float max_logit = output_ptr[0];
+    for (int i = 0; i < shape[1]; ++i) {
+        logits[i] = output_ptr[i];
+        if (output_ptr[i] > max_logit) max_logit = output_ptr[i];
+    }
+    // Subtract max for numerical stability
+    float sum_exp = 0.0f;
+    std::vector<float> probs(shape[1]);
+    for (int i = 0; i < shape[1]; ++i) {
+        probs[i] = std::exp(logits[i] - max_logit);
+        sum_exp += probs[i];
+    }
+    for (int i = 0; i < shape[1]; ++i) {
+        probs[i] /= sum_exp;
+    }
+
     // Create pairs of (probability, class_index)
     std::vector<std::pair<float, int>> prob_class_pairs;
     for (int i = 0; i < shape[1]; ++i) {
-        prob_class_pairs.emplace_back(output_ptr[i], i);
+        prob_class_pairs.emplace_back(probs[i], i);
     }
-    
+
     // Sort by probability in descending order
-    std::sort(prob_class_pairs.begin(), prob_class_pairs.end(), 
+    std::sort(prob_class_pairs.begin(), prob_class_pairs.end(),
               [](const std::pair<float, int>& a, const std::pair<float, int>& b) {
                   return a.first > b.first;
               });
-    
+
     // Print top-k predictions
     std::cout << "Top " << top_k << " predictions:" << std::endl;
     int num_predictions = (top_k < (int)prob_class_pairs.size()) ? top_k : (int)prob_class_pairs.size();
     for (int i = 0; i < num_predictions; ++i) {
         int class_idx = prob_class_pairs[i].second;
         float prob = prob_class_pairs[i].first;
-        std::cout << "  " << (i + 1) << ". " << CIFAR10_CLASSES[class_idx] 
+        std::cout << "  " << (i + 1) << ". " << CIFAR10_CLASSES[class_idx]
                   << " (probability: " << std::fixed << std::setprecision(4) << prob << ")" << std::endl;
     }
 }
 
 
 int runtest(std::string& model_name, std::unordered_map<std::string, std::string> vai_ep_options = {}, bool run_classification = false)
-{    
+{
     int64_t batch_size = 1;
 
     printf("Creating ORT env\n");
@@ -188,16 +206,16 @@ int runtest(std::string& model_name, std::unordered_map<std::string, std::string
             std::cerr << "Exception occurred in appending execution provider: " << e.what() << std::endl;
         }
     }
-    
+
     printf("Creating ONNX Session\n");
-    
+
     // Check if model file exists first
     if (!std::filesystem::exists(model_name)) {
         std::cerr << "Error: Model file not found at: " << model_name << std::endl;
         std::cerr << "Please ensure you have the model file before running this application." << std::endl;
         return -1;
     }
-    
+
     // Create session - this might throw an exception if the model can't be loaded
     Ort::Session session(env, std::basic_string<ORTCHAR_T>(model_name.begin(), model_name.end()).c_str(), session_options);
 
@@ -245,16 +263,16 @@ int runtest(std::string& model_name, std::unordered_map<std::string, std::string
         // If input shape has dynamic batch size, set it to a fixed value
         auto input_shape = input_shapes[0];
         if (input_shape[0] < 0) {
-            std::cout << "Dynamic batch size detected. Setting batch size to " << batch_size << "." << std::endl;        
+            std::cout << "Dynamic batch size detected. Setting batch size to " << batch_size << "." << std::endl;
             input_shape[0] = batch_size;
         }
 
         if (run_classification) {
             // Run classification on sample images
             std::cout << "Running classification on sample images..." << std::endl;
-            
+
             std::string exe_dir = get_program_dir();
-            
+
             // Check if test_images directory exists
             std::string test_images_dir = exe_dir + "\\test_images";
             if (!std::filesystem::exists(test_images_dir)) {
@@ -262,38 +280,38 @@ int runtest(std::string& model_name, std::unordered_map<std::string, std::string
                 std::cout << "Creating directory: " << test_images_dir << std::endl;
                 std::filesystem::create_directory(test_images_dir);
             }
-            
+
             std::vector<std::string> test_images = {
                 exe_dir + "\\test_images\\airplane.bin",
-                exe_dir + "\\test_images\\automobile.bin", 
+                exe_dir + "\\test_images\\automobile.bin",
                 exe_dir + "\\test_images\\cat.bin",
                 exe_dir + "\\test_images\\ship.bin",
                 exe_dir + "\\test_images\\dog.bin"
             };
-            
+
             for (const auto& image_path : test_images) {
                 std::cout << "\n--- Testing image: " << std::filesystem::path(image_path).filename().string() << " ---" << std::endl;
-                
+
                 // Load image data
                 std::vector<float> input_tensor_values = load_cifar_image(image_path);
-                
+
                 // Initialize input tensor
                 std::vector<Ort::Value> input_tensors;
                 input_tensors.emplace_back(vec_to_tensor<float>(input_tensor_values, input_shape));
 
                 // Run inference
-                try 
+                try
                 {
                     auto output_tensors = session.Run(
-                            Ort::RunOptions(), 
-                            input_names_char.data(), input_tensors.data(), input_names_char.size(), 
+                            Ort::RunOptions(),
+                            input_names_char.data(), input_tensors.data(), input_names_char.size(),
                             output_names_char.data(), output_names_char.size()
-                    ); 
-                    
+                    );
+
                     // Get predicted class
                     int predicted_class = get_predicted_class(output_tensors[0]);
                     std::cout << "Predicted class: " << CIFAR10_CLASSES[predicted_class] << std::endl;
-                    
+
                     // Print top predictions
                     print_top_predictions(output_tensors[0]);
                 }
@@ -307,7 +325,7 @@ int runtest(std::string& model_name, std::unordered_map<std::string, std::string
             auto n = 100;
             std::cout << "Running " << n << " inferences of the model" << std::endl;
             // Get the current time before the operation
-            auto start = std::chrono::high_resolution_clock::now(); 
+            auto start = std::chrono::high_resolution_clock::now();
             for (int i = 0; i < n; i++)
             {
                 // Initialize input data with random numbers in the range [0, 1]
@@ -319,13 +337,13 @@ int runtest(std::string& model_name, std::unordered_map<std::string, std::string
                 input_tensors.emplace_back(vec_to_tensor<float>(input_tensor_values, input_shape));
 
                 // Pass input tensors through model
-                try 
+                try
                 {
                     auto output_tensors = session.Run(
-                            Ort::RunOptions(), 
-                            input_names_char.data(), input_tensors.data(), input_names_char.size(), 
+                            Ort::RunOptions(),
+                            input_names_char.data(), input_tensors.data(), input_names_char.size(),
                             output_names_char.data(), output_names_char.size()
-                    ); 
+                    );
                     // std::cout << i << " : " << print_tensor(output_tensors[0]) << std::endl;
                 }
                 catch (const Ort::Exception& exception) {
@@ -353,20 +371,21 @@ int runtest(std::string& model_name, std::unordered_map<std::string, std::string
     printf("Done\n");
     printf("-------------------------------------------------------\n");
     printf("\n");
-    
+
     return 0;
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     std::string exe_dir = get_program_dir();
 
     // Default values
     std::unordered_map<std::string, std::string> vai_ep_options;
     vai_ep_options["config_file"] = exe_dir + "\\vitisai_config.json";
-    vai_ep_options["cache_dir"]   = exe_dir + "\\my_cache_dir"; 
-    vai_ep_options["cache_key"]   = "resnet_trained_for_cifar10"; 
+    vai_ep_options["cache_dir"]   = exe_dir + "\\my_cache_dir";
+    vai_ep_options["cache_key"]   = "resnet_trained_for_cifar10";
     
+
     // Ensure models directory exists
     std::string models_dir = exe_dir + "\\models";
     if (!std::filesystem::exists(models_dir)) {
@@ -374,16 +393,16 @@ int main(int argc, char* argv[])
         std::cout << "Creating directory: " << models_dir << std::endl;
         std::filesystem::create_directory(models_dir);
     }
-    
-    std::string model_path = exe_dir + "\\models\\resnet_trained_for_cifar10.onnx";
 
-    bool run_classification = true; // Default to classification mode
+    std::string model_path = exe_dir + "\\models\\resnet_trained_for_cifar10.onnx";
     
+    bool run_classification = true; // Default to classification mode
+
     std::cout << "usage: app.exe <onnx model> <json_config> [mode]" << std::endl;
     std::cout << "  mode: 'classification' (default) or 'benchmark'" << std::endl;
-    
+
     if (argc > 1) {
-        model_path = std::string(argv[1]); // First argument: model path    
+        model_path = std::string(argv[1]); // First argument: model path
     }
     if (argc > 2) {
         vai_ep_options["config_file"] = std::string(argv[2]); // Second argument config file
@@ -406,30 +425,30 @@ int main(int argc, char* argv[])
 
     std::cout << " - NPU Device ID     : 0x" << std::hex << npu_info.device_id << std::dec << std::endl;
     std::cout << " - NPU Device Name   : " << npu_info.device_name << std::endl;
-    std::cout << " - NPU Driver Version: " << npu_info.driver_version_string << std::endl;  
+    std::cout << " - NPU Driver Version: " << npu_info.driver_version_string << std::endl;
     switch (npu_info.check) {
-        case npu_util::Status::OK:          
+        case npu_util::Status::OK:
             std::cout << "Environment compatible for VitisAI EP" << std::endl;
             break;
         case npu_util::Status::NPU_UNRECOGNIZED:
             std::cout << "NPU type not recognized." << std::endl;
             std::cout << "Skipping run with VitisAI EP." << std::endl;
-            return -1;           
+            return -1;
             break;
-        case npu_util::Status::DRIVER_TOO_OLD: 
+        case npu_util::Status::DRIVER_TOO_OLD:
             std::cout << "Installed drivers are too old." << std::endl;
             std::cout << "Skipping run with VitisAI EP." << std::endl;
-            return -1;           
+            return -1;
             break;
         case npu_util::Status::EP_TOO_OLD:
             std::cout << "VitisAI EP is too old." << std::endl;
             std::cout << "Skipping run with VitisAI EP." << std::endl;
-            return -1;           
+            return -1;
             break;
         default:
             std::cout << "Unknown state." << std::endl;
             std::cout << "Skipping run with VitisAI EP." << std::endl;
-            return -1;           
+            return -1;
             break;
     }
     switch(npu_info.device_id) {
@@ -446,17 +465,17 @@ int main(int argc, char* argv[])
 
     // Set environment variables
     _putenv("XLNX_VART_FIRMWARE=");
-    _putenv("XLNX_TARGET_NAME=");  
-    _putenv("XLNX_ENABLE_CACHE=0");  
+    _putenv("XLNX_TARGET_NAME=");
+    _putenv("XLNX_ENABLE_CACHE=0");
 
     // Run test
     printf("-------------------------------------------------------\n");
-    printf("Running model on CPU                                   \n");    
+    printf("Running model on CPU                                   \n");
     printf("-------------------------------------------------------\n");
     runtest(model_path, {}, run_classification);
 
     printf("-------------------------------------------------------\n");
-    printf("Running model on NPU                                   \n");    
+    printf("Running model on NPU                                   \n");
     printf("-------------------------------------------------------\n");
     runtest(model_path, vai_ep_options, run_classification);
 

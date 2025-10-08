@@ -46,7 +46,7 @@ def main(args):
 
     # Define the calibration data reader
     num_calib_data = 100
-    calibration_dataset = ImageDataReader(calibration_dataset_path, input_model_path, data_size=num_calib_data, batch_size=32)
+    calibration_dataset = ImageDataReader(calibration_dataset_path, input_model_path, data_size=num_calib_data, batch_size=1)
 
     # Create an ONNX Quantizer
     quantizer = ModelQuantizer(config)
@@ -91,11 +91,14 @@ def main(args):
         provider = ['VitisAIExecutionProvider']
         cache_dir = Path(__file__).parent.resolve()
         provider_options = [{
-                    'config_file': 'vaip_config.json',
                     'cacheDir': str(cache_dir),
                     'cacheKey': 'modelcachekey',
-                    'xclbin': get_xclbin(npu_device)
+                    'enable_cache_file_io_in_mem':'0'
                 }]
+        # For PHX/HPT, xclbin is required
+        if npu_device == 'PHX/HPT':
+            provider_options[0]['target'] = 'X1'
+            provider_options[0]['xclbin'] = get_xclbin(npu_device)
         session = ort.InferenceSession(quant_model.SerializeToString(), providers=provider,
                                        provider_options=provider_options)
         print('Benchmarking NPU quantized model:')

@@ -207,6 +207,7 @@ class CVML_SDK_EXPORT_CORE Context {
 
   /**
    * Get detected NPU driver version.
+   * On Linux, NPU driver will return 1 if legacy driver detected
    *
    * @return NPU driver version, or 0 if not detected
    */

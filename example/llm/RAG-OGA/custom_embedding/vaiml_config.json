@@ -11,5 +11,15 @@
             "preferred_data_storage": "unvectorized"
           }
         }
+  ],
+  "target": "VAIML",
+    "targets": [
+        {
+            "name": "VAIML",
+            "pass": [
+                "init",
+                "vaiml_partition"
+            ]
+        }
     ]
 }

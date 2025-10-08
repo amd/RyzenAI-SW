@@ -42,7 +42,7 @@ To run the demos and examples in this repository, please follow the instructions
 ## LLM Flow
 
 - [LLMs on RyzenAI with ONNX Runtime GenAI API](example/llm/oga_api)
-- [ONNX Runtime GenAI(OGA)‑based RAG LLM](example/llm/RAG-OGA)
+
 
 ## Examples
 
@@ -56,7 +56,6 @@ To run the demos and examples in this repository, please follow the instructions
 ## Demos
 
 - [NPU-GPU pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
-- [Automatic Speech Recognition using OpenAI Whisper](demo/ASR/Whisper)
 
 
 ## Other Tutorials

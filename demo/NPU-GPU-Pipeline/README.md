@@ -7,11 +7,13 @@
 
 # Model Pipelining on NPU and iGPU
 
-We showcase an application that has models strategically distributed and off-loaded to the NPU and integrated GPU (iGPU), based on varying intensity of computation requirements and hardware support. The application consists of two Convolutional Neural Network (CNN) based models that run on the NPU, and one generative model that is off-loaded to the iGPU. ONNX Runtime provides support for Vitis AI EP and DirectML EP, used to demonstrate inference on the NPU and iGPU respectively. Some of these models operate concurrently, thus utilizing the accelerator resources to their full potential. 
+We showcase an application that has models strategically distributed and off-loaded to the NPU and integrated GPU (iGPU), based on varying intensity of computation requirements and hardware support. The application consists of two Convolutional Neural Network (CNN) based models that run on the NPU, and one generative model that is off-loaded to the iGPU. ONNX Runtime provides support for Vitis AI EP and DirectML EP, used to demonstrate inference on the NPU and iGPU respectively. Some of these models operate concurrently, thus utilizing the accelerator resources to their full potential. Please refer to [NPU-GPU article](https://www.amd.com/en/developer/resources/technical-articles/model-pipelining-on-npu-and-gpu-using-ryzen-ai-software.html) for high level implementation
 
 ## Prerequisites and Environment Setup
 
 Install Ryzen AI Software using the automatic installer [Link](https://ryzenai.docs.amd.com/en/latest/inst.html). This should create a conda environment that can be used for this example. Check the installation path variables
+
+Below instructions can be executed on Conda command prompt or Miniforge Prompt
 
 1. Create a clone of the Ryzen AI installation conda environment to add required python packages
 
@@ -23,13 +25,14 @@ conda activate npu-gpu-pipeline
 2. Set RyzenAI Environment variable
 
 ```bash
-# Default location of RyzenAI software installation
+# Location of RyzenAI software installation path or default at "C:\Program Files\RyzenAI\<version>"
 set RYZEN_AI_INSTALLATION_PATH=<Path to RyzenAI Installation>
 ```
 
 3. Install dependencies for Yolov8 and RCAN:
 
 ```bash
+cd <RyzenAI-SW>\demo\NPU-GPU-Pipeline
 python -m pip install -r requirements.txt 
 ```
 
@@ -40,10 +43,12 @@ python -m pip install -r requirements.txt
 ```bash
 python -m pip install -r stable_diffusion\requirements-common.txt 
 ```
+
 6. Make sure XLNX_VART_FIRMWARE is set to point to the correct xclbin from the VOE package
 ```bash
 echo %XLNX_VART_FIRMWARE%
 ```
+
 7. Copy vaip_config.json from the installed VOE package to this directory
 ```bash
 copy %RYZEN_AI_INSTALLATION_PATH%\voe-4.0-win_amd64\vaip_config.json .

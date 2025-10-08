@@ -181,6 +181,9 @@ int main(int argc, char** const argv) {
       return 1;
     }
 
+    // select backend (optional)
+    context->SetInferenceBackend(amd::cvml::Context::InferenceBackend::AUTO);
+
     fm_sample.SetContextStreamingModeBySrc(context.get(), fm_sample.src_path_);
 
     // initialize FaceDetector class

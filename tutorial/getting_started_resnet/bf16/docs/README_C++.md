@@ -1,6 +1,6 @@
-# ResNet18 CIFAR-10 Inference Example with C++
+# ResNet CIFAR-10 Inference Example with C++
 
-This example demonstrates how to run inference with a ResNet18 model trained on CIFAR-10 dataset using ONNX Runtime in C++.
+This example demonstrates how to run inference with a ResNet model trained on CIFAR-10 dataset using ONNX Runtime in C++.
 
 **Note:** Ensure that you are following the instructions for model and dataset setup and compilation from [BF16 setup](../README.md)
 
@@ -95,7 +95,7 @@ Running model on CPU
 Creating ORT env
 Initializing session options
 Creating ONNX Session
-ONNX model : ..\models\resnet_trained_for_cifar10.onnx
+ONNX model : ../models/resnet_quantized_bf16.onnx
   input -1x3x32x32
   output -1x10
 Dynamic batch size detected. Setting batch size to 1.
@@ -104,37 +104,37 @@ Running classification on sample images...
 --- Testing image: airplane.bin ---
 Predicted class: airplane
 Top 3 predictions:
-  1. airplane (probability: 4.0282)
-  2. ship (probability: 3.7459)
-  3. automobile (probability: 1.8095)
+  1. airplane (probability: 3.9844)
+  2. ship (probability: 3.7344)
+  3. automobile (probability: 1.8203)
 
 --- Testing image: automobile.bin ---
 Predicted class: truck
 Top 3 predictions:
-  1. truck (probability: 6.8240)
-  2. automobile (probability: 5.5014)
-  3. ship (probability: 0.2835)
+  1. truck (probability: 6.7812)
+  2. automobile (probability: 5.4688)
+  3. ship (probability: 0.2930)
 
 --- Testing image: cat.bin ---
 Predicted class: cat
 Top 3 predictions:
-  1. cat (probability: 7.8910)
-  2. frog (probability: 2.8882)
-  3. dog (probability: 2.1396)
-
+  1. cat (probability: 7.8750)
+  2. frog (probability: 2.8750)
+  3. dog (probability: 2.1094)
 --- Testing image: ship.bin ---
 Predicted class: ship
 Top 3 predictions:
-  1. ship (probability: 9.0202)
-  2. automobile (probability: 2.4488)
-  3. airplane (probability: 1.8038)
+  1. ship (probability: 9.0000)
+  2. automobile (probability: 2.4688)
+  3. airplane (probability: 1.7891)
 
 --- Testing image: dog.bin ---
 Predicted class: dog
 Top 3 predictions:
-  1. dog (probability: 6.5393)
-  2. cat (probability: 5.0560)
-  3. deer (probability: 2.0006)
+  1. dog (probability: 6.4688)
+  2. cat (probability: 5.0000)
+  3. deer (probability: 2.0312)
+  
 Done
 -------------------------------------------------------
 
@@ -144,16 +144,18 @@ Running model on NPU
 Creating ORT env
 Initializing session options
 Configuring VAI EP
-Creating ONNX Session
 WARNING: Logging before InitGoogleLogging() is written to STDERR
-I20250626 17:14:45.115626 46400 vitisai_compile_model.cpp:1157] Vitis AI EP Load ONNX Model Success
-I20250626 17:14:45.115626 46400 vitisai_compile_model.cpp:1158] Graph Input Node Name/Shape (1)
-I20250626 17:14:45.115626 46400 vitisai_compile_model.cpp:1162]          input : [-1x3x32x32]
-I20250626 17:14:45.115626 46400 vitisai_compile_model.cpp:1168] Graph Output Node Name/Shape (1)
-I20250626 17:14:45.115626 46400 vitisai_compile_model.cpp:1172]          output : [-1x10]
-[Vitis AI EP] No. of Operators : VAIML   124
-[Vitis AI EP] No. of Subgraphs : VAIML     1
-ONNX model : ..\models\resnet_trained_for_cifar10.onnx
+I20250929 15:57:49.471036  1528 register_ssmlp.cpp:124] Registering Custom Operator: com.amd:SSMLP
+I20250929 15:57:49.471036  1528 register_matmulnbits.cpp:110] Registering Custom Operator: com.amd:MatMulNBits
+Creating ONNX Session
+I20250929 15:57:49.685086  1528 vitisai_compile_model.cpp:1266] Vitis AI EP Load ONNX Model Success
+I20250929 15:57:49.685086  1528 vitisai_compile_model.cpp:1267] Graph Input Node Name/Shape (1)
+I20250929 15:57:49.685086  1528 vitisai_compile_model.cpp:1271]          input : [-1x3x32x32]
+I20250929 15:57:49.685086  1528 vitisai_compile_model.cpp:1277] Graph Output Node Name/Shape (1)
+I20250929 15:57:49.685086  1528 vitisai_compile_model.cpp:1281]          output : [-1x10]
+[Vitis AI EP] No. of Operators :   CPU     2  VAIML   272
+[Vitis AI EP] No. of Subgraphs :   NPU     1 Actually running on NPU      1
+ONNX model : ../models/resnet_quantized_bf16.onnx
   input -1x3x32x32
   output -1x10
 Dynamic batch size detected. Setting batch size to 1.
@@ -162,41 +164,41 @@ Running classification on sample images...
 --- Testing image: airplane.bin ---
 Predicted class: airplane
 Top 3 predictions:
-  1. airplane (probability: 3.9062)
-  2. ship (probability: 3.7812)
-  3. automobile (probability: 1.8359)
+  1. airplane (probability: 4.0312)
+  2. ship (probability: 3.8594)
+  3. automobile (probability: 1.8594)
 
 --- Testing image: automobile.bin ---
 Predicted class: truck
 Top 3 predictions:
-  1. truck (probability: 6.9375)
+  1. truck (probability: 7.0938)
   2. automobile (probability: 5.6875)
-  3. ship (probability: 0.2637)
+  3. ship (probability: 0.2910)
 
 --- Testing image: cat.bin ---
 Predicted class: cat
 Top 3 predictions:
-  1. cat (probability: 8.1250)
-  2. frog (probability: 3.0000)
-  3. dog (probability: 2.1562)
-
+  1. cat (probability: 8.1875)
+  2. frog (probability: 2.8906)
+  3. dog (probability: 2.1250)
 --- Testing image: ship.bin ---
 Predicted class: ship
 Top 3 predictions:
-  1. ship (probability: 9.0625)
-  2. automobile (probability: 2.4219)
-  3. airplane (probability: 1.7969)
+  1. ship (probability: 9.3125)
+  2. automobile (probability: 2.6094)
+  3. airplane (probability: 1.8281)
 
 --- Testing image: dog.bin ---
 Predicted class: dog
 Top 3 predictions:
-  1. dog (probability: 6.4375)
-  2. cat (probability: 5.0625)
-  3. deer (probability: 1.8594)
+  1. dog (probability: 6.6250)
+  2. cat (probability: 5.1250)
+  3. deer (probability: 1.9297)
 Done
 -------------------------------------------------------
 
 Test Done.
+-------------------------------------------------------
 ```
 
 Run in benchmark mode:
@@ -213,6 +215,7 @@ In benchmark mode, the application will:
 The output from the run command will look like below.
 
 ```bash
+
 usage: app.exe <onnx model> <json_config> [mode]
   mode: 'classification' (default) or 'benchmark'
 -------------------------------------------------------
@@ -230,12 +233,12 @@ Running model on CPU
 Creating ORT env
 Initializing session options
 Creating ONNX Session
-ONNX model : ..\models\resnet_trained_for_cifar10.onnx
+ONNX model : ../models/resnet_quantized_bf16.onnx
   input -1x3x32x32
   output -1x10
 Dynamic batch size detected. Setting batch size to 1.
 Running 100 inferences of the model
-Operation took 0.198749 seconds
+Operation took 0.290223 seconds
 Done
 -------------------------------------------------------
 
@@ -245,21 +248,23 @@ Running model on NPU
 Creating ORT env
 Initializing session options
 Configuring VAI EP
-Creating ONNX Session
 WARNING: Logging before InitGoogleLogging() is written to STDERR
-I20250626 17:13:40.685429 78924 vitisai_compile_model.cpp:1157] Vitis AI EP Load ONNX Model Success
-I20250626 17:13:40.685429 78924 vitisai_compile_model.cpp:1158] Graph Input Node Name/Shape (1)
-I20250626 17:13:40.685429 78924 vitisai_compile_model.cpp:1162]          input : [-1x3x32x32]
-I20250626 17:13:40.685429 78924 vitisai_compile_model.cpp:1168] Graph Output Node Name/Shape (1)
-I20250626 17:13:40.685429 78924 vitisai_compile_model.cpp:1172]          output : [-1x10]
-[Vitis AI EP] No. of Operators : VAIML   124
-[Vitis AI EP] No. of Subgraphs : VAIML     1
-ONNX model : ..\models\resnet_trained_for_cifar10.onnx
+I20250929 16:02:40.645891 23128 register_ssmlp.cpp:124] Registering Custom Operator: com.amd:SSMLP
+I20250929 16:02:40.645891 23128 register_matmulnbits.cpp:110] Registering Custom Operator: com.amd:MatMulNBits
+Creating ONNX Session
+I20250929 16:02:40.806568 23128 vitisai_compile_model.cpp:1266] Vitis AI EP Load ONNX Model Success
+I20250929 16:02:40.814989 23128 vitisai_compile_model.cpp:1267] Graph Input Node Name/Shape (1)
+I20250929 16:02:40.814989 23128 vitisai_compile_model.cpp:1271]          input : [-1x3x32x32]
+I20250929 16:02:40.814989 23128 vitisai_compile_model.cpp:1277] Graph Output Node Name/Shape (1)
+I20250929 16:02:40.814989 23128 vitisai_compile_model.cpp:1281]          output : [-1x10]
+[Vitis AI EP] No. of Operators :   CPU     2  VAIML   272
+[Vitis AI EP] No. of Subgraphs :   NPU     1 Actually running on NPU      1
+ONNX model : ../models/resnet_quantized_bf16.onnx
   input -1x3x32x32
   output -1x10
 Dynamic batch size detected. Setting batch size to 1.
 Running 100 inferences of the model
-Operation took 0.750481 seconds
+Operation took 0.298719 seconds
 Done
 -------------------------------------------------------
 

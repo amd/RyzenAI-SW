@@ -1,2 +1,3 @@
 torchvision
 opencv-python
+numpy==1.26.4

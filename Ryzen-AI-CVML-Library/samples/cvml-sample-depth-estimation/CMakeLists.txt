@@ -3,19 +3,18 @@
 set(PROJECT_NAME cvml-sample-depth-estimation)
 project(${PROJECT_NAME})
 
+list(APPEND CMAKE_MODULE_PATH ${OPENCV_INSTALL_ROOT} ${AMD_CVML_SDK_ROOT} "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+
 #
 # Find OpenCV and set include directories
 #
-find_package(OpenCV REQUIRED PATHS ${OPENCV_INSTALL_ROOT})
+find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 #
 # Find Ryzen AI CVML library (also sets include directories)
 #
-if (NOT DEFINED AMD_CVML_SDK_ROOT)
-    set(AMD_CVML_SDK_ROOT ../..)
-endif()
-find_package(RyzenAILibrary REQUIRED PATHS ${AMD_CVML_SDK_ROOT})
+find_package(RyzenAILibrary REQUIRED)
 
 #
 # Additional include folders for the sample

@@ -30,22 +30,22 @@ Follow these simple steps to get started:
 ### 1.1 Download the ONNX-Based Llama Model from Hugging Face
 
 ```sh
-git clone https://huggingface.co/amd/Llama-3.2-3B-Instruct-awq-g128-int4-asym-fp16-onnx-hybrid /path/to/your/directory/
+git clone https://huggingface.co/amd/Llama-3.2-3B-Instruct-onnx-ryzenai-hybrid /path/to/your/directory/
 ```
 replace `/path/to/your/directory/` with actual path where you want to download the model.
 
 ### 1.2  Activate Ryzen AI Environment
 
-To ensure compatibility with ONNX-based Llama model, activate the ryzen-ai-1.5.0 Conda environment.
+To ensure compatibility with ONNX-based Llama model, activate the ryzen-ai-1.6.0 Conda environment.
 
-Please follow instructions provided in the official AMD documentation to install Ryzen AI 1.5.0:
+Please follow instructions provided in the official AMD documentation to install Ryzen AI 1.6.0:
 
-👉 [Ryzen AI 1.5.0 Installation and Conda Environment Creation](https://ryzenai.docs.amd.com/en/latest/inst.html)
+👉 [Ryzen AI 1.6.0 Installation and Conda Environment Creation](https://ryzenai.docs.amd.com/en/latest/inst.html)
 
 After installation, activate the environment by running:
 
 ```sh
-conda activate ryzen-ai-1.5.0
+conda activate ryzen-ai-1.6.0
 ```
 ### 1.3  Install Dependencies
 
@@ -69,11 +69,11 @@ To explore the use case, please refer below steps:
 
 This example demonstrates a Retrieval-Augmented Generation (RAG) pipeline orchestrated using the LangChain framework. In this setup, documents are indexed into a Facebook AI Similarity Search(FAISS) vector database and retrieved at inference time to enrich user prompts with relevant contextual information.
 
-The following models are deployed using Ryzen AI 1.5.0:
+The following models are deployed using Ryzen AI 1.6.0:
 
 - **Embedding Model**: [BGE (BAAI General Embedding)](https://huggingface.co/BAAI/bge-large-en-v1.5), compiled using Vitis AI Execution Provider.
 
-- **Hybrid LLM**: [Llama3.2-3B-Instruct](https://huggingface.co/amd/Llama-3.2-3B-Instruct-awq-g128-int4-asym-fp16-onnx-hybrid), a quantized ONNX model, running using the OGA(OnnxRuntime GenAI) framework on Ryzen AI 1.5.0.
+- **Hybrid LLM**: [Llama3.2-3B-Instruct](https://huggingface.co/amd/Llama-3.2-3B-Instruct-onnx-ryzenai-hybrid), a quantized ONNX model, running using the OGA(OnnxRuntime GenAI) framework on Ryzen AI 1.6.0.
 
 By running both critical models on the NPU and/or GPU, this setup enables faster and more efficient inference, delivering a high-performance RAG system optimized for AI PCs.
 
@@ -111,7 +111,7 @@ Run the following command to perform download, export and compile steps:
 ```bash
 python custom_embedding/export_bge_onnx.py
 ```
-Note : Please ensure that you have activated your ryzen‑ai‑1.5.0 environment and are in the RyzenAI‑SW/example/llm/RAG‑OGA directory.
+Note : Please ensure that you have activated your ryzen‑ai‑1.6.0 environment and are in the RyzenAI‑SW/example/llm/RAG‑OGA directory.
 
 This script generates a static‑shape, non‑quantized FP32 ONNX model that serves as the baseline for further deployment. 
 The compiled BGE (BAAI General Embedding) ONNX model will be stored in the cache folder named ``modelcachekey_bge``.
@@ -255,23 +255,23 @@ Actual numbers may vary depending on the LLM used, model version, and specific s
 ```
 --- Aggregated Profiling Summary ---
 
-Q1:  
-  Avg Input Tokens           : 1608  
-  Avg Output Tokens          : 440  
-  Avg TTFT(Sec)              : 2.272704  
-  Avg TPS                    : 30.07  
+Q1:
+  Avg Input Tokens              : 1607
+  Avg Output Tokens             : 339
+  Avg TTFT(Sec)                 : 1.640761
+  Avg TPS                       : 31.16
 
-Q2:  
-  Avg Input Tokens           : 1172  
-  Avg Output Tokens          : 232  
-  Avg TTFT(Sec)              : 1.86373  
-  Avg TPS                    : 32.65  
+Q2:
+  Avg Input Tokens              : 1171
+  Avg Output Tokens             : 354
+  Avg TTFT(Sec)                 : 1.16953
+  Avg TPS                       : 32.74
 
-Q3:  
-  Avg Input Tokens           : 1452  
-  Avg Output Tokens          : 11  
-  Avg TTFT(Sec)              : 2.099082  
-  Avg TPS                    : 24.53 
+Q3:
+  Avg Input Tokens              : 1458
+  Avg Output Tokens             : 1
+  Avg TTFT(Sec)                 : 1.393054
+  Avg TPS                       : 0.0 
 ```
   
 

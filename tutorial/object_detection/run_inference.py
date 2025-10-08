@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from utils import evaluate_on_coco, get_npu_info, get_xclbin
 import os 
+import time 
 
 # Load COCO class labels (optional)
 COCO_CLASSES = [  # 80 classes
@@ -77,6 +78,27 @@ def postprocess(outputs, img, conf_thres=0.4):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
     return img
 
+def benchmark(session,input_name,input_img,num_inference=100):
+
+    # Perform warmup and 100 inference run of onnx model
+
+    # warmup for 10 runs
+    for _ in range(10):
+        session.run(None, {input_name: input_img})
+
+    # Running for 100 inference:
+    time_list = []
+    for _ in range(num_inference):
+        start = time.time()
+        output = session.run(None, {input_name: input_img})
+        end = time.time()
+        time_list.append(end-start)
+    
+    avg_time_per_inference = sum(time_list)/num_inference
+    print("Avg time for each inference run:{:.3f} seconds".format(avg_time_per_inference))
+    print("Model performance:{:.1f} FPS".format(1/avg_time_per_inference))
+
+
 def main(args):
     image_path = args.input_image
     onnx_path = args.model_input
@@ -89,11 +111,20 @@ def main(args):
     elif args.device == 'npu-int8':
         print('Running INT8 Model on NPU')
         npu_device = get_npu_info()
-        provider_options = [{
-            'cache_dir': str(Path(__file__).parent.resolve()),
-            'cache_key': 'modelcachekey',
-            'xclbin': get_xclbin(npu_device)
-        }]
+        if npu_device == 'PHX/HPT':
+            provider_options = [{
+                'cache_dir': str(Path(__file__).parent.resolve()),
+                'cache_key': 'modelcachekey',
+                'enable_cache_file_io_in_mem':'0',
+                'target': 'X1',
+                'xclbin': get_xclbin(npu_device)
+            }]
+        elif npu_device == 'STX' or 'KRK':
+            provider_options = [{
+                'cache_dir': str(Path(__file__).parent.resolve()),
+                'cache_key': 'modelcachekey',
+                'enable_cache_file_io_in_mem':'0'
+            }]
         ort_session = ort.InferenceSession(onnx_path, providers=['VitisAIExecutionProvider'], provider_options=provider_options)
 
     elif args.device == 'npu-bf16':
@@ -123,7 +154,10 @@ def main(args):
         print("Model Accuracy:")
         mAP, mAP50, mAP75 = evaluate_on_coco(args.model_input, ort_session, coco_dataset=args.coco_dataset, device=args.device)
         print("{} model accuracy on {}: mAP {:.3f}, mAP50 {:.3f}, mAP75 {:.3f}".format(args.model_input, args.device, mAP, mAP50, mAP75))
-
+    
+    if args.benchmark:
+        print("Model Performance:")
+        benchmark(ort_session,input_name,input_img)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Quantize and evaluate ONNX models.")

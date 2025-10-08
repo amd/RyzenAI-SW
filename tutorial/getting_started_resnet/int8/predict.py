@@ -31,9 +31,14 @@ if opt.ep == 'npu':
    cache_dir = Path(__file__).parent.resolve()
    provider_options = [{
                 'cache_dir': str(cache_dir),
+                'log_level':'info',
                 'cache_key': 'modelcachekey',
-                'xclbin': get_xclbin(npu_device)
+                'enable_cache_file_io_in_mem':'0'
             }]
+   # For PHX/HPT, xclbin is mandatory
+   if npu_device == 'PHX/HPT':
+       provider_options[0]['target'] = 'X1'
+       provider_options[0]['xclbin'] = get_xclbin(npu_device)
 
 session = ort.InferenceSession(model.SerializeToString(), providers=providers,
                                provider_options=provider_options)
@@ -49,7 +54,7 @@ def unpickle(file):
 datafile = r'./data/cifar-10-batches-py/test_batch'
 metafile = r'./data/cifar-10-batches-py/batches.meta'
 
-data_batch_1 = unpickle(datafile) 
+data_batch_1 = unpickle(datafile)
 metadata = unpickle(metafile)
 
 images = data_batch_1['data']
@@ -62,8 +67,8 @@ if not os.path.exists(dirname):
    os.mkdir(dirname)
 
 
-#Extract and dump first 10 images 
-for i in range (0,10): 
+#Extract and dump first 10 images
+for i in range (0,10):
     im = images[i]
     im  = im.transpose(1,2,0)
     im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
@@ -71,16 +76,16 @@ for i in range (0,10):
     cv2.imwrite(im_name, im)
 
 #Pick dumped images and predict
-for i in range (0,10): 
+for i in range (0,10):
     image_name = f'./images/image_{i}.png'
     image = Image.open(image_name).convert('RGB')
     # Resize the image to match the input size expected by the model
-    image = image.resize((32, 32))  
+    image = image.resize((32, 32))
     image_array = np.array(image).astype(np.float32)
     image_array = image_array/255
 
     # Reshape the array to match the input shape expected by the model
-    image_array = np.transpose(image_array, (2, 0, 1))  
+    image_array = np.transpose(image_array, (2, 0, 1))
 
     # Add a batch dimension to the input image
     input_data = np.expand_dims(image_array, axis=0)
@@ -98,6 +103,6 @@ for i in range (0,10):
     print(f'Image {i}: Actual Label {label}, Predicted Label {predicted_label}')
 
 
-#################################################################################  
+#################################################################################
 #License
 #Ryzen AI is licensed under `MIT License <https://github.com/amd/ryzen-ai-documentation/blob/main/License>`_ . Refer to the `LICENSE File <https://github.com/amd/ryzen-ai-documentation/blob/main/License>`_ for the full license text and copyright notice.

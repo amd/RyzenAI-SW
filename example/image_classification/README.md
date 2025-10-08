@@ -25,7 +25,9 @@ Setup Instructions
 Activate the conda environment created by the RyzenAI installer
 
 ```bash
-conda activate <env_name>
+conda create --name image_classification --clone ryzen-ai-<version>
+conda activate image_classification
+python -m pip install -r requirements.txt
 ```
 
 ResNet50 Model
@@ -51,30 +53,11 @@ mkdir val_data && tar -xzf val_images.tar.gz -C val_data
 python prepare_data.py val_data calib_data
 ```
 
-## Model Quantization
-
-
-The 'model_quantization.py' script uses the BF16 quantization configuration from AMD Quark quantizer. It also uses a subset of ImageNet as calibration dataset for quantization.
-
-```python
-quant_config = get_default_config("BF16")
-quant_config.extra_options["BF16QDQToCast"] = True
-config = Config(global_quant_config=quant_config)
-print("The configuration of the quantization is {}".format(config))
-```
-For more details about the BF16 quantization refer to [AMD Quark BF16 Tutorial](https://quark.docs.amd.com/latest/supported_accelerators/ryzenai/tutorial_convert_fp32_or_fp16_to_bf16.html)
-
-The ONNX model can be quantized to BF16 using the 'model_quantization.py' script, as shown:
-
-```bash
-python model_quantization.py --model_input models\resnet50.onnx --model_output models\resnet50_bf16.onnx --quantize bf16
-```
-
 ## Model Evaluation
 
 Evaluate the accuracy of the model using ImageNet dataset on CPU/NPU
 
-```
+```bash
 python image_classification.py --model_input models\resnet50_bf16.onnx --calib_data calib_data --device cpu/npu --evaluate
 ```
 
@@ -82,11 +65,10 @@ Summary of BF16 model accuracy:
 
 <div align="center">
 
-| ResNet50      | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|----------------|----------------|
-| Float 32      | 0.800          | 0.961          |
-| BF16 (CPU)    | 0.797          | 0.959          |
-| BF16 (NPU)    | 0.798          | 0.963          |
+| ResNet50              | Top-1 Accuracy | Top-5 Accuracy |
+|-----------------------|----------------|----------------|
+| Float 32              | 0.800          | 0.961          |
+| FP32 to BF16 (NPU)    | 0.804          | 0.962          |
 
 </div>
 

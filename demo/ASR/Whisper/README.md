@@ -38,7 +38,7 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
 2. **Activate environment**
 
    ```bash
-   conda activate ryzen-ai-1.5.0
+   conda activate ryzen-ai-<version>
    ```
 
 3. **Clone repository**

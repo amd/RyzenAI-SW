@@ -92,7 +92,7 @@ The following installations are for Ubuntu.  For Windows OS, follow [Windows Set
 
 Ensure that the following software tools/packages are installed on the development system.
 
-1. OS: Ubuntu 22.04 or Ubuntu 24.04 (recommended 6.11.0-rc2 linux kernel)
+1. OS: Ubuntu 22.04 or Ubuntu 24.04 (linux kernel >= 6.11.0-21-generic)
 2. Install latest Ryzen AI NPU driver from https://ryzenai.docs.amd.com/en/latest/inst.html
 3. Vulkan SDK
 
@@ -115,7 +115,7 @@ sudo apt upgrade
 
 #### Additional installation for Ubuntu 24.04
 ```
-sudo apt install libnsl2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly -y
+sudo apt install libavcodec-dev libavformat-dev libswscale-dev libnsl2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly -y
 
 DEP_PKG_LIST="https://launchpad.net/ubuntu/+archive/primary/+files/libmpdec3_2.5.1-2build2_amd64.deb \
     https://launchpad.net/ubuntu/+archive/primary/+files/libpython3.10-minimal_3.10.4-3_amd64.deb \
@@ -295,7 +295,7 @@ under [Prerequisites and dependencies](#dependencies), the included sample
 applications also make use of OpenCV for reading input images/videos/camera
 and displaying final output windows. A copy of [OpenCV](https://opencv.org/)
 will need to be downloaded to the development system before the samples can
-be rebuilt and/or executed.
+be rebuilt and/or executed. Note that CVML samples are built and tested with opencv 4.11 on both Windows and Linux.
 
 Ensure the following prerequisites have been set up to build Ryzen AI CVML library sample applications:
 - CMake has been installed and is available in the system/user path

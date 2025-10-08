@@ -54,38 +54,42 @@ def reorganize_imagenet_val(val_dir, mapping_file, output_dir):
 
 # Example usage
 # reorganize_imagenet_val('path/to/val_images', 'path/to/mapping_file.txt', 'path/to/output_dir')
-def get_apu_info():
+def get_npu_info():
     # Run pnputil as a subprocess to enumerate PCI devices
     command = r'pnputil /enum-devices /bus PCI /deviceids '
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     # Check for supported Hardware IDs
-    apu_type = ''
-    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): apu_type = 'KRK'
-    return apu_type
+    npu_type = ''
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): npu_type = 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): npu_type = 'KRK'
+    return npu_type
 
 def evaluate_onnx_model(onnx_model_path, imagenet_data_path, batch_size=1, device='cpu'):
     # Load the ONNX model
     if device == 'npu':
-        npu_device = get_apu_info()
+        npu_device = get_npu_info()
         provider = ['VitisAIExecutionProvider']
         cache_dir = Path(__file__).parent.resolve()
+        model_name = os.path.basename(onnx_model_path)[:-5]
         print(cache_dir)
-        provider_options = [{
-                        'config_file': 'vaip_config.json',
-                        'cache_dir': str(cache_dir),
-                        'cache_key': 'modelcachekey',
-                        'xclbin': get_xclbin(npu_device)
-                    }]
-
+        provider_options = [{}]
+        if npu_device == 'PHX/HPT':
+            provider_options[0]['target'] = 'X1'
+            provider_options[0]['xclbin'] = get_xclbin(npu_device)
         session = ort.InferenceSession(onnx_model_path, providers=provider,
                                        provider_options=provider_options)
     else:
-        session = ort.InferenceSession(onnx_model_path)
+        if 'BF16' in onnx_model_path:
+            from quark.onnx import get_library_path
+            sess_options = onnxruntime.SessionOptions()
+            sess_options.register_custom_ops_library(get_library_path(device='cpu'))
+            session = ort.InferenceSession(onnx_model_path, sess_options, providers=['CPUExecutionProvider'])
+        else:
+            session = ort.InferenceSession(onnx_model_path)
 
     input_name = session.get_inputs()[0].name
 
