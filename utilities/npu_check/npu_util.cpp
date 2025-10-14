@@ -230,4 +230,11 @@ namespace npu_util {
         return checkCompatibility(DriverNumberToHex(32,0,203,280), { std::chrono::July / 1 / 2028 });
     }
 
+    NPUInfo checkCompatibility_RAI_1_6()
+    {
+        // Min driver: 32.0.203.280
+        // Max date  : 2028-10-07 (3 yrs after the release date of RyzenAI 1.6)
+        return checkCompatibility(DriverNumberToHex(32,0,203,280), { std::chrono::October / 7 / 2028 });
+    }
+
 } // npu_util
