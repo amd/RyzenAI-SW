@@ -53,6 +53,24 @@
         "encoder": {},
         "decoder": {}
       }
+    },
+     "large-v3-turbo": {
+      "npu": {
+        "encoder": {
+          "cache_key": "whisper_large_turbo_encoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_encoder.json"
+        },
+        "decoder": {
+          "cache_key": "whisper_large_turbo_decoder",
+          "cache_dir": "./cache/",
+          "config_file": "./config/vitisai_config_whisper_decoder.json"
+        }
+      },
+      "cpu": {
+        "encoder": {},
+        "decoder": {}
+      }
     }
   }
 }

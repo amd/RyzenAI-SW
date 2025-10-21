@@ -8,23 +8,19 @@
             "name": "vaiml_partition",
             "plugin": "vaip-pass_vaiml_partition",
             "vaiml_config": {
-                "optimize_level": 2,
-                "logging_level": "info",
-                "no_failsafe": true,
-                "experiment_features": [
-                    "InsertGatherFront"
-                ]
+                "optimize_level": 3,
+                "aiecompiler_args": "--system-stack-size=512"
             }
         }
     ],
     "target": "VAIML",
     "targets": [
         {
-           "name": "VAIML",
-           "pass": [
-               "init",
-               "vaiml_partition"
-           ]
+            "name": "VAIML",
+            "pass": [
+                "init",
+                "vaiml_partition"
+            ]
         }
     ]
 }
