@@ -269,7 +269,6 @@ def download_whisper_onnx(model_type: str):
     if not (os.path.exists(encoder_path) and os.path.exists(decoder_path)):
         raise FileNotFoundError(f"Could not find encoder/decoder in {local_dir}")
 
-
     return encoder_path, decoder_path
 
 
