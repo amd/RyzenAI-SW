@@ -8,18 +8,20 @@
             "name": "vaiml_partition",
             "plugin": "vaip-pass_vaiml_partition",
             "vaiml_config": {
-                "optimize_level": 2
+                "optimize_level": 3,
+                "fe_experiment": "use-accurate-mode=LayerNorm2PassAdf",
+                "aiecompiler_args": "--system-stack-size=512"
             }
         }
     ],
     "target": "VAIML",
     "targets": [
         {
-           "name": "VAIML",
-           "pass": [
-               "init",
-               "vaiml_partition"
-           ]
+            "name": "VAIML",
+            "pass": [
+                "init",
+                "vaiml_partition"
+            ]
         }
     ]
 }

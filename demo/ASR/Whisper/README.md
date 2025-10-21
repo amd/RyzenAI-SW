@@ -11,8 +11,7 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
 
 ## Features
 
-* 🚀 Export Whisper models from Hugging Face to ONNX
-* ⚙️ Optimize for static shape inference
+* 🚀 Download NPU Optimized Whisper ONNX models from HF
 * ⚡ Run ASR locally on CPU or NPU
 * 📊 Evaluate ASR on LibriSpeech samples and report WER/CER
 * 🎧 Supports transcription of audio files and microphone input
@@ -20,7 +19,6 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
 
 ## 🔗 Quick Links
 - [Prerequisites](#prerequisites)
-- [Export Whisper Model to ONNX](#export-whisper-model-to-onnx)
 - [Accelerate Whisper on AMD NPU](#accelerate-whisper-on-amd-npu)
   - [Why run on NPU?](#why-run-on-npu)
   - [Set up VitisEP Configuration for NPU](#set-up-vitisep-configuration-for-npu)
@@ -45,7 +43,7 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
 
    ```bash
    git clone https://github.com/amd/RyzenAI-SW.git
-   cd RyzenAI-SW/example/ASR/Whisper-AI
+   cd RyzenAI-SW/demo/ASR/Whisper
    ```
 
 4. **Install dependencies**
@@ -53,28 +51,6 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
    ```bash
    pip install -r requirements.txt
    ```
-
-
-## ⚙️ Export Whisper Model to ONNX
-
-1. **Export using Hugging Face Optimum**
-
-   ```bash
-   optimum-cli export onnx --model openai/whisper-base.en --opset 17 exported_model_directory
-   ```
-
-   * Output: `encoder_model.onnx`, `decoder_model.onnx`
-   * Supports multilingual whisper-base, whisper-small, whisper-medium
-
-2. **Convert dynamic ONNX to static**
-
-   ```bash
-   python dynamic_to_static.py --input_model exported_model_directory/encoder_model.onnx
-   python dynamic_to_static.py --input_model exported_model_directory/decoder_model.onnx
-   ```
-
-   * Uses `onnxruntime.tools.make_dynamic_shape_fixed`
-   * Final models overwrite originals in `exported_model_directory`
 
 ## ⚡Accelerate Whisper on AMD NPU
 
@@ -108,22 +84,22 @@ Example:
 
 ```json
 {
-  "config_file": "config/whisper_vitisai.json",
+  "config_file": "config/vitisai_config_whisper_decoder.json",
   "cache_dir": "./cache",
-  "cache_key": "whisper_base"
+  "cache_key": "whisper_medium_decoder"
 }
 ```
 #### ⚠️ Special Instructions for Whisper-Medium
 When running whisper-medium on NPU, it is recommended to add the following flags to `configs\vitisai_config_whisper_encoder.json` incase of compilation issues.
 ```json
 "vaiml_config": {
-  "optimize_level": 2,
+  "optimize_level": 3,
   "aiecompiler_args": "--system-stack-size=512"
 }
 ```
 These settings:
 
-- optimize_level=2: Enables aggressive optimizations for larger models.
+- optimize_level=3: Enables aggressive optimizations for larger models.
 - --system-stack-size=512: Increases the AI Engine system stack size to handle Whisper-Medium’s higher resource demand.
 
 ## 🚀 Usage
@@ -132,10 +108,7 @@ These settings:
 Use this to transcribe a pre-recorded `.wav` file into text using the Whisper mode
 ```bash
 python run_whisper.py \
-  --encoder exported_model_directory/encoder_model.onnx \
-  --decoder exported_model_directory/decoder_model.onnx \
   --model-type <whisper-type> \
-  --config-file config/model_config.json \
   --device npu \
   --input path/to/audio.wav
 ```
@@ -143,15 +116,17 @@ python run_whisper.py \
 
 - Replace path/to/audio.wav with your audio file.
 
+For example, run whisper-large-v3-turbo
+```bash
+python run_whisper.py --model-type whisper-large-v3-turbo --device npu  --input audio_files\1089-134686-0000.wav
+```
+
 ### Transcribe from Microphone
 Run real-time speech-to-text by capturing audio from your microphone. This allows you to speak and see live transcription:
 
 ```bash
 python run_whisper.py \
-  --encoder exported_model_directory/encoder_model.onnx \
-  --decoder exported_model_directory/decoder_model.onnx \
   --model-type <whisper-type> \
-  --config-file config/model_config.json \
   --device npu \
   --input mic \
   --duration 0
@@ -164,10 +139,7 @@ python run_whisper.py \
 Run batch evaluation on a dataset (e.g., LibriSpeech samples) to measure model performance with metrics like WER, CER, and RTF:
 ```bash
 python run_whisper.py \
-  --encoder exported_model_directory/encoder_model.onnx \
-  --decoder exported_model_directory/decoder_model.onnx \
   --model-type <whisper-type> \
-  --config-file config/model_config.json \
   --device npu \
   --eval-dir eval_dataset/LibriSpeech-samples \
   --results-dir results

@@ -7,9 +7,11 @@ import sounddevice as sd
 import queue
 import threading
 import time
+import os
 from transformers import WhisperFeatureExtractor, WhisperTokenizer
 from pathlib import Path
 from jiwer import wer, cer
+from huggingface_hub import snapshot_download
 
 SAMPLE_RATE = 16000
 CHUNK_SIZE = 1600  # 0.1 sec chunks
@@ -17,21 +19,19 @@ CHUNK_SIZE = 1600  # 0.1 sec chunks
 
 class WhisperONNX:
     def __init__(self, encoder_path, decoder_path,
-                 tokenizer_dir=None,encoder_providers=None, decoder_providers=None):
+                 model_type, encoder_providers=None, decoder_providers=None):
 
         self.encoder = ort.InferenceSession(encoder_path, providers=encoder_providers)
         self.decoder = ort.InferenceSession(decoder_path, providers=decoder_providers)
 
-        if tokenizer_dir is None:
-            tokenizer_dir = Path(encoder_path).parent
-            print(f"\nLoading tokenizer and feature extractor from: {Path(tokenizer_dir).resolve()}")
-        self.feature_extractor = WhisperFeatureExtractor.from_pretrained(tokenizer_dir, local_files_only=True)
-        self.tokenizer = WhisperTokenizer.from_pretrained(tokenizer_dir)
+        self.feature_extractor = WhisperFeatureExtractor.from_pretrained(f"openai/{model_type}")
+        self.tokenizer = WhisperTokenizer.from_pretrained(f"openai/{model_type}")
         self.decoder_start_token = self.sot_token = self.tokenizer.convert_tokens_to_ids("<|startoftranscript|>")
         self.eos_token = self.tokenizer.eos_token_id
         self.max_length = min(448, self.decoder.get_inputs()[0].shape[1])
         if not isinstance(self.max_length, int):
             raise ValueError("Invalid/Dynamic input shapes")
+
     def preprocess(self, audio):
         """
         Convert raw audio to Whisper log-mel spectrogram
@@ -43,25 +43,24 @@ class WhisperONNX:
         """
         Run encoder ONNX model
         """
-        return self.encoder.run(None, {"input_features": input_features})[0]
+        return self.encoder.run(None, {"x": input_features})[0]
 
     def decode(self, encoder_out):
         """
         Greedy decode with fixed-length input_ids
         """
         tokens = [self.decoder_start_token]
-        first_token_time = None  
+        first_token_time = None
         for _ in range(self.max_length):
-            # Pad input_ids to (1, max_length)
             decoder_input = np.full((1, self.max_length), self.eos_token, dtype=np.int64)
             decoder_input[0, :len(tokens)] = tokens
 
             outputs = self.decoder.run(None, {
-                "input_ids": decoder_input,
-                "encoder_hidden_states": encoder_out
+                "x": decoder_input,
+                "xa": encoder_out
             })
             logits = outputs[0]
-            next_token = int(np.argmax(logits[0, len(tokens)-1])) 
+            next_token = int(np.argmax(logits[0, len(tokens)-1]))
 
             if first_token_time is None:
                 first_token_time = time.time()
@@ -75,23 +74,22 @@ class WhisperONNX:
         """
         Full encode-decode pipeline with support for long-form transcription using chunking.
         """
-        chunk_size = SAMPLE_RATE * chunk_length_s 
+        chunk_size = SAMPLE_RATE * chunk_length_s
         total_samples = len(audio)
         transcription = []
         chunk_idx = 0
         total_start_time = time.time()
 
-        overlap = SAMPLE_RATE * 1 #Tune this
+        overlap = SAMPLE_RATE * 1  # Tune this
         for start in range(0, total_samples, chunk_size - overlap):
             end = min(start + chunk_size, total_samples)
             audio_chunk = audio[start:end]
 
-            # Process the chunk
             input_features = self.preprocess(audio_chunk)
             encoder_out = self.encode(input_features)
             tokens, first_token_time = self.decode(encoder_out)
             transcription.append(self.tokenizer.decode(tokens, skip_special_tokens=True).strip())
-            chunk_idx+= 1
+            chunk_idx += 1
             if not is_mic:
                 print(f"\nPerformance Metric (Chunk {chunk_idx}):")
                 print(f" Time to First Token for this chunk: {first_token_time - total_start_time:.2f} seconds")
@@ -102,8 +100,8 @@ class WhisperONNX:
         if not is_mic:
             print(f" RTF: {rtf:.2f}")
 
-        # Combine all transcriptions
         return " ".join(transcription), rtf
+
 
 def evaluate(model, dataset_dir, results_dir):
     dataset_name = Path(dataset_dir).name
@@ -130,7 +128,6 @@ def evaluate(model, dataset_dir, results_dir):
                 print(f"Reference for {key} not found in transcripts.txt")
                 continue
             reference = references[key].lower()
-            # FIX: Convert Path to str for torchaudio
             waveform, sr = torchaudio.load(str(wav_path))
             if sr != SAMPLE_RATE:
                 waveform = torchaudio.transforms.Resample(orig_freq=sr, new_freq=SAMPLE_RATE)(waveform)
@@ -159,11 +156,9 @@ def evaluate(model, dataset_dir, results_dir):
         else:
             print("No valid audio-transcript pairs found.")
 
+
 def load_provider_options(config, model_name, device):
-    """
-    Load provider options for encoder and decoder from JSON config
-    """
-    model_key = model_name.split("-")[-1]  # e.g., whisper-base -> base
+    model_key = model_name.replace("whisper-", "")
     if model_key not in config["whisper"]:
         raise ValueError(f"Model type '{model_key}' not found in config")
 
@@ -188,6 +183,7 @@ def load_provider_options(config, model_name, device):
             ]
         else:
             return ["CPUExecutionProvider"]
+
     print("Selected Provider Options: ")
     print("Decoder: ", build_provider_opts(decoder_opts))
     print("Encoder: ", build_provider_opts(encoder_opts))
@@ -195,10 +191,6 @@ def load_provider_options(config, model_name, device):
 
 
 def mic_stream(model, duration=0, silence_threshold=0.01, silence_duration=5.0):
-    """
-    Capture microphone audio and transcribe in real time.
-    Automatically stops on silence if duration=0.
-    """
     q_audio = queue.Queue()
     stop_flag = threading.Event()
 
@@ -232,8 +224,7 @@ def mic_stream(model, duration=0, silence_threshold=0.01, silence_duration=5.0):
             chunk = q_audio.get(timeout=0.1).squeeze()
             buffer = np.concatenate((buffer, chunk))
 
-            # Check for silence
-            rms = np.sqrt(np.mean(chunk**2))
+            rms = np.sqrt(np.mean(chunk ** 2))
             if rms < silence_threshold:
                 if silence_start is None:
                     silence_start = time.time()
@@ -242,7 +233,7 @@ def mic_stream(model, duration=0, silence_threshold=0.01, silence_duration=5.0):
                     stop_flag.set()
                     break
             else:
-                silence_start = None  # Reset silence timer
+                silence_start = None
 
             if len(buffer) >= SAMPLE_RATE * 2:
                 text, _ = model.transcribe(buffer, is_mic=True)
@@ -252,17 +243,43 @@ def mic_stream(model, duration=0, silence_threshold=0.01, silence_duration=5.0):
             continue
 
 
+def download_whisper_onnx(model_type: str):
+    """
+    Download Whisper ONNX encoder/decoder from Hugging Face if not already present.
+    Returns paths to encoder and decoder model files.
+    """
+    hf_model_map = {
+        "whisper-small": "amd/whisper-small-onnx-npu",
+        "whisper-medium": "amd/whisper-medium-onnx-npu",
+        "whisper-large-v3-turbo": "amd/whisper-large-turbo-onnx-npu"
+    }
+
+    repo_id = hf_model_map.get(model_type)
+    if repo_id is None:
+        raise ValueError(f"Unsupported model_type '{model_type}' for ONNX auto-download.")
+
+    local_dir = snapshot_download(
+        repo_id=repo_id,
+    )
+
+    # Construct paths to encoder/decoder ONNX files
+    encoder_path = os.path.join(local_dir, "encoder_model.onnx")
+    decoder_path = os.path.join(local_dir, "decoder_model.onnx")
+
+    if not (os.path.exists(encoder_path) and os.path.exists(decoder_path)):
+        raise FileNotFoundError(f"Could not find encoder/decoder in {local_dir}")
+
+    return encoder_path, decoder_path
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", help="WAV file path or 'mic'")
-    parser.add_argument("--encoder", required=True, help="Path to Whisper encoder ONNX model")
-    parser.add_argument("--decoder", required=True, help="Path to Whisper decoder ONNX model")
-    parser.add_argument("--tokenizer-dir", default=None,
-                        help="Path to directory containing tokenizer and feature extractor files. "
-                         "If not set, defaults to directory of encoder/decoder models.")
-    parser.add_argument("--model-type", required=True, default="whisper-base", 
-                        choices=["whisper-base", "whisper-medium", "whisper-small"],
+    parser.add_argument("--encoder", help="Path to Whisper encoder ONNX model (optional, auto-download if not provided)")
+    parser.add_argument("--decoder", help="Path to Whisper decoder ONNX model (optional, auto-download if not provided)")
+    parser.add_argument("--model-type", required=True, default="whisper-base",
+                        choices=["whisper-tiny", "whisper-base", "whisper-small",
+                                 "whisper-medium", "whisper-large-v3-turbo"],
                         help="Whisper model name")
     parser.add_argument("--eval-dir", help="Dataset directory with wavs/ and transcripts.txt")
     parser.add_argument("--results-dir", default="results", help="Directory to store evaluation results")
@@ -281,16 +298,25 @@ def main():
         model_config, args.model_type, args.device
     )
 
-    model = WhisperONNX(args.encoder, 
-                        args.decoder,
-                        tokenizer_dir=args.tokenizer_dir,
-                        encoder_providers=encoder_providers,
-                        decoder_providers=decoder_providers)
-    
+    # Auto-download ONNX models if not provided
+    if args.encoder is None or args.decoder is None:
+        print(f"Downloading ONNX models for {args.model_type} from Hugging Face ...")
+        encoder_path, decoder_path = download_whisper_onnx(args.model_type)
+    else:
+        encoder_path, decoder_path = args.encoder, args.decoder
+
+    model = WhisperONNX(
+        encoder_path,
+        decoder_path,
+        args.model_type,
+        encoder_providers=encoder_providers,
+        decoder_providers=decoder_providers
+    )
+
     if args.eval_dir:
         evaluate(model, args.eval_dir, args.results_dir)
         return
-    
+
     if not args.input and not args.eval_dir:
         print("Error: You must provide --input (wav or mic) or --eval-dir.")
         return
@@ -298,7 +324,7 @@ def main():
     if args.input and args.input.lower() not in ['mic'] and not Path(args.input).suffix == '.wav':
         print("Error: --input must be 'mic' or path to a .wav file.")
         return
-    
+
     if args.input.lower() == 'mic':
         try:
             mic_stream(model, args.duration)
