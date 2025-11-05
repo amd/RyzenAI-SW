@@ -147,7 +147,7 @@ python quantize_quark.py --input_model_path models/yolov8m.onnx \
                          --calib_data_path calib_images \
                          --output_model_path models/yolov8m_XINT8.onnx \
                          --config XINT8
-                         --exclude_subgraphs "[/model.22/Concat_3], [/model.22/Concat_5]]"
+                         --exclude_subgraphs "[/model.22/Concat_3], [/model.22/Concat_10]"
 ```
 
 ## Sample Output
@@ -183,26 +183,3 @@ python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_d
 
 </div>
 
-
-## Evaluate the Model Performance across formats
-
-Evaluate the Performance of Model across Float32 (CPU), BF16 and XINT8. Model is benchmarked across 100 inference runs and we measure  
-1) Latency - Average time for each Inference run on CPU/NPU
-2) Frames per Second - Indicates how many individual images, or frames, are inferred per second 
-
-Use `--benchmark` option while running the Model
-
-```bash
-python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16 --benchmark
-```
-
-
-<div align="center">
-
-|  Yolov8m      | Avg time for each Inference (Latency) |  Frames per Second (FPS)| 
-|---------------|---------------------------------------|-------------------------|
-| Float32 (CPU) |       0.486 sec                       |     2.1                 |
-| BF16    (NPU) |       0.075 sec                       |     13.4                |
-| XINT8   (NPU) |       0.021 sec                       |     48.2                |
-
-</div>

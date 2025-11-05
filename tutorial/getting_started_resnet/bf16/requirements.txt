@@ -1,5 +1,5 @@
-timm
-torch
-torchvision
-opencv-python
+timm==1.0.20
+torch==2.8.0
+torchvision==0.23.0
+opencv-python==4.11.0.86
 numpy==1.26.4

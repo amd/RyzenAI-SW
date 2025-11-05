@@ -1,5 +1,5 @@
 opencv-python==4.11.0.86
 pycocotools
 wget
-torch
+torch==2.8.0
 ultralytics==8.3.155
