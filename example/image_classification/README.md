@@ -44,7 +44,7 @@ ImageNet Dataset
 ----------------
 If you already have an ImageNet datasets, you can directly use your dataset path.
 
-To prepare the test data, please check the download section of the main website: https://huggingface.co/datasets/imagenet-1k/tree/main/data. You need to register and download **val_images.tar.gz**.
+To prepare the test data, please check the download section of the main website: https://huggingface.co/datasets/ILSVRC/imagenet-1k/tree/script/data. You need to register and download **val_images.tar.gz**.
 
 Then, create the validation dataset and calibration dataset:
 
