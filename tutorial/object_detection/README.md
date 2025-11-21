@@ -77,7 +77,7 @@ python prepare_data.py
 Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-bf16` to measure accuracy metrics on CPU/NPU respectively.
 
 ```bash
-python run_inference --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
+python run_inference.py --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
 ```
 
 <div align="center">
@@ -169,7 +169,7 @@ python prepare_data.py
 Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-int8` to measure accuracy metrics on CPU/NPU respectively.
 
 ```bash
-python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_dataset datasets\coco --device npu-int8
+python run_inference.py --model_input models\yolov8m_XINT8.onnx --evaluate --coco_dataset datasets\coco --device npu-int8
 ```
 
 <div align="center">
