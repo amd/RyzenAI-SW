@@ -22,7 +22,7 @@ This folder contains the following files:
 
 Before running this example, ensure that you have followed the Ryzen AI Installation instructions found [here](https://ryzenai.docs.amd.com/en/latest/inst.html) and have activated the conda environment created during installation.
 
-Create a clone of the Ryzen AI installation conda environment to add required python packages
+Create a clone of the Ryzen AI installation conda environment and activate it.
 
 ```python
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>

@@ -58,7 +58,7 @@ tmp_model_path = "models/helloworld.onnx"
 # Call export function
 torch.onnx.export(
         pytorch_model,
-        inputs,
+        dummy_input,
         tmp_model_path,
         export_params=True,
         opset_version=17,  # Recommended opset
@@ -130,6 +130,7 @@ if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): npu_type = 'PHX/HPT'
 if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): npu_type = 'STX'
 if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): npu_type = 'STX'
 if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): npu_type = 'STX'
+if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): npu_type = 'KRK'
 
 print(f"APU Type: {npu_type}")
 
@@ -139,8 +140,8 @@ match npu_type:
     case 'PHX/HPT':
         print("Setting xclbin file for PHX/HPT")
         xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
-    case 'STX':
-        print("Setting xclbin file for STX")
+    case 'STX' | 'KRK':
+        print("Setting xclbin file for STX/KRK")
         xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_4x4_Overlay.xclbin')
     case _:
         print("Unrecognized APU type. Exiting.")
@@ -190,3 +191,20 @@ npu_total = timer() - start
 
 print(f"CPU Execution Time: {cpu_total}")
 print(f"NPU Execution Time: {npu_total}")
+
+
+iterations = 50 # edit this for more or less
+
+npu_total = cpu_total = 0
+for i in range(iterations):
+    start = timer()
+    npu_results = aie_session.run(None, {'input': input_data})
+    npu_total += timer() - start
+    start = timer()
+    cpu_results = cpu_session.run(None, {'input': input_data})
+    cpu_total += timer() - start
+
+print(f"For {iterations} iterations of a small model:")
+print(f"- CPU Execution Time: {cpu_total}")
+print(f"- NPU Execution Time: {npu_total}")
+
