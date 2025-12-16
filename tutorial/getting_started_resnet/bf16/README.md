@@ -73,8 +73,6 @@ Above script will use the config_file and cache_dir to compile model using VAIML
 
 The expected output after the model compilation
 
-The expected output after the model compilation
-
 ```bash
 Compilation Complete
 (WARNING:71, CRITICAL-WARNING:0, ERROR:0)
