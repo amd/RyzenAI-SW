@@ -25,8 +25,6 @@ In this section we deploy our model on Python for inferencing purpose.
 
 ## Model Deployment on NPU
 
-## Model Deployment on NPU
-
 ```bash
     python predict.py --ep npu
     Expected output:
