@@ -1,0 +1,78 @@
+The configuration of the quantization is Config(global_quant_config=QuantizationConfig(calibrate_method=<CalibrationMethod.MinMax: 0>, quant_format=<ExtendedQuantFormat.QDQ: 1>, activation_type=<ExtendedQuantType.QInt16: 3>, weight_type=<QuantType.QInt8: 0>, input_nodes=[], output_nodes=[], op_types_to_quantize=[], nodes_to_quantize=[], extra_op_types_to_quantize=[], nodes_to_exclude=[], subgraphs_to_exclude=[], specific_tensor_precision=False, execution_providers=['CPUExecutionProvider'], per_channel=False, reduce_range=False, optimize_model=True, use_dynamic_quant=False, use_external_data_format=False, convert_fp16_to_fp32=False, convert_nchw_to_nhwc=False, include_sq=False, include_rotation=False, include_cle=True, include_auto_mp=False, include_fast_ft=False, enable_npu_cnn=False, enable_npu_transformer=False, debug_mode=False, crypto_mode=False, print_summary=True, ignore_warnings=True, log_severity_level=1, extra_options={'ActivationSymmetric': True, 'AlignSlice': False, 'FoldRelu': True, 'AlignConcat': True, 'AlignEltwiseQuantType': True}))
+[QUARK_INFO]: Time information:
+2025-10-14 20:02:03.157295
+[QUARK_INFO]: OS and CPU information:
+                                        system --- Windows
+                                          node --- XSJSTRXHPOMNI01
+                                       release --- 11
+                                       version --- 10.0.26100
+                                       machine --- AMD64
+                                     processor --- AMD64 Family 26 Model 36 Stepping 0, AuthenticAMD
+[QUARK_INFO]: Tools version information:
+                                        python --- 3.12.11
+                                          onnx --- 1.18.0
+                                   onnxruntime --- 1.23.0.dev20250928
+                                    quark.onnx --- 0.10+db671e3+db671e3
+[QUARK_INFO]: Quantized Configuration information:
+                                   model_input --- perf_models\squeezenet1_0.onnx
+                                  model_output --- models\squeezenet1_0_A16W8.onnx
+                       calibration_data_reader --- <utils.ImageDataReader object at 0x000002632CB73590>
+                         calibration_data_path --- None
+                                  quant_format --- QDQ
+                                   input_nodes --- []
+                                  output_nodes --- []
+                          op_types_to_quantize --- []
+                    extra_op_types_to_quantize --- []
+                                   per_channel --- False
+                                  reduce_range --- False
+                               activation_type --- QInt16
+                                   weight_type --- QInt8
+                             nodes_to_quantize --- []
+                              nodes_to_exclude --- []
+                          subgraphs_to_exclude --- []
+                                optimize_model --- True
+                      use_external_data_format --- False
+                              calibrate_method --- CalibrationMethod.MinMax
+                           execution_providers --- ['CPUExecutionProvider']
+                                enable_npu_cnn --- False
+                        enable_npu_transformer --- False
+                     specific_tensor_precision --- False
+                                    debug_mode --- False
+                          convert_fp16_to_fp32 --- False
+                          convert_nchw_to_nhwc --- False
+                                   include_cle --- True
+                                    include_sq --- False
+                              include_rotation --- False
+                               include_fast_ft --- False
+                                 extra_options --- {'ActivationSymmetric': True, 'AlignSlice': False, 'FoldRelu': True, 'AlignConcat': True, 'AlignEltwiseQuantType': True}
++--------------------------------------------------------+
+| Op Type              | Float Model                     |
+|----------------------+---------------------------------|
+| Conv                 | 26                              |
+| Relu                 | 26                              |
+| MaxPool              | 3                               |
+| Concat               | 8                               |
+| GlobalAveragePool    | 1                               |
+| Flatten              | 1                               |
+|----------------------+---------------------------------|
+| Quantized model path | models\squeezenet1_0_A16W8.onnx |
++--------------------------------------------------------+
++-------------------------------------------------------+
+| Op Type           | Activation | Weights  | Bias      |
+|-------------------+------------+----------+-----------|
+| Conv              | INT16(26)  | INT8(26) | INT32(26) |
+| MaxPool           | INT16(3)   |          |           |
+| Concat            | INT16(8)   |          |           |
+| GlobalAveragePool | INT16(1)   |          |           |
+| Flatten           | INT16(1)   |          |           |
++-------------------------------------------------------+
+Model Size:
+Float32 model size: 4.78 MB
+A16W8 quantized model size: 1.27 MB
+Model Accuracy:
+Using TXN FORMAT 0.1
+[Vitis AI EP] No. of Operators :   CPU     1    NPU   200 VITIS_EP_CPU     2 
+[Vitis AI EP] No. of Subgraphs :   NPU     1 Actually running on NPU      1
+Float32 model accuracy: Top1 0.586, Top5 0.798 
+C:\Users\dwchenna\github\amd_repo\RyzenAI-SW\tutorial\quark_quantization
+A16W8 quantized model accuracy (NPU): Top1 0.575, Top5 0.793 

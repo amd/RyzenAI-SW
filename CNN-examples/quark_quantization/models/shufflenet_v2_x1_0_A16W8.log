@@ -1,0 +1,90 @@
+The configuration of the quantization is Config(global_quant_config=QuantizationConfig(calibrate_method=<CalibrationMethod.MinMax: 0>, quant_format=<ExtendedQuantFormat.QDQ: 1>, activation_type=<ExtendedQuantType.QInt16: 3>, weight_type=<QuantType.QInt8: 0>, input_nodes=[], output_nodes=[], op_types_to_quantize=[], nodes_to_quantize=[], extra_op_types_to_quantize=[], nodes_to_exclude=[], subgraphs_to_exclude=[], specific_tensor_precision=False, execution_providers=['CPUExecutionProvider'], per_channel=False, reduce_range=False, optimize_model=True, use_dynamic_quant=False, use_external_data_format=False, convert_fp16_to_fp32=False, convert_nchw_to_nhwc=False, include_sq=False, include_rotation=False, include_cle=True, include_auto_mp=False, include_fast_ft=False, enable_npu_cnn=False, enable_npu_transformer=False, debug_mode=False, crypto_mode=False, print_summary=True, ignore_warnings=True, log_severity_level=1, extra_options={'ActivationSymmetric': True, 'AlignSlice': False, 'FoldRelu': True, 'AlignConcat': True, 'AlignEltwiseQuantType': True}))
+[QUARK_INFO]: Time information:
+2025-10-14 20:04:04.114187
+[QUARK_INFO]: OS and CPU information:
+                                        system --- Windows
+                                          node --- XSJSTRXHPOMNI01
+                                       release --- 11
+                                       version --- 10.0.26100
+                                       machine --- AMD64
+                                     processor --- AMD64 Family 26 Model 36 Stepping 0, AuthenticAMD
+[QUARK_INFO]: Tools version information:
+                                        python --- 3.12.11
+                                          onnx --- 1.18.0
+                                   onnxruntime --- 1.23.0.dev20250928
+                                    quark.onnx --- 0.10+db671e3+db671e3
+[QUARK_INFO]: Quantized Configuration information:
+                                   model_input --- perf_models\shufflenet_v2_x1_0.onnx
+                                  model_output --- models\shufflenet_v2_x1_0_A16W8.onnx
+                       calibration_data_reader --- <utils.ImageDataReader object at 0x0000022FC2416210>
+                         calibration_data_path --- None
+                                  quant_format --- QDQ
+                                   input_nodes --- []
+                                  output_nodes --- []
+                          op_types_to_quantize --- []
+                    extra_op_types_to_quantize --- []
+                                   per_channel --- False
+                                  reduce_range --- False
+                               activation_type --- QInt16
+                                   weight_type --- QInt8
+                             nodes_to_quantize --- []
+                              nodes_to_exclude --- []
+                          subgraphs_to_exclude --- []
+                                optimize_model --- True
+                      use_external_data_format --- False
+                              calibrate_method --- CalibrationMethod.MinMax
+                           execution_providers --- ['CPUExecutionProvider']
+                                enable_npu_cnn --- False
+                        enable_npu_transformer --- False
+                     specific_tensor_precision --- False
+                                    debug_mode --- False
+                          convert_fp16_to_fp32 --- False
+                          convert_nchw_to_nhwc --- False
+                                   include_cle --- True
+                                    include_sq --- False
+                              include_rotation --- False
+                               include_fast_ft --- False
+                                 extra_options --- {'ActivationSymmetric': True, 'AlignSlice': False, 'FoldRelu': True, 'AlignConcat': True, 'AlignEltwiseQuantType': True}
++-------------------------------------------------------------+
+| Op Type              | Float Model                          |
+|----------------------+--------------------------------------|
+| Conv                 | 56                                   |
+| Relu                 | 37                                   |
+| MaxPool              | 1                                    |
+| Concat               | 16                                   |
+| Constant             | 110                                  |
+| Reshape              | 32                                   |
+| Transpose            | 16                                   |
+| Shape                | 13                                   |
+| Gather               | 13                                   |
+| Add                  | 13                                   |
+| Div                  | 13                                   |
+| Mul                  | 26                                   |
+| Slice                | 26                                   |
+| ReduceMean           | 1                                    |
+| Gemm                 | 1                                    |
+|----------------------+--------------------------------------|
+| Quantized model path | models\shufflenet_v2_x1_0_A16W8.onnx |
++-------------------------------------------------------------+
++------------------------------------------------+
+| Op Type    | Activation | Weights  | Bias      |
+|------------+------------+----------+-----------|
+| Conv       | INT16(56)  | INT8(56) | INT32(56) |
+| MaxPool    | INT16(1)   |          |           |
+| Concat     | INT16(16)  |          |           |
+| Reshape    | INT16(32)  |          |           |
+| Transpose  | INT16(16)  |          |           |
+| Slice      | INT16(26)  |          |           |
+| ReduceMean | INT16(1)   |          |           |
+| Gemm       | INT16(1)   | INT8(1)  | INT32(1)  |
++------------------------------------------------+
+Model Size:
+Float32 model size: 8.72 MB
+A16W8 quantized model size: 2.37 MB
+Model Accuracy:
+Using TXN FORMAT 0.1
+[Vitis AI EP] No. of Operators :   CPU    48    NPU   470 VITIS_EP_CPU    98 
+[Vitis AI EP] No. of Subgraphs :   NPU    17 Actually running on NPU     17
+Float32 model accuracy: Top1 0.686, Top5 0.881 
+C:\Users\dwchenna\github\amd_repo\RyzenAI-SW\tutorial\quark_quantization
+A16W8 quantized model accuracy (NPU): Top1 0.680, Top5 0.878 

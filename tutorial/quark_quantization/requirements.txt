@@ -1,7 +1,0 @@
-numpy
-Pillow
-protobuf
-rich
-torchvision==0.23.0
-timm
-numpy==1.26.4
