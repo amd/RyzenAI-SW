@@ -43,6 +43,8 @@ To run the demos and examples in this repository, please follow the instructions
 
 - [LLMs on RyzenAI with ONNX Runtime GenAI API](LLM-examples/oga_api)
 - [ONNX Runtime GenAI(OGA)‑based RAG LLM](LLM-examples/RAG-OGA)
+- [Running Vision Language Model (VLM) on RyzenAI NPU](LLM-examples/VLM)
+- [Running GPT-OSS-20B with chat template](LLM-examples/oga_inference)
 
 ## Examples
 
@@ -51,6 +53,7 @@ To run the demos and examples in this repository, please follow the instructions
   - [Image classification](CNN-examples/image_classification)
 - [Object detection with Yolov8 models](CNN-examples/object_detection)
 - [Automatic Speech Recognition: Step by Step guide to run Whisper-base on NPU](Transformer-examples/ASR/Whisper-AI)
+
 
 ## Demos
 
