@@ -1,0 +1,1 @@
+curl -L -o models/yolov8s-worldv2.pt https://github.com/ultralytics/assets/releases/download/v8.4.0/yolov8s-worldv2.pt

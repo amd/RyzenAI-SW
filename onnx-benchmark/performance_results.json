@@ -1,0 +1,562 @@
+[
+    {
+        "timestamp": "2025-08-07T22:32:12.120605",
+        "rai_release": "1.4.1",
+        "model_name": "efficientnet_b0",
+        "device_name": "STX",
+        "throughput_fps": 62.34,
+        "latency_ms": 15.97
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.122604",
+        "rai_release": "1.4.1",
+        "model_name": "efficientnet_b0_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 206.93,
+        "latency_ms": 4.78
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.124610",
+        "rai_release": "1.4.1",
+        "model_name": "efficientnet_b1",
+        "device_name": "STX",
+        "throughput_fps": 44.91,
+        "latency_ms": 22.2
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.126737",
+        "rai_release": "1.4.1",
+        "model_name": "efficientnet_b1_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 147.62,
+        "latency_ms": 6.7
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.129667",
+        "rai_release": "1.4.1",
+        "model_name": "efficientnet_b2",
+        "device_name": "STX",
+        "throughput_fps": 42.81,
+        "latency_ms": 23.29
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.131665",
+        "rai_release": "1.4.1",
+        "model_name": "efficientnet_b2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 145.65,
+        "latency_ms": 6.8
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.134666",
+        "rai_release": "1.4.1",
+        "model_name": "mobilenet_v2",
+        "device_name": "STX",
+        "throughput_fps": 144.71,
+        "latency_ms": 6.84
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.136709",
+        "rai_release": "1.4.1",
+        "model_name": "mobilenet_v2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 415.69,
+        "latency_ms": 2.37
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.139718",
+        "rai_release": "1.4.1",
+        "model_name": "mobilenet_v3",
+        "device_name": "STX",
+        "throughput_fps": 383.17,
+        "latency_ms": 2.56
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.141719",
+        "rai_release": "1.4.1",
+        "model_name": "mobilenet_v3_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 410.46,
+        "latency_ms": 2.4
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.145233",
+        "rai_release": "1.4.1",
+        "model_name": "resnet18",
+        "device_name": "STX",
+        "throughput_fps": 32.37,
+        "latency_ms": 30.83
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.147680",
+        "rai_release": "1.4.1",
+        "model_name": "resnet18_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 391.29,
+        "latency_ms": 2.5
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.149747",
+        "rai_release": "1.4.1",
+        "model_name": "resnet34",
+        "device_name": "STX",
+        "throughput_fps": 17.26,
+        "latency_ms": 57.85
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.151746",
+        "rai_release": "1.4.1",
+        "model_name": "resnet34_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 302.28,
+        "latency_ms": 3.27
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.153747",
+        "rai_release": "1.4.1",
+        "model_name": "resnet50",
+        "device_name": "STX",
+        "throughput_fps": 14.02,
+        "latency_ms": 71.26
+    },
+    {
+        "timestamp": "2025-08-07T22:32:12.155748",
+        "rai_release": "1.4.1",
+        "model_name": "resnet50_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 193.65,
+        "latency_ms": 5.11
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.334375",
+        "rai_release": "1.5.0",
+        "model_name": "efficientnet_b0",
+        "device_name": "STX",
+        "throughput_fps": 69.91,
+        "latency_ms": 14.24
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.336381",
+        "rai_release": "1.5.0",
+        "model_name": "efficientnet_b0_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 94.01,
+        "latency_ms": 10.57
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.336381",
+        "rai_release": "1.5.0",
+        "model_name": "efficientnet_b1",
+        "device_name": "STX",
+        "throughput_fps": 36.84,
+        "latency_ms": 27.06
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.336381",
+        "rai_release": "1.5.0",
+        "model_name": "efficientnet_b1_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 65.9,
+        "latency_ms": 15.11
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.338384",
+        "rai_release": "1.5.0",
+        "model_name": "efficientnet_b2",
+        "device_name": "STX",
+        "throughput_fps": 40.47,
+        "latency_ms": 24.64
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.338384",
+        "rai_release": "1.5.0",
+        "model_name": "efficientnet_b2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 40.57,
+        "latency_ms": 24.57
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.338384",
+        "rai_release": "1.5.0",
+        "model_name": "mobilenet_v2",
+        "device_name": "STX",
+        "throughput_fps": 120.57,
+        "latency_ms": 8.22
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.340971",
+        "rai_release": "1.5.0",
+        "model_name": "mobilenet_v2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 175.12,
+        "latency_ms": 5.66
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.342011",
+        "rai_release": "1.5.0",
+        "model_name": "mobilenet_v3",
+        "device_name": "STX",
+        "throughput_fps": 455.47,
+        "latency_ms": 2.17
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.343021",
+        "rai_release": "1.5.0",
+        "model_name": "mobilenet_v3_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 178.05,
+        "latency_ms": 5.57
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.343976",
+        "rai_release": "1.5.0",
+        "model_name": "resnet18",
+        "device_name": "STX",
+        "throughput_fps": 31.51,
+        "latency_ms": 31.67
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.344401",
+        "rai_release": "1.5.0",
+        "model_name": "resnet18_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 186.04,
+        "latency_ms": 5.33
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.345546",
+        "rai_release": "1.5.0",
+        "model_name": "resnet34",
+        "device_name": "STX",
+        "throughput_fps": 15.71,
+        "latency_ms": 63.59
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.345546",
+        "rai_release": "1.5.0",
+        "model_name": "resnet34_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 129.62,
+        "latency_ms": 7.66
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.346545",
+        "rai_release": "1.5.0",
+        "model_name": "resnet50",
+        "device_name": "STX",
+        "throughput_fps": 13.12,
+        "latency_ms": 76.13
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.347381",
+        "rai_release": "1.5.0",
+        "model_name": "resnet50_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 85.17,
+        "latency_ms": 11.68
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.348237",
+        "rai_release": "1.5.0",
+        "model_name": "yolov8m",
+        "device_name": "STX",
+        "throughput_fps": 1.26,
+        "latency_ms": 792.07
+    },
+    {
+        "timestamp": "2025-09-02T21:14:13.348670",
+        "rai_release": "1.5.0",
+        "model_name": "yolov8m_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 13.21,
+        "latency_ms": 75.61
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.505047",
+        "rai_release": "1.6.0",
+        "model_name": "efficientnet_b0",
+        "device_name": "STX",
+        "throughput_fps": 73.87,
+        "latency_ms": 13.47
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.506045",
+        "rai_release": "1.6.0",
+        "model_name": "efficientnet_b0_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 28.08,
+        "latency_ms": 35.55
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.507045",
+        "rai_release": "1.6.0",
+        "model_name": "efficientnet_b1",
+        "device_name": "STX",
+        "throughput_fps": 43.95,
+        "latency_ms": 22.67
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.507045",
+        "rai_release": "1.6.0",
+        "model_name": "efficientnet_b1_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 20.41,
+        "latency_ms": 48.93
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.507045",
+        "rai_release": "1.6.0",
+        "model_name": "efficientnet_b2",
+        "device_name": "STX",
+        "throughput_fps": 38.86,
+        "latency_ms": 25.65
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.508044",
+        "rai_release": "1.6.0",
+        "model_name": "efficientnet_b2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 20.12,
+        "latency_ms": 49.63
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.508044",
+        "rai_release": "1.6.0",
+        "model_name": "mobilenet_v2",
+        "device_name": "STX",
+        "throughput_fps": 138.44,
+        "latency_ms": 7.16
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.509043",
+        "rai_release": "1.6.0",
+        "model_name": "mobilenet_v2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 71.17,
+        "latency_ms": 14.01
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.509043",
+        "rai_release": "1.6.0",
+        "model_name": "mobilenet_v3",
+        "device_name": "STX",
+        "throughput_fps": 326.73,
+        "latency_ms": 2.99
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.510044",
+        "rai_release": "1.6.0",
+        "model_name": "mobilenet_v3_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 69.33,
+        "latency_ms": 14.38
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.511044",
+        "rai_release": "1.6.0",
+        "model_name": "resnet18",
+        "device_name": "STX",
+        "throughput_fps": 31.93,
+        "latency_ms": 31.24
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.511548",
+        "rai_release": "1.6.0",
+        "model_name": "resnet18_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 480.14,
+        "latency_ms": 2.02
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.512556",
+        "rai_release": "1.6.0",
+        "model_name": "resnet34",
+        "device_name": "STX",
+        "throughput_fps": 15.1,
+        "latency_ms": 66.15
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.512556",
+        "rai_release": "1.6.0",
+        "model_name": "resnet34_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 394.03,
+        "latency_ms": 2.5
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.513561",
+        "rai_release": "1.6.0",
+        "model_name": "resnet50",
+        "device_name": "STX",
+        "throughput_fps": 14.29,
+        "latency_ms": 69.89
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.514562",
+        "rai_release": "1.6.0",
+        "model_name": "resnet50_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 276.03,
+        "latency_ms": 3.58
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.514562",
+        "rai_release": "1.6.0",
+        "model_name": "yolov8m",
+        "device_name": "STX",
+        "throughput_fps": 1.4,
+        "latency_ms": 714.27
+    },
+    {
+        "timestamp": "2025-10-22T21:59:27.515561",
+        "rai_release": "1.6.0",
+        "model_name": "yolov8m_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 7.46,
+        "latency_ms": 134.04
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.788638",
+        "rai_release": "1.7.0",
+        "model_name": "efficientnet_b0",
+        "device_name": "STX",
+        "throughput_fps": 71.39,
+        "latency_ms": 13.93
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.788638",
+        "rai_release": "1.7.0",
+        "model_name": "efficientnet_b0_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 119.44,
+        "latency_ms": 8.23
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.793349",
+        "rai_release": "1.7.0",
+        "model_name": "efficientnet_b1",
+        "device_name": "STX",
+        "throughput_fps": 50.85,
+        "latency_ms": 19.58
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.793349",
+        "rai_release": "1.7.0",
+        "model_name": "efficientnet_b1_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 92.12,
+        "latency_ms": 10.75
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.794856",
+        "rai_release": "1.7.0",
+        "model_name": "efficientnet_b2",
+        "device_name": "STX",
+        "throughput_fps": 37.68,
+        "latency_ms": 26.44
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.794856",
+        "rai_release": "1.7.0",
+        "model_name": "efficientnet_b2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 83.14,
+        "latency_ms": 11.93
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.797189",
+        "rai_release": "1.7.0",
+        "model_name": "mobilenet_v2",
+        "device_name": "STX",
+        "throughput_fps": 67.42,
+        "latency_ms": 14.71
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.797189",
+        "rai_release": "1.7.0",
+        "model_name": "mobilenet_v2_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 55.91,
+        "latency_ms": 17.79
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.797189",
+        "rai_release": "1.7.0",
+        "model_name": "mobilenet_v3",
+        "device_name": "STX",
+        "throughput_fps": 413.4,
+        "latency_ms": 2.37
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.797189",
+        "rai_release": "1.7.0",
+        "model_name": "mobilenet_v3_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 270.1,
+        "latency_ms": 3.63
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.797189",
+        "rai_release": "1.7.0",
+        "model_name": "resnet18",
+        "device_name": "STX",
+        "throughput_fps": 32.54,
+        "latency_ms": 30.66
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.802934",
+        "rai_release": "1.7.0",
+        "model_name": "resnet18_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 564.97,
+        "latency_ms": 1.7
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.802934",
+        "rai_release": "1.7.0",
+        "model_name": "resnet34",
+        "device_name": "STX",
+        "throughput_fps": 16.35,
+        "latency_ms": 61.1
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.805820",
+        "rai_release": "1.7.0",
+        "model_name": "resnet34_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 362.6,
+        "latency_ms": 2.68
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.805820",
+        "rai_release": "1.7.0",
+        "model_name": "resnet50",
+        "device_name": "STX",
+        "throughput_fps": 14.4,
+        "latency_ms": 69.37
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.805820",
+        "rai_release": "1.7.0",
+        "model_name": "resnet50_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 252.62,
+        "latency_ms": 3.84
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.805820",
+        "rai_release": "1.7.0",
+        "model_name": "yolov8m",
+        "device_name": "STX",
+        "throughput_fps": 0.84,
+        "latency_ms": 1188.26
+    },
+    {
+        "timestamp": "2026-01-12T23:08:18.809424",
+        "rai_release": "1.7.0",
+        "model_name": "yolov8m_XINT8",
+        "device_name": "STX",
+        "throughput_fps": 28.97,
+        "latency_ms": 34.4
+    }
+]

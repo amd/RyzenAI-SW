@@ -1,5 +1,0 @@
-torch
-torchvision==0.23.0
-tqdm
-ipykernel
-matplotlib
