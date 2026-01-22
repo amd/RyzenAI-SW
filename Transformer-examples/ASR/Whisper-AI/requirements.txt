@@ -1,0 +1,9 @@
+torch==2.8.0
+torchaudio==2.8.0
+sounddevice==0.5.3
+transformers==4.52.4
+onnxsim==0.4.36
+optimum==1.27.0
+accelerate==1.11.0
+jiwer==4.0.0
+PySoundFile==0.9.0

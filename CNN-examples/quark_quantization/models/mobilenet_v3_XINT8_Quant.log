@@ -1,0 +1,84 @@
+The configuration of the quantization is Config(global_quant_config=QuantizationConfig(calibrate_method=<PowerOfTwoMethod.MinMSE: 1>, quant_format=<QuantFormat.QDQ: 1>, activation_type=<QuantType.QUInt8: 1>, weight_type=<QuantType.QInt8: 0>, input_nodes=[], output_nodes=[], op_types_to_quantize=[], nodes_to_quantize=[], extra_op_types_to_quantize=[], nodes_to_exclude=[], subgraphs_to_exclude=[], specific_tensor_precision=False, execution_providers=['CPUExecutionProvider'], per_channel=False, reduce_range=False, optimize_model=True, use_dynamic_quant=False, use_external_data_format=False, convert_fp16_to_fp32=False, convert_nchw_to_nhwc=False, include_sq=False, include_rotation=False, include_cle=True, include_auto_mp=False, include_fast_ft=False, enable_npu_cnn=True, enable_npu_transformer=False, debug_mode=False, crypto_mode=False, print_summary=True, ignore_warnings=True, log_severity_level=1, extra_options={'ActivationSymmetric': True}))
+[QUARK_INFO]: Time information:
+2025-10-14 16:50:23.009755
+[QUARK_INFO]: OS and CPU information:
+                                        system --- Windows
+                                          node --- XSJSTRXHPOMNI01
+                                       release --- 11
+                                       version --- 10.0.26100
+                                       machine --- AMD64
+                                     processor --- AMD64 Family 26 Model 36 Stepping 0, AuthenticAMD
+[QUARK_INFO]: Tools version information:
+                                        python --- 3.12.11
+                                          onnx --- 1.18.0
+                                   onnxruntime --- 1.23.0.dev20250928
+                                    quark.onnx --- 0.10+db671e3+db671e3
+[QUARK_INFO]: Quantized Configuration information:
+                                   model_input --- perf_models\mobilenet_v3.onnx
+                                  model_output --- perf_models\mobilenet_v3_XINT8.onnx
+                       calibration_data_reader --- <utils.ImageDataReader object at 0x000001A7D81D25D0>
+                         calibration_data_path --- None
+                                  quant_format --- QDQ
+                                   input_nodes --- []
+                                  output_nodes --- []
+                          op_types_to_quantize --- []
+                    extra_op_types_to_quantize --- []
+                                   per_channel --- False
+                                  reduce_range --- False
+                               activation_type --- QUInt8
+                                   weight_type --- QInt8
+                             nodes_to_quantize --- []
+                              nodes_to_exclude --- []
+                          subgraphs_to_exclude --- []
+                                optimize_model --- True
+                      use_external_data_format --- False
+                              calibrate_method --- PowerOfTwoMethod.MinMSE
+                           execution_providers --- ['CPUExecutionProvider']
+                                enable_npu_cnn --- True
+                        enable_npu_transformer --- False
+                     specific_tensor_precision --- False
+                                    debug_mode --- False
+                          convert_fp16_to_fp32 --- False
+                          convert_nchw_to_nhwc --- False
+                                   include_cle --- True
+                                    include_sq --- False
+                              include_rotation --- False
+                               include_fast_ft --- False
+                                 extra_options --- {'ActivationSymmetric': True}
++------------------------------------------------------------+
+| Op Type              | Float Model                         |
+|----------------------+-------------------------------------|
+| Conv                 | 52                                  |
+| HardSwish            | 19                                  |
+| Relu                 | 14                                  |
+| GlobalAveragePool    | 10                                  |
+| HardSigmoid          | 9                                   |
+| Mul                  | 9                                   |
+| Add                  | 6                                   |
+| Flatten              | 1                                   |
+| Gemm                 | 2                                   |
+|----------------------+-------------------------------------|
+| Quantized model path | perf_models\mobilenet_v3_XINT8.onnx |
++------------------------------------------------------------+
++------------------------------------------------------+
+| Op Type           | Activation | Weights  | Bias     |
+|-------------------+------------+----------+----------|
+| Conv              | UINT8(52)  | INT8(52) | INT8(52) |
+| HardSigmoid       | UINT8(28)  |          |          |
+| Mul               | UINT8(28)  |          |          |
+| AveragePool       | UINT8(1)   |          |          |
+| GlobalAveragePool | UINT8(10)  |          |          |
+| Add               | UINT8(6)   |          |          |
+| Flatten           | UINT8(1)   |          |          |
+| Gemm              | UINT8(2)   | INT8(2)  | INT8(2)  |
++------------------------------------------------------+
+Model Size:
+Float32 model size: 9.71 MB
+Int8 quantized model size: 2.66 MB
+Model Accuracy:
+Float32 model accuracy: Top1 0.674, Top5 0.868 
+Using TXN FORMAT 0.1
+[Vitis AI EP] No. of Operators :   CPU    62    NPU   448 VITIS_EP_CPU    70 
+[Vitis AI EP] No. of Subgraphs :   NPU    32 Actually running on NPU     32
+Int8 quantized model accuracy: Top1 0.002, Top5 0.007 
+C:\Users\dwchenna\github\amd_repo\RyzenAI-SW\tutorial\quark_quantization
