@@ -21,52 +21,53 @@ Follow the instructions at [Ryzen™ AI Software](https://ryzenai.docs.amd.com/e
 ```
  git lfs install
 ```
- - Clone the repository (or a fork of it): 
+ - Clone the repository (or a fork of it):
 ```
 git clone https://github.com/amd/RyzenAI-SW.git
 ```
-- Pull the actual LFS files: 
+- Pull the actual LFS files:
 ```
 git lfs pull
 ```
 
-To run the demos and examples in this repository, please follow the instructions of README.md in each directory. 
+To run the demos and examples in this repository, please follow the instructions of README.md in each directory.
 
 
 ## Getting Started Tutorials
 
-- [Getting started tutorial with a fine-tuned ResNet model](tutorial/getting_started_resnet)
-- [Hello world jupyter notebook tutorial](tutorial/hello_world)
-- [Getting started ResNet50 example on iGPU](example/iGPU/getting_started)
+- [Getting started tutorial with a fine-tuned ResNet model](CNN-examples/getting_started_resnet)
+- [Hello world jupyter notebook tutorial](CNN-examples/hello_world)
+- [Getting started ResNet50 example on iGPU](CNN-examples/iGPU/getting_started)
 
 ## LLM Flow
 
-- [LLMs on RyzenAI with ONNX Runtime GenAI API](example/llm/oga_api)
-- [ONNX Runtime GenAI(OGA)‑based RAG LLM](example/llm/RAG-OGA)
+- [LLMs on RyzenAI with ONNX Runtime GenAI API](LLM-examples/oga_api)
+- [ONNX Runtime GenAI(OGA)‑based RAG LLM](LLM-examples/RAG-OGA)
+- [Running Vision Language Model (VLM) on RyzenAI NPU](LLM-examples/VLM)
+- [Running GPT-OSS-20B with chat template](LLM-examples/oga_inference)
 
 ## Examples
 
 - BF16 Model Examples
-  - [Finetuned DistilBERT for Text Classification](example/DistilBERT_text_classification_bf16)
-  - [Image classification](example/image_classification)
-  - [Text Embedding Model Alibaba-NLP/gte-large-en-v1.5](example/gte-large-en-v1.5-bf16)
-- [Object detection with Yolov8](tutorial/object_detection)
-- [Automatic Speech Recognition: Step by Step guide to run Whisper-base on NPU](example/ASR/Whisper-AI) 
+  - [Finetuned DistilBERT for Text Classification](Transformer-examples/DistilBERT_text_classification_bf16)
+  - [Image classification](CNN-examples/image_classification)
+- [Object detection with Yolov8 models](CNN-examples/object_detection)
+- [Automatic Speech Recognition: Step by Step guide to run Whisper-base on NPU](Transformer-examples/ASR/Whisper-AI)
 
 
 ## Demos
 
-- [NPU-GPU pipeline on RyzenAI](demo/NPU-GPU-Pipeline)
-- [Automatic Speech Recognition using OpenAI Whisper (small, medium, large)](demo/ASR/Whisper)
+- [NPU-GPU pipeline on RyzenAI](Demos/NPU-GPU-Pipeline)
+- [Automatic Speech Recognition using OpenAI Whisper](Demos/ASR/Whisper)
 
 ## Other Tutorials
 
-- [AMD Quark Quantization](tutorial/quark_quantization)
+- [AMD Quark Quantization](CNN-examples/quark_quantization)
 - [Run Ryzen AI CVML library application](Ryzen-AI-CVML-Library)
-- [Torchvision models End-to-End inference with Ryzen AI](tutorial/torchvision_inference)
+- [Torchvision models End-to-End inference with Ryzen AI](CNN-examples/torchvision_inference)
 
 
-## Benchmarking 
+## Benchmarking
 
 - [ONNX benchmark utilities](onnx-benchmark)
 

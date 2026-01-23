@@ -42,6 +42,9 @@ namespace npu_util {
     // Checks whether the system configuration is compatible for VitisAI EP 1.6
     NPUInfo checkCompatibility_RAI_1_6();
 
+    // Checks whether the system configuration is compatable for VitisAI EP 1.7
+    NPUInfo checkCompatibility_RAI_1_7();
+
 }
 ```
 
