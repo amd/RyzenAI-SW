@@ -7,7 +7,7 @@ from pathlib import Path
 
 cache_dir = Path(__file__).parent.resolve()
 # Create session options
-session_options = onnxruntime.SessionOptions()
+session_options = ort.SessionOptions()
 session_options.log_severity_level = 1  # 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Fatal
 
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
