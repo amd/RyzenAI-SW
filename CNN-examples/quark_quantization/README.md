@@ -34,7 +34,7 @@ conda activate quark_quantization
 Add python packages needed for the tutorial:
 
 ```bash
-cd ryzenai-sw\CNN-examples\quark_quantization
+cd <ryzenai-sw>\CNN-examples\quark_quantization
 pip install -r requirements.txt
 ``` 
 
