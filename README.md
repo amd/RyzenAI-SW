@@ -53,6 +53,7 @@ To run the demos and examples in this repository, please follow the instructions
   - [Image classification](CNN-examples/image_classification)
 - [Object detection with Yolov8 models](CNN-examples/object_detection)
 - [Automatic Speech Recognition: Step by Step guide to run Whisper-base on NPU](Transformer-examples/ASR/Whisper-AI)
+- [Super-Resolution](examples/super-resolution)
 
 
 ## Demos
@@ -74,6 +75,9 @@ To run the demos and examples in this repository, please follow the instructions
 
 ## Reference
 
+- [AMD AI Developer Program](https://www.amd.com/en/developer/ai-dev-program.html)
+- [AMD Developer Community Discord](https://discord.gg/amd-dev)
+- [AMD AI Developer Forum](https://community.amd.com/t5/ai/ct-p/amd_ai)
 - [Ryzen™ AI Developer Guide](https://ryzenai.docs.amd.com/en/latest)
 - [ONNX Runtime Vitis-AI EP](https://onnxruntime.ai/docs/execution-providers/Vitis-AI-ExecutionProvider.html)
-- [AMD AI Developer Forum](https://community.amd.com/t5/ai/ct-p/amd_ai)
+
