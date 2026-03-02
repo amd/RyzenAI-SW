@@ -1,0 +1,39 @@
+# Applications
+
+> AI applications optimized for AMD Ryzen AI hardware, running locally on NPU and GPU.
+
+# Applications
+
+AI applications optimized for AMD Ryzen AI hardware, running locally on NPU and GPU.
+
+| Application | Developer | Description | NPU | GPU |
+|------------|-----------|-------------|-----|-----|
+| [AI Toolkit for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio) | Microsoft | AI model development toolkit for Visual Studio Code | | Yes |
+| [Amuse](https://www.tensorstack.ai/amuse) | TensorStack | AI image generation desktop application | Yes | Yes |
+| [AnythingLLM](https://anythingllm.com/) | Mintplex Labs | All-in-one desktop LLM application | Yes | |
+| [Belt Desktop](https://belt.ai) | Belt AI | Local AI assistant for productivity | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/belt.html) | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/belt.html) |
+| [Camo Studio](https://reincubate.com) | Reincubate | AI-powered webcam with background effects | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/camo.html) | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/camo.html) |
+| [CodeGPT](https://codegpt.co/) | CodeGPT | AI code assistant for VS Code | Yes | |
+| [ComfyUI](https://github.com/comfyanonymous/ComfyUI) | Comfy Org | Node-based Stable Diffusion workflow editor | Yes | Yes |
+| [Continue](https://continue.dev/) | Continue | Open-source AI code assistant for VS Code and JetBrains | Yes | |
+| [FastFlowLM](https://fastflowlm.com/) | FastFlowLM | High-performance local LLM inference engine | Yes | |
+| [GAIA](https://github.com/amd/gaia) | AMD | Open-source local AI agent framework | [Yes](https://github.com/amd/gaia#features) | [Yes](https://github.com/amd/gaia#features) |
+| [Generate](https://iterate.ai/platform/generate) | Iterate.ai | Enterprise AI platform for building AI applications | [Yes](https://www.amd.com/en/resources/case-studies/iterate-ai.html) | [Yes](https://www.amd.com/en/resources/case-studies/iterate-ai.html) |
+| [Hyperlink](https://hyperlink.nexa.ai) | Nexa AI | Local AI-powered web browser | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/nexa.html) | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/nexa.html) |
+| [Lemonade](https://github.com/lemonade-sdk/lemonade) | AMD | LLM serving platform with OpenAI-compatible API | [Yes](https://github.com/lemonade-sdk/lemonade#supported-hardware) | [Yes](https://github.com/lemonade-sdk/lemonade#supported-hardware) |
+| [LM Studio](https://lmstudio.ai) | LM Studio | Desktop application for running local LLMs | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/lm-studio.html) | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/lm-studio.html) |
+| [LM-Eval](https://github.com/EleutherAI/lm-evaluation-harness) | EleutherAI | LLM evaluation and benchmarking harness | Yes | |
+| [Open WebUI](https://openwebui.com/) | Open WebUI | Self-hosted LLM chat interface | Yes | |
+| [Promeo](https://www.cyberlink.com) | CyberLink | AI video creation and editing suite | Yes | Yes |
+| [Render FX](https://www.distinctplugins.io/renderfx) | Distinct AI | Real-time AI image generation plugin | | Yes |
+| [Scam Detector](https://www.mcafee.com) | McAfee | AI-powered scam and phishing detection | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/mcafee.html) | |
+| [Video AI](https://www.topazlabs.com/video-ai) | Topaz Labs | AI video enhancement and upscaling | | [Yes](https://gpuopen.com/learn/topaz-labs-brings-generative-ai-video-enhancement/) |
+| [Voicemod](https://www.voicemod.net) | Voicemod | Real-time AI voice changer | | [Yes](https://www.amd.com/en/ecosystem/isv/consumer-partners/voicemod.html) |
+
+## Lemonade Server Compatibility
+
+[Lemonade](https://github.com/lemonade-sdk/lemonade) is AMD's open-source LLM serving platform. It provides an [OpenAI-compatible REST API](/models-tutorials/llms/server-interface) that allows any application supporting the OpenAI API standard to run LLMs locally on Ryzen AI hardware. Applications marked with NPU support above can use Lemonade Server as a backend for local inference.
+
+:::tip
+Want to build your own application on Ryzen AI? See the [Develop & Tools](/develop) section for SDK documentation and the [Models & Tutorials](/models-tutorials) section for supported models.
+:::

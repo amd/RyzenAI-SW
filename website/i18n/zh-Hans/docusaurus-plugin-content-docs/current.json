@@ -1,0 +1,46 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.mainSidebar.category.Getting Started": {
+    "message": "快速入门",
+    "description": "The label for category 'Getting Started' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Models & Tutorials": {
+    "message": "模型和教程",
+    "description": "The label for category 'Models & Tutorials' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Audio": {
+    "message": "音频",
+    "description": "The label for category 'Audio' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Large Language Models": {
+    "message": "大语言模型",
+    "description": "The label for category 'Large Language Models' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Multimodal": {
+    "message": "多模态",
+    "description": "The label for category 'Multimodal' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Vision": {
+    "message": "视觉",
+    "description": "The label for category 'Vision' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Develop": {
+    "message": "开发",
+    "description": "The label for category 'Develop' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Tools": {
+    "message": "工具",
+    "description": "The label for category 'Tools' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Reference": {
+    "message": "参考",
+    "description": "The label for category 'Reference' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.doc.Changelog": {
+    "message": "更新日志",
+    "description": "The label for the doc item 'Changelog' in sidebar 'mainSidebar', linking to the doc reference/changelog"
+  }
+}

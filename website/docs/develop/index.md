@@ -1,0 +1,44 @@
+# Develop & Tools
+
+> import CIStatus from '@site/src/components/CIStatus';
+
+import CIStatus from '@site/src/components/CIStatus';
+
+# Develop & Tools
+
+<CIStatus validated={false} />
+
+Libraries, SDKs, and developer tools for building applications on AMD Ryzen AI hardware. This section covers application development, model deployment, quantization, analysis tools, and GPU acceleration.
+
+## Development Guides
+
+| Area | Description |
+|------|-------------|
+| [Application Development Guide](/develop/app-development) | Requirements and recommendations for creating, packaging, and distributing NPU-enabled applications |
+| [CVML Library Guide](/develop/cvml-library) | Optimized computer vision pipelines for C++ applications |
+| [DirectML Flow (GPU)](/develop/rocm-client-gpu) | Run models on Ryzen AI GPU using DirectML with Microsoft Olive |
+| [Model Deployment](/develop/model-deployment) | Load, compile, and run ONNX models using the Vitis AI Execution Provider |
+| [Model Quantization (AMD Quark)](/develop/model-quantization) | Quantize models to BF16 or INT8 for efficient NPU deployment |
+| [ONNX Model Preparation](/develop/onnx-model-preparation) | Prepare LLMs for Ryzen AI using quantization and postprocessing |
+| [Operator Preparation](/develop/operator-preparation) | Compile custom operators for fine-tuned OGA models |
+
+## Tools & Tutorials
+
+| Tool | Description |
+|------|-------------|
+| [AI Analyzer](/tools/ai-analyzer) | Profile and analyze model performance on Ryzen AI |
+| [CVML Library Tutorial](/models-tutorials/vision/cvml) | Hands-on tutorial for the CVML computer vision SDK |
+| [NPU Benchmark](/tools/benchmarking) | Benchmark ONNX model inference (FPS, latency, power) |
+| [NPU Check Utility](/tools/npu-check) | C++ utility to check NPU compatibility and driver status |
+| [NPU Management](/tools/npu-management) | NPU device management and monitoring |
+| [Quark Quantization Tutorial](/models-tutorials/vision/quark-quantization) | Step-by-step model quantization with AMD Quark |
+| [Torchvision Inference](/models-tutorials/vision/torchvision-inference) | Run any torchvision model on Ryzen AI NPU |
+
+## SDKs and APIs
+
+| SDK | Language | Description |
+|-----|----------|-------------|
+| [CVML Library](/develop/cvml-library) | C++ | Optimized computer vision pipelines |
+| [Lemonade Python SDK](/models-tutorials/llms/python-api) | Python | High-level Python SDK for LLM inference |
+| [Lemonade Server](/models-tutorials/llms/server-interface) | REST | OpenAI-compatible REST API for LLM serving |
+| [OGA Flow (C++/Python)](/models-tutorials/llms/hybrid-inference) | C++, Python | ONNX Runtime GenAI for hybrid and NPU-only LLM inference |

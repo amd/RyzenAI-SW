@@ -1,0 +1,7 @@
+onnxruntime-vitisai>=1.0.0
+numpy>=1.24.0
+transformers>=4.36.0
+huggingface-hub>=0.20.0
+torch>=2.0.0
+Pillow>=10.0.0
+datasets>=2.16.0

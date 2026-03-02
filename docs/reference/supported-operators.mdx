@@ -1,0 +1,134 @@
+---
+title: Supported Operators
+sidebar_position: 4
+ci_validated: false
+ci_last_run: 2026-02-27
+---
+
+import CIStatus from '@site/src/components/CIStatus';
+
+<CIStatus validated={false} />
+The following table lists the ONNX operators supported in Ryzen AI 1.7.0. The operators are categorized by their support for different quantization types: BF16, A16W8, A8W8, and XINT8. A "Y" indicates that Ryzen AI provides broad coverage for that operator and for that specific quantization type for CNN and NLP models. Some specific configurations of that operator may however not be fully supported.
+
+| Ops | BF16 | A16W8 | A8W8 | XINT8 |
+|-----|------|-------|------|-------|
+| Abs | Y | | | Y |
+| Add | Y | Y | Y | Y |
+| And | Y | | | Y |
+| ArgMax | Y | | | Y |
+| ArgMin | Y | | | Y |
+| AveragePool | Y | Y | Y | Y |
+| BatchNormalization | Y | Y | Y | Y |
+| BitShift | Y | | | Y |
+| BitwiseAnd | Y | | | Y |
+| BitwiseNot | Y | | | Y |
+| BitwiseOr | Y | | | Y |
+| BitwiseXor | Y | | | Y |
+| Cast | Y | | | Y |
+| Ceil | Y | | | Y |
+| Celu | | | | Y |
+| Clip | | Y | Y | Y |
+| Concat | Y | Y | Y | Y |
+| Constant | Y | Y | Y | Y |
+| ConstantOfShape | Y | Y | Y | Y |
+| Conv | Y | Y | Y | Y |
+| ConvTranspose | Y | Y | Y | |
+| Cos | | Y | Y | |
+| CumSum | Y | | | Y |
+| DepthToSpace | Y | Y | Y | Y |
+| DequantizeLinear | | Y | Y | Y |
+| Div | Y | Y | Y | Y |
+| Einsum | Y | | | |
+| Elu | | Y | | Y |
+| Equal | Y | | | Y |
+| Erf | Y | | | Y |
+| Exp | Y | Y | | |
+| Expand | Y | Y | Y | Y |
+| Flatten | Y | Y | Y | Y |
+| Floor | Y | | | Y |
+| Gather | Y | | | |
+| GatherElements | Y | Y | | |
+| Gelu | | Y | Y | Y |
+| Gemm | Y | Y | Y | Y |
+| GlobalAveragePool | Y | Y | Y | Y |
+| GlobalMaxPool | | Y | Y | Y |
+| Greater | Y | | | Y |
+| GreaterOrEqual | | | | Y |
+| GridSample | Y | | | |
+| GroupConv | Y | | | |
+| GroupNormalization | | Y | Y | Y |
+| HardSigmoid | | | Y | |
+| HardSwish | | | Y | Y |
+| Identity | Y | Y | Y | Y |
+| InstanceNormalization | Y | Y | Y | Y |
+| LSTM | Y | | | |
+| LayerNormalization | | | | Y |
+| LeakyRelu | | Y | Y | Y |
+| Less | Y | | | Y |
+| LessOrEqual | | | | Y |
+| Log | Y | | | Y |
+| MatMul | Y | Y | Y | Y |
+| Max | Y | Y | Y | Y |
+| MaxPool | Y | Y | Y | Y |
+| Min | Y | Y | Y | Y |
+| Mish | | | | Y |
+| Mod | Y | | | |
+| Mul | Y | Y | Y | Y |
+| Neg | Y | | | Y |
+| Not | Y | | | |
+| Or | Y | | | Y |
+| Pad | Y | Y | Y | Y |
+| Pow | Y | | | Y |
+| QLinearConv | | Y | Y | |
+| QLinearMatMul | | | Y | |
+| QuantizeLinear | | Y | Y | |
+| Range | | | | Y |
+| Reciprocal | Y | Y | Y | Y |
+| ReduceMax | Y | Y | Y | Y |
+| ReduceMean | Y | | Y | Y |
+| ReduceMin | Y | | | Y |
+| ReduceSum | Y | | | Y |
+| Relu | | Y | Y | Y |
+| Reshape | Y | Y | Y | Y |
+| Resize | Y | | Y | Y |
+| Round | Y | | | Y |
+| STFT | | | | Y |
+| ScatterND | Y | | | |
+| Shape | Y | Y | Y | Y |
+| Shrink | | | | Y |
+| Sigmoid | Y | Y | | |
+| Sign | Y | | | Y |
+| Sin | Y | Y | | |
+| Size | Y | | | |
+| Slice | Y | Y | Y | Y |
+| Softmax | | Y | Y | Y |
+| Softsign | | | | Y |
+| Split | Y | Y | | |
+| Sqrt | Y | Y | Y | Y |
+| Squeeze | Y | Y | Y | Y |
+| Sub | Y | Y | Y | Y |
+| Tanh | Y | Y | | Y |
+| ThresholdedRelu | | | | Y |
+| Tile | Y | | | Y |
+| TopK | | Y | | Y |
+| Transpose | Y | Y | Y | Y |
+| Unsqueeze | Y | Y | Y | Y |
+| Upsample | | Y | Y | Y |
+| Upsample (deprecated) | Y | | | |
+| Where | Y | Y | | Y |
+| Xor | Y | | | |
+
+## LLM Operator support
+
+The Ryzen AI LLM execution flow supports ONNX Runtime GenAI-based models with the following operators:
+
+- SimplifiedLayerNormalization
+- SkipSimplifiedLayerNormalization
+- MatMulNBits (W4ABF16/W4ABFP16)
+- Add
+- RotaryEmbedding
+- GroupQueryAttention
+- Sigmoid
+- Mul
+
+These operators are optimized for execution on the Ryzen AI NPU via the ONNX Runtime GenAI framework.

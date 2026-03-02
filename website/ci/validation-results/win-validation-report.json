@@ -1,0 +1,203 @@
+{
+  "total": 502,
+  "passed": 463,
+  "failed": 39,
+  "skipped": 10,
+  "failures": [
+    {
+      "file": "docs\\models-tutorials\\audio\\whisper\\run_whisper.py",
+      "test_type": "import",
+      "error": "Missing imports: jiwer, sounddevice, torchaudio"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\llm-sft-deploy\\quark_utils.py",
+      "test_type": "import",
+      "error": "Missing imports: accelerate"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\llm-sft-deploy\\train.py",
+      "test_type": "import",
+      "error": "Missing imports: accelerate, peft, trl, wandb"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\RAG-OGA\\custom_embedding\\custom_embedding.py",
+      "test_type": "import",
+      "error": "Missing imports: langchain_core"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\RAG-OGA\\custom_llm\\custom_llm.py",
+      "test_type": "import",
+      "error": "Missing imports: langchain_core"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\RAG-OGA\\Dataset\\ryzenAI_sw_rst_files.py",
+      "test_type": "import",
+      "error": "Missing imports: git"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\RAG-OGA\\gradio_app.py",
+      "test_type": "import",
+      "error": "Missing imports: custom_embedding, gradio, langchain_community, langchain_core, langchain_text_splitters"
+    },
+    {
+      "file": "docs\\models-tutorials\\llms\\RAG-OGA\\rag.py",
+      "test_type": "import",
+      "error": "Missing imports: custom_embedding, langchain_community, langchain_core, langchain_text_splitters"
+    },
+    {
+      "file": "docs\\models-tutorials\\multimodal\\npu-gpu-pipeline\\pipeline.py",
+      "test_type": "import",
+      "error": "Missing imports: olive, ort_util_img2img"
+    },
+    {
+      "file": "docs\\models-tutorials\\multimodal\\npu-gpu-pipeline\\stable_diffusion\\ort_util_img2img.py",
+      "test_type": "import",
+      "error": "Missing imports: olive"
+    },
+    {
+      "file": "docs\\models-tutorials\\multimodal\\npu-gpu-pipeline\\stable_diffusion\\stable_diffusion.py",
+      "test_type": "import",
+      "error": "Missing imports: olive"
+    },
+    {
+      "file": "docs\\models-tutorials\\multimodal\\npu-gpu-pipeline\\utils_img2img.py",
+      "test_type": "import",
+      "error": "Missing imports: pkg_resources, torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\getting_started_resnet\\bf16\\app\\prepare_test_images.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\getting_started_resnet\\bf16\\export_to_onnx.py",
+      "test_type": "import",
+      "error": "Missing imports: timm"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\getting_started_resnet\\bf16\\prepare_model_data.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\getting_started_resnet\\int8\\prepare_model_data.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\getting_started_resnet\\int8\\resnet_quantize.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\image_classification\\models\\download_ResNet.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\image_classification\\utils.py",
+      "test_type": "import",
+      "error": "Missing imports: timm, torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\object_detection\\yolov8m\\prepare_data.py",
+      "test_type": "import",
+      "error": "Missing imports: wget"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\object_detection\\yolov8m\\utils.py",
+      "test_type": "import",
+      "error": "Missing imports: pycocotools"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\object_detection\\yolov8s-worldv2\\eval_on_coco.py",
+      "test_type": "import",
+      "error": "Missing imports: pycocotools"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\object_detection\\yolov8s-worldv2\\infer_single.py",
+      "test_type": "import",
+      "error": "Missing imports: pycocotools"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\object_detection\\yolov8s-worldv2\\ultra_yolo_to_onnx.py",
+      "test_type": "import",
+      "error": "Missing imports: onnx_graphsurgeon, ultralytics"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\quark_quantization\\models\\download_MobileNetV2.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\quark_quantization\\models\\download_ResNet.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\quark_quantization\\utils.py",
+      "test_type": "import",
+      "error": "Missing imports: timm, torchvision"
+    },
+    {
+      "file": "docs\\models-tutorials\\vision\\torchvision_inference\\classification.py",
+      "test_type": "import",
+      "error": "Missing imports: torchvision"
+    },
+    {
+      "file": "docs\\tools\\benchmarking\\benchmark_gui.py",
+      "test_type": "import",
+      "error": "Missing imports: pyperclip"
+    },
+    {
+      "file": "docs\\tools\\benchmarking\\performance_benchmark.py",
+      "test_type": "import",
+      "error": "Missing imports: keyboard"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0084.py",
+      "test_type": "syntax",
+      "error": "File \"C:\\Users\\bconsolvo\\code\\RyzenAI-SW\\docs\\website\\ci\\extracted-blocks\\block_0084.py\", line 5\n    Use: ``inference.py`` to run inference on GPU . <br/>\n         ^\nSyntaxError: invalid syntax"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0090.py",
+      "test_type": "import",
+      "error": "Missing imports: lemonade"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0098.py",
+      "test_type": "syntax",
+      "error": "File \"C:\\Users\\bconsolvo\\code\\RyzenAI-SW\\docs\\website\\ci\\extracted-blocks\\block_0098.py\", line 3\n    set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>\n        ^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0139.py",
+      "test_type": "syntax",
+      "error": "File \"C:\\Users\\bconsolvo\\code\\RyzenAI-SW\\docs\\website\\ci\\extracted-blocks\\block_0139.py\", line 3\n    set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>\n        ^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0143.py",
+      "test_type": "syntax",
+      "error": "File \"C:\\Users\\bconsolvo\\code\\RyzenAI-SW\\docs\\website\\ci\\extracted-blocks\\block_0143.py\", line 3\n    set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>\n        ^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0174.py",
+      "test_type": "syntax",
+      "error": "File \"C:\\Users\\bconsolvo\\code\\RyzenAI-SW\\docs\\website\\ci\\extracted-blocks\\block_0174.py\", line 3\n    set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>\n        ^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0197.py",
+      "test_type": "import",
+      "error": "Missing imports: utils"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0200.py",
+      "test_type": "import",
+      "error": "Missing imports: utils"
+    },
+    {
+      "file": "docs\\website\\ci\\extracted-blocks\\block_0227.py",
+      "test_type": "import",
+      "error": "Missing imports: ryzenai"
+    }
+  ]
+}

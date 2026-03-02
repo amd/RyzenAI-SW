@@ -1,0 +1,21 @@
+# ResNet INT8 Quantization
+
+> {/* AUTO-GENERATED from vision/getting_started_resnet/int8/README.md -- do not edit directly. */}
+{/* Run "node website/scripts/sync-examples.mjs" after updating the source. */}
+
+{/* AUTO-GENERATED from vision/getting_started_resnet/int8/README.md -- do not edit directly. */}
+{/* Run "node website/scripts/sync-examples.mjs" after updating the source. */}
+
+import CIStatus from '@site/src/components/CIStatus';
+
+<CIStatus validated={false} />
+
+:::info Source Code
+Clone the repo and find this example at [`examples/vision/getting_started_resnet/int8/`](https://github.com/amd/RyzenAI-SW/tree/main/examples/vision/getting_started_resnet/int8).
+:::
+
+# Getting Started Example
+
+This tutorial uses a fine-tuned version of the ResNet model (using the CIFAR-10 dataset) to demonstrate the process of preparing, quantizing, and deploying a model using Ryzen AI Software. The tutorial features deployment using both Python and C++ ONNX runtime code.
+
+For a walkthrough of this tutorial please follow the [tutorial documentation](https://ryzenai.docs.amd.com/en/latest/getstartex.html)
