@@ -1,0 +1,74 @@
+---
+title: Examples & Demos
+sidebar_position: 1
+ci_validated: false
+ci_last_run: 2026-02-27
+---
+
+import CIStatus from '@site/src/components/CIStatus';
+
+# Examples and Demos
+
+<CIStatus validated={false} />
+
+All examples are available in the [RyzenAI-SW GitHub repository](https://github.com/amd/RyzenAI-SW).
+
+## Vision Examples
+
+| Example | Description | Device | Language | Link |
+|---------|-------------|--------|----------|------|
+| Hello World | Simple ONNX model on NPU | NPU | Python | [Code](/models-tutorials/vision/hello-world) |
+| ResNet CIFAR-10 (INT8) | Image classification with INT8 quantization | NPU | Python, C++ | [Code](/models-tutorials/vision/getting-started-resnet/int8) |
+| ResNet CIFAR-10 (BF16) | Image classification with BF16 | NPU | Python, C++ | [Code](/models-tutorials/vision/getting-started-resnet/bf16) |
+| ResNet-50 ImageNet | BF16 image classification on ImageNet | NPU | Python | [Code](/models-tutorials/vision/image-classification) |
+| YOLOv8m Object Detection | BF16 and XINT8 object detection | NPU | Python | [Code](/models-tutorials/vision/object-detection/yolov8m) |
+| YOLOv8s-WorldV2 | Open-vocabulary object detection | NPU | Python | [Code](/models-tutorials/vision/object-detection/yolov8s-worldv2) |
+| Torchvision Models | Run torchvision models on NPU | NPU | Python, Jupyter | [Code](/models-tutorials/vision/torchvision-inference) |
+| Quark Quantization | Quantize models with AMD Quark | NPU | Python | [Code](/models-tutorials/vision/quark-quantization) |
+| ResNet-50 on iGPU | Image classification on integrated GPU | iGPU | Python, C++ | [Code](/models-tutorials/vision/igpu-getting-started) |
+| Super Resolution | Real-ESRGAN and SESR-M7 | NPU | - | [Tutorial](/models-tutorials/vision/super-resolution) |
+| Stable Diffusion | SD 1.5 to 3.5 on iGPU | iGPU | Python | [Tutorial](/models-tutorials/vision/stable-diffusion) |
+
+## LLM Examples
+
+| Example | Description | Device | Language | Link |
+|---------|-------------|--------|----------|------|
+| OGA Python Inference | Chat with LLMs using OGA Python API | NPU, Hybrid | Python | [Code](/models-tutorials/llms/oga-inference) |
+| OGA C++ API | Native C++ LLM inference | NPU, Hybrid | C++ | [Code](/models-tutorials/llms/oga-api) |
+| LLM Fine-Tuning & Deploy | Fine-tune and deploy LLMs on NPU | NPU | Python | [Code](/models-tutorials/llms/llm-sft-deploy) |
+| Vision-Language Model | Run VLMs with OGA | NPU | Python | [Code](/models-tutorials/llms/vlm) |
+| RAG with OGA | Retrieval-augmented generation | NPU | Python | [Code](/models-tutorials/llms/rag-oga) |
+
+## Audio Examples
+
+| Example | Description | Device | Language | Link |
+|---------|-------------|--------|----------|------|
+| Whisper ASR | Speech-to-text with Whisper | NPU | Python | [Code](/models-tutorials/audio/whisper) |
+
+## NLP Examples
+
+| Example | Description | Device | Language | Link |
+|---------|-------------|--------|----------|------|
+| DistilBERT Text Classification | BF16 text classification | NPU | Python | [Code](/models-tutorials/nlp/distilbert) |
+
+## End-to-End Demos
+
+| Demo | Description | Devices | Link |
+|------|-------------|---------|------|
+| NPU-GPU Pipeline | YOLOv8 + RCAN on NPU, Stable Diffusion on iGPU | NPU + iGPU | [Code](/models-tutorials/multimodal/npu-gpu-pipeline) |
+| Whisper ASR Demo | Real-time speech-to-text | NPU | [Code](/models-tutorials/audio/whisper) |
+
+## Tools
+
+| Tool | Description | Link |
+|------|-------------|------|
+| ONNX Benchmark | Benchmark ONNX model inference (FPS, latency, power) | [Code](/tools/benchmarking) |
+| NPU Check Utility | C++ utility to check NPU compatibility | [Code](/tools/npu-check) |
+
+## CVML Library Samples
+
+| Sample | Description | Link |
+|--------|-------------|------|
+| Face Detection | Real-time face detection | [Code](/models-tutorials/vision/cvml/face-detection) |
+| Face Mesh | Face landmark detection | [Code](/models-tutorials/vision/cvml/face-mesh) |
+| Depth Estimation | Monocular depth estimation | [Code](/models-tutorials/vision/cvml) |

@@ -1,0 +1,46 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.mainSidebar.category.Getting Started": {
+    "message": "Primeros Pasos",
+    "description": "The label for category 'Getting Started' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Models & Tutorials": {
+    "message": "Modelos y Tutoriales",
+    "description": "The label for category 'Models & Tutorials' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Audio": {
+    "message": "Audio",
+    "description": "The label for category 'Audio' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Large Language Models": {
+    "message": "Modelos de Lenguaje Grande",
+    "description": "The label for category 'Large Language Models' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Multimodal": {
+    "message": "Multimodal",
+    "description": "The label for category 'Multimodal' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Vision": {
+    "message": "Visión",
+    "description": "The label for category 'Vision' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Develop": {
+    "message": "Desarrollo",
+    "description": "The label for category 'Develop' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Tools": {
+    "message": "Herramientas",
+    "description": "The label for category 'Tools' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.category.Reference": {
+    "message": "Referencia",
+    "description": "The label for category 'Reference' in sidebar 'mainSidebar'"
+  },
+  "sidebar.mainSidebar.doc.Changelog": {
+    "message": "Registro de Cambios",
+    "description": "The label for the doc item 'Changelog' in sidebar 'mainSidebar', linking to the doc reference/changelog"
+  }
+}

@@ -1,0 +1,10 @@
+# Extracted from C:\Users\bconsolvo\code\RyzenAI-SW\docs\models-tutorials\vision\stable-diffusion.mdx:93
+python run_sd.py    --model_id "stable-diffusion-v1-5/stable-diffusion-v1-5" --model_path ..\models\sd15_bfp\ --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd.py    --model_id "stabilityai/stable-diffusion-2-1-base" --model_path ..\models\sd21_base_bfp --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd.py    --model_id "stabilityai/stable-diffusion-2-1" --model_path ..\models\sd-2.1-v\ --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd.py    --model_id "stabilityai/sd-turbo" --model_path ..\models\sd_turbo_bfp --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd.py    --model_id "stabilityai/sd-turbo" --model_path ..\models\sd_turbo_bs1_bfp --num_images_per_prompt 1 --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd_xl.py --model_id "stabilityai/sdxl-turbo" --model_path ..\models\sdxl_turbo_bfp --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd_xl.py --model_id "stabilityai/sdxl-turbo" --model_path ..\models\sdxl_turbo_bs1_bfp --num_images_per_prompt 1 --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd_xl.py --model_id "stabilityai/stable-diffusion-xl-base-1.0"  --model_path ..\models\sdxl-base-1.0_bfp\ --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"
+python run_sd_xl.py --model_id "segmind/Segmind-Vega" --model_path ..\models\segmind-vega_bfp\ --custom_op_path "C:\Program Files\RyzenAI\1.7.0\deployment\onnx_custom_ops.dll"

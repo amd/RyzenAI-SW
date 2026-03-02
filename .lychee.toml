@@ -1,0 +1,56 @@
+## Lychee link checker configuration
+## https://lychee.cli.rs/usage/config/
+
+# Check external links (HTTP/HTTPS)
+include_verbatim = true
+
+# Timeout per request (seconds)
+timeout = 30
+
+# Max retries per link
+max_retries = 3
+
+# Max concurrent requests
+max_concurrency = 8
+
+# User-agent string (some sites block bots)
+user_agent = "Mozilla/5.0 (compatible; lychee/0.23; +https://github.com/lycheeverse/lychee)"
+
+# Accept these HTTP status codes as valid
+accept = [200, 204, 301, 302, 307, 308]
+
+# Exclude private/internal IPs
+exclude_all_private = true
+
+# Do not check mail addresses
+include_mail = false
+
+# Glob patterns for files to skip
+exclude_path = [
+  "docs/website/node_modules/**",
+  "docs/website/.docusaurus/**",
+  "docs/website/build/**",
+  "docs/templates/**",
+]
+
+# URL patterns to exclude from checking (regex)
+exclude = [
+  # AMD websites have HTTP/2 protocol issues with automated checkers
+  "https://www\\.amd\\.com/.*",
+  "https://community\\.amd\\.com/.*",
+  # AMD account-gated downloads (require login)
+  "https://account\\.amd\\.com/.*",
+  # Hugging Face model repos (rate-limited / gated)
+  "https://huggingface\\.co/amd/.*",
+  "https://huggingface\\.co/collections/.*",
+  "https://hf\\.co/.*",
+  # localhost references (used in code examples)
+  "http://localhost.*",
+  "http://127\\.0\\.0\\.1.*",
+  # PyPI simple index (not browsable)
+  "https://pypi\\.amd\\.com/.*",
+  # Lunarg URLs with shell variables
+  ".*\\$UBUNTU_CODENAME.*",
+  # Reacher API endpoint (not a browsable URL)
+  "https://api\\.reacher\\.email/.*",
+]

@@ -1,0 +1,91 @@
+# CODEOWNERS - Ryzen AI Software
+#
+# Each path has a designated owner who must approve PRs touching that path.
+# Replace @bconsolvo placeholders with actual GitHub usernames as the team grows.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ──────────────────────────────────────────────
+# Default owner (catch-all for anything not listed below)
+# ──────────────────────────────────────────────
+*                                               @bconsolvo
+
+# ──────────────────────────────────────────────
+# Repository root files
+# ──────────────────────────────────────────────
+/*.md                                           @bconsolvo
+/LICENSE                                        @bconsolvo
+/CODEOWNERS                                     @bconsolvo
+/.gitignore                                     @bconsolvo
+/.gitattributes                                 @bconsolvo
+/.lychee.toml                                   @bconsolvo
+
+# ──────────────────────────────────────────────
+# CI/CD workflows (all managed together)
+# ──────────────────────────────────────────────
+/.github/                                       @bconsolvo
+
+# ──────────────────────────────────────────────
+# Website infrastructure (Docusaurus config, theme, scripts, i18n)
+# ──────────────────────────────────────────────
+/website/                                       @bconsolvo
+
+# ══════════════════════════════════════════════
+# DOCUMENTATION (docs/)
+# ══════════════════════════════════════════════
+
+# ──────────────────────────────────────────────
+# Getting Started
+# ──────────────────────────────────────────────
+/docs/getting-started/installation.mdx          @bconsolvo
+/docs/getting-started/overview.mdx              @bconsolvo
+/docs/getting-started/quickstart.mdx            @bconsolvo
+/docs/getting-started/supported-hardware.mdx    @bconsolvo
+
+# ──────────────────────────────────────────────
+# Applications
+# ──────────────────────────────────────────────
+/docs/applications/                             @bconsolvo
+
+# ──────────────────────────────────────────────
+# Models & Tutorials - Overview
+# ──────────────────────────────────────────────
+/docs/models-tutorials/index.mdx                @bconsolvo
+/docs/models-tutorials/examples.mdx             @bconsolvo
+
+# Models & Tutorials - Audio (docs + examples)
+/docs/models-tutorials/audio/                   @bconsolvo
+/examples/audio/                                @bconsolvo
+
+# Models & Tutorials - Large Language Models (docs + examples)
+/docs/models-tutorials/llms/                    @bconsolvo
+/examples/llms/                                 @bconsolvo
+
+# Models & Tutorials - Multimodal (docs + examples)
+/docs/models-tutorials/multimodal/              @bconsolvo
+/examples/multimodal/                           @bconsolvo
+
+# Models & Tutorials - NLP (docs + examples)
+/docs/models-tutorials/nlp/                     @bconsolvo
+/examples/nlp/                                  @bconsolvo
+
+# Models & Tutorials - Vision (docs + examples)
+/docs/models-tutorials/vision/                  @bconsolvo
+/examples/vision/                               @bconsolvo
+
+# ──────────────────────────────────────────────
+# Develop & Tools (docs + examples)
+# ──────────────────────────────────────────────
+/docs/develop/                                  @bconsolvo
+/docs/tools/                                    @bconsolvo
+/examples/tools/                                @bconsolvo
+
+# ──────────────────────────────────────────────
+# Reference
+# ──────────────────────────────────────────────
+/docs/reference/                                @bconsolvo
+
+# ──────────────────────────────────────────────
+# Site map
+# ──────────────────────────────────────────────
+/docs/README.mdx                                @bconsolvo

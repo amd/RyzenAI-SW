@@ -1,0 +1,50 @@
+# Vision: Supported Models
+
+> import CIStatus from '@site/src/components/CIStatus';
+
+import CIStatus from '@site/src/components/CIStatus';
+
+# Vision: Supported Models
+
+<CIStatus validated={false} />
+
+These vision models have examples in the [RyzenAI-SW repository](https://github.com/amd/RyzenAI-SW). CNN models run on the NPU via the Vitis AI Execution Provider; Stable Diffusion models run on the iGPU via DirectML.
+
+For tutorials, see [CNN Examples](/models-tutorials/vision/cnn-examples) and [Stable Diffusion](/models-tutorials/vision/stable-diffusion).
+
+## CNN Models (NPU)
+
+Examples in [`CNN-examples/`](/models-tutorials/vision/cnn-examples):
+
+| Model | Task | Quantization | Example Location | Verified |
+|-------|------|-------------|------------------|----------|
+| ResNet-50 | Image Classification | INT8 (XINT8) | `getting_started_resnet/int8/` | Pending |
+| ResNet-50 | Image Classification | BF16 | `getting_started_resnet/bf16/` | Pending |
+| ResNet-50 | Image Classification | FP32 (iGPU, DirectML) | `iGPU/getting_started/` | Pending |
+| YOLOv8m | Object Detection | BF16, XINT8 | `object_detection/yolov8m/` | Pending |
+| YOLOv8s-WorldV2 | Object Detection | A16W8 | `object_detection/yolov8s-worldv2/` | Pending |
+| MobileNetV2 | Image Classification | INT8 (Quark) | `quark_quantization/` | Pending |
+
+## Super Resolution (NPU)
+
+Examples in [Super Resolution](/models-tutorials/vision/super-resolution):
+
+| Model | Task | Example Location | Verified |
+|-------|------|------------------|----------|
+| Real-ESRGAN | Super Resolution (4x) | `examples/super-resolution/` | Pending |
+| SESR-M7 | Super Resolution (2x) | `examples/super-resolution/` | Pending |
+
+## Stable Diffusion (iGPU via DirectML)
+
+Examples in [`Demos/NPU-GPU-Pipeline/`](/models-tutorials/multimodal/npu-gpu-pipeline):
+
+| Model | Task | Verified |
+|-------|------|----------|
+| Stable Diffusion 1.5 | Image Generation | Pending |
+| Stable Diffusion 2.1 | Image Generation | Pending |
+| Stable Diffusion XL | Image Generation | Pending |
+| Stable Diffusion 3.5 | Image Generation | Pending |
+
+:::note
+The Stable Diffusion demo instructions are in the [Stable Diffusion tutorial](/models-tutorials/vision/stable-diffusion). These models run on the integrated GPU, not the NPU.
+:::

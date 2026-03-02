@@ -1,8 +1,70 @@
-*~
-*.swp
-__pycache__
-*node_modules*
-*.yml
+# Dependencies
+node_modules/
+
+# Docusaurus
+.docusaurus/
+build/
+.cache-loader
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# CI artifacts
+docs/website/ci/validation-results/
+docs/website/ci/extracted-blocks/
+docs/website/ci/model-validation/results/*.tmp
+
+# Generated docs (from docusaurus-plugin-llms)
+# The plugin copies .mdx content as .md into the website dir
+docs/website/docs/
+docs/website/applications/*.md
+docs/website/applications.md
+docs/website/develop/**/*.md
+docs/website/getting-started/**/*.md
+docs/website/models-tutorials/**/*.md
+docs/website/reference/**/*.md
+docs/website/templates/**/*.md
+docs/website/tools/**/*.md
+
+# Downloaded models
+*-onnx-ryzenai-*/
+
+# Build artifacts
 *_Perf.log
 test.json
-benchmark_scripts
+benchmark_scripts/
+build_out/
+
+# C++ build artifacts (ResNet examples)
+configure.txt
+passContext.txt
+original-info-signature.txt
+original-model-signature.txt
+output.log
+
+# Local validation scripts
+run_validation.bat
+validation-output.txt
+
+# Editor
+*~
+*.swp
+.DS_Store
+
+# Environment
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vale downloaded styles
+docs/website/.vale/styles/Vale/

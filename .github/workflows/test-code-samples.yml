@@ -1,0 +1,166 @@
+# =============================================================================
+# Test Code Samples
+# =============================================================================
+#
+# PURPOSE:
+#   Validates that every code snippet in the documentation actually works.
+#   This workflow extracts code blocks from MDX files, runs them, and updates
+#   the CI validation status badges shown on each docs page. This is the
+#   "docs as code" principle -- if the code in the docs is broken, CI fails.
+#
+# HOW IT WORKS (3-stage pipeline):
+#
+#   1. syntax-check    - Runs on ubuntu-latest (no AMD hardware needed).
+#                        Uses extract_code_blocks.py to parse every .mdx file,
+#                        extract fenced code blocks (```python, ```bash, etc.),
+#                        and run syntax/import checks on them. Blocks tagged
+#                        with `notest` are skipped. This catches obvious errors
+#                        (syntax errors, missing imports) without needing real
+#                        hardware. Results are saved to syntax-results.json.
+#
+#   2. test-npu        - Runs on a SELF-HOSTED runner with AMD NPU hardware
+#                        (labels: self-hosted, windows, npu, ryzen-ai). Only
+#                        runs after syntax-check passes. Does two things:
+#                          a) Runs pytest on standalone code-samples/ test files
+#                          b) Runs extract_code_blocks.py again, this time with
+#                             FULL EXECUTION -- actually running every code
+#                             block to verify it produces correct output on
+#                             real AMD hardware.
+#                        Results are saved to test-results.json.
+#
+#   3. update-ci-status - Runs on ubuntu-latest after test-npu completes.
+#                         Only runs on main branch or manual dispatch.
+#                         Downloads the test results, then runs
+#                         update_ci_status.py to update the `ci_validated`
+#                         and `ci_last_run` front matter fields in each .mdx
+#                         file. These fields drive the <CIStatus> badge shown
+#                         at the top of each docs page, telling readers whether
+#                         the code on that page has been verified on real
+#                         hardware. Changes are committed automatically.
+#
+# CODE BLOCK CONVENTIONS:
+#   - ```python          -- will be extracted and tested
+#   - ```python notest   -- will be SKIPPED (e.g., pseudocode, partial snippets)
+#   - ```bash            -- tested on Linux runners
+#   - ```bat             -- tested on Windows runners
+#   - ```powershell      -- tested on Windows runners
+#
+# SELF-HOSTED RUNNER REQUIREMENTS:
+#   Same as validate-models.yml: Windows 11, AMD NPU, ryzen-ai-1.7.0 conda env.
+#
+# TRIGGERS: push/PR when docs/** or website/code-samples/** change, or manual.
+# =============================================================================
+
+name: Test Code Samples
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'website/code-samples/**'
+      - 'docs/**/*.mdx'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'website/code-samples/**'
+      - 'docs/**/*.mdx'
+  workflow_dispatch:
+
+jobs:
+  # ---- Stage 1: Lightweight syntax/import checks (no hardware needed) ----
+  syntax-check:
+    name: Syntax & import checks (no hardware)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run syntax checks on inline blocks + standalone files
+        run: |
+          python website/ci/extract_code_blocks.py \
+            --run --syntax-only \
+            --check-files --check-requirements \
+            --output-json syntax-results.json
+
+      - name: Upload syntax results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: syntax-results
+          path: syntax-results.json
+
+  # ---- Stage 2: Full execution on AMD NPU hardware (self-hosted runner) ----
+  test-npu:
+    name: Full execution (NPU hardware)
+    runs-on: [self-hosted, windows, npu, ryzen-ai]
+    needs: syntax-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r website/code-samples/requirements.txt
+
+      - name: Test code samples
+        run: pytest website/code-samples/ --tb=short -v
+
+      - name: Run full execution of inline code blocks
+        run: |
+          python website/ci/extract_code_blocks.py \
+            --run --check-files --check-imports \
+            --output-json test-results.json
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results.json
+
+  # ---- Stage 3: Write pass/fail results back into .mdx front matter ----
+  update-ci-status:
+    name: Update CI validation badges
+    runs-on: ubuntu-latest
+    needs: test-npu
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: .
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Update CI status in MDX files
+        run: |
+          python website/ci/update_ci_status.py \
+            --results test-results.json \
+            --date $(date +%Y-%m-%d)
+
+      - name: Commit updated CI status
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/**/*.mdx
+          git diff --cached --quiet && echo "No CI status changes" && exit 0
+          git commit -m "ci: update CI validation status [skip ci]"
+          git push

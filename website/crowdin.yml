@@ -1,0 +1,10 @@
+project_id_env: CROWDIN_PROJECT_ID
+api_token_env: CROWDIN_PERSONAL_TOKEN
+
+preserve_hierarchy: true
+
+files:
+  - source: /docs/**/*.mdx
+    translation: /website/i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+  - source: /website/src/pages/**/*.{js,jsx,tsx}
+    translation: /website/i18n/%two_letters_code%/docusaurus-plugin-content-pages/**/%original_file_name%

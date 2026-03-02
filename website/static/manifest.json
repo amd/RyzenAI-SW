@@ -1,0 +1,17 @@
+{
+  "name": "Ryzen AI Documentation",
+  "short_name": "Ryzen AI Docs",
+  "theme_color": "#ed1c24",
+  "background_color": "#1b1b1d",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "img/amd-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

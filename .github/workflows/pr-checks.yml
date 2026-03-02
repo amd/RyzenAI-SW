@@ -1,0 +1,137 @@
+# =============================================================================
+# PR Checks
+# =============================================================================
+#
+# PURPOSE:
+#   Gate checks that run on every pull request to main. These are the minimum
+#   quality bars that must pass before a PR can be merged. They focus on
+#   structural correctness of the docs site (not prose quality -- that's in
+#   docs-lint.yml).
+#
+# WHAT IT CHECKS (4 jobs, some run in parallel):
+#
+#   1. enforce-mdx  - Scans docs/ for any .md files (which should be .mdx).
+#                     All documentation must use .mdx extension for Docusaurus
+#                     MDX features (component imports, Tabs, etc.) to work.
+#                     Plain .md files will fail the build silently or produce
+#                     broken pages.
+#
+#   2. mdx-check    - Runs the Docusaurus MDX syntax checker to catch invalid
+#                     JSX, unclosed tags, missing imports, and other MDX
+#                     compilation errors BEFORE attempting a full build.
+#                     Much faster feedback than waiting for a build failure.
+#
+#   3. build-test   - Full production build of the Docusaurus site. Catches
+#                     broken links, missing pages, import errors, and any
+#                     issues that only surface during static site generation
+#                     (SSG). If this passes, the site will deploy cleanly.
+#
+#   4. smoke-test   - Runs Playwright end-to-end tests against the built site.
+#                     Waits for build-test to complete first (needs: build-test).
+#                     Verifies that key pages load, navigation works, search
+#                     functions, and critical UI elements render correctly.
+#                     Config: website/playwright.config.ts
+#
+# TRIGGERS: Pull requests to main, or manual dispatch.
+# =============================================================================
+
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ---- Job 1: Reject plain .md files in docs/ ----
+  enforce-mdx:
+    name: Enforce .mdx (no .md files)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for .md files in docs/
+        run: |
+          # Find any .md files in docs/ content (excluding website/ and node_modules/)
+          MD_FILES=$(find docs -name "*.md" \
+            -not -path "*/website/*" \
+            -not -path "*/node_modules/*" \
+            2>/dev/null || true)
+
+          if [ -n "$MD_FILES" ]; then
+            echo "::error::Found .md files in docs/. All documentation must use .mdx extension."
+            echo ""
+            echo "Files that need to be renamed to .mdx:"
+            echo "$MD_FILES"
+            echo ""
+            echo "Rename with: mv <file>.md <file>.mdx"
+            exit 1
+          fi
+          echo "All documentation files use .mdx extension."
+
+  # ---- Job 2: Validate MDX syntax (fast, no full build) ----
+  mdx-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: MDX check
+        run: npx docusaurus-mdx-checker
+
+  # ---- Job 3: Full production build (catches SSG errors, broken links) ----
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  # ---- Job 4: Playwright E2E tests against the built site ----
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: build-test
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Playwright smoke tests
+        run: npx playwright test --config=playwright.config.ts
