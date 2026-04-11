@@ -216,6 +216,13 @@ def load_provider_options(config, model_name, device):
 
 
 def mic_stream(model, duration=0, silence_threshold=0.01, silence_duration=5.0):
+    try:
+        import sounddevice as sd
+    except ImportError:
+        print("\n⚠️ sounddevice is required for microphone input.")
+        print("   Install it with `pip install sounddevice` or use a .wav file instead.")
+        return
+
     q_audio = queue.Queue()
     stop_flag = threading.Event()
 
@@ -354,11 +361,7 @@ def main():
         return
 
     if args.input.lower() == 'mic':
-        import sounddevice as sd
-        try:
-            mic_stream(model, args.duration)
-        except sd.PortAudioError as e:
-            print("Fix your device or try using a .wav file instead of mic. Exiting")
+        mic_stream(model, args.duration)
         return
     else:
         waveform, sr = torchaudio.load(args.input)
