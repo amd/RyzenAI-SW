@@ -14,6 +14,12 @@ from huggingface_hub import snapshot_download
 
 SAMPLE_RATE = 16000
 CHUNK_SIZE = 1600  # 0.1 sec chunks
+SUPPORTED_WHISPER_MODEL_TYPES = (
+    "whisper-base",
+    "whisper-small",
+    "whisper-medium",
+    "whisper-large-v3-turbo",
+)
 
 
 class WhisperONNX:
@@ -281,9 +287,10 @@ def download_whisper_onnx(model_type: str):
     Returns paths to encoder and decoder model files.
     """
     hf_model_map = {
+        "whisper-base": "amd/whisper-base-onnx-npu",
         "whisper-small": "amd/whisper-small-onnx-npu",
         "whisper-medium": "amd/whisper-medium-onnx-npu",
-        "whisper-large-v3-turbo": "amd/whisper-large-turbo-onnx-npu"
+        "whisper-large-v3-turbo": "amd/whisper-large-turbo-onnx-npu",
     }
 
     repo_id = hf_model_map.get(model_type)
@@ -310,10 +317,12 @@ def main():
     parser.add_argument("--input", help="WAV file path or 'mic'")
     parser.add_argument("--encoder", help="Path to Whisper encoder ONNX model (optional, auto-download if not provided)")
     parser.add_argument("--decoder", help="Path to Whisper decoder ONNX model (optional, auto-download if not provided)")
-    parser.add_argument("--model-type", required=True, default="whisper-base",
-                        choices=["whisper-tiny", "whisper-base", "whisper-small",
-                                 "whisper-medium", "whisper-large-v3-turbo"],
-                        help="Whisper model name")
+    parser.add_argument(
+        "--model-type",
+        default="whisper-base",
+        choices=SUPPORTED_WHISPER_MODEL_TYPES,
+        help="Whisper model name",
+    )
     parser.add_argument("--eval-dir", help="Dataset directory with wavs/ and transcripts.txt")
     parser.add_argument("--results-dir", default="results", help="Directory to store evaluation results")
     parser.add_argument("--config-file", default="./config/model_config.json", help="Path to Model provider configs")
