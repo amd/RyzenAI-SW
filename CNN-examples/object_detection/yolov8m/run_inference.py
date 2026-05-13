@@ -121,7 +121,8 @@ def main(args):
                 'cache_key': 'modelcachekey',
                 'enable_cache_file_io_in_mem':'0',
                 'target': 'X1',
-                'xclbin': get_xclbin(npu_device)
+                'xclbin': get_xclbin(npu_device),
+                'xlnx_enable_py3_round': 0 # PHX/HPT devices are not compatible with the default py3 rounding mode.
             }]
         elif npu_device == 'STX' or 'KRK':
             provider_options = [{
