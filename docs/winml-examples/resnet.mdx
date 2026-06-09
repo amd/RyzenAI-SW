@@ -1,0 +1,198 @@
+---
+title: "Windows ML: ResNet"
+description: "Windows ML: ResNet on AMD Ryzen AI."
+---
+
+{/* owner: dwithchenna */}
+
+<Note>Source: [RyzenAI-SW / WinML/CNN/ResNet](https://github.com/amd/RyzenAI-SW/blob/main/WinML/CNN/ResNet). Code is maintained in the repository; this page mirrors its README.</Note>
+
+
+
+# Introduction
+
+This tutorial demonstrates how to use Windows Machine Learning (WinML) for ONNX model inference using Python. It covers setup, running models, and sample code for image classification using ResNet. This tutorial uses Windows ML APIs to run a ResNet model using Python and C++ examples.
+
+## Overview
+
+This Tutorial will help with the steps to deploy ResNet model demonstrating:
+
+- Setup instructions to create the python environment and install dependencies
+- Download the ResNet ONNX model
+- (Optional) Quantize the model using AI tool kit to QDQ ONNX format for low precision inference
+- Compile and run the model on NPU using ONNX runtime with Vitis AI Execution provider using Python/C++ code.
+
+## Setup Instructions
+
+Install the required python packages in the conda environment `winml_resnet` and Windows Apps SDK using the [Windows ML installation instructions](https://github.com/amd/RyzenAI-SW/blob/main/WinML/CNN/ResNet/README.md#winml-installation-instructions) in the main README.:
+
+```powershell
+conda create -n winml_resnet --clone winml_env
+conda activate winml_resnet
+pip install --pre --upgrade -r .\requirements.txt
+```
+
+Check installed wasdk python version and install same version of [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads):
+
+```powershell
+conda list | findstr wasdk
+```
+
+Expected Output:
+
+```powershell
+wasdk-microsoft-windows-ai-machinelearning 2.0.0.dev4               pypi_0    pypi
+wasdk-microsoft-windows-applicationmodel-dynamicdependency-bootstrap 2.0.0.dev4               pypi_0    pypi
+```
+
+Download the Windows App SDK corresponding to the wasdk version (e.g., 2.0.0.dev4) or latest and install it to ensure the WinML execution providers work correctly.
+
+```powershell
+curl -L -o windowsappruntimeinstall-x86.exe "https://aka.ms/windowsappsdk/2.0/2.0.0-experimental4/windowsappruntimeinstall-x86.exe"
+windowsappruntimeinstall-x86.exe --quiet
+```
+
+
+## Download Model
+
+Download the ResNet model using the `download_ResNet.py` script. This downloads the ResNet-50 model in ONNX format.
+
+```powershell
+cd <RyzenAI-SW>\WinML\CNN\ResNet\model\
+python download_ResNet.py
+```
+
+## Model Quantization (Optional)
+
+You can optionally quantize the model for low precision inference, by converting it to QDQ ONNX format using the AI Toolkit for better performance on compatible hardware.
+
+Model conversion steps:
+1. Open the ResNet50 model in VS Code with AI Toolkit extension installed
+2. Right-click the model file and select "Convert Model"
+3. Choose the target platform (e.g., AMD NPU)
+4. Select quantization settings (e.g., QDQ with INT8)
+5. The toolkit will generate an optimized model
+
+When using the quantized model with AI Toolkit, make sure to update the model path in the Python or C++ examples to specify the converted model path.
+
+### Run Inference
+
+Run inference on NPU (Neural Processing Unit):
+
+```powershell
+cd <RyzenAI-SW>\WinML\CNN\ResNet\python
+python run_model.py --ep_policy NPU --model ..\model\resnet50.onnx --image_path ..\images\dog.jpg
+```
+
+Or simply run with defaults (uses NPU policy, resnet50.onnx model, and all images in images folder):
+
+```powershell
+python run_model.py --ep_policy NPU
+```
+if using the quantized model with AI Toolkit, make sure to give the converted model path.
+
+### Command-Line Arguments
+
+- `--ep_policy <NPU|CPU|DEFAULT|DISABLE>`: Execution provider policy. Default: NPU
+- `--model <path>`: Path to input ONNX model (default: ../model/resnet50.onnx)
+- `--compiled_output <path>`: Path for compiled output model (default: ../model/resnet50_ctx.onnx)
+- `--image_path <path>`: Path to input image (default: all images in ../images folder)
+
+### Example Output
+```
+Registering execution providers ...
+Registered execution provider: VitisAIExecutionProvider with library path: C:\Program Files\WindowsApps\MicrosoftCorporationII.WinML.AMD.NPU.EP.1.8_1.8.25.0_x64__8wekyb3d8bbwe\ExecutionProvider\onnxruntime_providers_vitisai.dll
+Creating session ...
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I20251009 12:48:36.467561  4136 vitisai_compile_model.cpp:1263] Vitis AI EP Load ONNX Model Success
+I20251009 12:48:36.469228  4136 vitisai_compile_model.cpp:1264] Graph Input Node Name/Shape (1)
+I20251009 12:48:36.469748  4136 vitisai_compile_model.cpp:1268]          input : [-1x3x224x224]
+I20251009 12:48:36.469833  4136 vitisai_compile_model.cpp:1274] Graph Output Node Name/Shape (1)
+I20251009 12:48:36.469993  4136 vitisai_compile_model.cpp:1278]          output : [-1x1000]
+Active execution providers (priority order): ['VitisAIExecutionProvider', 'CPUExecutionProvider']
+Primary provider (highest priority): VitisAIExecutionProvider
+Running inference on image: D:\repos\RyzenAI-SW\tutorial\WinML\images\dog.jpg
+Preparing input ...
+Running inference ...
+Top-5 (softmax probabilities):
+  Top-1: golden retriever (id=207, p=0.891560)
+  Top-2: Labrador retriever (id=208, p=0.093102)
+  Top-3: kuvasz (id=222, p=0.002696)
+  Top-4: Chesapeake Bay retriever (id=209, p=0.001279)
+  Top-5: tennis ball (id=852, p=0.001126)
+```
+
+## Python API Components
+
+### Registration of Execution Provider
+
+The script registers WinML execution providers using `ort.register_execution_provider_library()`:
+
+```python
+def register_execution_providers():
+    worker_script = str(Path(__file__).parent / 'winml_worker.py')
+    result = subprocess.check_output([sys.executable, worker_script], text=True)
+    paths = json.loads(result)
+    for item in paths.items():
+        ort.register_execution_provider_library(item[0], item[1])
+```
+
+**Key API**: `ort.register_execution_provider_library(name, path)`
+- Registers custom execution provider libraries
+- Required for WinML to work with ONNX Runtime
+- The worker script discovers the WinML EP library path from the Windows App SDK
+
+### Session Options and Provider Selection
+
+Session options configure how ONNX Runtime executes the model:
+
+```python
+session_options = ort.SessionOptions()
+policy_enum = ort.OrtExecutionProviderDevicePolicy
+session_options.set_provider_selection_policy(selected_policy)
+```
+
+**Key APIs**:
+- `ort.SessionOptions()`: Creates session configuration object
+- `set_provider_selection_policy()`: Sets execution provider selection policy
+  - `PREFER_NPU`: Prioritizes Neural Processing Unit
+  - `PREFER_CPU`: Prioritizes CPU execution
+  - `DEFAULT`: Uses default provider selection
+
+### Model Compilation
+
+Model compilation optimizes the ONNX model for specific hardware:
+
+```python
+model_compiler = ort.ModelCompiler(session_options, model_path)
+model_compiler.compile_to_file(compiled_model_path)
+```
+
+### Inference Session
+
+The inference session is the main interface for running predictions:
+
+```python
+session = ort.InferenceSession(model_path, sess_options=session_options)
+```
+
+**Key APIs**:
+- `ort.InferenceSession(model_path, sess_options)`: Creates inference session
+- `session.get_providers()`: Returns list of active execution providers
+- `session.get_inputs()`: Returns model input metadata
+- `session.get_outputs()`: Returns model output metadata
+
+
+## For a walkthrough tutorial using C++ please follow:
+
+- [Tutorial for WinML in C++](https://github.com/amd/RyzenAI-SW/blob/main/WinML/CNN/ResNet/cpp/README.md)
+
+## References
+
+- [AI Toolkit Documentation](https://code.visualstudio.com/docs/intelligentapps/modelconversion)
+- [WinML Documentation](https://learn.microsoft.com/en-us/windows/ai/windows-ml/)
+- [ONNX Runtime Python API](https://onnxruntime.ai/docs/api/python/)
+- [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/)
+
+
+

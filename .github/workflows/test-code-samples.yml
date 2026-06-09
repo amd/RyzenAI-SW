@@ -1,166 +1,114 @@
 # =============================================================================
 # Test Code Samples
 # =============================================================================
+# The "docs as code" accuracy gate: code in the docs must actually work.
+#   1. syntax-check  - python syntax checks for every block (cloud, no hardware)
+#   2. test-hardware - executes blocks tagged `test` on real AMD hardware,
+#                      on the AMD Playbooks self-hosted Windows runner pool.
+#                      v1 scope: Strix Point (stxp) and Strix Halo (halo) only.
+#                      Requires our repo to be added to the org runner group
+#                      that owns these machines (see .github/scripts/RUNNERS.md).
+# Failing pages are uploaded so Notify Owner can route to the page owner.
 #
-# PURPOSE:
-#   Validates that every code snippet in the documentation actually works.
-#   This workflow extracts code blocks from MDX files, runs them, and updates
-#   the CI validation status badges shown on each docs page. This is the
-#   "docs as code" principle -- if the code in the docs is broken, CI fails.
-#
-# HOW IT WORKS (3-stage pipeline):
-#
-#   1. syntax-check    - Runs on ubuntu-latest (no AMD hardware needed).
-#                        Uses extract_code_blocks.py to parse every .mdx file,
-#                        extract fenced code blocks (```python, ```bash, etc.),
-#                        and run syntax/import checks on them. Blocks tagged
-#                        with `notest` are skipped. This catches obvious errors
-#                        (syntax errors, missing imports) without needing real
-#                        hardware. Results are saved to syntax-results.json.
-#
-#   2. test-npu        - Runs on a SELF-HOSTED runner with AMD NPU hardware
-#                        (labels: self-hosted, windows, npu, ryzen-ai). Only
-#                        runs after syntax-check passes. Does two things:
-#                          a) Runs pytest on standalone code-samples/ test files
-#                          b) Runs extract_code_blocks.py again, this time with
-#                             FULL EXECUTION -- actually running every code
-#                             block to verify it produces correct output on
-#                             real AMD hardware.
-#                        Results are saved to test-results.json.
-#
-#   3. update-ci-status - Runs on ubuntu-latest after test-npu completes.
-#                         Only runs on main branch or manual dispatch.
-#                         Downloads the test results, then runs
-#                         update_ci_status.py to update the `ci_validated`
-#                         and `ci_last_run` front matter fields in each .mdx
-#                         file. These fields drive the <CIStatus> badge shown
-#                         at the top of each docs page, telling readers whether
-#                         the code on that page has been verified on real
-#                         hardware. Changes are committed automatically.
-#
-# CODE BLOCK CONVENTIONS:
-#   - ```python          -- will be extracted and tested
-#   - ```python notest   -- will be SKIPPED (e.g., pseudocode, partial snippets)
-#   - ```bash            -- tested on Linux runners
-#   - ```bat             -- tested on Windows runners
-#   - ```powershell      -- tested on Windows runners
-#
-# SELF-HOSTED RUNNER REQUIREMENTS:
-#   Same as validate-models.yml: Windows 11, AMD NPU, ryzen-ai-1.7.0 conda env.
-#
-# TRIGGERS: push/PR when docs/** or website/code-samples/** change, or manual.
+# Code-block conventions (see .github/scripts/extract_code_blocks.py):
+#   ```python          -> executed by default (also syntax-checked)
+#   ```python npu      -> executed; device-scoped (cpu|gpu|npu)
+#   ```bash notest     -> skipped entirely
+# Test-by-default: every runnable block runs unless tagged `notest`.
 # =============================================================================
 
 name: Test Code Samples
 
 on:
+  pull_request:
+    paths: ['docs/**/*.mdx']
   push:
     branches: [main]
-    paths:
-      - 'docs/**'
-      - 'website/code-samples/**'
-      - 'docs/**/*.mdx'
-  pull_request:
-    paths:
-      - 'docs/**'
-      - 'website/code-samples/**'
-      - 'docs/**/*.mdx'
+    paths: ['docs/**/*.mdx']
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  # ---- Stage 1: Lightweight syntax/import checks (no hardware needed) ----
   syntax-check:
-    name: Syntax & import checks (no hardware)
+    name: Syntax checks (no hardware)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Run syntax checks on inline blocks + standalone files
-        run: |
-          python website/ci/extract_code_blocks.py \
-            --run --syntax-only \
-            --check-files --check-requirements \
-            --output-json syntax-results.json
-
-      - name: Upload syntax results
-        uses: actions/upload-artifact@v4
-        if: always()
+      - name: Syntax-check code blocks
+        run: python .github/scripts/extract_code_blocks.py --syntax-only --docs docs --failed-pages failed-pages-syntax.txt
+      - uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: syntax-results
-          path: syntax-results.json
+          name: failed-pages-syntax
+          path: failed-pages-syntax.txt
 
-  # ---- Stage 2: Full execution on AMD NPU hardware (self-hosted runner) ----
-  test-npu:
-    name: Full execution (NPU hardware)
-    runs-on: [self-hosted, windows, npu, ryzen-ai]
+  test-hardware:
+    name: Execute on ${{ matrix.hw }}
     needs: syntax-check
+    strategy:
+      fail-fast: false
+      matrix:
+        # Device labels match the AMD Playbooks runner pool (see
+        # amd/playbooks .github/workflows/test-playbooks.yml):
+        #   stxp = Strix Point, halo = Strix Halo.
+        hw: [stxp, halo]
+    # Reuse the AMD Playbooks self-hosted Windows runner pool.
+    # Label scheme: [self-hosted, Windows, <device>] (capital "Windows").
+    runs-on: [self-hosted, Windows, "${{ matrix.hw }}"]
+    env:
+      # The Ryzen AI conda env on the runner (NPU/GPU/CPU providers installed).
+      # Override per-repo with the RYZEN_AI_ENV variable.
+      RYZEN_AI_ENV: ${{ vars.RYZEN_AI_ENV || 'ryzen-ai-1.7.1' }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      # Execute inside the Ryzen AI conda env so `python` blocks see the NPU
+      # (VitisAIExecutionProvider), GPU (DmlExecutionProvider), and CPU.
+      - name: Execute code blocks on hardware
+        shell: powershell
+        run: conda run --no-capture-output -n $env:RYZEN_AI_ENV python .github/scripts/extract_code_blocks.py --run --docs docs --failed-pages failed-pages-${{ matrix.hw }}.txt
+      - uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          python-version: '3.10'
+          name: failed-pages-${{ matrix.hw }}
+          path: failed-pages-${{ matrix.hw }}.txt
 
-      - name: Install dependencies
-        run: pip install -r website/code-samples/requirements.txt
-
-      - name: Test code samples
-        run: pytest website/code-samples/ --tb=short -v
-
-      - name: Run full execution of inline code blocks
-        run: |
-          python website/ci/extract_code_blocks.py \
-            --run --check-files --check-imports \
-            --output-json test-results.json
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: test-results.json
-
-  # ---- Stage 3: Write pass/fail results back into .mdx front matter ----
-  update-ci-status:
-    name: Update CI validation badges
+  # ---- Record this run to the CI history (dashboard data) ----
+  record:
+    needs: [syntax-check, test-hardware]
+    if: always()
     runs-on: ubuntu-latest
-    needs: test-npu
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download test results
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results
-          path: .
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Update CI status in MDX files
+      - name: Build page results
+        run: python .github/scripts/extract_code_blocks.py --syntax-only --docs docs --output-json code-results.json --failed-pages failed-pages.txt || true
+      - name: Append run to ci-history.json
+        env:
+          RUN_STATUS: ${{ (needs.syntax-check.result == 'success' && needs.test-hardware.result == 'success') && 'success' || 'failure' }}
         run: |
-          python website/ci/update_ci_status.py \
-            --results test-results.json \
-            --date $(date +%Y-%m-%d)
-
-      - name: Commit updated CI status
+          python .github/scripts/record_run.py \
+            --workflow "Test Code Samples" \
+            --status "$RUN_STATUS" \
+            --code-results code-results.json \
+            --history .github/scripts/ci-history.json
+      - name: Commit history (main) or upload artifact
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/**/*.mdx
-          git diff --cached --quiet && echo "No CI status changes" && exit 0
-          git commit -m "ci: update CI validation status [skip ci]"
-          git push
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .github/scripts/ci-history.json
+            git diff --staged --quiet || (git commit -m "ci: record docs CI run [skip ci]" && git push)
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ci-history
+          path: .github/scripts/ci-history.json

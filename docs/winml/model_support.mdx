@@ -1,0 +1,22 @@
+---
+title: "VitisAI EP Model Support"
+description: "Model formats supported by the VitisAI EP within Windows ML: CNN, Transformer, and LLM."
+---
+
+{/* owner: dwithchenna */}
+
+The VitisAI EP (Execution Provider) within Windows ML supports input models in the following formats.
+
+## Model Support Table
+
+| Model Type                          | Support                                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **CNN Models**                      | <ul><li>Original float (FP32) model with automatic BF16 conversion during compilation</li><li>Quantized QDQ model using A8W8 configuration</li></ul> |
+| **Transformer Models**              | <ul><li>Original float (FP32) model with automatic BF16 conversion during compilation</li><li>Quantized QDQ model using A16W8 configuration</li></ul> |
+| **LLM Models (via Foundry Local)**  | <ul><li>Quantized and pre-compiled LLM models</li><li>Support for custom models through Olive recipe</li></ul>          |
+
+### Note
+
+- For CNN and Transformer models, you can use either the original float model (with automatic BF16 conversion) or a quantized QDQ model. Quantization can reduce model size and improve inference performance.
+- For LLMs, Foundry Local provides pre-built models that auto-detect the NPU. Custom LLM deployment may require model preparation using the Olive recipe or Ryzen AI OGA workflow. See [Windows ML LLM examples](https://github.com/amd/RyzenAI-SW/tree/main/WinML/LLM) for details.
+- For model conversion and quantization options, see [Model Conversion](/winml/model_conversion).

@@ -1,0 +1,43 @@
+# =============================================================================
+# Update Model List
+# =============================================================================
+# Keeps the model tables in docs/models-tutorials/index.mdx in sync with the official AMD
+# Hugging Face collections for the current Ryzen AI version. Runs weekly and on
+# demand; opens a PR when the collections change so the owner can review.
+# Owner: uday610.
+# =============================================================================
+
+name: Update Model List
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'   # Mondays 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Regenerate model table from Hugging Face
+        run: python .github/scripts/fetch_models.py
+      - name: Open PR if the table changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "docs: refresh Ryzen AI model table from Hugging Face"
+          title: "Refresh model table from Hugging Face collections"
+          body: |
+            Automated refresh of the model tables in `docs/models-tutorials/index.mdx`
+            from the AMD Hugging Face collections for the current Ryzen AI version.
+
+            @uday610 please review and merge to keep the published model list accurate.
+          branch: auto/update-model-list
+          add-paths: docs/models-tutorials/index.mdx
+          reviewers: uday610

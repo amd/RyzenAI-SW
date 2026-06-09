@@ -13,7 +13,7 @@ The full documentation site is built from the `docs/` directory using [Docusauru
 To run the docs site locally:
 
 ```bash
-cd docs/website
+cd website
 npm install
 npx docusaurus start
 ```
@@ -22,19 +22,26 @@ npx docusaurus start
 
 ```
 RyzenAI-SW/
-├── docs/                        # Documentation and examples
+├── docs/                        # MDX documentation (source of truth for the website)
 │   ├── getting-started/         # Installation, quickstart, hardware support
 │   ├── applications/            # Showcased AI PC applications
 │   ├── models-tutorials/        # Models, tutorials, and example code
-│   │   ├── llms/                # LLM tutorials and examples
+│   │   ├── llms/                # LLM and NLP tutorials
 │   │   ├── vision/              # CNN, object detection, image classification
-│   │   ├── audio/               # Whisper ASR examples
-│   │   ├── multimodal/          # VLM and multi-model pipelines
-│   │   └── nlp/                 # DistilBERT and NLP examples
+│   │   ├── audio/               # Whisper ASR
+│   │   └── multimodal/          # Multi-model pipelines
 │   ├── develop/                 # Developer guides (deployment, quantization)
 │   ├── tools/                   # AI Analyzer, NPU management, benchmarking
-│   ├── reference/               # Changelog, model list, supported operators
-│   └── website/                 # Docusaurus build infrastructure
+│   └── reference/               # Changelog, model list, supported operators
+├── models-tutorials/            # Runnable code examples with plain README.md
+│   ├── llms/                    # LLM and NLP examples (DistilBERT, OGA, RAG, VLM, etc.)
+│   ├── vision/                  # Vision examples (ResNet, YOLO, CVML, etc.)
+│   ├── audio/                   # Audio examples (Whisper)
+│   ├── multimodal/              # Multimodal examples (NPU-GPU pipeline)
+│   └── tools/                   # Tool examples (benchmarking, NPU check)
+├── website/                     # Docusaurus build infrastructure
+│   ├── scripts/                 # Build-time scripts (sync-examples.mjs)
+│   └── src/                     # Theme customizations, components, CSS
 └── .github/workflows/           # CI/CD pipelines
 ```
 
@@ -51,6 +58,7 @@ RyzenAI-SW/
 - [Vision Language Model (VLM)](docs/models-tutorials/llms/VLM)
 - [OGA Inference](docs/models-tutorials/llms/oga_inference)
 - [LLM Fine-tuning and Deployment](docs/models-tutorials/llms/llm-sft-deploy)
+- [DistilBERT Text Classification](docs/models-tutorials/llms/distilbert)
 
 ## Vision Examples
 
@@ -70,11 +78,7 @@ RyzenAI-SW/
 
 ## Multimodal Examples
 
-- [NPU-GPU Pipeline](docs/models-tutorials/multimodal/npu-gpu-pipeline)
-
-## NLP Examples
-
-- [DistilBERT Text Classification](docs/models-tutorials/nlp/distilbert)
+- [NPU-GPU Pipeline](docs/vision/npu-gpu-pipeline)
 
 ## Tools
 

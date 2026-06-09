@@ -1,0 +1,104 @@
+---
+title: "Windows ML: Google BERT"
+description: "Windows ML: Google BERT on AMD Ryzen AI."
+---
+
+{/* owner: dwithchenna */}
+
+<Note>Source: [RyzenAI-SW / WinML/Transformers/GoogleBert](https://github.com/amd/RyzenAI-SW/blob/main/WinML/Transformers/GoogleBert). Code is maintained in the repository; this page mirrors its README.</Note>
+
+
+
+# Windows ML Google BERT - Text Embedding
+
+Run quantized Google BERT models on Windows NPU for text embedding generation.
+
+### Installation Instructions
+
+Install the required python packages in the conda environment `winml_env` and Windows Apps SDK using the [Windows ML installation instructions](https://github.com/amd/RyzenAI-SW/blob/main/WinML/Transformers/GoogleBert/README.md#winml-installation-instructions) in the main README.:
+
+```powershell
+conda create -n winml_bert --clone winml_env
+conda activate winml_bert
+pip install --pre -r .\requirements.txt
+```
+
+Check installed wasdk python version and install same version of [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/stable-channel):
+```powershell
+conda list | findstr wasdk
+```
+Expected Output:
+
+```powershell
+wasdk-microsoft-windows-ai-machinelearning 2.0.0.dev4               pypi_0    pypi
+wasdk-microsoft-windows-applicationmodel-dynamicdependency-bootstrap 2.0.0.dev4               pypi_0    pypi
+```
+
+Download the Windows App SDK corresponding to the wasdk version (e.g., 2.0.0.dev4) or latest and install it to ensure the WinML execution providers work correctly.
+
+```powershell
+curl -L -o windowsappruntimeinstall-x86.exe "https://aka.ms/windowsappsdk/2.0/2.0.0-experimental4/windowsappruntimeinstall-x86.exe"
+windowsappruntimeinstall-x86.exe --quiet
+```
+
+### Model Conversion
+
+Get the optimized Google BERT model for NPU using AI Toolkit:
+
+Model conversion steps:
+1. Open the Google BERT model in VS Code with AI Toolkit extension installed
+2. Right-click the model file (`./model/model.onnx`) and select "Convert Model"
+3. Choose the target platform (e.g., AMD NPU)
+4. Select quantization settings (e.g., A16W8 for activation 16-bit, weight 8-bit)
+5. The toolkit will generate an optimized model (typically saved to `./model_a16w8/model.onnx`)
+
+## Run Inference
+
+Run inference with NPU (default) and provide the path to the quantized model:
+
+```powershell
+python run_google_bert.py --model model\model.onnx --ep_policy NPU
+```
+
+### Command-Line Arguments
+
+- `--ep_policy`: Execution provider policy (default: NPU)
+  - `NPU`: Prefer NPU execution using VitisAIExecutionProvider
+  - `CPU`: Prefer CPU execution using CPUExecutionProvider
+  - `GPU`: Prefer GPU execution using DmlExecutionProvider
+  - `DEFAULT`: Use default provider selection
+- `--model`: Path to ONNX model (default: `./model_a16w8/model.onnx`)
+
+### Expected Output
+
+Expected output for NPU:
+
+```powershell
+Registering execution providers ...
+Model path: ./model_a16w8/model.onnx
+Creating session ...
+Set provider selection policy to: NPU
+Active execution providers (priority order): ['VitisAIExecutionProvider', 'CPUExecutionProvider']
+Primary provider (highest priority): VitisAIExecutionProvider
+Running inference ...
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1263] Vitis AI EP Load ONNX Model Success
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1264] Graph Input Node Name/Shape (3)
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1268]          input_ids : [1x128]
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1268]          attention_mask : [1x128]
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1268]          token_type_ids : [1x128]
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1274] Graph Output Node Name/Shape (2)
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1278]          last_hidden_state : [1x128x768]
+I20251022 14:24:49.824476 16728 vitisai_compile_model.cpp:1278]          1619 : [1x768]
+[Vitis AI EP] No. of Operators :   CPU     9    NPU  1488 VITIS_EP_CPU    14
+[Vitis AI EP] No. of Subgraphs :   NPU     1 Actually running on NPU      1
+2025-10-22 14:24:51.2642176 [W:onnxruntime:, session_state.cc:1307 onnxruntime::VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+2025-10-22 14:24:51.2745154 [W:onnxruntime:, session_state.cc:1309 onnxruntime::VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+D:\repos\RyzenAI-SW\tutorial\WinML\Transformers\GoogleBert\run_google_bert.py:19: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  token_embeddings = torch.tensor(model_output[0])
+Similarity: 0.959819495677948
+```
+
+
+
+

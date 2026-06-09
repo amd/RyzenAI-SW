@@ -1,0 +1,32 @@
+---
+title: "Super-Resolution on Ryzen AI"
+description: "Run image super-resolution models (Real-ESRGAN, SESR) on the AMD Ryzen AI NPU."
+---
+
+{/* owner: bconsolvo */}
+
+Image super-resolution upscales a low-resolution image to a higher resolution while recovering detail. This tutorial runs super-resolution models on the AMD Ryzen&trade; AI NPU. Full source is in the [RyzenAI-SW super-resolution example](https://github.com/amd/RyzenAI-SW/tree/main/CNN-examples/super-resolution).
+
+## Quality metric (PSNR)
+
+Super-resolution quality is commonly reported with Peak Signal-to-Noise Ratio (PSNR). Runnable code blocks are executed by the docs CI by default on real hardware (Strix / Strix Halo) on every change, failing the build if they stop working.
+
+```python
+import math
+
+def psnr(mse: float, peak: float = 255.0) -> float:
+    if mse == 0:
+        return float("inf")
+    return 20 * math.log10(peak) - 10 * math.log10(mse)
+
+# A small, deterministic sanity check that the metric behaves as expected.
+assert psnr(mse=0.0) == float("inf")
+assert abs(psnr(mse=100.0) - 28.13) < 0.1
+print(f"PSNR @ MSE=100 -> {psnr(100.0):.2f} dB")
+```
+
+## Next steps
+
+- Models: see the [Vision Models table](/models-tutorials/index#vision-models) for verified models.
+- Quantize your own model with [Model Quantization](/running-models/model_quantization).
+- Deploy with [Model Compilation and Deployment](/running-models/modelrun).

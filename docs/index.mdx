@@ -1,0 +1,80 @@
+---
+title: "Overview"
+description: "Tools and runtime libraries for optimizing and deploying AI inference on AMD Ryzen AI powered PCs."
+icon: "house"
+---
+
+{/* owner: uday610 */}
+
+AMD Ryzen&trade; AI Software includes the tools and runtime libraries for optimizing and deploying AI inference on AMD Ryzen&trade; AI powered PCs. Ryzen AI software enables applications to run on the neural processing unit (NPU) built in the AMD XDNA&trade; architecture, as well as on the integrated GPU. This allows developers to build and deploy models trained in PyTorch or TensorFlow and run them directly on laptops powered by Ryzen AI using ONNX Runtime and the Vitis&trade; AI Execution Provider (EP).
+
+<img src="/images/rai-sw.png" alt="Ryzen AI Software stack" />
+
+## Quick Start
+
+<CardGroup cols={3}>
+  <Card title="Supported Configurations" href="/reference/relnotes#supported-configurations" icon="circle-check">
+    Hardware and OS matrix for Ryzen AI Software.
+  </Card>
+  <Card title="Installation Instructions" href="/getting-started/inst" icon="download">
+    Install the NPU driver and Ryzen AI Software on Windows.
+  </Card>
+  <Card title="Examples, Demos, Tutorials" href="/models-tutorials/index" icon="lightbulb">
+    Browse runnable samples and end-to-end demos.
+  </Card>
+</CardGroup>
+
+## Development Flow Overview
+
+The Ryzen AI development flow does not require any modifications to the existing model training processes and methods. The pre-trained model can be used as the starting point of the Ryzen AI flow.
+
+### Quantization
+
+Quantization involves converting the AI model's parameters from floating-point to lower-precision representations, such as 8-bit integer. Quantized models are more power-efficient, utilize less memory, and offer better performance. Ryzen AI Software also supports CNN and Transformer models in floating-point 32 format as input models without quantization. These models are internally converted to bfloat16 and compiled using the bfloat16 compilation flow.
+
+**AMD Quark** is a comprehensive cross-platform deep learning toolkit designed to simplify and enhance the quantization of deep learning models. Supporting both PyTorch and ONNX models, Quark empowers developers to optimize their models for deployment on a wide range of hardware backends, achieving significant performance gains without compromising accuracy.
+
+For more details, refer to the [Model Quantization](/running-models/model_quantization) page.
+
+### CNN/Transformer Compilation and Deployment
+
+The AI model is deployed using the ONNX Runtime with either C++ or Python APIs. The Vitis AI Execution Provider included in the ONNX Runtime intelligently determines what portions of the AI model should run on the NPU, optimizing workloads to ensure optimal performance with lower power consumption.
+
+For more details, refer to the [Model Compilation and Deployment](/running-models/modelrun) page.
+
+## LLM Flow Overview
+
+The Ryzen AI LLM software stack is available through three development interfaces, each suited for specific use cases as outlined in the sections below. All three interfaces are built on top of native OnnxRuntime GenAI (OGA) libraries or llama.cpp libraries, as shown in the Ryzen AI Software Stack diagram below.
+
+The **high-level Python APIs**, as well as the **Server Interface**, also leverage the **Lemonade SDK**, which is multi-vendor open-source software that provides everything necessary for quickly getting started with LLMs on OGA or llama.cpp.
+
+At the bottom, **OnnxRuntime GenAI (OGA)** or llama.cpp (only supported for iGPU) API is the lowest-level API available for building LLM applications on a Ryzen AI PC.
+
+<a id="llm-software-stack-table" />
+
+**Ryzen AI Software Stack**
+
+<table>
+  <thead>
+    <tr>
+      <th>Your Python Application</th>
+      <th>Your LLM Stack</th>
+      <th>Your Native Application</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="/llms/high_level_python">Lemonade Python API*</a></td>
+      <td><a href="/llms/server_interface">Lemonade Server Interface*</a></td>
+      <td><a href="/llms/hybrid_oga">OGA C++ Headers</a> <strong>OR</strong> <a href="https://github.com/ggml-org/llama.cpp">llama.cpp C++ Headers</a></td>
+    </tr>
+    <tr>
+      <td colSpan={3}><a href="https://github.com/microsoft/onnxruntime-genai">Custom AMD OnnxRuntime GenAI (OGA)</a> <strong>OR</strong> <a href="https://github.com/ggml-org/llama.cpp">llama.cpp*</a></td>
+    </tr>
+    <tr>
+      <td colSpan={3}><a href="https://www.amd.com/en/products/processors/consumer/ryzen-ai.html">AMD Ryzen AI Driver and Hardware</a></td>
+    </tr>
+  </tbody>
+</table>
+
+For more details, refer to the [LLM Deployment Overview](/llms/overview) page.

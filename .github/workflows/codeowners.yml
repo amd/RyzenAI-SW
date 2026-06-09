@@ -1,0 +1,51 @@
+# =============================================================================
+# CODEOWNERS & Page Ownership
+# =============================================================================
+# Guarantees every docs page has an owner, using standard tooling:
+#   - check_owners.py : every docs/ page must have an inline owner header
+#   - generate_codeowners.py : regenerate CODEOWNERS and fail if it is stale
+#   - codeowners-validator : validate CODEOWNERS syntax, no duplicate/shadowed
+#     patterns, no unowned files, and that listed owners are valid.
+# =============================================================================
+
+name: CODEOWNERS & Page Ownership
+
+on:
+  pull_request:
+    paths: ['docs/**', 'CODEOWNERS', '.github/**']
+  push:
+    branches: [main]
+    paths: ['docs/**', 'CODEOWNERS', '.github/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  page-owner-headers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Every docs page has an owner header
+        run: python .github/scripts/check_owners.py
+      - name: CODEOWNERS is in sync with page headers
+        run: |
+          python .github/scripts/generate_codeowners.py
+          git diff --exit-code CODEOWNERS || {
+            echo "::error::CODEOWNERS is stale. Run 'python .github/scripts/generate_codeowners.py' and commit.";
+            exit 1;
+          }
+
+  codeowners-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate CODEOWNERS
+        uses: mszostok/codeowners-validator@v0.7.4
+        with:
+          checks: "files,syntax,duppatterns"
+          experimental_checks: "notowned,avoid-shadowing"
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,24 @@
+/* ===========================================
+   Navigation polish (parity with amd-gaia.ai)
+   =========================================== */
+
+/* Higher-contrast inactive tab text */
+.nav-tabs .nav-tabs-item {
+  color: rgb(156 163 175);
+}
+.dark .nav-tabs .nav-tabs-item {
+  color: rgb(209 213 219);
+}
+
+/* Thicker active-tab underline */
+.nav-tabs .nav-tabs-item > div {
+  height: 3.5px;
+}
+
+/* Subtle separator under the navbar */
+#navbar {
+  border-bottom: 1px solid rgb(120 120 120 / 0.25);
+}
+.dark #navbar {
+  border-bottom: 1px solid rgb(120 120 120 / 0.4);
+}

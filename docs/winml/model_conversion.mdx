@@ -1,0 +1,41 @@
+---
+title: "Model Conversion and Quantization (AI Toolkit)"
+description: "Convert and quantize models for Windows ML on Ryzen AI using the VS Code AI Toolkit."
+---
+
+{/* owner: dwithchenna */}
+
+The **AI Toolkit (AITK)** for Visual Studio Code is the primary tool for model conversion and quantization when preparing models for Windows ML on Ryzen AI.
+
+AITK supports:
+
+- **Model conversion:** Export models from PyTorch, TensorFlow, and other frameworks to ONNX
+- **Model quantization:** Convert to QDQ (Quantize-Dequantize) format for lower precision inference
+- **Evaluation:** Run models on CPU, GPU, or NPU to validate accuracy and performance
+
+## Quantization Options
+
+| Option            | Values                                            |
+| ----------------- | ------------------------------------------------- |
+| Activation type   | INT8, UINT8, INT16, UINT16, BF16                  |
+| Weight type       | INT8, UINT8, INT16, UINT16, INT4, BF16            |
+
+Recommended Precision Settings by Model Type:
+
+- CNN Models: Use **A8W8** quantization (activation INT8/UINT8, weight INT8/UINT8)
+- Transformer Models: Use **A16W8** quantization (activation INT16/UINT16, weight INT8/UINT8)
+- LLM Models: BF16 and INT4 precision options are available
+
+## Device Evaluation
+
+You can evaluate quantized models on CPU, GPU, or NPU to compare accuracy and performance before deployment.
+
+## Known Limitations
+
+- **AMD GPU conversion:** Model conversion for AMD GPU may fail due to limited Olive and Quark AMD GPU support. Use NPU or CPU for conversion and evaluation when possible.
+- **Windows vs Linux:** For larger LLM models, model conversion is done on Linux with GPU support, due to limited support on Windows. See the [Windows ML LLM examples](https://github.com/amd/RyzenAI-SW/tree/main/WinML/LLM) for details.
+
+## References
+
+- [VS Code AI Toolkit model conversion](https://code.visualstudio.com/docs/intelligentapps/modelconversion)
+- [Model quantization](/running-models/model_quantization) (Ryzen AI Quark flow for NPU-only path)

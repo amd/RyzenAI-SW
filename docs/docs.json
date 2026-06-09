@@ -1,0 +1,207 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Ryzen AI Software",
+  "metadata": {
+    "og:site_name": "Ryzen AI Software",
+    "og:title": "Ryzen AI Software Documentation",
+    "og:description": "Tools and runtime libraries for optimizing and deploying AI inference on AMD Ryzen AI powered PCs."
+  },
+  "colors": {
+    "primary": "#ED1C24",
+    "light": "#F4484D",
+    "dark": "#C8171E"
+  },
+  "favicon": "/assets/favicon.ico",
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "cursor"
+    ]
+  },
+  "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/amd/RyzenAI-SW",
+          "icon": "github"
+        },
+        {
+          "anchor": "Discord",
+          "href": "https://discord.gg/amd-dev",
+          "icon": "discord"
+        }
+      ],
+      "versions": [
+        { "version": "1.7.1", "default": true, "href": "/" },
+        { "version": "1.7", "href": "https://ryzenai.docs.amd.com/en/1.7/" },
+        { "version": "1.6.1", "href": "https://ryzenai.docs.amd.com/en/1.6.1/" },
+        { "version": "1.6", "href": "https://ryzenai.docs.amd.com/en/1.6/" },
+        { "version": "1.5", "href": "https://ryzenai.docs.amd.com/en/1.5/" },
+        { "version": "1.4", "href": "https://ryzenai.docs.amd.com/en/1.4/" },
+        { "version": "1.3", "href": "https://ryzenai.docs.amd.com/en/1.3/" },
+        { "version": "1.2", "href": "https://ryzenai.docs.amd.com/en/1.2/" },
+        { "version": "1.1", "href": "https://ryzenai.docs.amd.com/en/1.1/" }
+      ]
+    },
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Ryzen AI Software",
+            "pages": [
+              "index",
+              {
+                "group": "Getting Started",
+                "icon": "rocket",
+                "expanded": false,
+                "pages": [
+                  "getting-started/index",
+                  "getting-started/inst",
+                  "running-models/model_quantization",
+                  "running-models/modelrun",
+                  "running-models/app_development",
+                  "applications/index"
+                ]
+              },
+              {
+                "group": "Models & Tutorials",
+                "icon": "graduation-cap",
+                "expanded": false,
+                "pages": [
+                  "models-tutorials/index",
+                  {
+                    "group": "Vision",
+                    "expanded": false,
+                    "pages": [
+                      "vision/getstartex",
+                      "vision/sd_demo",
+                      "vision/super_resolution",
+                      "vision/getting-started-resnet",
+                      "vision/getting-started-resnet-bf16",
+                      "vision/hello-world",
+                      "vision/image-classification",
+                      "vision/igpu-getting-started",
+                      "vision/yolov8m",
+                      "vision/yolov8s-worldv2",
+                      "vision/torchvision",
+                      "vision/cvml",
+                      "vision/nemotron-ocr-v2",
+                      "vision/npu-gpu-pipeline"
+                    ]
+                  },
+                  {
+                    "group": "LLMs",
+                    "expanded": false,
+                    "pages": [
+                      "llms/overview",
+                      "llms/high_level_python",
+                      "llms/server_interface",
+                      "llms/hybrid_oga",
+                      "llms/oga_model_prepare",
+                      "llms/oga_op_prepare",
+                      "llms/llm_linux",
+                      "llms/llm_list",
+                      "llms/oga-cpp-api",
+                      "llms/oga-inference",
+                      "llms/rag-oga",
+                      "llms/llm-sft-deploy",
+                      "llms/vlm",
+                      "llms/distilbert-example"
+                    ]
+                  },
+                  {
+                    "group": "Audio",
+                    "expanded": false,
+                    "pages": [
+                      "audio/whisper_cpp",
+                      "audio/whisper-asr",
+                      "audio/parakeet-tdt"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "GPU & Radeon",
+                "icon": "microchip",
+                "expanded": false,
+                "pages": [
+                  "gpu/index",
+                  "gpu/ryzenai_gpu",
+                  "gpu/radeon"
+                ]
+              },
+              {
+                "group": "Windows ML",
+                "icon": "windows",
+                "expanded": false,
+                "pages": [
+                  "winml/index",
+                  "winml/winml_overview",
+                  "winml/installation",
+                  "winml/model_support",
+                  "winml/model_deployment",
+                  "winml/model_conversion",
+                  "winml/winml_ep",
+                  "winml/winml_example",
+                  "winml/faq",
+                  "winml/troubleshooting",
+                  {
+                    "group": "Examples",
+                    "expanded": false,
+                    "pages": [
+                      "winml-examples/resnet",
+                      "winml-examples/clip",
+                      "winml-examples/googlebert"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Tools",
+                "icon": "screwdriver-wrench",
+                "expanded": false,
+                "pages": [
+                  "tools/index",
+                  "tools/xrt_smi",
+                  "tools/ai_analyzer",
+                  "tools/ryzen_ai_libraries",
+                  "tools/ops_support",
+                  "benchmarking/quark-quantization",
+                  "benchmarking/onnx-benchmark",
+                  "benchmarking/npu-check"
+                ]
+              },
+              {
+                "group": "Reference",
+                "icon": "book",
+                "expanded": false,
+                "pages": [
+                  "reference/index",
+                  "reference/relnotes",
+                  "reference/licenses",
+                  "reference/versions",
+                  "reference/ci-dashboard"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/amd/RyzenAI-SW",
+      "discord": "https://discord.gg/amd-dev",
+      "x": "https://x.com/amd",
+      "linkedin": "https://www.linkedin.com/company/amd"
+    },
+    "copyright": "Copyright (C) 2023-2026 Advanced Micro Devices, Inc."
+  }
+}

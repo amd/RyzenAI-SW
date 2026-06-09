@@ -1,0 +1,41 @@
+# =============================================================================
+# Link Check (external)
+# =============================================================================
+# Internal links are checked on every PR by the "Mintlify Docs Checks" workflow
+# (`mint broken-links`). External links rot over time (e.g. an old version URL
+# going 404), so this job also checks EXTERNAL links, anchors, and redirects on
+# a weekly schedule and on demand. On failure it opens/updates a tracking issue.
+# =============================================================================
+
+name: Link Check
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'   # Mondays 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  external-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Mintlify CLI
+        run: npm i -g mint
+      - name: Check all links (internal + external + anchors + redirects)
+        id: links
+        working-directory: docs
+        run: mint broken-links --check-external --check-anchors --check-redirects 2>&1 | tee ../link-report.txt
+      - name: Open an issue if links are broken
+        if: failure()
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "Broken links detected by scheduled link check"
+          content-filepath: ./link-report.txt
+          labels: docs, broken-links, automated

@@ -1,0 +1,48 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "files": ["docs/**/*.mdx"],
+  "ignorePaths": [
+    "docs/images/**",
+    "docs/assets/**",
+    "**/node_modules/**"
+  ],
+  "ignoreRegExpList": [
+    "/\\{/\\*[\\s\\S]*?\\*/\\}/",
+    "/`[^`]*`/",
+    "/```[\\s\\S]*?```/"
+  ],
+  "words": [
+    "Ryzen",
+    "AMD",
+    "XDNA",
+    "Vitis",
+    "iGPU",
+    "dGPU",
+    "ROCm",
+    "Radeon",
+    "Mintlify",
+    "MDX",
+    "onnx",
+    "onnxruntime",
+    "OGA",
+    "genai",
+    "Quark",
+    "Lemonade",
+    "llama",
+    "Strix",
+    "Krackan",
+    "Phoenix",
+    "Hawk",
+    "quantization",
+    "quantized",
+    "bfloat",
+    "Whisper",
+    "Nemotron",
+    "Parakeet",
+    "WinML",
+    "Docusaurus",
+    "lychee",
+    "cspell"
+  ]
+}

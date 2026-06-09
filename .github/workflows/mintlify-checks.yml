@@ -1,0 +1,132 @@
+# =============================================================================
+# Mintlify Docs Checks
+# =============================================================================
+# Cloud-only, fast quality gate for the Mintlify docs in docs/.
+#   - validate : `mint validate` (build) + `mint broken-links` (internal links)
+#   - prose    : Vale style (warning-level to start, per docs-as-code best practice)
+#   - spell    : cspell typo detection
+#   - a11y     : `mint a11y` accessibility (non-blocking)
+# On failure, collect-failures records the changed docs pages and uploads them
+# so the Notify Owner workflow can route the failure to the page owner.
+# =============================================================================
+
+name: Mintlify Docs Checks
+
+on:
+  pull_request:
+    paths: ['docs/**']
+  push:
+    branches: [main]
+    paths: ['docs/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Mintlify CLI
+        run: npm i -g mint
+      - name: Validate docs build
+        working-directory: docs
+        run: mint validate
+      - name: Check broken internal links
+        working-directory: docs
+        run: mint broken-links
+
+  a11y:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Mintlify CLI
+        run: npm i -g mint
+      - name: Accessibility check
+        working-directory: docs
+        run: mint a11y
+
+  prose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vale prose lint (warning-level)
+        uses: vale-cli/vale-action@v2
+        with:
+          files: docs
+          vale_flags: "--config=.github/scripts/.vale.ini"
+          fail_on_error: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  spell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Spell check
+        uses: streetsidesoftware/cspell-action@v6
+        with:
+          files: 'docs/**/*.mdx'
+          config: .github/scripts/cspell.json
+
+  collect-failures:
+    needs: [validate, prose, spell]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Collect changed docs pages
+        run: |
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            base="HEAD~1"
+          fi
+          git diff --name-only "$base" HEAD -- 'docs/**/*.mdx' > failed-pages.txt || true
+          echo "Changed docs pages:"; cat failed-pages.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: failed-pages-checks
+          path: failed-pages.txt
+
+  # ---- Record this run to the CI history (dashboard data) ----
+  record:
+    needs: [validate, prose, spell]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Append run to ci-history.json
+        env:
+          RUN_STATUS: ${{ (needs.validate.result == 'success' && needs.prose.result == 'success' && needs.spell.result == 'success') && 'success' || 'failure' }}
+        run: |
+          python .github/scripts/record_run.py \
+            --workflow "Mintlify Docs Checks" \
+            --status "$RUN_STATUS" \
+            --history .github/scripts/ci-history.json
+      - name: Commit history (main) or upload artifact
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .github/scripts/ci-history.json
+            git diff --staged --quiet || (git commit -m "ci: record docs CI run [skip ci]" && git push)
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ci-history-checks
+          path: .github/scripts/ci-history.json

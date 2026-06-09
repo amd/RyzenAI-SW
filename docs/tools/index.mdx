@@ -1,18 +1,23 @@
 ---
-title: Tools
-sidebar_position: 1
+title: "Tools"
+description: "Developer tools for profiling, managing, and extending Ryzen AI."
 ---
 
-# Tools
+{/* owner: bconsolvo */}
 
-These tools are part of the [Develop & Tools](/develop) section. See the full listing there.
+Developer tooling for the Ryzen&trade; AI stack.
 
-| Tool | Description |
-|------|-------------|
-| [AI Analyzer](/tools/ai-analyzer) | Profile and analyze model performance on NPU |
-| [CVML Library Tutorial](/models-tutorials/vision/cvml) | Hands-on tutorial for the CVML computer vision SDK |
-| [NPU Benchmark](/tools/benchmarking) | Benchmark ONNX model inference (FPS, latency, power) |
-| [NPU Check Utility](/tools/npu-check) | C++ utility to check NPU compatibility and driver status |
-| [NPU Management (xrt-smi)](/tools/npu-management) | Monitor NPU utilization, examine device status, validate firmware |
-| [Quark Quantization Tutorial](/models-tutorials/vision/quark-quantization) | Step-by-step model quantization with AMD Quark |
-| [Torchvision Inference](/models-tutorials/vision/torchvision-inference) | Run any torchvision model on Ryzen AI NPU |
+<CardGroup cols={2}>
+  <Card title="NPU Management (xrt-smi)" href="/tools/xrt_smi" icon="gauge">
+    Inspect and manage the NPU from the command line.
+  </Card>
+  <Card title="AI Analyzer" href="/tools/ai_analyzer" icon="chart-line">
+    Visualize model compilation and inference profiling.
+  </Card>
+  <Card title="CVML Library" href="/tools/ryzen_ai_libraries" icon="eye">
+    Computer-vision and ML library for Ryzen AI.
+  </Card>
+  <Card title="Supported Operators" href="/tools/ops_support" icon="list">
+    Operators supported by the NPU compiler.
+  </Card>
+</CardGroup>

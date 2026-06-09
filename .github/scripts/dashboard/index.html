@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ryzen AI Docs - CI Dashboard</title>
+  <style>
+    :root { color-scheme: light dark; --b:#8884; --ok:#1a7f37; --bad:#cf222e; --info:#0969da; --muted:#8b949e; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 24px; max-width: 1100px; }
+    h1 { font-size: 22px; margin: 0 0 2px; }
+    .sub { color: var(--muted); margin: 0 0 20px; }
+    .cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+    .card { border: 1px solid var(--b); border-radius: 8px; padding: 12px; }
+    .card .v { font-size: 24px; font-weight: 700; }
+    .card .l { color: var(--muted); font-size: 12px; }
+    .v.ok { color: var(--ok); } .v.bad { color: var(--bad); } .v.info { color: var(--info); }
+    table { border-collapse: collapse; width: 100%; margin: 8px 0 4px; font-size: 13px; }
+    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--b); vertical-align: top; }
+    th { font-weight: 600; }
+    td.r, th.r { text-align: right; }
+    tr.ok td { background: color-mix(in srgb, var(--ok) 8%, transparent); }
+    tr.bad td { background: color-mix(in srgb, var(--bad) 9%, transparent); }
+    .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--b); }
+    .pill.ok { color: var(--ok); } .pill.bad { color: var(--bad); } .pill.info { color: var(--info); }
+    .cap { color: var(--muted); font-size: 12px; margin: 2px 0 20px; }
+    h2 { font-size: 16px; margin: 22px 0 6px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+    .err { color: var(--bad); }
+  </style>
+</head>
+<body>
+  <h1>Ryzen AI Docs - CI Dashboard</h1>
+  <p class="sub">Docs-as-code pipeline: what ran, when, pass/fail, and the owner for each page.</p>
+  <div id="app">Loading <code>ci-history.json</code> ...</div>
+
+  <script>
+    const fmt = (iso) => { const [d, t] = iso.split("T"); return `${d} ${t.slice(0,5)}`; };
+    const esc = (s) => String(s ?? "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+    const cls = (s) => (["success","pass","notified"].includes(s) ? "ok" : ["failure","fail"].includes(s) ? "bad" : "");
+
+    function render(hist) {
+      const runs = hist.runs || [];
+      const total = runs.length;
+      const failures = runs.filter(r => r.status === "failure").length;
+      const successes = total - failures;
+      const latest = runs[0] || { status: "n/a" };
+
+      const pageMap = new Map();
+      for (const run of runs) for (const p of (run.pages||[]))
+        if (!pageMap.has(p.page)) pageMap.set(p.page, { ...p, when: run.started_at });
+      const pages = [...pageMap.values()];
+      const passing = pages.filter(p => p.status === "pass").length;
+      const failing = pages.filter(p => p.status === "fail").length;
+      const notified = new Set(runs.flatMap(r => (r.pages||[]).filter(p => p.status==="notified").map(p => p.owner_id))).size;
+
+      const cards = `
+        <div class="cards">
+          <div class="card"><div class="v ${cls(latest.status)}">${latest.status==="success"?"Passing":latest.status==="failure"?"Failing":esc(latest.status)}</div><div class="l">Latest run</div></div>
+          <div class="card"><div class="v">${total}</div><div class="l">Runs recorded</div></div>
+          <div class="card"><div class="v ok">${passing}</div><div class="l">Pages passing</div></div>
+          <div class="card"><div class="v ${failing?"bad":""}">${failing}</div><div class="l">Pages failing</div></div>
+          <div class="card"><div class="v ${notified?"info":""}">${notified}</div><div class="l">Owners notified</div></div>
+        </div>`;
+
+      const runsRows = runs.map(r => `
+        <tr class="${cls(r.status)}">
+          <td>${fmt(r.started_at)}</td>
+          <td>${esc(r.workflow)}</td>
+          <td>${esc(r.event)}</td>
+          <td>${(r.jobs||[]).map(j => `<code>${esc(j.script)}</code>`).join("<br>")}</td>
+          <td class="r"><span class="pill ${cls(r.status)}">${r.status==="success"?"passed":"failed"}</span></td>
+        </tr>`).join("");
+
+      const pageRows = pages.map(p => `
+        <tr class="${cls(p.status)}">
+          <td><code>${esc(p.page)}</code></td>
+          <td>@${esc(p.owner_id)}</td>
+          <td>${esc(p.check)}</td>
+          <td class="r"><span class="pill ${cls(p.status)}">${esc(p.status)}</span></td>
+          <td class="r">${fmt(p.when)}</td>
+        </tr>`).join("");
+
+      document.getElementById("app").innerHTML = cards +
+        `<h2>Runs (${successes} passed / ${failures} failed)</h2>
+         <table><thead><tr><th>Time</th><th>Workflow</th><th>Trigger</th><th>Scripts</th><th class="r">Status</th></tr></thead><tbody>${runsRows}</tbody></table>
+         <p class="cap">Source: .github/scripts/ci-history.json - appended by .github/scripts/record_run.py on every CI run.</p>
+         <h2>Pages &amp; owners (latest result)</h2>
+         <table><thead><tr><th>Page</th><th>Owner</th><th>Check</th><th class="r">Status</th><th class="r">Last run</th></tr></thead><tbody>${pageRows}</tbody></table>
+         <p class="cap">Owner is read from each page's hidden header; failing pages route to the owner automatically.</p>`;
+    }
+
+    fetch("../ci-history.json")
+      .then(r => r.json())
+      .then(render)
+      .catch(e => { document.getElementById("app").innerHTML = `<p class="err">Could not load ../ci-history.json: ${esc(e.message)}</p>`; });
+  </script>
+</body>
+</html>

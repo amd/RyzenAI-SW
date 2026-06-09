@@ -14,24 +14,23 @@ __pycache__/
 *.egg-info/
 
 # CI artifacts
-docs/website/ci/validation-results/
-docs/website/ci/extracted-blocks/
-docs/website/ci/model-validation/results/*.tmp
+website/ci/validation-results/
+website/ci/extracted-blocks/
+website/ci/model-validation/results/*.tmp
 
 # Generated docs (from docusaurus-plugin-llms)
-# The plugin copies .mdx content as .md into the website dir
-docs/website/docs/
-docs/website/applications/*.md
-docs/website/applications.md
-docs/website/develop/**/*.md
-docs/website/getting-started/**/*.md
-docs/website/models-tutorials/**/*.md
-docs/website/reference/**/*.md
-docs/website/templates/**/*.md
-docs/website/tools/**/*.md
+# The plugin copies .mdx content as .md into the website dir at build time
+website/docs/
 
 # Downloaded models
 *-onnx-ryzenai-*/
+
+# Local model downloads + ported example artifacts (multi-GB; not docs source)
+/models/
+/models-tutorials/
+
+# Downloaded installers / binaries (pulled at runtime by examples)
+*.exe
 
 # Build artifacts
 *_Perf.log
@@ -67,4 +66,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # Vale downloaded styles
-docs/website/.vale/styles/Vale/
+website/.vale/styles/Vale/

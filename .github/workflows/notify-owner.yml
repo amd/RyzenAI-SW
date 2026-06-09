@@ -1,0 +1,90 @@
+# =============================================================================
+# Notify Owner On Failure
+# =============================================================================
+# When a docs check fails, route the failure to the page OWNER (resolved from
+# the hidden owner header inside the page) using GitHub-native notifications.
+#
+#   - workflow_run : real path. Fires after "Mintlify Docs Checks" or
+#                    "Test Code Samples" complete; only acts on failure.
+#                    Downloads the failed-pages artifacts from that run.
+#   - workflow_dispatch : demo path. Pick a page to simulate a failure for and
+#                    watch the owner get resolved + notified.
+#
+# Notification is a GitHub issue whose body @mentions the page owner(s) by
+# GitHub ID. GitHub then emails them through its own system. No email addresses
+# and no SMTP are used or stored.
+# =============================================================================
+
+name: Notify Owner On Failure
+
+on:
+  workflow_run:
+    workflows: ["Mintlify Docs Checks", "Test Code Samples"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Docs page to simulate a failure for (demo)"
+        required: false
+        default: "docs/getting-started/inst.mdx"
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  notify:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Download failed-pages artifacts from the failed run
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: failed-pages*
+          merge-multiple: true
+          path: ./_failed
+
+      - name: Assemble failing pages list
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "${{ github.event.inputs.file }}" > failed-pages.txt
+          else
+            cat ./_failed/*.txt 2>/dev/null | sort -u > failed-pages.txt || true
+          fi
+          echo "Failing pages:"; cat failed-pages.txt
+
+      - name: Compose owner notification (resolve owner GitHub IDs)
+        id: compose
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          python .github/scripts/notify_owner.py \
+            --failed-pages failed-pages.txt \
+            --body-out owner-issue-body.md
+
+      - name: Open issue mentioning the owner(s)
+        if: ${{ steps.compose.outputs.has_targets == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "${{ steps.compose.outputs.title }}" \
+            --body-file owner-issue-body.md \
+            --label "docs,ci-failure"
+
+      - name: Upload notification body
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-notification
+          path: owner-issue-body.md

@@ -1,0 +1,35 @@
+---
+title: "Radeon GPU (ROCm)"
+description: "Run AI workloads on AMD Radeon and Ryzen AI integrated/discrete GPUs using ROCm."
+---
+
+{/* owner: dwithchenna */}
+
+AMD Ryzen&trade; AI systems pair the NPU with a Radeon&trade; integrated GPU (iGPU), and many platforms also support a Radeon discrete GPU (dGPU). For GPU-accelerated AI on Windows and Linux, AMD provides **ROCm** for Radeon and Ryzen.
+
+<Note>
+GPU documentation lives in the canonical ROCm docs to avoid drift. This page is the entry point from Ryzen AI Software; deep GPU content is maintained by the ROCm team.
+</Note>
+
+## ROCm on Radeon and Ryzen
+
+<CardGroup cols={2}>
+  <Card title="ROCm for Radeon and Ryzen" href="https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/index.html" icon="microchip">
+    Official ROCm documentation for AMD Radeon and Ryzen AI GPUs.
+  </Card>
+  <Card title="DirectML Flow (iGPU)" href="/gpu/ryzenai_gpu" icon="window">
+    Run models on the Ryzen AI integrated GPU via the DirectML execution provider.
+  </Card>
+</CardGroup>
+
+## When to use the GPU vs the NPU
+
+- **NPU** - best for sustained, power-efficient inference (CNNs, transformers, LLM hybrid/NPU flows).
+- **GPU (Radeon)** - best for high-throughput workloads, larger models via GGUF/Vulkan, and ROCm-accelerated pipelines.
+- **Hybrid** - LLM flows can split work across NPU and iGPU for the best time-to-first-token and tokens-per-second.
+
+## Next steps
+
+- Install: see the [Installation Instructions](/getting-started/inst).
+- LLMs: see the [LLM Deployment Overview](/llms/overview).
+- Full GPU setup and supported configurations: [ROCm for Radeon and Ryzen](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/index.html).

@@ -1,0 +1,52 @@
+---
+title: "CI Dashboard"
+description: "Status of the docs-as-code CI: what ran, when, pass/fail, and the owner for each page."
+---
+
+{/* owner: bconsolvo */}
+
+This page tracks the documentation CI pipeline: which checks ran, when, what passed or failed, and the owner responsible for each page. The data comes from `.github/scripts/ci-history.json`, which CI appends to on every run.
+
+<Note>
+The runs below are **real executions** recorded by `.github/scripts/record_run.py` (not mock data). Cloud-stage checks (link check, page build, code-block syntax + execution of `test`-tagged blocks) run on each PR. NPU-hardware execution of `test`-tagged blocks runs on the self-hosted Strix / Strix Halo runners; those rows appear here once that runner is connected.
+</Note>
+
+## How the pipeline works
+
+| Stage | What runs | Where |
+|-------|-----------|-------|
+| Link + build | `mint broken-links`, `mint validate` | cloud |
+| Prose + spelling | Vale, cspell | cloud |
+| Code blocks | `extract_code_blocks.py` (syntax always; `test`-tagged blocks executed on hardware) | cloud + Strix / Strix Halo |
+| Failure routing | `notify_owner.py` opens an issue that @mentions the owner (GitHub notifies them) | cloud |
+| Record | `record_run.py` appends the run here | cloud |
+
+## Latest runs
+
+| Time | Workflow | Trigger | Scripts | Status |
+|------|----------|---------|---------|--------|
+| 2026-06-03 16:03 | Test Code Samples | local | `extract_code_blocks.py --run` | passed |
+| 2026-06-03 16:03 | Mintlify Docs Checks | local | `mint broken-links` | passed |
+
+## Pages checked (latest run) and their owners
+
+| Page | Owner | Check | Status |
+|------|-------|-------|--------|
+| vision/getstartex.mdx | @savitha-srinivasan | code-execution | pass |
+| getting-started/inst.mdx | @uday610 | code-execution | pass |
+| llms/high_level_python.mdx | @jeremyfowers | code-execution | pass |
+| llms/hybrid_oga.mdx | @uday610 | code-execution | pass |
+| running-models/model_quantization.mdx | @uday610 | code-execution | pass |
+| running-models/modelrun.mdx | @uday610 | code-execution | pass |
+| tools/ai_analyzer.mdx | @savitha-srinivasan | code-execution | pass |
+| vision/super_resolution.mdx | @bconsolvo | code-execution | pass |
+| winml/winml_ep.mdx | @dwithchenna | code-execution | pass |
+
+## Full / live dashboard
+
+- Rich, filterable dashboard (summary cards, pass/fail chart, full run log): `.github/scripts/dashboard/index.html` (host the `.github/scripts/dashboard/` folder, e.g. on GitHub Pages).
+- Raw data: `.github/scripts/ci-history.json`.
+
+## Maintainer
+
+This page and the CI pipeline are owned by `@bconsolvo`.
