@@ -26,7 +26,7 @@ on:
       file:
         description: "Docs page to simulate a failure for (demo)"
         required: false
-        default: "docs/getting-started/inst.mdx"
+        default: "docs/installation.mdx"
 
 permissions:
   contents: read

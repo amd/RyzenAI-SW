@@ -12,7 +12,7 @@ on GitHub's notification system, keyed off the owner's GitHub ID.
 
 Usage:
   python notify_owner.py --failed-pages failed-pages.txt --body-out body.md
-  python notify_owner.py --file docs/getting-started/inst.mdx   # single-file demo
+  python notify_owner.py --file docs/installation.mdx   # single-file demo
 """
 
 import argparse

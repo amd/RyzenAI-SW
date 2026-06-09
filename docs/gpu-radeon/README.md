@@ -2,4 +2,4 @@
 
 Run AI workloads on AMD Radeon integrated and discrete GPUs (DirectML and ROCm).
 
-Landing page: `gpu/index.mdx`.
+Landing page: `gpu-radeon/index.mdx`.
