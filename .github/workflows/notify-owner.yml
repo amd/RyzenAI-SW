@@ -10,9 +10,14 @@
 #   - workflow_dispatch : demo path. Pick a page to simulate a failure for and
 #                    watch the owner get resolved + notified.
 #
-# Notification is a GitHub issue whose body @mentions the page owner(s) by
-# GitHub ID. GitHub then emails them through its own system. No email addresses
-# and no SMTP are used or stored.
+# Two notifications, both keyed off the page's hidden owner header:
+#   1. GitHub issue whose body @mentions the page owner(s) by GitHub ID (always;
+#      GitHub emails them through its own system - no individual emails stored).
+#   2. A full report emailed to the shared Ryzen AI support distribution list
+#      (`NOTIFY_EMAIL`, default dl.ryzenai.support@amd.com). A DL is safe to keep
+#      in the open - it is not an individual's address. This step only runs when
+#      the SMTP_* secrets are set; otherwise it is skipped and only the issue is
+#      opened.
 # =============================================================================
 
 name: Notify Owner On Failure
@@ -37,6 +42,16 @@ jobs:
   notify:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
+    env:
+      # Shared distribution list for the full failure report (safe to be public).
+      # Override with the NOTIFY_EMAIL repo variable if the DL ever changes.
+      NOTIFY_EMAIL: ${{ vars.NOTIFY_EMAIL || 'dl.ryzenai.support@amd.com' }}
+      # SMTP relay for the email step. Set these as repo secrets to enable email;
+      # if unset, the email step is skipped and only the GitHub issue is opened.
+      SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -70,6 +85,7 @@ jobs:
         run: |
           python .github/scripts/notify_owner.py \
             --failed-pages failed-pages.txt \
+            --notify-email "$NOTIFY_EMAIL" \
             --body-out owner-issue-body.md
 
       - name: Open issue mentioning the owner(s)
@@ -82,6 +98,22 @@ jobs:
             --title "${{ steps.compose.outputs.title }}" \
             --body-file owner-issue-body.md \
             --label "docs,ci-failure"
+
+      # Additionally email the full report to the shared Ryzen AI support DL.
+      # Skipped automatically when SMTP_* secrets are not configured.
+      - name: Email full report to the Ryzen AI support DL
+        if: ${{ steps.compose.outputs.has_targets == 'true' && env.SMTP_SERVER != '' }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ env.SMTP_SERVER }}
+          server_port: ${{ env.SMTP_PORT }}
+          username: ${{ env.SMTP_USERNAME }}
+          password: ${{ env.SMTP_PASSWORD }}
+          from: "Ryzen AI Docs CI <${{ env.SMTP_USERNAME }}>"
+          to: ${{ env.NOTIFY_EMAIL }}
+          subject: ${{ steps.compose.outputs.title }}
+          body: "Ryzen AI docs CI failed. Full per-owner report attached (and filed as a GitHub issue). Run: ${{ github.event.workflow_run.html_url }}"
+          attachments: owner-issue-body.md
 
       - name: Upload notification body
         uses: actions/upload-artifact@v4

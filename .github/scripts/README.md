@@ -154,7 +154,14 @@ self-hosted runner (Windows); add the label `halo`; run as a service
   the committed file is stale.
 - On a failing run, `notify_owner.py` resolves the owner from the page header
   and opens an issue that **@mentions** them - GitHub emails them through its own
-  system, so no email addresses are stored anywhere.
+  system, so no individual email addresses are stored anywhere.
+- **Plus a full report by email to the shared support DL.** `notify-owner.yml`
+  also emails the report to `NOTIFY_EMAIL` (repo variable, default
+  `dl.ryzenai.support@amd.com`). A distribution list is safe to keep public - it
+  is not a person's address. This email step runs only when the SMTP relay
+  secrets are configured: `SMTP_SERVER`, `SMTP_PORT`, `SMTP_USERNAME`,
+  `SMTP_PASSWORD`. Without them, the GitHub issue is still opened; the email is
+  simply skipped.
 
 ## End-to-end walkthrough
 

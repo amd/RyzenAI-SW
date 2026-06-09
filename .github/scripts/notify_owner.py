@@ -40,6 +40,8 @@ def main() -> None:
     ap.add_argument("--file", type=Path)
     ap.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", "amd/RyzenAI-SW"))
     ap.add_argument("--run-url", default=os.environ.get("RUN_URL", ""))
+    ap.add_argument("--notify-email", default=os.environ.get("NOTIFY_EMAIL", ""),
+                    help="shared DL also emailed the report (e.g. dl.ryzenai.support@amd.com)")
     ap.add_argument("--body-out", type=Path, default=Path("owner-issue-body.md"))
     args = ap.parse_args()
 
@@ -69,6 +71,10 @@ def main() -> None:
         lines.append(f"### @{oid}")
         for p in sorted(owners[oid]):
             lines.append(f"- `{p}`")
+        lines.append("")
+    if args.notify_email:
+        lines.append(f"_A copy of this report is emailed to the Ryzen AI support "
+                     f"distribution list ({args.notify_email})._")
         lines.append("")
     args.body_out.write_text("\n".join(lines), encoding="utf-8")
 
