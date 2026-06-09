@@ -30,8 +30,8 @@ Create a clone of the Ryzen AI installation conda environment to add required py
 
 ### Create and Activate Conda Environment
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
@@ -39,8 +39,8 @@ conda create --name quark_quantization --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate quark_quantization
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 export RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
@@ -48,29 +48,29 @@ conda create --name quark_quantization --clone $RYZEN_AI_CONDA_ENV_NAME
 conda activate quark_quantization
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 Add python packages needed for the tutorial:
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 cd <ryzenai-sw>\docs\models-tutorials\vision\quark_quantization
 pip install -r requirements.txt
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 cd <ryzenai-sw>/docs/vision/quark_quantization
 pip install -r requirements.txt
 ```
 
-&lt;/TabItem>
-&lt;/Tabs> 
+</Tab>
+</Tabs> 
 
 Input model
 -----------
@@ -97,8 +97,8 @@ To prepare the test data, please check the download section of the main website:
 
 Then, create the validation dataset and calibration dataset:
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 mkdir val_data
@@ -106,16 +106,16 @@ tar -xzf val_images.tar.gz -C val_data
 python prepare_data.py val_data calib_data
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 mkdir -p val_data && tar -xzf val_images.tar.gz -C val_data
 python prepare_data.py val_data calib_data
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 Quantization configuration
 --------------------------

@@ -1,32 +1,136 @@
 ---
 title: "Super-Resolution on Ryzen AI"
-description: "Run image super-resolution models (Real-ESRGAN, SESR) on the AMD Ryzen AI NPU."
+description: "Upscale images locally on the AMD Ryzen AI NPU with Real-ESRGAN (4x) and SESR-M7 (2x) super-resolution models."
 ---
 
 {/* owner: bconsolvo */}
 
-Image super-resolution upscales a low-resolution image to a higher resolution while recovering detail. This tutorial runs super-resolution models on the AMD Ryzen&trade; AI NPU. Full source is in the [RyzenAI-SW super-resolution example](https://github.com/amd/RyzenAI-SW/tree/main/CNN-examples/super-resolution).
+This Ryzen&trade; AI example lets you upscale images using state-of-the-art super-resolution models running locally on your AMD NPU. Two model families are provided:
 
-## Quality metric (PSNR)
+- **Real-ESRGAN** — A perceptually optimized model for **4x** upscaling, available in four tile sizes (Wang et al., 2021)
+- **SESR-M7** — A super-efficient model for **2x** upscaling (Bhardwaj et al., 2022)
 
-Super-resolution quality is commonly reported with Peak Signal-to-Noise Ratio (PSNR). Runnable code blocks are executed by the docs CI by default on real hardware (Strix / Strix Halo) on every change, failing the build if they stop working.
+The models have been quantized to INT8 and optimized for the AMD Ryzen AI NPU using ONNX Runtime with the Vitis AI Execution Provider. Full source is in the [RyzenAI-SW super-resolution example](https://github.com/amd/RyzenAI-SW/tree/main/CNN-examples/super-resolution).
 
-```python
-import math
+## Prerequisites
 
-def psnr(mse: float, peak: float = 255.0) -> float:
-    if mse == 0:
-        return float("inf")
-    return 20 * math.log10(peak) - 10 * math.log10(mse)
+### Hardware
 
-# A small, deterministic sanity check that the metric behaves as expected.
-assert psnr(mse=0.0) == float("inf")
-assert abs(psnr(mse=100.0) - 28.13) < 0.1
-print(f"PSNR @ MSE=100 -> {psnr(100.0):.2f} dB")
+You need an AMD AI PC with a Ryzen AI NPU. Supported processors:
+
+| Series                      | Codename                    | Abbreviation | Launch Year | Windows 11 |
+| --------------------------- | --------------------------- | ------------ | ----------- | ---------- |
+| Ryzen AI Max PRO 300 Series | Strix Halo                  | STX          | 2025        | Yes        |
+| Ryzen AI PRO 300 Series     | Strix Point / Krackan Point | STX/KRK      | 2025        | Yes        |
+| Ryzen AI Max 300 Series     | Strix Halo                  | STX          | 2025        | Yes        |
+| Ryzen AI 300 Series         | Strix Point                 | STX          | 2025        | Yes        |
+
+### Software
+
+1. Install the latest NPU drivers and Ryzen AI Software by following the [Ryzen AI Software Installation Instructions](/installation). Allow approximately **30 minutes** for the full installation.
+2. Clone and activate your own conda environment based on the installed `ryzen-ai-<version>` environment. Substitute the correct version number (e.g., `1.7.1`), and set the `RYZEN_AI_INSTALLATION_PATH` environment variable.
+
+```powershell
+conda create -n super-resolution --clone ryzen-ai-1.7.1
+conda activate super-resolution
+$Env:RYZEN_AI_INSTALLATION_PATH = 'C:/Program Files/RyzenAI/1.7.1/'
 ```
 
-## Next steps
+## Real-ESRGAN — 4x Super-Resolution
 
-- Models: see the [Vision Models table](/vision/index#vision-models) for verified models.
-- Quantize your own model with [Model Quantization](/getting-started/model_quantization).
-- Deploy with [Model Compilation and Deployment](/getting-started/modelrun).
+**Real-ESRGAN** (Real Enhanced Super-Resolution Generative Adversarial Networks) produces high-quality **4x** upscaled images with strong perceptual fidelity. This AMD version has been re-trained with reduced feature channels and fewer stacked blocks for improved efficiency, then quantized to INT8 for the AMD NPU.
+
+Four tile-size variants are available. All share the same code and inference pipeline — only the ONNX model file differs:
+
+| Model       | Tile Size | Hugging Face Link                                                                                 |
+| ----------- | --------- | ------------------------------------------------------------------------------------------------- |
+| Real-ESRGAN | 128x128   | [amd/realesrgan-128x128-tiles-amdnpu](https://huggingface.co/amd/realesrgan-128x128-tiles-amdnpu)   |
+| Real-ESRGAN | 256x256   | [amd/realesrgan-256x256-tiles-amdnpu](https://huggingface.co/amd/realesrgan-256x256-tiles-amdnpu)   |
+| Real-ESRGAN | 512x512   | [amd/realesrgan-512x512-tiles-amdnpu](https://huggingface.co/amd/realesrgan-512x512-tiles-amdnpu)   |
+| Real-ESRGAN | 1024x1024 | [amd/realesrgan-1024x1024-tiles-amdnpu](https://huggingface.co/amd/realesrgan-1024x1024-tiles-amdnpu) |
+
+**Tile size tradeoffs:** A larger tile size reduces stitching overhead and may produce fewer boundary artifacts, but requires more memory per tile. A smaller tile size is more memory-friendly and can be better suited for lower-resolution inputs.
+
+### Quick Start
+
+The example below uses the 256x256 variant. To use a different tile size, substitute the repository name and ONNX filename accordingly.
+
+1. Clone the model repository from Hugging Face:
+
+```powershell
+git clone https://hf.co/amd/realesrgan-256x256-tiles-amdnpu
+cd realesrgan-256x256-tiles-amdnpu
+```
+
+2. Install dependencies (you should already be in the activated `super-resolution` conda environment):
+
+```powershell
+pip install -r requirements.txt
+```
+
+3. Run inference on an image:
+
+```powershell
+python onnx_inference.py --onnx onnx-models/realesrgan_nchw_256x256_u8s8.onnx --input assets/input_tiger_320x480_108005.png --out-dir outputs --device npu
+```
+
+For other tile sizes, visit the other Hugging Face repos and follow the same steps.
+
+### Arguments
+
+| Argument   | Description                                                                  |
+| ---------- | ---------------------------------------------------------------------------- |
+| `--onnx`   | Path to the ONNX model file                                                  |
+| `--input`  | A single image file or a directory (recursively processes .png, .jpg, .jpeg) |
+| `--out-dir`| Output directory for the upscaled images                                     |
+| `--device` | `npu` (default) or `cpu`                                                     |
+
+To use evaluation scripts, benchmark datasets, and accuracy metrics, see the full model card on Hugging Face: [amd/realesrgan-256x256-tiles-amdnpu](https://huggingface.co/amd/realesrgan-256x256-tiles-amdnpu).
+
+## SESR-M7 — 2x Super-Resolution
+
+**SESR** (Super-Efficient Super Resolution) is a lightweight CNN-based model designed for fast, efficient image upscaling. SESR-M7 is one of the smaller variants and uses a tiling technique to work across the image in 256x256 pixel tiles to produce a **2x** super-resolution output. Even though the tile size is 256x256, the inference pipeline handles images of almost any size.
+
+### Quick Start
+
+1. Clone the model repository from Hugging Face:
+
+```powershell
+git clone https://hf.co/amd/sesr-m7-256x256-tiles-amdnpu
+cd sesr-m7-256x256-tiles-amdnpu
+```
+
+2. Install dependencies (you should already be in the activated `super-resolution` conda environment):
+
+```powershell
+pip install -r requirements.txt
+```
+
+3. Run inference on an image:
+
+```powershell
+python onnx_inference.py --onnx onnx-models/sesr_nchw_int8.onnx --input assets/input_ice_climber_0844.png --out-dir outputs --device npu
+```
+
+### Arguments
+
+| Argument   | Description                                                                  |
+| ---------- | ---------------------------------------------------------------------------- |
+| `--onnx`   | Path to the ONNX model file                                                  |
+| `--input`  | A single image file or a directory (recursively processes .png, .jpg, .jpeg) |
+| `--out-dir`| Output directory for the upscaled images                                     |
+| `--device` | `npu` (default) or `cpu`                                                     |
+
+To use evaluation scripts, benchmark results, and training details, see the full model card on Hugging Face: [amd/sesr-m7-256x256-tiles-amdnpu](https://huggingface.co/amd/sesr-m7-256x256-tiles-amdnpu).
+
+## Notes
+
+- **First-run compilation:** If the model has not been previously compiled for your NPU, the first inference run will take several minutes to compile and cache the model. Subsequent runs will be fast. The compiled model cache is stored in the `modelcachekey_*` directory within the repository.
+- **CPU fallback:** All models can also run on CPU by passing `--device cpu`. No NPU drivers or Ryzen AI Software are required for CPU execution, but performance will be significantly slower.
+
+## Additional Resources
+
+- **Hugging Face model cards:** [sesr-m7-256x256-tiles-amdnpu](https://huggingface.co/amd/sesr-m7-256x256-tiles-amdnpu), [realesrgan-128x128-tiles-amdnpu](https://huggingface.co/amd/realesrgan-128x128-tiles-amdnpu), [realesrgan-256x256-tiles-amdnpu](https://huggingface.co/amd/realesrgan-256x256-tiles-amdnpu), [realesrgan-512x512-tiles-amdnpu](https://huggingface.co/amd/realesrgan-512x512-tiles-amdnpu), [realesrgan-1024x1024-tiles-amdnpu](https://huggingface.co/amd/realesrgan-1024x1024-tiles-amdnpu)
+- **Supported models:** see the [Vision Models table](/vision#vision-models)
+- **Quantize your own model:** [Model Quantization](/tools/model_quantization)
+- **Deploy:** [Model Compilation and Deployment](/tools/modelrun)

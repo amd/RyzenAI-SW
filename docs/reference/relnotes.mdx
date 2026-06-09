@@ -104,9 +104,9 @@ The following table lists which types of models are supported on what hardware p
 
 - Breaking Changes
 
-  - For running INT8 models on STX/KRK or newer devices, the `xclbin` provider option is no longer supported and should no longer be used. See [Using INT8 Models](/getting-started/modelrun#int8-models) for full details.
-  - For running INT8 models on PHX/HPT devices, the `target` option should be set to `X1`. The NPU binary should still be specified using the `xclbin` provider option. See [Using INT8 Models](/getting-started/modelrun#int8-models) for full details.
-  - For BF16 models, the default configurations file requires a new `target` section. See [Config File Options](/getting-started/modelrun#configuration-file) for full details.
+  - For running INT8 models on STX/KRK or newer devices, the `xclbin` provider option is no longer supported and should no longer be used. See [Using INT8 Models](/tools/modelrun#int8-models) for full details.
+  - For running INT8 models on PHX/HPT devices, the `target` option should be set to `X1`. The NPU binary should still be specified using the `xclbin` provider option. See [Using INT8 Models](/tools/modelrun#int8-models) for full details.
+  - For BF16 models, the default configurations file requires a new `target` section. See [Config File Options](/tools/modelrun#configuration-file) for full details.
   - LLM:
 
     - OGA version has been updated to v0.9.2 (Ryzen AI 1.6) from v0.7.0 (Ryzen AI 1.5). Any APIs that are obsolete must be updated to the supported equivalents as described in the [Microsoft ONNX Runtime GenAI v0.9.2 documentation](https://github.com/microsoft/onnxruntime-genai/tree/rel-0.9.2)
@@ -131,17 +131,17 @@ The following table lists which types of models are supported on what hardware p
 
 - Breaking Changes
 
-  - The `%RYZEN_AI_INSTALLATION_PATH%\deployment` folder has been reorganized and flattened. Deployment DLLs are no longer organized in subfolders. If you use application build scripts that pull DLLs from the `deployment` folder, you need to update them based on the new paths. Refer to the [Application Packaging Requirements](/getting-started/app_development#app-packaging) section for further details.
+  - The `%RYZEN_AI_INSTALLATION_PATH%\deployment` folder has been reorganized and flattened. Deployment DLLs are no longer organized in subfolders. If you use application build scripts that pull DLLs from the `deployment` folder, you need to update them based on the new paths. Refer to the [Application Packaging Requirements](/reference/app_development#app-packaging) section for further details.
 
   - The `1x4.xclbin` (PHX/HPT) and `AMD_AIE2P_Nx4_Overlay.xclbin` (STX/KRK) NPU binaries are no longer supported and should not be used. You should use the `4x4.xclbin` (PHX/HPT) and `AMD_AIE2P_4x4_Overlay.xclbin` (STX/KRK) NPU binaries instead.
 
   - The `XLNX_ENABLE_CACHE`, `XLNX_VART_FIRMWARE`, and `XLNX_TARGET_NAME` environment variables are no longer supported and should not be relied upon.
 
-  - Support for VitisAI EP cache encryption is no longer available. To encrypt the compiled models, use the ONNX Runtime [EP Context Cache](/getting-started/modelrun#ort-ep-context-cache) feature instead.
+  - Support for VitisAI EP cache encryption is no longer available. To encrypt the compiled models, use the ONNX Runtime [EP Context Cache](/tools/modelrun#ort-ep-context-cache) feature instead.
 
-  - For INT8 models, the VitisAI EP does not save the compiled model to disk by default. To save the compiled model, use the ONNX Runtime [EP Context Cache](/getting-started/modelrun#ort-ep-context-cache) feature or set the `enable_cache_file_io_in_mem` provider option to 0.
+  - For INT8 models, the VitisAI EP does not save the compiled model to disk by default. To save the compiled model, use the ONNX Runtime [EP Context Cache](/tools/modelrun#ort-ep-context-cache) feature or set the `enable_cache_file_io_in_mem` provider option to 0.
 
-  - Generation of the `vitisai_ep_report.json` file is no longer automatic and should be manually enabled. See the [Operator Assignment Report](/getting-started/modelrun#op-assignment-report) section for details.
+  - Generation of the `vitisai_ep_report.json` file is no longer automatic and should be manually enabled. See the [Operator Assignment Report](/tools/modelrun#op-assignment-report) section for details.
 
   - Changes to the OGA flow for LLMs:
 
@@ -190,7 +190,7 @@ The following table lists which types of models are supported on what hardware p
 
     - [Lemonade Server](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/README.md#serving): A server interface that uses the standard Open AI API, allowing applications in any language to integrate with Lemonade Server for local LLM deployment and compatibility with existing Open AI apps.
     - [Lemonade Python API](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/README.md#api): Offers High-Level API for easy integration of Lemonade LLMs into Python applications and Low-Level API for custom experiments with specific checkpoints, devices, and tools.
-    - [Lemonade Command Line](https://github.com/onnx/turnkeyml/blob/main/docs/lemonade/getting_started.md#cli-commands) Interface easily benchmark, measure accuracy, prompt or gather memory usage of your LLM.
+    - [Lemonade Command Line](https://github.com/lemonade-sdk/lemonade) Interface easily benchmark, measure accuracy, prompt or gather memory usage of your LLM.
   - [TurnkeyML](https://github.com/onnx/turnkeyml) – Open-source tool that includes low-code APIs for general ONNX workflows.
   - [Digest AI](https://github.com/onnx/digestai) – A Model Ingestion and Analysis Tool in collaboration with the Linux Foundation.
   - [GAIA](https://github.com/amd/gaia/tree/main) – An open-source application designed for the quick setup and execution of generative AI applications on local PC hardware.
@@ -239,7 +239,7 @@ The following table lists which types of models are supported on what hardware p
   - Support for mixed precision data types
   - Compatibility with Copilot+ applications
 
-- Improved support for [LLMs using OGA](/llms/overview)
+- Improved support for [LLMs using OGA](/llms)
 
 - New EoU Tools:
 
@@ -334,7 +334,7 @@ The following table lists which types of models are supported on what hardware p
 
 - New model support:
 
-  - [LLM flow support](https://ryzenai.docs.amd.com/en/latest/llm_flow.html) for multiple models in both PyTorch and ONNX flow (optimized model support will be released asynchronously)
+  - [LLM flow support](/llms) for multiple models in both PyTorch and ONNX flow (optimized model support will be released asynchronously)
   - SDXL-T with limited performance optimization
 
 - New EoU tools:
@@ -345,7 +345,7 @@ The following table lists which types of models are supported on what hardware p
 
 - New Demos:
 
-  - NPU-GPU multi-model pipeline application [demo](https://github.com/amd/RyzenAI-SW/tree/main/demo/NPU-GPU-Pipeline)
+  - NPU-GPU multi-model pipeline application [demo](/vision/npu-gpu-pipeline)
 
 - NPU and Compiler
 

@@ -31,7 +31,7 @@ The following are the steps and the required files to run the example:
 
 ## Step 1: Install Packages
 
-- Ensure that the Ryzen AI Software is correctly installed. For more details, see the [installation instructions](/getting-started/inst).
+- Ensure that the Ryzen AI Software is correctly installed. For more details, see the [installation instructions](/installation).
 
 - Use the conda environment created during the installation for the rest of the steps. This example requires a couple of additional packages. Run the following command to install them:
 
@@ -120,7 +120,7 @@ It demonstrates deploying the quantized model using both Python and C++ APIs.
 - [Deployment - C++](#dep-cpp)
 
 <Note>
-During the Python and C++ deployment, the compiled model artifacts can be saved in the cache folder named `<run directory>/modelcachekey` using provider option `enable_cache_file_io_in_mem`. For more details refer to the [Model Compilation and Deployment](/getting-started/modelrun).
+During the Python and C++ deployment, the compiled model artifacts can be saved in the cache folder named `<run directory>/modelcachekey` using provider option `enable_cache_file_io_in_mem`. For more details refer to the [Model Compilation and Deployment](/tools/modelrun).
 
 Ryzen AI does not support the complied model artifacts across the versions, so if the model artifacts exist from the previous software version, ensure to delete the `modelcachekey` folder before executing the deployment steps.
 </Note>

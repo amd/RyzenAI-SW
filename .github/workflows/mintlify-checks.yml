@@ -40,6 +40,24 @@ jobs:
         working-directory: docs
         run: mint broken-links
 
+  # Every PR also gets an external + anchor + redirect link check. It is
+  # non-blocking (continue-on-error) because external sites can be transiently
+  # unreachable; the weekly "Link Check" workflow is the authoritative gate and
+  # opens a tracking issue on real failures.
+  external-links:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Mintlify CLI
+        run: npm i -g mint
+      - name: Check external links, anchors, and redirects
+        working-directory: docs
+        run: mint broken-links --check-external --check-anchors --check-redirects
+
   a11y:
     runs-on: ubuntu-latest
     continue-on-error: true

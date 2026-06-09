@@ -1,0 +1,143 @@
+---
+title: "Windows ML: LLM"
+description: "Run large language models on the AMD NPU through Foundry Local and the Windows ML / ONNX Runtime GenAI APIs."
+---
+
+{/* owner: dwithchenna */}
+
+This example shows different ways to deploy an LLM on the AMD NPU through **Foundry Local** and the **Windows ML** APIs.
+
+Windows ML enables support for Foundry Local models for on-device AI inference that provides privacy and performance. Foundry Local (currently in preview) automatically detects the NPU and downloads a compatible model for the device.
+
+## Prerequisites
+
+- **Operating System:** Windows 10 (x64), Windows 11 (x64/ARM), Windows Server 2025, or macOS.
+- **Hardware:** Minimum 8 GB RAM and 3 GB free disk space. Recommended 16 GB RAM and 15 GB free disk space.
+- **Network:** Internet connection to download the initial model (optional for offline use).
+- **Acceleration (optional):** AMD GPU (6000 series or newer) or AMD NPU.
+
+There are two ways to run LLM models on the AMD NPU:
+
+- **Foundry Local** — recommended for most users; a simple, efficient way to run LLMs on the NPU without manually managing dependencies or optimizing the model.
+- **Windows ML APIs** — for users who want more control over the inference process and are comfortable managing dependencies and model preparation manually.
+
+## Running LLMs with Foundry Local
+
+### Install Foundry Local
+
+Download and install Foundry Local from the [official AMD website](https://www.amd.com/en/technologies/foundry-local), or install it from a terminal:
+
+```powershell
+winget install Microsoft.FoundryLocal
+```
+
+To upgrade an existing installation:
+
+```powershell
+winget upgrade --id Microsoft.FoundryLocal
+```
+
+### Run an LLM with Foundry Local
+
+Run a model supported by Foundry Local:
+
+```powershell
+foundry model run phi-4-mini
+```
+
+This downloads the compatible model, then runs it with an interactive CLI chat interface.
+
+List the models supported on the NPU device:
+
+```powershell
+foundry model list --filter device=NPU
+```
+
+```text
+Alias                          Device     Task               File Size    License      Model ID
+-----------------------------------------------------------------------------------------------
+phi-3-mini-128k                NPU        chat-completion    2.13 GB      MIT          phi-3-mini-128k-instruct-vitis-npu:1
+phi-3-mini-4k                  NPU        chat-completion    2.13 GB      MIT          Phi-3-mini-4k-instruct-vitis-npu:1
+mistral-7b-v0.2                NPU        chat-completion    4.07 GB      apache-2.0   Mistral-7B-Instruct-v0-2-vitis-npu:1
+deepseek-r1-7b                 NPU        chat-completion    5.58 GB      MIT          DeepSeek-R1-Distill-Qwen-7B-vitis-npu:1
+qwen2.5-0.5b                   NPU        chat-completion    0.52 GB      apache-2.0   qwen2.5-0.5b-instruct-vitis-npu:2
+phi-4-mini                     NPU        chat-completion    3.60 GB      MIT          phi-4-mini-instruct-vitis-npu:1
+phi-4-mini-reasoning           NPU        chat-completion    2.78 GB      MIT          Phi-4-mini-reasoning-vitis-npu:1
+qwen2.5-7b                     NPU        chat-completion    5.20 GB      apache-2.0   qwen2.5-7b-instruct-vitis-npu:1
+```
+
+For more details, see the [Foundry Local documentation](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-local/get-started).
+
+## Running a custom LLM with the Windows ML APIs
+
+This option uses the Windows ML APIs with ONNX Runtime GenAI to run LLM models on the AMD NPU. Download and quantize/optimize the model using an [Olive recipe](https://github.com/microsoft/olive-recipes/), then use the generated ONNX model with the Windows ML and OGA APIs.
+
+You need two separate Python environments due to incompatible package requirements:
+
+- **Model quantization (Olive / AMD Quark):** specific older versions (transformers 4.50.0, onnx 1.18.0/1.19.0, standard onnxruntime).
+- **Model inference (Windows ML):** latest nightly WinML packages (`onnxruntime-winml`, `onnxruntime-genai-winml`).
+
+### 1. Set up the quantization environment
+
+```powershell
+conda create -n winml_olive python=3.10
+conda activate winml_olive
+pip install -r requirements_olive.txt
+```
+
+Install PyTorch (Windows):
+
+```powershell
+pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128
+```
+
+On Linux:
+
+```bash
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.1
+```
+
+### 2. Quantize / optimize the model
+
+For `Phi-4-mini-instruct`, download and quantize the model using the [Olive recipe](https://github.com/microsoft/olive-recipes/blob/main/microsoft-Phi-4-mini-instruct/VitisAI/Phi-4-mini-instruct_quark_vitisai_llm.json):
+
+```powershell
+olive run --config Phi-4-mini-instruct_quark_vitisai_llm.json
+```
+
+### 3. Set up the inference environment and run
+
+```powershell
+conda create -n winml_llm python=3.11
+conda activate winml_llm
+pip install -r requirements.txt
+```
+
+```powershell
+python run_genai_llm.py --model models\phi-4-mini-instruct-vai-npu --interactive
+```
+
+Expected output:
+
+```text
+============================================================
+Registering Execution Providers
+============================================================
+[INFO] Available Execution Providers in WinML catalog:
+  1. VitisAIExecutionProvider (Status: NOT_READY)
+[INFO] Ensuring VitisAIExecutionProvider ...
+[INFO] VitisAIExecutionProvider is ready
+[INFO] Registered VitisAIExecutionProvider to ONNX GenAI
+
+============================================================
+Loading model from: models\Phi-4-mini-instruct-vai-npu
+============================================================
+[INFO] Using VitisAI Execution Provider (configured in genai_config.json)
+[INFO] Model loaded successfully
+
+Prompt: What is an AI accelerator?
+Response: An AI accelerator is specialized hardware designed to enhance the
+efficiency and speed of training and deploying AI and deep learning models.
+```
+
+Full source for this example is in the [RyzenAI-SW WinML/LLM example](https://github.com/amd/RyzenAI-SW/tree/main/WinML/LLM).

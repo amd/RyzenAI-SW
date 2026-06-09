@@ -56,19 +56,7 @@
             "group": "Ryzen AI Software",
             "pages": [
               "index",
-              {
-                "group": "Getting Started",
-                "icon": "rocket",
-                "expanded": false,
-                "pages": [
-                  "getting-started/index",
-                  "getting-started/inst",
-                  "getting-started/model_quantization",
-                  "getting-started/modelrun",
-                  "getting-started/app_development",
-                  "getting-started/applications"
-                ]
-              },
+              "installation",
               {
                 "group": "Vision",
                 "icon": "image",
@@ -82,11 +70,12 @@
                   "vision/getting-started-resnet-bf16",
                   "vision/hello-world",
                   "vision/image-classification",
-                  "vision/igpu-getting-started",
                   "vision/yolov8m",
                   "vision/yolov8s-worldv2",
                   "vision/torchvision",
                   "vision/cvml",
+                  "vision/cvml-face-detection",
+                  "vision/cvml-face-mesh",
                   "vision/nemotron-ocr-v2",
                   "vision/npu-gpu-pipeline"
                 ]
@@ -97,14 +86,12 @@
                 "expanded": false,
                 "pages": [
                   "llms/index",
-                  "llms/overview",
                   "llms/high_level_python",
                   "llms/server_interface",
                   "llms/hybrid_oga",
                   "llms/oga_model_prepare",
                   "llms/oga_op_prepare",
                   "llms/llm_linux",
-                  "llms/llm_list",
                   "llms/oga-cpp-api",
                   "llms/oga-inference",
                   "llms/rag-oga",
@@ -131,6 +118,7 @@
                 "pages": [
                   "gpu-radeon/index",
                   "gpu-radeon/ryzenai_gpu",
+                  "gpu-radeon/igpu-getting-started",
                   "gpu-radeon/radeon"
                 ]
               },
@@ -140,24 +128,18 @@
                 "expanded": false,
                 "pages": [
                   "windows-ml/index",
-                  "windows-ml/winml_overview",
                   "windows-ml/installation",
                   "windows-ml/model_support",
                   "windows-ml/model_deployment",
                   "windows-ml/model_conversion",
                   "windows-ml/winml_ep",
                   "windows-ml/winml_example",
+                  "windows-ml/resnet",
+                  "windows-ml/clip",
+                  "windows-ml/googlebert",
+                  "windows-ml/llm",
                   "windows-ml/faq",
-                  "windows-ml/troubleshooting",
-                  {
-                    "group": "Examples",
-                    "expanded": false,
-                    "pages": [
-                      "windows-ml/resnet",
-                      "windows-ml/clip",
-                      "windows-ml/googlebert"
-                    ]
-                  }
+                  "windows-ml/troubleshooting"
                 ]
               },
               {
@@ -166,13 +148,15 @@
                 "expanded": false,
                 "pages": [
                   "tools/index",
-                  "tools/xrt_smi",
-                  "tools/ai_analyzer",
-                  "tools/ryzen_ai_libraries",
-                  "tools/ops_support",
+                  "tools/model_quantization",
+                  "tools/modelrun",
                   "tools/quark-quantization",
+                  "tools/ops_support",
+                  "tools/ai_analyzer",
+                  "tools/xrt_smi",
                   "tools/onnx-benchmark",
-                  "tools/npu-check"
+                  "tools/npu-check",
+                  "tools/ryzen_ai_libraries"
                 ]
               },
               {
@@ -184,6 +168,8 @@
                   "reference/relnotes",
                   "reference/licenses",
                   "reference/versions",
+                  "reference/app_development",
+                  "reference/applications",
                   "reference/ci-dashboard"
                 ]
               }

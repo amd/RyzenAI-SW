@@ -1,0 +1,45 @@
+---
+title: "CVML Sample: Face Detection"
+description: "Detect faces, five facial landmarks, and confidence scores on Ryzen AI using the CVML Library face detection sample."
+---
+
+{/* owner: dwithchenna */}
+
+<Note>Source: [RyzenAI-SW / Ryzen-AI-CVML-Library/samples/cvml-sample-face-detection](https://github.com/amd/RyzenAI-SW/tree/main/Ryzen-AI-CVML-Library/samples/cvml-sample-face-detection). This sample is built from the [Ryzen AI CVML Library](/vision/cvml) — see that page for SDK setup and build instructions.</Note>
+
+This sample demonstrates AMD's Face Detection feature. It detects faces along with five landmarks (two eyes, the nose, and the two edges of the mouth) plus confidence scores in an input image, video, or camera stream, then visually represents the results in an output image or video.
+
+## Usage
+
+```text
+cvml-sample-face-detection.exe [-i path_to_image/video] [-o output image/video filename] [-m fd_model] [-h]
+```
+
+Options:
+
+- `-i` — Run face detection on the given image or video. (Optional)
+- `-o` — Output image or video file name, e.g. `.mp4` or `.jpg`. (Optional)
+- `-m` — Face detection model (`precise` / `fast`). `fast` is the default. (Optional)
+- `-h` — Show usage.
+
+If no arguments are provided, the application captures input from camera index 0.
+
+## Examples
+
+Run on an image (no output file):
+
+```powershell
+cvml-sample-face-detection.exe -i my_image.jpg
+```
+
+Run on a video and save the result to an output video:
+
+```powershell
+cvml-sample-face-detection.exe -i my_video.mp4 -o output_video.mp4
+```
+
+Capture from the camera using the `precise` model and save to a video file:
+
+```powershell
+cvml-sample-face-detection.exe -m precise -o output_video.mp4
+```

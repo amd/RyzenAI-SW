@@ -1,0 +1,356 @@
+---
+title: "Installation Instructions"
+description: "Install the Ryzen AI NPU driver and Ryzen AI Software on Windows or Linux."
+icon: "download"
+---
+
+{/* owner: uday610 */}
+
+Install the Ryzen AI NPU driver and Ryzen AI Software. Choose your operating system below.
+
+<Tabs>
+<Tab title="Windows">
+
+This tab covers Ryzen AI installation on Windows.
+
+## Prerequisites
+
+The Ryzen AI Software supports AMD processors with a Neural Processing Unit (NPU). Refer to the release notes for the full list of [supported configurations](/reference/relnotes#supported-configurations).
+
+The following dependencies must be installed on the system before installing the Ryzen AI Software:
+
+| Dependencies                                | Version Requirement   |
+| ------------------------------------------- | --------------------- |
+| Windows 11                                  | build >= 22621.3527   |
+| Visual Studio                               | 2022                  |
+| cmake                                       | version >= 3.26       |
+| Python distribution (Miniforge preferred)   | Latest version        |
+
+<Warning>
+**IMPORTANT**:
+
+- Visual Studio 2022 Community (Optional for AMD Quark, to support custom op flow): ensure that `Desktop Development with C++` is installed
+- Miniforge: ensure that the following path is set in the System PATH variable: `path\to\miniforge3\condabin` or `path\to\miniforge3\Scripts\` or `path\to\miniforge3\` (The System PATH variable should be set in the *System Variables* section of the *Environment Variables* window).
+</Warning>
+
+<a id="install-driver" />
+
+## Install NPU Drivers
+
+- Download and Install the NPU driver version: 32.0.203.280 or newer using the following links:
+
+  - [NPU Driver (Version 32.0.203.280)](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=NPU_RAI1.5.zip)
+
+    - NPU driver 32.0.203.280 is production driver for Phoenix, Hawk Point, Strix, Strix Halo, and Krackan Point.
+  - [NPU Driver (Version 32.0.203.314)](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=NPU_RAI1.5.0.314.zip)
+
+- Install the NPU drivers by following these steps:
+
+  - Extract the downloaded ZIP file.
+  - Open a terminal in administrator mode and execute the `.\npu_sw_installer.exe` file.
+
+- Ensure that NPU driver (Version:32.0.203.280, Date:5/16/2025) is correctly installed by opening Task Manager -> Performance -> NPU0.
+
+<a id="install-bundled" />
+
+## Install Ryzen AI Software
+
+- Download the Ryzen AI Software installer [ryzen-ai-lt-1.7.1.exe](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=ryzen-ai-lt-1.7.1.exe).
+
+- Launch the EXE installer and follow the instructions on the installation wizard:
+
+  - Accept the terms of the Licence agreement
+  - Provide the destination folder for Ryzen AI installation (default: `C:\Program Files\RyzenAI\1.7.1`)
+  - Specify the name for the conda environment (default: `ryzen-ai-1.7.1`)
+
+The Ryzen AI Software packages are now installed in the conda environment created by the installer.
+
+<Note>
+NuGet package is available to download at [ryzen-ai-1.7.1-nuget.zip](https://account.amd.com/en/forms/downloads/ryzen-ai-software-platform-xef.html?filename=ryzen-ai-1.7.1-nuget.zip).
+</Note>
+
+<a id="quicktest" />
+
+## Test the Installation
+
+The Ryzen AI Software installation folder contains test to verify that the software is correctly installed. This installation test can be found in the `quicktest` subfolder which is expected to work for Strix (STX) or newer devices.
+
+- Open a Conda command prompt (search for "Miniforge Prompt" in the Windows start menu)
+
+- Activate the Conda environment created by the Ryzen AI installer:
+
+```
+conda activate ryzen-ai-<version>
+```
+
+- Run the test:
+
+```
+cd %RYZEN_AI_INSTALLATION_PATH%/quicktest
+python quicktest.py
+```
+
+```
+[I:onnxruntime:, session_state_utils.cc:243 onnxruntime::session_state_utils::SaveInitializedTensors] Saving initialized tensors.
+[I:onnxruntime:, session_state_utils.cc:438 onnxruntime::session_state_utils::SaveInitializedTensors] Done saving initialized tensors
+[I:onnxruntime:, inference_session.cc:2532 onnxruntime::InferenceSession::Initialize] Session successfully initialized.
+Test Finished
+```
+
+- Verify NPU activity by opening **Task Manager → Performance → NPU** while the test is running. You should see NPU utilization increase during model inference.
+
+### NPU Offloading with Session Options
+
+This section demonstrates how to enable NPU offloading logs using ONNX Runtime session options. The code also includes changes needed in `quicktest.py` to run on Phoenix/Hawk Point devices.
+To view detailed logging information, update the session options in `quicktest.py` as shown below:
+
+```python
+import os
+import sys
+import subprocess
+import numpy as np
+import onnxruntime as ort
+
+def get_npu_info():
+    # Run pnputil as a subprocess to enumerate PCI devices
+    command = r'pnputil /enum-devices /bus PCI /deviceids '
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    # Check for supported Hardware IDs
+    npu_type = ''
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): npu_type = 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): npu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): npu_type = 'KRK'
+    return npu_type
+
+# Get APU type info: PHX/STX/HPT
+npu_type = get_npu_info()
+install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+model = os.path.join(install_dir, 'quicktest', 'test_model.onnx')
+providers = ['VitisAIExecutionProvider']
+provider_options = [{}] # Default provider options for STX/KRK and newer devices
+
+if npu_type == 'PHX/HPT':
+    print("Setting environment for PHX/HPT")
+    xclbin_file = os.path.join(install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '4x4.xclbin')
+    provider_options = [{
+        'target': 'X1',
+        'xlnx_enable_py3_round': 0,
+        'xclbin': xclbin_file,
+    }]
+
+# Create session options
+session_options = ort.SessionOptions()
+session_options.log_severity_level = 0 # 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Fatal
+
+try:
+    session = ort.InferenceSession(model,
+                                   sess_options=session_options,
+                                   providers=providers,
+                                   provider_options=provider_options)
+except Exception as e:
+    print(f"Failed to create an InferenceSession: {e}")
+    sys.exit(1) # Exit the program with a non-zero status to indicate an error
+
+def preprocess_random_image():
+    image_array = np.random.rand(3, 32, 32).astype(np.float32)
+    return np.expand_dims(image_array, axis=0)
+
+# inference on random image data
+input_data = preprocess_random_image()
+try:
+    outputs = session.run(None, {'input': input_data})
+except Exception as e:
+    print(f"Failed to run the InferenceSession: {e}")
+    sys.exit(1) # Exit the program with a non-zero status to indicate an error
+else:
+    print("Test finished")
+```
+
+- Run the test:
+
+```
+cd %RYZEN_AI_INSTALLATION_PATH%/quicktest
+python quicktest.py 2>&1 | findstr /i "VerifyEachNodeIsAssignedToAnEp | Test"
+```
+
+- On a successful run, you will see an output similar to the one shown below. This indicates that the model is running on the NPU and that the installation of the Ryzen AI Software was successful:
+
+```
+[V:onnxruntime:, session_state.cc:1296 onnxruntime::VerifyEachNodeIsAssignedToAnEp] Node placements
+[V:onnxruntime:, session_state.cc:1299 onnxruntime::VerifyEachNodeIsAssignedToAnEp] All nodes placed on [VitisAIExecutionProvider]. Number of nodes: 3
+Test Finished
+```
+
+<Note>
+- The full path to the Ryzen AI Software installation folder is stored in the `RYZEN_AI_INSTALLATION_PATH` environment variable.
+- For Phoenix/Hawk Point hardware, set the `target` to `X1` in the provider options.
+</Note>
+
+</Tab>
+<Tab title="Linux">
+
+Ryzen AI for Linux supports running AI models on the AMD Neural Processing Unit (NPU).
+The current release supports STX and KRK platforms.
+
+With this release, users can now compile and run AI models using the following formats:
+
+- CNN models in INT8
+- CNN models in BF16
+- NLP models (e.g., BERT, encoder-based) in BF16
+- LLMs (NPU-only flow)
+
+## Prerequisites
+
+| Dependencies          | Version Requirement |
+| --------------------- | ------------------- |
+| Ubuntu Distribution   | Ubuntu 24.04 LTS    |
+| Kernel Version        | >= 6.10             |
+| RAM                   | 64GB (Recommended)  |
+| Python                | 3.12.x              |
+
+Use the commands below to install Python 3.12.x along with certain dependencies:
+
+```bash
+sudo apt update
+sudo apt install python3.12
+sudo apt install python3.12-venv
+sudo apt install libboost-filesystem1.74.0
+```
+
+After installing required Ubuntu distribution and Python version, proceed with NPU drivers installation.
+
+## Install NPU Drivers
+
+- Download the NPU driver package from the `Downloads` section of [Ryzen AI Software Drivers](https://account.amd.com/en/forms/downloads/xef.html?filename=RAI_1.7.1_Linux_NPU_XRT.zip).
+
+- RyzenAI linux driver package contains
+  - XRT Package
+    - xrt_202610.2.21.75_24.04-amd64-base.deb
+    - xrt_202610.2.21.75_24.04-amd64-base-dev.deb
+    - xrt_202610.2.21.75_24.04-amd64-npu.deb
+  - NPU driver package
+    - xrt_plugin.2.21.260102.53.release_24.04-amd64-amdxdna.deb
+
+- Install NPU driver package on your machine:
+
+```bash
+sudo apt install --fix-broken -y ./xrt_202610.2.21.75_24.04-amd64-base.deb
+sudo apt install --fix-broken -y ./xrt_202610.2.21.75_24.04-amd64-base-dev.deb
+sudo apt install --fix-broken -y ./xrt_202610.2.21.75_24.04-amd64-npu.deb
+sudo apt install --fix-broken -y ./xrt_plugin.2.21.260102.53.release_24.04-amd64-amdxdna.deb
+```
+
+- Set essential Environment variables:
+
+```bash
+export LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+source /opt/xilinx/xrt/setup.sh
+```
+
+- Verify your Driver installation:
+
+```bash
+xrt-smi examine
+
+Device(s) Present
+|BDF             |Name       |
+|----------------|-----------|
+|[0000:c5:00.1]  |NPU Strix  |
+
+# NPU name might differ based on your machine
+```
+
+## Install Ryzen AI Software
+
+- Download the RyzenAI for Linux package `ryzen_ai-1.7.1.tgz` from the `Downloads` section of [Ryzen AI Software Installer](https://account.amd.com/en/forms/downloads/xef.html?filename=ryzen_ai-1.7.1.tgz).
+- Navigate to the downloaded path and follow the below steps:
+
+```bash
+mkdir ryzen_ai-1.7.1
+cp ryzen_ai-1.7.1.tgz ryzen_ai-1.7.1
+
+cd ryzen_ai-1.7.1
+tar -xvzf ryzen_ai-1.7.1.tgz
+```
+
+- Install RyzenAI package at your desired target path:
+
+```bash
+./install_ryzen_ai.sh -a yes -p <TARGET-PATH>/venv
+source <TARGET-PATH>/venv/bin/activate
+```
+
+- This will successfully install RyzenAI and activate the Virtual environment at your target location:
+
+```bash
+# Validate your installation path
+echo $RYZEN_AI_INSTALLATION_PATH
+```
+
+## Test the Installation
+
+The RyzenAI software package contains a test script that verifies your correct installation of NPU Drivers.
+
+- Navigate to your targeted Virtual Environment created in the previous step
+- You will observe a subfolder named "quicktest":
+
+```bash
+cd <TARGET-PATH>/venv/quicktest
+python quicktest.py
+```
+
+- The `quicktest.py` script picks up a simple CNN model, compiles it and runs on AMD's Neural Processing Unit (NPU).
+- On successful run, you can observe output as shown below:
+
+```bash
+Setting environment for STX/KRK
+
+Test Finished
+```
+
+## Examples, Demos, Tutorials
+
+- The docs mirror various demos and examples for model compilation and deployment on NPUs. A few to start with:
+  - [ResNet on Ryzen AI (BF16)](/vision/getting-started-resnet-bf16)
+  - [ResNet on Ryzen AI (INT8)](/vision/getstartex)
+  - [YOLOv8m for Object Detection](/vision/yolov8m)
+- Browse all mirrored examples under [Vision](/vision/index), [LLMs](/llms/index), and [Audio](/audio/index).
+
+### Note
+
+Before running the above examples:
+- RyzenAI creates its own Python Virtual Environment to run the examples. You can skip conda environment instruction as they are Windows specific only
+- Ensure to activate Linux based Python Virtual Environment
+
+```bash
+source <TARGET-PATH>/venv/bin/activate
+```
+
+### Get NPU Info for your Machine
+
+The [ResNet on Ryzen AI (INT8)](/vision/getstartex) example contains a `get_npu_info` function to detect the correct NPU type on your machine. That lookup is for Windows; the Linux equivalent is shown below:
+
+```python
+import subprocess
+
+def get_npu_info():
+    # Run below command as subprocess to enumerate PCI devices
+    command = r'lspci -nn'
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    # Check for supported Hardware IDs
+    npu_type = ''
+    if '1022:17f0' in stdout.decode(): npu_type = 'STX/KRK'
+    return npu_type
+```
+
+## Running LLM
+
+Follow this page to run LLM models on Linux: [LLM on Linux](/llms/llm_linux)
+
+</Tab>
+</Tabs>

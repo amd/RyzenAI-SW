@@ -14,19 +14,28 @@ This ports the useful ideas from the AMD Playbooks test runner
 default to "test everything", and (2) uses MDX-valid comment syntax
 `{/* ... */}` instead of HTML comments `<!-- ... -->`.
 
-================================ Capabilities ================================
-All optional. None are required, and no docs use them yet - they are available
-for authors when a page needs them.
+================================ Testing model ==============================
+TEST BY DEFAULT. Every fenced block written in a runnable language IS EXECUTED
+on every run. There is no opt-in tag. The ONLY way to skip a block is `notest`.
 
-Per-block, in the fence info string (after the language):
-    ```python                  -> executed (default)
-    ```python notest           -> skipped entirely
+    ```python                  -> EXECUTED (always; also python-syntax-checked)
+    ```powershell              -> EXECUTED (always)
+    ```bash                    -> EXECUTED (always)
+    ```python notest           -> the one opt-out: skipped entirely
+    ```cpp / ```text / ```json -> not a runnable language -> recorded "skipped"
+
+Runnable languages (executed): python, bash/sh/shell, powershell/pwsh/ps1,
+cmd/bat/batch. Everything else (cpp, c, text, json, yaml, mdx, cmake, ...) is
+recorded with status "skipped" (reason: non-runnable) - never silently passed.
+
+=============================== Authoring extras ============================
+The tags/attributes below are OPTIONAL conveniences for authors (they do NOT
+make testing optional). Per-block, in the fence info string (after the language):
     ```python npu              -> device-scoped (cpu | gpu | npu)
     ```python timeout=600      -> per-block timeout (seconds)
     ```bash workdir=examples   -> run in <page-dir>/examples
     ```bash continue_on_error=true   -> a failure doesn't fail the page
     ```python setup=activate-venv    -> run a named @setup first
-    ```text / ```json          -> ignored (non-runnable language)
 
 Inline marker:
     any line ending with `#hide` is executed but meant to be hidden from the
@@ -57,6 +66,7 @@ Usage:
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -338,6 +348,11 @@ def main() -> None:
         setup_defs = extract_setup_definitions(content)
         var_defs = extract_var_definitions(content)
 
+        # Per-page sandbox: all of a page's blocks run in ONE temp dir, in order,
+        # so files/downloads from earlier blocks persist for later blocks
+        # ("keep the environment open"), and nothing pollutes the docs tree.
+        page_dir = Path(tempfile.mkdtemp(prefix="docs-ci-"))
+
         for i, m in enumerate(FENCE_RE.finditer(content)):
             parsed = parse_fence(m.group(1))
             if not parsed:
@@ -378,7 +393,8 @@ def main() -> None:
                 continue
             setup = resolve_setup(attrs.get("setup"), setup_defs, platform)
             timeout = attrs.get("timeout", args.timeout)
-            workdir = (mdx.parent / attrs["workdir"]) if attrs.get("workdir") else mdx.parent
+            workdir = (page_dir / attrs["workdir"]) if attrs.get("workdir") else page_dir
+            workdir.mkdir(parents=True, exist_ok=True)
             cont = attrs.get("continue_on_error", False)
 
             status, detail, ran = "skipped", "", False
@@ -396,6 +412,8 @@ def main() -> None:
                     failed_pages.add(rel)
 
             results.append(_rec(rel, i, lang, tags, ran, status, detail))
+
+        shutil.rmtree(page_dir, ignore_errors=True)
 
     args.output_json.write_text(json.dumps(results, indent=2), encoding="utf-8")
     args.failed_pages.write_text("\n".join(sorted(failed_pages)), encoding="utf-8")

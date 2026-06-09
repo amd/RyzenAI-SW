@@ -25,8 +25,8 @@ The following steps outline how to deploy the quantized model on an NPU:
 
 ## Create and Activate Conda Environment
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
@@ -34,8 +34,8 @@ conda create --name yolov8m_env --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate yolov8m_env
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 export RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
@@ -43,29 +43,29 @@ conda create --name yolov8m_env --clone $RYZEN_AI_CONDA_ENV_NAME
 conda activate yolov8m_env
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 Install the required python packages for the tutorial:
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 cd <RyzenAI-SW>\docs\models-tutorials\vision\object_detection\yolov8m
 pip install -r requirements.txt
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 cd <RyzenAI-SW>/docs/vision/object_detection/yolov8m
 pip install -r requirements.txt
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 ## Download and export the model
 
@@ -95,22 +95,22 @@ python quantize_quark.py --input_model_path models/yolov8m.onnx \
 
 - **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 python run_inference.py --model_input models/yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 ### Evaluate the model accuracy
 
@@ -124,22 +124,22 @@ python prepare_data.py
 
 Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-bf16` to measure accuracy metrics on CPU/NPU respectively.
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 python run_inference.py --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 python run_inference.py --model_input models/yolov8m_BF16.onnx --evaluate --coco_dataset datasets/coco --device npu-bf16
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 
 
@@ -170,22 +170,22 @@ python quantize_quark.py --input_model_path models/yolov8m.onnx \
 
 - **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 python run_inference.py --model_input models\yolov8m_XINT8.onnx --input_image test_image.jpg --output_image test_output_int8.jpg --device npu-int8
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 python run_inference.py --model_input models/yolov8m_XINT8.onnx --input_image test_image.jpg --output_image test_output_int8.jpg --device npu-int8
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 - **Sample Output** - Sample outputs generated using `XINT8` configuration
 
@@ -242,22 +242,22 @@ python prepare_data.py
 
 Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-int8` to measure accuracy metrics on CPU/NPU respectively.
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 python run_inference.py --model_input models\yolov8m_XINT8.onnx --evaluate --coco_dataset datasets\coco --device npu-int8
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 python run_inference.py --model_input models/yolov8m_XINT8.onnx --evaluate --coco_dataset datasets/coco --device npu-int8
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 
 
@@ -279,22 +279,22 @@ Evaluate the Performance of Model across Float32 (CPU), BF16 and XINT8. Model is
 
 Use `--benchmark` option while running the Model
 
-&lt;Tabs groupId="os">
-&lt;TabItem value="windows" label="Windows">
+<Tabs>
+<Tab title="Windows">
 
 ```powershell
 python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16 --benchmark
 ```
 
-&lt;/TabItem>
-&lt;TabItem value="linux" label="Linux / WSL">
+</Tab>
+<Tab title="Linux / WSL">
 
 ```powershell
 python run_inference.py --model_input models/yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16 --benchmark
 ```
 
-&lt;/TabItem>
-&lt;/Tabs>
+</Tab>
+</Tabs>
 
 
 

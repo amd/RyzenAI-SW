@@ -7,7 +7,7 @@ description: "Use the Lemonade Server REST API to load LLMs on Ryzen AI hardware
 
 The Lemonade SDK offers a server interface that allows your application to load an LLM on Ryzen AI hardware in a process, and then communicate with this process using standard `REST` APIs. This allows applications written in any language (C#, JavaScript, Python, C++, etc.) to easily integrate with Ryzen AI LLMs.
 
-Server interfaces are used across the LLM ecosystem because they allow for no-code plug-and-play between the higher level of the application stack (GUIs, agents, RAG, etc.) with the LLM and hardware that have been abstracted by the server. For more information, see the [Understanding local LLM Servers Guide](https://lemonade-server.ai/docs/server/concepts/).
+Server interfaces are used across the LLM ecosystem because they allow for no-code plug-and-play between the higher level of the application stack (GUIs, agents, RAG, etc.) with the LLM and hardware that have been abstracted by the server. For more information, see the [Understanding local LLM Servers Guide](https://lemonade-server.ai/docs/guide/concepts/).
 
 For example, open source projects such as Open WebUI have out-of-box support for connecting to a variety of server interfaces, which in turn allows users to quickly start working with LLMs in a GUI.
 
@@ -15,7 +15,7 @@ For example, open source projects such as Open WebUI have out-of-box support for
 
 Lemonade Server can be installed via the Lemonade Server Installer executable by following these steps:
 
-1. Make sure your system has the recommended Ryzen AI driver installed as described in [Install NPU Drivers](/getting-started/inst#install-driver).
+1. Make sure your system has the recommended Ryzen AI driver installed as described in [Install NPU Drivers](/installation#install-driver).
 2. Download and install `Lemonade_Server_Installer.exe` from the [latest Lemonade release](https://github.com/lemonade-sdk/lemonade/releases).
 3. Launch the server by double-clicking the `lemonade_server` shortcut added to your desktop.
 
@@ -50,23 +50,23 @@ The [OpenAI API documentation](https://platform.openai.com/docs/guides/streaming
 
 ### Supported Applications
 
-The Lemonade Server supports a variety of applications that can connect to it using the OpenAI API. Some of the applications that have been tested with Lemonade Server can be found at [Lemonade Server Apps](https://lemonade-server.ai/docs/server/apps/).
+The Lemonade Server supports a variety of applications that can connect to it using the OpenAI API. Some of the applications that have been tested with Lemonade Server can be found at [Lemonade Server Apps](https://lemonade-server.ai/docs/integrations/).
 
 A short list of applications that have been tested with Lemonade Server includes:
 
 <div>
-  <a href="https://lemonade-server.ai/docs/server/apps/open-webui/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/openwebui.jpg" width="60" alt="Open WebUI" /></a>
-  <a href="https://lemonade-server.ai/docs/server/apps/continue/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/continue_dev.png" width="60" alt="Continue" /></a>
+  <a href="https://lemonade-server.ai/docs/integrations/open-webui/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/openwebui.jpg" width="60" alt="Open WebUI" /></a>
+  <a href="https://lemonade-server.ai/docs/integrations/continue/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/continue_dev.png" width="60" alt="Continue" /></a>
   <a href="https://github.com/amd/gaia"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/gaia.ico" width="60" alt="Gaia" /></a>
-  <a href="https://lemonade-server.ai/docs/server/apps/anythingLLM/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/anything_llm.png" width="60" alt="AnythingLLM" /></a>
-  <a href="https://lemonade-server.ai/docs/server/apps/ai-dev-gallery/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/ai_dev_gallery.webp" width="60" alt="AI Dev Gallery" /></a>
-  <a href="https://lemonade-server.ai/docs/server/apps/lm-eval/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/lm_eval.png" width="60" alt="LM-Eval" /></a>
-  <a href="https://lemonade-server.ai/docs/server/apps/codeGPT/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/codegpt.jpg" width="60" alt="CodeGPT" /></a>
-  <a href="https://github.com/lemonade-sdk/lemonade/blob/main/docs/server/apps/ai-toolkit.md"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/ai_toolkit.png" width="60" alt="AI Toolkit" /></a>
+  <a href="https://lemonade-server.ai/docs/integrations/anythingLLM/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/anything_llm.png" width="60" alt="AnythingLLM" /></a>
+  <a href="https://github.com/microsoft/ai-dev-gallery"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/ai_dev_gallery.webp" width="60" alt="AI Dev Gallery" /></a>
+  <a href="https://github.com/EleutherAI/lm-evaluation-harness"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/lm_eval.png" width="60" alt="LM-Eval" /></a>
+  <a href="https://lemonade-server.ai/docs/integrations/codeGPT/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/codegpt.jpg" width="60" alt="CodeGPT" /></a>
+  <a href="https://lemonade-server.ai/docs/integrations/ai-toolkit/"><img src="https://raw.githubusercontent.com/lemonade-sdk/assets/refs/heads/main/partner_logos/ai_toolkit.png" width="60" alt="AI Toolkit" /></a>
 </div>
 
 ## Next Steps
 
-- See [Lemonade Server Examples](https://lemonade-server.ai/docs/server/apps/) to find applications that have been tested with Lemonade Server.
+- See [Lemonade Server Examples](https://lemonade-server.ai/docs/integrations/) to find applications that have been tested with Lemonade Server.
 - Check out the [Lemonade Server specification](https://lemonade-server.ai/docs/server/server_spec/) to learn more about supported features.
 - Try out your Lemonade Server install with any application that uses the OpenAI chat completions API.

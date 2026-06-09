@@ -1,11 +1,6 @@
 # Dependencies
 node_modules/
 
-# Docusaurus
-.docusaurus/
-build/
-.cache-loader
-
 # Python
 __pycache__/
 *.pyc
@@ -13,14 +8,10 @@ __pycache__/
 .venv/
 *.egg-info/
 
-# CI artifacts
-website/ci/validation-results/
-website/ci/extracted-blocks/
-website/ci/model-validation/results/*.tmp
-
-# Generated docs (from docusaurus-plugin-llms)
-# The plugin copies .mdx content as .md into the website dir at build time
-website/docs/
+# CI artifacts / local report scratch
+report_run.json
+report_failed.txt
+report_pages.md
 
 # Downloaded models
 *-onnx-ryzenai-*/
@@ -64,6 +55,3 @@ validation-output.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Vale downloaded styles
-website/.vale/styles/Vale/

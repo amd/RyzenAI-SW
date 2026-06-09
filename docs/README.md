@@ -15,8 +15,9 @@ Then open http://localhost:3000.
 ## Structure
 
 - `docs.json` - site configuration (navigation, theme, branding)
-- `index.mdx` - landing page
-- Category folders (one level each): `getting-started/`, `vision/`, `llms/`, `audio/`, `gpu-radeon/`, `windows-ml/`, `tools/`, `reference/`
+- `index.mdx` - landing page (Overview)
+- `installation.mdx` - Installation Instructions (top-level page)
+- Category folders (one level each): `vision/`, `llms/`, `audio/`, `gpu-radeon/`, `windows-ml/`, `tools/`, `reference/`
 - `images/` - inline diagrams
 - `assets/` - site assets (favicon)
 

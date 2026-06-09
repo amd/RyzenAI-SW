@@ -7,9 +7,6 @@ description: "Ryzen AI CVML Library on AMD Ryzen AI."
 
 <Note>Source: [RyzenAI-SW / Ryzen-AI-CVML-Library](https://github.com/amd/RyzenAI-SW/blob/main/Ryzen-AI-CVML-Library). Code is maintained in the repository; this page mirrors its README.</Note>
 
-
-
-
 The Ryzen AI Libraries build on top of the Ryzen AI drivers and execution
 infrastructure to provide powerful AI capabilities to C++ applications without
 having to worry about training specific AI models and integrating them to the
@@ -17,8 +14,6 @@ Ryzen AI framework.
 
 Each Ryzen AI CVML library feature offers a simple C++ application programming
 interface (API) that can be easily incorporated into existing applications.
-
-[TOC]
 
 Package Contents
 ================
@@ -49,8 +44,6 @@ The Ryzen AI CVML library consists of the following files and folders,
 
     License file
 
-[Back to top](#top)
-
 Executing Ryzen AI CVML library enabled applications
 ====================================================
 
@@ -60,18 +53,14 @@ In order to execute applications that utilize the Ryzen AI CVML library, the app
 
 > Ryzen AI CVML library features that utilize the ONNX backend for NPU operations may experience a longer startup latency the first time they are executed on a device. This increased startup latency does not occur for subsequent runs the feature.
 
-
 Prerequisites and dependencies
 ------------------------------
 
 The AMD Adrenalin and Ryzen AI drivers should be installed before attempting to execute Ryzen AI CVML library applications.
 
-[Back to top](#top)
-
-
 ### Windows Setup
 
-The following installations are for Windows OS.  For Linux OS, follow [Ubuntu Setup](#linux_setup) instructions 
+The following installations are for Windows OS.  For Linux OS, follow [Ubuntu Setup](#ubuntu-setup) instructions 
 
 ### AMD Adrenalin driver
 
@@ -79,20 +68,15 @@ Install either the following Adrenalin driver or a newer one,
 
 https://www.amd.com/en/support/download/drivers.html
 
-[Back to top](#top)
-
 ### AMD Ryzen AI driver
 
 Install the latest Ryzen AI NPU driver from,
 
 https://ryzenai.docs.amd.com/en/latest/inst.html
 
-[Back to top](#top)
-
-
 ### Ubuntu Setup
 
-The following installations are for Ubuntu.  For Windows OS, follow [Windows Setup](#windows_setup) instructions
+The following installations are for Ubuntu.  For Windows OS, follow [Windows Setup](#windows-setup) instructions
 
 Ensure that the following software tools/packages are installed on the development system.
 
@@ -140,13 +124,10 @@ do
 done
 ```
 
-[Back to top](#top)
-
-Locating Ryzen AI CVML library runtime files for [Windows](#windows_execution) and [Linux](#linux_execution)
+Locating Ryzen AI CVML library runtime files for Windows and Linux
 --------------------------------------------
 
 When executing applications built against the Ryzen AI CVML library, ensure that:
-
 
 For Windows, either one of the following conditions are met:
 1. The Ryzen AI CVML library runtime dll and graphlib files are in the same folder
@@ -154,20 +135,15 @@ For Windows, either one of the following conditions are met:
 2. The Ryzen AI CVML library's **windows/** folder has been added to the PATH
    environment variable.
 
-
 For Linux, all the following conditions are met.
 1. Add location of **linux/** to LD_LIBRARY_PATH
 2. Add location of NPU driver libs (/opt/xilinx/xrt/lib) to LD_LIBRARY_PATH
-
-[Back to top](#top)
 
 Programming guide for C++ Applications
 ======================================
 
 Incorporating the Ryzen AI's optimized features into C++ applications can be
 done in a few simple steps, as explained in the following sections.
-
-[Back to top](#top)
 
 Include Ryzen AI CVML library headers
 -------------------------------------
@@ -188,8 +164,6 @@ available after adding a line similar to the following example:
 Details about each feature's programming interface and expected usage are
 provided within their individual include headers.
 
-[Back to top](#top)
-
 Create Ryzen AI CVML library context
 ------------------------------------
 
@@ -204,8 +178,6 @@ member function:
 
     ryzenai_context->Release();
 
-[Back to top](#top)
-
 Create Ryzen AI CVML library feature object
 -------------------------------------------
 
@@ -218,8 +190,6 @@ library:
 
     amd::cvml::DepthEstimation ryzenai_depth_estimation(ryzenai_context);
 
-[Back to top](#top)
-
 Encapsulate image buffers
 -------------------------
 
@@ -231,8 +201,6 @@ an incoming RGB888 frame buffer can be created with the following code:
     amd::cvml::Image ryzenai_image(amd::cvml::Image::Format::kRGB,
                                    amd::cvml::Image::DataType::kUint8, width,
                                    height, data_pointer);
-
-[Back to top](#top)
 
 Execute the feature
 -------------------
@@ -250,8 +218,6 @@ estimation library, using the *ryzenai_image* from the previous section:
 
     // execute the feature
     ryzenai_depth_estimation.GenerateDepthMap(ryzenai_image, &ryzenai_output);
-
-[Back to top](#top)
 
 Building applications with Ryzen AI CVML Libraries
 ==================================================
@@ -271,8 +237,6 @@ Depending on the application's build environment, it may also be necessary to
 explicitly list which of the Ryzen AI CVML library's .LIB files (when building for
 Windows applications) need to be linked.
 
-[Back to top](#top)
-
 Building Ryzen AI CVML library applications with CMake
 ------------------------------------------------------
 
@@ -289,13 +253,11 @@ in the application's CMakeLists.txt file:
 where `AMD_CVML_SDK_ROOT` defines the location of the Ryzen AI CVML library files and
 `PROJECT_NAME` defines the name of the application build target.
 
-[Back to top](#top)
-
 Building Ryzen AI CVML library sample applications
 --------------------------------------------------
 
 In addition to general Ryzen AI CVML library prerequisite and dependencies listed
-under [Prerequisites and dependencies](#dependencies), the included sample
+under [Prerequisites and dependencies](#prerequisites-and-dependencies), the included sample
 applications also make use of OpenCV for reading input images/videos/camera
 and displaying final output windows. A copy of [OpenCV](https://opencv.org/)
 will need to be downloaded to the development system before the samples can
@@ -325,14 +287,10 @@ cmake -S $PWD -B $PWD/build -DOPENCV_INSTALL_ROOT=$OPENCV_INSTALL_ROOT
 cmake --build $PWD/build --config Release
 ```
 
-[Back to top](#top)
-
 License
 =======
 
 Refer to the LICENSE.txt file for the full license text and copyright notice.
-
-[Back to top](#top)
 
 Copyrights and Trademarks
 =========================
@@ -340,6 +298,5 @@ Copyrights and Trademarks
 **2021 Advanced Micro Devices, Inc.** All rights reserved.
 
 The information contained herein is for informational purposes only, and is subject to change without notice. While every precaution has been taken in the preparation of this document, it may contain technical inaccuracies, omissions and typographical errors, and AMD is under no obligation to update or otherwise correct this information. Advanced Micro Devices, Inc. makes no representations or warranties with respect to the accuracy or completeness of the contents of this document, and assumes no liability of any kind, including the implied warranties of noninfringement, merchantability or fitness for particular purposes, with respect to the operation or use of AMD hardware, software or other products described herein. No license, including implied or arising by estoppel, to any intellectual property rights is granted by this document. Terms and limitations applicable to the purchase or use of AMD's products are as set forth in a signed agreement between the parties or in AMD's Standard Terms and Conditions of Sale. Any unauthorized copying, alteration, distribution, transmission, performance, display or other use of this material is prohibited.
-
 
 Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.

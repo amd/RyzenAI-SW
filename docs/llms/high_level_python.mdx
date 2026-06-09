@@ -13,7 +13,7 @@ To get started, follow these instructions.
 
 You only need to do this once per computer:
 
-1. Make sure your system has the recommended Ryzen AI driver installed as described in [Install NPU Drivers](/getting-started/inst#install-driver).
+1. Make sure your system has the recommended Ryzen AI driver installed as described in [Install NPU Drivers](/installation#install-driver).
 2. Download and install [Miniconda for Windows](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) or [Miniforge for Windows](https://github.com/conda-forge/miniforge/releases/download/25.3.0-1/Miniforge3-25.3.0-1-Windows-x86_64.exe).
 3. Launch a terminal and call `conda init`.
 
@@ -37,7 +37,7 @@ Run this command in a terminal that has your environment activated:
 lemonade -i amd/Llama-3.2-1B-Instruct-awq-g128-int4-asym-fp16-onnx-hybrid oga-load --device hybrid --dtype int4 llm-prompt --max-new-tokens 64 -p PROMPT
 ```
 
-For an end-to-end example demonstrating the Validation Tools, visit the [Lemonade Tools Tutorial](https://github.com/lemonade-sdk/lemonade/blob/main/examples/notebooks/lemonade_model_validation.ipynb).
+For an end-to-end example demonstrating the Validation Tools, visit the [Lemonade Tools Tutorial](https://github.com/lemonade-sdk/lemonade/tree/main/examples).
 
 ## Python API
 
@@ -58,4 +58,4 @@ print(tokenizer.decode(response[0]))
 
 ## Next Steps
 
-From here, you can check out the Jupyter Notebook that provides an end-to-end validation of OGA hybrid and NPU-only execution. To run the notebook, visit the [Lemonade Tools Tutorial](https://github.com/lemonade-sdk/lemonade/blob/main/examples/notebooks/lemonade_model_validation.ipynb).
+From here, you can check out the Jupyter Notebook that provides an end-to-end validation of OGA hybrid and NPU-only execution. To run the notebook, visit the [Lemonade Tools Tutorial](https://github.com/lemonade-sdk/lemonade/tree/main/examples).

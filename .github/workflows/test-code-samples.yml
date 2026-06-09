@@ -3,28 +3,29 @@
 # =============================================================================
 # The "docs as code" accuracy gate: code in the docs must actually work.
 #   1. syntax-check  - python syntax checks for every block (cloud, no hardware)
-#   2. test-hardware - executes blocks tagged `test` on real AMD hardware,
-#                      on the AMD Playbooks self-hosted Windows runner pool.
-#                      v1 scope: Strix Point (stxp) and Strix Halo (halo) only.
-#                      Requires our repo to be added to the org runner group
-#                      that owns these machines (see .github/scripts/RUNNERS.md).
+#   2. test-hardware - EXECUTES every runnable block on real AMD hardware via a
+#                      self-hosted runner. Devices are configurable with the
+#                      `DOCS_CI_DEVICES` repo variable (JSON array; default
+#                      ["halo"] = the local Strix Halo box). Add more runners by
+#                      labelling them and extending that variable - no edits
+#                      here. See the "Runners" section of scripts/README.md.
 # Failing pages are uploaded so Notify Owner can route to the page owner.
 #
-# Code-block conventions (see .github/scripts/extract_code_blocks.py):
-#   ```python          -> executed by default (also syntax-checked)
-#   ```python npu      -> executed; device-scoped (cpu|gpu|npu)
-#   ```bash notest     -> skipped entirely
-# Test-by-default: every runnable block runs unless tagged `notest`.
+# Test-by-default (see .github/scripts/extract_code_blocks.py):
+#   ```python / ```powershell / ```bash  -> EXECUTED on every run
+#   ```python npu                          -> executed; device-scoped (cpu|gpu|npu)
+#   ```bash notest                         -> the only opt-out: skipped
+#   ```cpp / ```text / ```json             -> non-runnable -> recorded "skip"
 # =============================================================================
 
 name: Test Code Samples
 
 on:
   pull_request:
-    paths: ['docs/**/*.mdx']
+    paths: ['docs/**']
   push:
     branches: [main, bconsolvo]
-    paths: ['docs/**/*.mdx']
+    paths: ['docs/**']
   workflow_dispatch:
 
 permissions:
@@ -53,13 +54,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Device labels match the AMD Playbooks runner pool (see
-        # amd/playbooks .github/workflows/test-playbooks.yml):
-        #   stxp = Strix Point, halo = Strix Halo.
-        hw: [stxp, halo]
-    # Reuse the AMD Playbooks self-hosted Windows runner pool.
-    # Label scheme: [self-hosted, Windows, <device>] (capital "Windows").
-    runs-on: [self-hosted, Windows, "${{ matrix.hw }}"]
+        # Which device labels to run on. Configurable per-repo WITHOUT editing
+        # this file: set the `DOCS_CI_DEVICES` repo variable to a JSON array,
+        # e.g. ["halo","stxp","krk"]. Defaults to ["halo"] (the local Strix
+        # Halo runner). Each value must be a runner label (see RUNNERS section
+        # of .github/scripts/README.md): halo = Strix Halo, stxp = Strix Point.
+        hw: ${{ fromJSON(vars.DOCS_CI_DEVICES || '["halo"]') }}
+    # Runner selection: [self-hosted, <OS>, <device>]. OS label is configurable
+    # via DOCS_CI_OS (default "Windows"); device comes from the matrix above.
+    runs-on: [self-hosted, "${{ vars.DOCS_CI_OS || 'Windows' }}", "${{ matrix.hw }}"]
     env:
       # The Ryzen AI conda env on the runner (NPU/GPU/CPU providers installed).
       # Override per-repo with the RYZEN_AI_ENV variable.
@@ -70,12 +73,19 @@ jobs:
       # (VitisAIExecutionProvider), GPU (DmlExecutionProvider), and CPU.
       - name: Execute code blocks on hardware
         shell: powershell
-        run: conda run --no-capture-output -n $env:RYZEN_AI_ENV python .github/scripts/extract_code_blocks.py --run --docs docs --failed-pages failed-pages-${{ matrix.hw }}.txt
+        run: conda run --no-capture-output -n $env:RYZEN_AI_ENV python .github/scripts/extract_code_blocks.py --run --docs docs --output-json code-results-${{ matrix.hw }}.json --failed-pages failed-pages-${{ matrix.hw }}.txt
+      - name: Build per-page report
+        if: always()
+        shell: powershell
+        run: python .github/scripts/report.py --results code-results-${{ matrix.hw }}.json --docs docs --out CODE_TEST_REPORT-${{ matrix.hw }}.md
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: failed-pages-${{ matrix.hw }}
-          path: failed-pages-${{ matrix.hw }}.txt
+          name: code-report-${{ matrix.hw }}
+          path: |
+            code-results-${{ matrix.hw }}.json
+            CODE_TEST_REPORT-${{ matrix.hw }}.md
+            failed-pages-${{ matrix.hw }}.txt
 
   # ---- Record this run to the CI history (dashboard data) ----
   record:

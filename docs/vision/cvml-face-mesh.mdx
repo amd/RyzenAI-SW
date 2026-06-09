@@ -1,0 +1,51 @@
+---
+title: "CVML Sample: Face Mesh"
+description: "Compute face landmarks and head-pose information on Ryzen AI using the CVML Library face mesh sample."
+---
+
+{/* owner: dwithchenna */}
+
+<Note>Source: [RyzenAI-SW / Ryzen-AI-CVML-Library/samples/cvml-sample-face-mesh](https://github.com/amd/RyzenAI-SW/tree/main/Ryzen-AI-CVML-Library/samples/cvml-sample-face-mesh). This sample is built from the [Ryzen AI CVML Library](/vision/cvml) — see that page for SDK setup and build instructions.</Note>
+
+This sample demonstrates AMD's Face Mesh feature. It detects faces in an input image or video, computes face landmarks and head-pose information, and then visually represents the results in an output image or video.
+
+## Usage
+
+```text
+cvml-sample-facemesh.exe [-i path_to_video/image] [-o output image/video filename] [-fd fd_model] [-h] [-?]
+```
+
+Options:
+
+- `-i` — Specify an input image or video.
+- `-o` — Output image or video file name, e.g. `.mp4` or `.jpg`.
+- `-fd` — Face detection model (`precise` / `fast`). `precise` is the default. (Optional)
+- `-h` / `-?` — Show usage.
+
+If no arguments are provided, the application captures input from the camera.
+
+## Examples
+
+Capture from the camera (no output file):
+
+```powershell
+cvml-sample-facemesh.exe
+```
+
+Run on a video (no output file):
+
+```powershell
+cvml-sample-facemesh.exe -i my_video.mp4
+```
+
+Run on an image and save the result to an image file:
+
+```powershell
+cvml-sample-facemesh.exe -i my_image.jpg -o output_image.jpg
+```
+
+Capture from the camera and save to a video file:
+
+```powershell
+cvml-sample-facemesh.exe -o output_video.mp4
+```

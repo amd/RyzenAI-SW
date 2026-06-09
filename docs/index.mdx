@@ -10,17 +10,32 @@ AMD Ryzen&trade; AI Software includes the tools and runtime libraries for optimi
 
 <img src="/images/rai-sw.png" alt="Ryzen AI Software stack" />
 
-## Quick Start
+## Explore
 
-<CardGroup cols={3}>
-  <Card title="Supported Configurations" href="/reference/relnotes#supported-configurations" icon="circle-check">
-    Hardware and OS matrix for Ryzen AI Software.
+<CardGroup cols={2}>
+  <Card title="Installation Instructions" href="/installation" icon="download">
+    Install the NPU driver and Ryzen AI Software on Windows or Linux.
   </Card>
-  <Card title="Installation Instructions" href="/getting-started/inst" icon="download">
-    Install the NPU driver and Ryzen AI Software on Windows.
+  <Card title="Vision" href="/vision" icon="image">
+    Image generation, object detection, classification, OCR, and super-resolution on the NPU.
   </Card>
-  <Card title="Models &amp; Tutorials" href="/vision/index" icon="lightbulb">
-    Browse runnable samples and end-to-end demos.
+  <Card title="LLMs" href="/llms" icon="comments">
+    Run large language models on the NPU and iGPU via OGA and the Lemonade SDK.
+  </Card>
+  <Card title="Audio" href="/audio" icon="microphone">
+    On-device speech-to-text (ASR) with Whisper and Parakeet.
+  </Card>
+  <Card title="GPU & Radeon" href="/gpu-radeon" icon="microchip">
+    GPU-accelerated inference on AMD Radeon and the integrated GPU.
+  </Card>
+  <Card title="Windows ML" href="/windows-ml" icon="windows">
+    Run ONNX models through Windows ML and the VitisAI execution provider.
+  </Card>
+  <Card title="Tools" href="/tools" icon="screwdriver-wrench">
+    Quantization, compilation, profiling, and NPU management utilities.
+  </Card>
+  <Card title="Reference" href="/reference" icon="book">
+    Release notes, supported operators, model lists, and licenses.
   </Card>
 </CardGroup>
 
@@ -34,13 +49,13 @@ Quantization involves converting the AI model's parameters from floating-point t
 
 **AMD Quark** is a comprehensive cross-platform deep learning toolkit designed to simplify and enhance the quantization of deep learning models. Supporting both PyTorch and ONNX models, Quark empowers developers to optimize their models for deployment on a wide range of hardware backends, achieving significant performance gains without compromising accuracy.
 
-For more details, refer to the [Model Quantization](/getting-started/model_quantization) page.
+For more details, refer to the [Model Quantization](/tools/model_quantization) page.
 
 ### CNN/Transformer Compilation and Deployment
 
 The AI model is deployed using the ONNX Runtime with either C++ or Python APIs. The Vitis AI Execution Provider included in the ONNX Runtime intelligently determines what portions of the AI model should run on the NPU, optimizing workloads to ensure optimal performance with lower power consumption.
 
-For more details, refer to the [Model Compilation and Deployment](/getting-started/modelrun) page.
+For more details, refer to the [Model Compilation and Deployment](/tools/modelrun) page.
 
 ## LLM Flow Overview
 
@@ -77,4 +92,4 @@ At the bottom, **OnnxRuntime GenAI (OGA)** or llama.cpp (only supported for iGPU
   </tbody>
 </table>
 
-For more details, refer to the [LLM Deployment Overview](/llms/overview) page.
+For more details, refer to the [LLM Deployment Overview](/llms) page.

@@ -1,81 +1,210 @@
 # Docs-as-Code CI
 
-Self-contained CI for the Mintlify docs in `../docs`. Three workflows in
-`.github/workflows/`:
+Everything that powers the documentation CI for the Mintlify site in `../../docs`.
+This is the **single** doc for the CI - scripts, conventions, runners, reporting,
+and deployment. (The only other file you should ever read here is the generated
+`CODE_TEST_REPORT.md`.)
 
-| Workflow | What it does | Runner |
-|----------|--------------|--------|
-| `mintlify-checks.yml` | `mint validate`, `mint broken-links`, `mint a11y`, Vale prose, cspell | cloud (ubuntu) |
-| `test-code-samples.yml` | python syntax checks of all blocks; executes blocks tagged `test` on hardware | cloud + self-hosted Strix / Strix Halo (Windows) |
-| `notify-owner.yml` | on failure, resolves the page owner and emails them the failure | cloud (ubuntu) |
+## Table of contents
+
+1. [Pipeline at a glance](#pipeline-at-a-glance)
+2. [Scripts](#scripts)
+3. [Code-block testing model (test-by-default)](#code-block-testing-model-test-by-default)
+4. [Languages: what runs, what doesn't (incl. C++)](#languages-what-runs-what-doesnt-incl-c)
+5. [Authoring conventions](#authoring-conventions)
+6. [Runners (hardware execution)](#runners-hardware-execution)
+7. [Per-page report & dashboard](#per-page-report--dashboard)
+8. [Failure routing (CODEOWNERS + notify)](#failure-routing-codeowners--notify)
+9. [End-to-end walkthrough](#end-to-end-walkthrough)
+10. [Deploying the site](#deploying-the-site)
+11. [Run it locally](#run-it-locally)
+
+---
+
+## Pipeline at a glance
+
+| Workflow (`.github/workflows/`) | What it does | Where |
+|---|---|---|
+| `mintlify-checks.yml` | `mint validate`, internal `broken-links` (blocking); external links + anchors + redirects (non-blocking); Vale prose; cspell | cloud (ubuntu) |
+| `link-check.yml` | full external link check, opens a tracking issue on failure | cloud, weekly + manual |
+| `test-code-samples.yml` | python syntax check (cloud) + **execute every runnable block** on AMD hardware | cloud + self-hosted |
+| `codeowners.yml` | regenerate `CODEOWNERS`, fail if the committed file is stale | cloud |
+| `notify-owner.yml` | on failure, resolve the page owner and open an issue that @mentions them | cloud |
+| `update-model-list.yml` | refresh the model tables from Hugging Face | cloud, scheduled |
+
+Every code/link run ends by appending a record to `ci-history.json` (the data
+store behind the dashboard).
 
 ## Scripts
 
-- `resolve_owner.py` - read the hidden `{/* owner: id | email */}` header from a page.
-- `generate_codeowners.py` - regenerate `CODEOWNERS` from page headers + the example-owner map (CI fails if the committed file is stale).
-- `extract_code_blocks.py` - parse/validate fenced code blocks (opt-in execution via the `test` tag; skip with `notest`).
-- `notify_owner.py` - compose the owner notification; dry-run preview when SMTP is not configured; `--send`/`--to` for local test emails.
-- `record_run.py` - append a run record (what ran, when, pass/fail, per-page results + owner) to `ci-history.json`.
+| Script | Purpose |
+|---|---|
+| `extract_code_blocks.py` | Parse every fenced block in `docs/**` (`.mdx` **and** `.md`) and **execute** each runnable one. `--syntax-only` for cloud; `--run` for hardware. |
+| `report.py` | Turn a run's JSON into `CODE_TEST_REPORT.md` (per-page + per-block dashboard) and inject the summary table into the CI dashboard page. |
+| `generate_codeowners.py` | Regenerate `docs/CODEOWNERS` from each page's `{/* owner: id */}` header (no external map). |
+| `resolve_owner.py` | Read the owner id from a single page. |
+| `check_owners.py` | Verify every page has an owner header. |
+| `notify_owner.py` | Compose the GitHub-native failure notification (issue @mentioning owners). |
+| `record_run.py` | Append a run (status + per-page results + owner) to `ci-history.json`. |
+| `fetch_models.py` | Regenerate the model tables on the Vision/LLMs/Audio pages. |
+| `gen_cards.py` | Regenerate the "bubble" card lists on each category index page. |
 
-## CI tracking dashboard
+## Code-block testing model (test-by-default)
 
-Every workflow ends with a `record` job that calls `record_run.py` to append the
-run to `ci-history.json` (committed on `main`, uploaded as an artifact on PRs).
-Two ways to view it:
-
-- **In-repo dashboard:** open `.github/scripts/dashboard/index.html` (or host the
-  `.github/scripts/dashboard/` folder on GitHub Pages). It reads `ci-history.json` and
-  shows summary cards, the run log (time, workflow, trigger, scripts, status),
-  and a per-page table with owners.
-- **Cursor canvas:** `rai-docs-ci.canvas.tsx` (in the workspace `canvases/`
-  folder) renders the same data beside the chat.
-
-`ci-history.json` is the single data store for both.
-
-## Code-block conventions (test-by-default / opt-out)
+**Every fenced block in a runnable language is executed on every run.** There is
+no opt-in. The single opt-out is `notest`.
 
 ````
-```python          -> executed by default (also syntax-checked)
-```bash             -> executed by default
-```python npu       -> executed; device-scoped (cpu | gpu | npu)
-```bash notest      -> skipped entirely (use for non-runnable snippets)
-```text / ```json   -> ignored (non-runnable language)
+```python          -> EXECUTED (always; also python-syntax-checked)
+```powershell       -> EXECUTED (always)
+```bash             -> EXECUTED (always)
+```python notest    -> the only opt-out: skipped entirely
+```cpp / ```text    -> non-runnable language -> recorded "skip" (never "pass")
 ````
 
-Every runnable block runs unless you add `notest`. Device tags scope a block to
-an accelerator: with `--device npu`, only `npu`-tagged and untagged blocks run.
+Optional **authoring** tags (they do not make testing optional):
 
-### Advanced (optional) - ported from AMD Playbooks, none used yet
+- `npu` / `gpu` / `cpu` - device scope (`--device npu` runs npu-tagged + untagged).
+- `timeout=600`, `workdir=examples`, `continue_on_error=true`, `setup=<id>`.
+- Page directives in MDX comments: `{/* @os:windows */}…{/* @os:end */}`,
+  `{/* @device:npu */}…`, `{/* @setup:id=… command="…" */}`,
+  `{/* @var:id=… device=npu value="…" */}`, `{/* @require:<id> */}`.
 
-These are available for authors but no page uses them today. Tags use MDX-valid
-`{/* ... */}` comments (not Playbooks' `<!-- ... -->`). See the
-`extract_code_blocks.py` docstring for full syntax.
+A page's blocks run **in order in one sandbox dir**, so a `git clone` / `cd` in
+an early block persists for later blocks, and nothing pollutes the docs tree.
 
-- Per-block attrs in the fence: `timeout=600`, `workdir=examples`,
-  `continue_on_error=true`, `setup=<named-setup>`.
-- `#hide` on a line - executed, but meant to be hidden on the rendered site.
-- Scope blocks: `{/* @os:windows */}…{/* @os:end */}`,
-  `{/* @device:npu */}…{/* @device:end */}`.
-- Reusable `{/* @setup:id=… command="…" */}` (OS-scoped) and device-aware
-  `{/* @var:id=… device=npu value="…" */}` referenced in code as `${name}`.
-- `{/* @require:<id> */}` to inline a shared include from `docs/_includes/`.
+## Languages: what runs, what doesn't (incl. C++)
 
-## Secrets / variables (optional, enable real sends)
+| Fence | Runs in CI? | How |
+|---|---|---|
+| `python` | Yes | syntax-compiled, then run with the runner's `python` (inside the Ryzen AI conda env, so NPU/GPU/CPU providers are visible) |
+| `bash` / `sh` / `shell` | Yes | `bash -c` |
+| `powershell` / `pwsh` / `ps1` | Yes | `powershell -NoProfile -Command` (native on the Windows runner) |
+| `cmd` / `bat` / `batch` | Yes | written to a `.bat`, run with `cmd /c` |
+| `cpp` / `c` | **No** | C/C++ snippets in the docs are excerpts without a build context (headers, CMake, project). They are recorded as `skip (cpp not runnable)`, never passed. Compile-testing them would need the full example project; that's a future enhancement, not done today. |
+| `text` / `json` / `yaml` / `mdx` / `cmake` | No | output samples / config, not executable -> `skip`. |
 
-- `SMTP_SERVER`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` (secrets) - enable real emails. Without them, the notifier prints a full dry-run preview (used for the demo).
-- `NOTIFY_TEST_RECIPIENT` (variable) - redirect all notifications to one address while testing.
+So today's executed languages are **python, powershell, bash, and cmd/bat**;
+C++ (and other non-runnable fences) are explicitly reported as skipped.
 
-## Demo
+## Authoring conventions
 
-Trigger `Notify Owner On Failure` via "Run workflow" with a page (default `docs/getting-started/inst.mdx`) to watch owner resolution + notification end to end. Locally:
+1. **Owner header (required)** - first line after frontmatter:
+   `{/* owner: <github-id> */}`. Drives CODEOWNERS + failure routing. Default
+   owner: `@dwithchenna`.
+2. **Language tabs** - when the same step exists in multiple languages, show
+   **Python first**, then **C++**, using Mintlify `<Tabs><Tab title="Python">…`.
+3. **2-level page paths** - `folder/page.mdx` (e.g. `llms/hybrid_oga.mdx`). The
+   link checker and Mintlify only resolve 2-level page paths; do deeper grouping
+   in `docs.json` nav, not on disk. (Top-level standalone pages like
+   `index.mdx` and `installation.mdx` are fine.)
+4. **Icons** - only on top-level categories (group `icon` in `docs.json`, or a
+   frontmatter `icon:` on a top-level page). Never on second-level pages.
+
+## Runners (hardware execution)
+
+The `test-hardware` job runs on a **self-hosted runner**. Devices are chosen by
+the `DOCS_CI_DEVICES` repo variable (a JSON array) so you never edit the
+workflow to add hardware:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DOCS_CI_DEVICES` | `["halo"]` | runner device labels to target (e.g. `["halo","stxp","krk"]`) |
+| `DOCS_CI_OS` | `Windows` | OS label in the runner triple |
+| `RYZEN_AI_ENV` | `ryzen-ai-1.7.1` | conda env on the runner with the NPU/GPU/CPU providers |
+
+A job targets `runs-on: [self-hosted, <DOCS_CI_OS>, <device>]`. To add a machine:
+label it `self-hosted`, the OS, and a device tag, then add that tag to
+`DOCS_CI_DEVICES`.
+
+**Today:** a single local **Strix Halo** box (`AMD Ryzen AI Max+`, NPU present)
+is registered to this repo with the label `halo`, so `DOCS_CI_DEVICES=["halo"]`
+runs the whole suite end-to-end on real hardware.
+
+**Shared AMD pool (future):** the AMD Playbooks lab machines (`xsj-aimlab-halo-*`,
+`xsj-aimlab-stxp-*`, `…-krk-*`) use the same `[self-hosted, Windows, <device>]`
+label scheme. They are registered to an AMD **org runner group**, so to use them
+the docs repo must live under the `amd` org and be added to that group (a fork
+under a personal account gets `403` and the job queues forever). Then set
+`DOCS_CI_DEVICES=["halo","stxp","krk"]`.
+
+Register the local box (stopgap): repo -> Settings -> Actions -> Runners -> New
+self-hosted runner (Windows); add the label `halo`; run as a service
+(`./svc.cmd install && ./svc.cmd start`).
+
+## Per-page report & dashboard
+
+- **`report.py`** reads a run's JSON (`--output-json` from
+  `extract_code_blocks.py`) and writes **`CODE_TEST_REPORT.md`** - a summary
+  table (one row per page: blocks / pass / fail / skip / owner) plus a per-page
+  detail table (one row per block: `#`, lang, result, short detail). It covers
+  **every** `.mdx` and `.md`, including pages with no code (`no code`).
+- It also injects the summary table into `docs/reference/ci-dashboard.mdx`
+  between `{/* RESULTS_START */}` / `{/* RESULTS_END */}`, so the published CI
+  dashboard reflects all pages.
+- **`ci-history.json`** is the append-only run log (status + per-page result +
+  owner) that `record_run.py` writes; the in-repo dashboard
+  (`.github/scripts/dashboard/index.html`) and the Cursor canvas read it.
+
+## Failure routing (CODEOWNERS + notify)
+
+- `generate_codeowners.py` rebuilds `docs/CODEOWNERS` from page headers: a
+  catch-all default, infra rules, a per-folder default (the folder's dominant
+  owner), then a per-page rule for every page. `codeowners.yml` fails a PR if
+  the committed file is stale.
+- On a failing run, `notify_owner.py` resolves the owner from the page header
+  and opens an issue that **@mentions** them - GitHub emails them through its own
+  system, so no email addresses are stored anywhere.
+
+## End-to-end walkthrough
+
+Take `docs/vision/super_resolution.mdx` (owner `@bconsolvo`), which has a
+runnable `python` PSNR block.
+
+1. A PR edits `docs/**` -> `Mintlify Docs Checks` and `Test Code Samples` run.
+2. `mint validate` + `broken-links` confirm the build and links.
+3. `extract_code_blocks.py --syntax-only` compiles every python block (cloud).
+4. `extract_code_blocks.py --run` executes the PSNR block on the Strix Halo
+   runner; it prints `PSNR @ MSE=100 -> 28.13 dB` and passes.
+5. If it regressed, the page is written to `failed-pages.txt`, `notify-owner`
+   resolves `@bconsolvo` from the header and opens an issue mentioning them.
+6. `generate_codeowners.py` keeps `CODEOWNERS` in sync from the same header, so
+   review assignment and the notifier always agree.
+
+## Deploying the site
+
+The site is hosted by **Mintlify** from the `/docs` subfolder; the GitHub repo
+can stay private while the site is public.
+
+1. mintlify.com -> connect the repo via the Mintlify GitHub App (works on
+   private repos; scope it to this repo).
+2. Dashboard -> Git Settings -> enable **monorepo**, set the docs path to
+   `/docs` (otherwise it looks for `docs.json` at the root and fails).
+3. Push/merge to `main` -> auto rebuild + deploy. Every PR gets a preview build.
+4. The public URL (e.g. `https://ryzen-ai-xxxx.mintlify.app`) shows on the
+   dashboard Overview.
+
+Notes: GitHub/Discord sidebar links, icons, theme, and the AI "Ask/Copy" menu
+live in `docs/docs.json`. The "View as Markdown" / Ask-AI routes are produced by
+Mintlify's hosted build and 404 under local `mint dev` - expected.
+
+## Run it locally
 
 ```bash
-python .github/scripts/notify_owner.py --file docs/getting-started/inst.mdx
+# Cloud-equivalent syntax check (fast, no hardware)
+python .github/scripts/extract_code_blocks.py --syntax-only --docs docs
+
+# Full hardware run (inside the Ryzen AI conda env), then build the report
+conda run -n ryzen-ai-1.7.1 python .github/scripts/extract_code_blocks.py \
+    --run --docs docs --output-json report_run.json --failed-pages report_failed.txt
+python .github/scripts/report.py --results report_run.json --docs docs \
+    --out .github/scripts/CODE_TEST_REPORT.md --dashboard docs/reference/ci-dashboard.mdx
+
+# Regenerate CODEOWNERS / model tables / index cards
+python .github/scripts/generate_codeowners.py
+python .github/scripts/fetch_models.py
+python .github/scripts/gen_cards.py
+
+# Preview the site
+cd docs && npx mint dev      # http://localhost:3000
 ```
-
-## Hardware
-
-`test-hardware` targets `[self-hosted, Windows, stxp]` (Strix Point) and
-`[self-hosted, Windows, halo]` (Strix Halo) - the real AMD Playbooks device
-labels. See `RUNNERS.md` for where those machines live and how to get the docs
-repo added to the runner group that hosts them.
