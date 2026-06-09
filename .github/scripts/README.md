@@ -25,68 +25,69 @@ and deployment. (The only other file you should ever read here is the generated
 
 ### Execution order (what runs first)
 
-A push/PR touching `docs/**` starts **three workflows in parallel**. The only
-ordered dependency is *inside* Test Code Samples: the cloud syntax gate must pass
-**before** the hardware run starts. Notification runs **after** a check workflow
-finishes (and only if it failed).
+The pipeline below runs on a push/PR touching `docs/**`. It is ordered
+**generate first, then test, then check prose**: ownership and the model tables
+(generated content) come first, then the code is extracted and tested, then
+links/prose are checked.
 
 ```text
 push / PR to docs/**
 │
-├─ Mintlify Docs Checks ............................... cloud            (parallel)
-│     1. validate ........ mint validate  →  mint broken-links (internal)   [blocks merge]
-│     2. external-links .. mint broken-links --check-external/anchors        [non-blocking]
-│     3. prose (Vale)     4. spell (cspell)
-│     5. record ......... record_run.py  →  ci-history.json
+1. CODEOWNERS & Page Ownership ...................... cloud
+│     a. check_owners.py ........ every page has an owner header
+│     b. generate_codeowners.py . rebuild docs/CODEOWNERS; fail if stale
+│     c. codeowners-validator ... syntax / no-unowned / no-shadow
 │
-├─ Test Code Samples ................................. cloud → self-hosted (parallel)
-│     1. syntax-check (cloud) .... extract_code_blocks.py --syntax-only
-│           └ python syntax  +  json/yaml/toml/cmake lint              [runs first]
-│     2. test-hardware (runner) .. extract_code_blocks.py --run        [needs #1 to pass]
+2. Update Model List ............................... cloud (weekly / on demand)
+│     a. fetch_models.py ........ refresh Vision/LLMs/Audio model tables
+│
+3. Test Code Samples ............................... cloud → self-hosted
+│     a. syntax-check (cloud) .... extract_code_blocks.py --syntax-only
+│           └ python syntax + json/yaml/toml/cmake lint
+│     b. test-hardware (runner) .. extract_code_blocks.py --run        [needs 3a]
 │           └ run python/powershell/cmd · bash via WSL · compile C/C++ · lint
 │           └ report.py  →  CODE_TEST_REPORT.md (uploaded artifact)
-│     3. record (always) ......... record_run.py  →  ci-history.json
+│     c. record (always) ......... record_run.py  →  ci-history.json
 │
-└─ CODEOWNERS & Page Ownership ....................... cloud            (parallel)
-      1. check_owners.py ......... every page has an owner header
-      2. generate_codeowners.py .. fail if docs/CODEOWNERS is stale
-      3. codeowners-validator .... syntax / no-unowned / no-shadow
-
-AFTER Mintlify Docs Checks OR Test Code Samples completes:
-└─ Notify Owner On Failure (only if that run FAILED) . cloud
-      1. download the failed-pages artifact(s)
-      2. notify_owner.py  →  resolve owner GitHub IDs from page headers
-      3. open a GitHub issue @mentioning the owner(s)
-      4. email the full report to NOTIFY_EMAIL (if SMTP_* secrets are set)
-
-Scheduled separately (NOT on PRs):
-• Link Check ......... weekly · mint broken-links --check-external · opens an issue
-• Update Model List .. weekly · fetch_models.py · opens a PR if HF tables changed
+4. Mintlify Docs Checks ............................ cloud
+│     a. validate (mint validate → broken-links)   b. external links
+│     c. Vale prose   d. cspell   e. record → ci-history.json
+│
+5. Notify Owner On Failure (only if 3 or 4 failed) . cloud
+      resolve owner → open issue @mention → email NOTIFY_EMAIL (if SMTP_* set)
 ```
+
+> On GitHub, stages 1, 3, and 4 are separate workflows triggered by the same PR,
+> so they actually run **concurrently**; the numbering is the intended logical
+> order (and within stage 3 the cloud syntax gate truly runs before the hardware
+> run via `needs`). Stage 2 runs on a weekly schedule / on demand and
+> regenerates the tables the other stages build on. Also weekly: **Link Check**
+> (external links → opens an issue). Want hard serialization (1 → 2 → 3 → 4)?
+> That needs `workflow_run` chaining - say the word.
 
 ### Workflows (in run order)
 
 | # | Workflow (`.github/workflows/`) | Trigger | Where |
 |---|---|---|---|
-| 1a (parallel) | `mintlify-checks.yml` | PR/push `docs/**` | cloud |
-| 1b (parallel) | `test-code-samples.yml` | PR/push `docs/**` | cloud → self-hosted |
-| 1c (parallel) | `codeowners.yml` | PR/push `docs/**`,`.github/**` | cloud |
-| 2 (after 1a/1b fails) | `notify-owner.yml` | `workflow_run` completed | cloud |
-| weekly | `link-check.yml` | schedule + manual | cloud |
-| weekly | `update-model-list.yml` | schedule + manual | cloud |
+| 1 | `codeowners.yml` | PR/push `docs/**`,`.github/**` | cloud |
+| 2 | `update-model-list.yml` | weekly + manual | cloud |
+| 3 | `test-code-samples.yml` | PR/push `docs/**` | cloud → self-hosted |
+| 4 | `mintlify-checks.yml` | PR/push `docs/**` | cloud |
+| 5 | `notify-owner.yml` | `workflow_run` completed (on failure) | cloud |
+| — | `link-check.yml` | weekly + manual | cloud |
 
 ### Scripts (in run order)
 
 | # | Script | Runs during | What it does |
 |---|---|---|---|
-| 1 | `extract_code_blocks.py` | Test Code Samples — **syntax-check** (cloud), then **test-hardware** (runner) | parse every block in `docs/**` (`.mdx` + `.md`); `--syntax-only` = python syntax + format lint; `--run` = execute / compile / WSL |
-| 2 | `report.py` | Test Code Samples — after test-hardware | run JSON → `CODE_TEST_REPORT.md` + inject the dashboard table |
-| 3 | `record_run.py` | end of Mintlify Docs Checks **and** Test Code Samples | append the run (status + per-page result + owner) to `ci-history.json` |
-| 4 | `check_owners.py` | CODEOWNERS — step 1 | every page has an owner header |
-| 5 | `generate_codeowners.py` | CODEOWNERS — step 2 | rebuild `docs/CODEOWNERS` from headers; fail if stale |
-| 6 | `resolve_owner.py` | Notify Owner (helper, also used by 2 & 3) | read the owner GitHub ID from a page header |
-| 7 | `notify_owner.py` | Notify Owner — on failure | compose the issue/email body @mentioning owners |
-| 8 | `fetch_models.py` | Update Model List (weekly) | refresh the Vision/LLMs/Audio model tables |
+| 1 | `check_owners.py` | CODEOWNERS — step 1 | every page has an owner header |
+| 2 | `generate_codeowners.py` | CODEOWNERS — step 2 | rebuild `docs/CODEOWNERS` from headers; fail if stale |
+| 3 | `fetch_models.py` | Update Model List | refresh the Vision/LLMs/Audio model tables |
+| 4 | `extract_code_blocks.py` | Test Code Samples — **syntax-check** (cloud), then **test-hardware** (runner) | parse every block in `docs/**` (`.mdx` + `.md`); `--syntax-only` = python syntax + format lint; `--run` = execute / compile / WSL |
+| 5 | `report.py` | Test Code Samples — after test-hardware | run JSON → `CODE_TEST_REPORT.md` + inject the dashboard table |
+| 6 | `record_run.py` | end of Test Code Samples **and** Mintlify Docs Checks | append the run (status + per-page result + owner) to `ci-history.json` |
+| 7 | `resolve_owner.py` | Notify Owner (helper, also used by 5 & 6) | read the owner GitHub ID from a page header |
+| 8 | `notify_owner.py` | Notify Owner — on failure | compose the issue/email body @mentioning owners |
 
 ## Code-block testing model (test-by-default)
 
@@ -242,19 +243,19 @@ Mintlify's hosted build and 404 under local `mint dev` - expected.
 ## Run it locally
 
 ```bash
-# Cloud-equivalent syntax check (fast, no hardware)
+# 1. Ownership + generated tables first (the pipeline order)
+python .github/scripts/check_owners.py
+python .github/scripts/generate_codeowners.py
+python .github/scripts/fetch_models.py
+
+# 2. Cloud-equivalent syntax + format check (fast, no hardware)
 python .github/scripts/extract_code_blocks.py --syntax-only --docs docs
 
-# Full hardware run (inside the Ryzen AI conda env), then build the report
+# 3. Full hardware run (inside the Ryzen AI conda env), then build the report
 conda run -n ryzen-ai-1.7.1 python .github/scripts/extract_code_blocks.py \
     --run --docs docs --output-json report_run.json --failed-pages report_failed.txt
 python .github/scripts/report.py --results report_run.json --docs docs \
     --out .github/scripts/CODE_TEST_REPORT.md --dashboard docs/reference/ci-dashboard.mdx
-
-# Regenerate CODEOWNERS / model tables / index cards
-python .github/scripts/generate_codeowners.py
-python .github/scripts/fetch_models.py
-python .github/scripts/gen_cards.py
 
 # Preview the site
 cd docs && npx mint dev      # http://localhost:3000
