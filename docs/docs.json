@@ -12,10 +12,7 @@
     "light": "#F4484D",
     "dark": "#C8171E"
   },
-  "favicon": {
-    "light": "/logo/favicon-light.svg",
-    "dark": "/logo/favicon-dark.svg"
-  },
+  "favicon": "/logo/favicon-light.svg",
   "logo": {
     "light": "/logo/amd-ryzenai-light.svg",
     "dark": "/logo/amd-ryzenai-dark.svg",
@@ -45,142 +42,170 @@
         }
       ],
       "versions": [
-        { "version": "1.7.1", "default": true, "href": "/" },
-        { "version": "1.7", "href": "https://ryzenai.docs.amd.com/en/1.7/" },
-        { "version": "1.6.1", "href": "https://ryzenai.docs.amd.com/en/1.6.1/" },
-        { "version": "1.6", "href": "https://ryzenai.docs.amd.com/en/1.6/" },
-        { "version": "1.5", "href": "https://ryzenai.docs.amd.com/en/1.5/" },
-        { "version": "1.4", "href": "https://ryzenai.docs.amd.com/en/1.4/" },
-        { "version": "1.3", "href": "https://ryzenai.docs.amd.com/en/1.3/" },
-        { "version": "1.2", "href": "https://ryzenai.docs.amd.com/en/1.2/" },
-        { "version": "1.1", "href": "https://ryzenai.docs.amd.com/en/1.1/" }
+        {
+          "version": "1.7.1",
+          "default": true,
+          "href": "/"
+        },
+        {
+          "version": "1.7",
+          "href": "https://ryzenai.docs.amd.com/en/1.7/"
+        },
+        {
+          "version": "1.6.1",
+          "href": "https://ryzenai.docs.amd.com/en/1.6.1/"
+        },
+        {
+          "version": "1.6",
+          "href": "https://ryzenai.docs.amd.com/en/1.6/"
+        },
+        {
+          "version": "1.5",
+          "href": "https://ryzenai.docs.amd.com/en/1.5/"
+        },
+        {
+          "version": "1.4",
+          "href": "https://ryzenai.docs.amd.com/en/1.4/"
+        },
+        {
+          "version": "1.3",
+          "href": "https://ryzenai.docs.amd.com/en/1.3/"
+        },
+        {
+          "version": "1.2",
+          "href": "https://ryzenai.docs.amd.com/en/1.2/"
+        },
+        {
+          "version": "1.1",
+          "href": "https://ryzenai.docs.amd.com/en/1.1/"
+        }
       ]
     },
     "groups": [
       {
         "group": "Ryzen AI Software",
+        "pages": [
+          "index",
+          "installation",
+          {
+            "group": "Vision",
+            "icon": "image",
+            "expanded": false,
             "pages": [
-              "index",
-              "installation",
-              {
-                "group": "Vision",
-                "icon": "image",
-                "expanded": false,
-                "pages": [
-                  "vision/index",
-                  "vision/getstartex",
-                  "vision/sd_demo",
-                  "vision/super_resolution",
-                  "vision/getting-started-resnet",
-                  "vision/getting-started-resnet-bf16",
-                  "vision/hello-world",
-                  "vision/image-classification",
-                  "vision/yolov8m",
-                  "vision/yolov8s-worldv2",
-                  "vision/torchvision",
-                  "vision/cvml",
-                  "vision/cvml-face-detection",
-                  "vision/cvml-face-mesh",
-                  "vision/nemotron-ocr-v2",
-                  "vision/npu-gpu-pipeline"
-                ]
-              },
-              {
-                "group": "LLMs",
-                "icon": "comments",
-                "expanded": false,
-                "pages": [
-                  "llms/index",
-                  "llms/high_level_python",
-                  "llms/server_interface",
-                  "llms/hybrid_oga",
-                  "llms/oga_model_prepare",
-                  "llms/oga_op_prepare",
-                  "llms/llm_linux",
-                  "llms/oga-cpp-api",
-                  "llms/oga-inference",
-                  "llms/rag-oga",
-                  "llms/llm-sft-deploy",
-                  "llms/vlm",
-                  "llms/distilbert-example"
-                ]
-              },
-              {
-                "group": "Audio",
-                "icon": "microphone",
-                "expanded": false,
-                "pages": [
-                  "audio/index",
-                  "audio/whisper_cpp",
-                  "audio/whisper-asr",
-                  "audio/parakeet-tdt"
-                ]
-              },
-              {
-                "group": "GPU & Radeon",
-                "icon": "microchip",
-                "expanded": false,
-                "pages": [
-                  "gpu-radeon/index",
-                  "gpu-radeon/ryzenai_gpu",
-                  "gpu-radeon/igpu-getting-started",
-                  "gpu-radeon/radeon"
-                ]
-              },
-              {
-                "group": "Windows ML",
-                "icon": "windows",
-                "expanded": false,
-                "pages": [
-                  "windows-ml/index",
-                  "windows-ml/installation",
-                  "windows-ml/model_support",
-                  "windows-ml/model_deployment",
-                  "windows-ml/model_conversion",
-                  "windows-ml/winml_ep",
-                  "windows-ml/winml_example",
-                  "windows-ml/resnet",
-                  "windows-ml/clip",
-                  "windows-ml/googlebert",
-                  "windows-ml/llm",
-                  "windows-ml/faq",
-                  "windows-ml/troubleshooting"
-                ]
-              },
-              {
-                "group": "Tools",
-                "icon": "screwdriver-wrench",
-                "expanded": false,
-                "pages": [
-                  "tools/index",
-                  "tools/model_quantization",
-                  "tools/modelrun",
-                  "tools/quark-quantization",
-                  "tools/ops_support",
-                  "tools/ai_analyzer",
-                  "tools/xrt_smi",
-                  "tools/onnx-benchmark",
-                  "tools/npu-check",
-                  "tools/ryzen_ai_libraries"
-                ]
-              },
-              {
-                "group": "Reference",
-                "icon": "book",
-                "expanded": false,
-                "pages": [
-                  "reference/index",
-                  "reference/relnotes",
-                  "reference/licenses",
-                  "reference/versions",
-                  "reference/app_development",
-                  "reference/applications",
-                  "reference/ci-dashboard"
-                ]
-              }
+              "vision/index",
+              "vision/cvml-face-detection",
+              "vision/cvml-face-mesh",
+              "vision/getting-started-resnet",
+              "vision/getting-started-resnet-bf16",
+              "vision/hello-world",
+              "vision/image-classification",
+              "vision/nemotron-ocr-v2",
+              "vision/npu-gpu-pipeline",
+              "vision/yolov8m",
+              "vision/yolov8s-worldv2",
+              "vision/getstartex",
+              "vision/cvml",
+              "vision/sd_demo",
+              "vision/super_resolution",
+              "vision/torchvision"
+            ]
+          },
+          {
+            "group": "LLMs",
+            "icon": "comments",
+            "expanded": false,
+            "pages": [
+              "llms/index",
+              "llms/oga_op_prepare",
+              "llms/distilbert-example",
+              "llms/llm-sft-deploy",
+              "llms/high_level_python",
+              "llms/oga-cpp-api",
+              "llms/oga-inference",
+              "llms/hybrid_oga",
+              "llms/oga_model_prepare",
+              "llms/rag-oga",
+              "llms/llm_linux",
+              "llms/server_interface",
+              "llms/vlm"
+            ]
+          },
+          {
+            "group": "Audio",
+            "icon": "microphone",
+            "expanded": false,
+            "pages": [
+              "audio/index",
+              "audio/parakeet-tdt",
+              "audio/whisper-asr",
+              "audio/whisper_cpp"
+            ]
+          },
+          {
+            "group": "GPU & Radeon",
+            "icon": "microchip",
+            "expanded": false,
+            "pages": [
+              "gpu-radeon/index",
+              "gpu-radeon/ryzenai_gpu",
+              "gpu-radeon/igpu-getting-started",
+              "gpu-radeon/radeon"
+            ]
+          },
+          {
+            "group": "Windows ML",
+            "icon": "windows",
+            "expanded": false,
+            "pages": [
+              "windows-ml/index",
+              "windows-ml/winml_ep",
+              "windows-ml/faq",
+              "windows-ml/installation",
+              "windows-ml/model_conversion",
+              "windows-ml/model_deployment",
+              "windows-ml/troubleshooting",
+              "windows-ml/model_support",
+              "windows-ml/winml_example",
+              "windows-ml/clip",
+              "windows-ml/googlebert",
+              "windows-ml/llm",
+              "windows-ml/resnet"
+            ]
+          },
+          {
+            "group": "Tools",
+            "icon": "screwdriver-wrench",
+            "expanded": false,
+            "pages": [
+              "tools/index",
+              "tools/ai_analyzer",
+              "tools/modelrun",
+              "tools/model_quantization",
+              "tools/npu-check",
+              "tools/xrt_smi",
+              "tools/onnx-benchmark",
+              "tools/quark-quantization",
+              "tools/ryzen_ai_libraries",
+              "tools/ops_support"
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book",
+            "expanded": false,
+            "pages": [
+              "reference/index",
+              "reference/app_development",
+              "reference/applications",
+              "reference/ci-dashboard",
+              "reference/licenses",
+              "reference/versions",
+              "reference/relnotes"
             ]
           }
         ]
+      }
+    ]
   },
   "footer": {
     "socials": {

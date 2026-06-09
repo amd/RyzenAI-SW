@@ -44,7 +44,8 @@ def flatten(pages):
 
 def main():
     nav = json.loads((DOCS / "docs.json").read_text(encoding="utf-8"))
-    groups = nav["navigation"]["tabs"][0]["groups"][0]["pages"]
+    navn = nav["navigation"]
+    groups = (navn["tabs"][0]["groups"] if "tabs" in navn else navn["groups"])[0]["pages"]
 
     updated = 0
     for g in groups:
