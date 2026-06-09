@@ -21,9 +21,9 @@ This page addresses common issues and solutions when using Windows ML on Ryzen A
 
 **Solution:**
 
-- Ensure you have called EP registration before creating the session. See [Execution Providers](/winml/winml_ep).
+- Ensure you have called EP registration before creating the session. See [Execution Providers](/windows-ml/winml_ep).
 - Run the application with administrator privileges if the EP requires Microsoft Store download.
-- Verify the NPU driver is installed. See [Installation](/winml/installation).
+- Verify the NPU driver is installed. See [Installation](/windows-ml/installation).
 
 ### Issue: Model Compilation Fails
 
@@ -31,9 +31,9 @@ This page addresses common issues and solutions when using Windows ML on Ryzen A
 
 **Solution:**
 
-- Ensure the model is in a supported format (FP32 or QDQ). See [Model Support](/winml/model_support).
+- Ensure the model is in a supported format (FP32 or QDQ). See [Model Support](/windows-ml/model_support).
 - For quantized models, verify the quantization configuration (A8W8 for CNN, A16W8 for Transformer).
-- Check model opset compatibility. ONNX opset 17 is recommended. See [Model compilation and deployment](/running-models/modelrun).
+- Check model opset compatibility. ONNX opset 17 is recommended. See [Model compilation and deployment](/getting-started/modelrun).
 
 ## Runtime Issues
 
@@ -43,12 +43,12 @@ This page addresses common issues and solutions when using Windows ML on Ryzen A
 
 **Solution:**
 
-- Set execution policy to `PREFER_NPU` or explicitly use `VitisAIExecutionProvider`. See [Execution Providers](/winml/winml_ep).
+- Set execution policy to `PREFER_NPU` or explicitly use `VitisAIExecutionProvider`. See [Execution Providers](/windows-ml/winml_ep).
 - Verify the NPU driver is installed and the device is recognized.
-- Check that the model is compatible with the Vitis AI EP. See [Model Support](/winml/model_support).
+- Check that the model is compatible with the Vitis AI EP. See [Model Support](/windows-ml/model_support).
 
 ### Issue: TensorRTRTX or Pywinrt Registration Failure (Python)
 
 **Symptom:** Importing `winrt.runtime` causes the TensorRTRTX execution provider to fail registration.
 
-**Solution:** Run pywinrt-related code in a **separate process**. Use the subprocess pattern shown in [Execution Providers](/winml/winml_ep) (place `winml.py` in the same directory as your application script).
+**Solution:** Run pywinrt-related code in a **separate process**. Use the subprocess pattern shown in [Execution Providers](/windows-ml/winml_ep) (place `winml.py` in the same directory as your application script).

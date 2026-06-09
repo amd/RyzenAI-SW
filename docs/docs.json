@@ -63,10 +63,10 @@
                 "pages": [
                   "getting-started/index",
                   "getting-started/inst",
-                  "running-models/model_quantization",
-                  "running-models/modelrun",
-                  "running-models/app_development",
-                  "applications/index"
+                  "getting-started/model_quantization",
+                  "getting-started/modelrun",
+                  "getting-started/app_development",
+                  "getting-started/applications"
                 ]
               },
               {
@@ -131,9 +131,9 @@
                 "icon": "microchip",
                 "expanded": false,
                 "pages": [
-                  "gpu/index",
-                  "gpu/ryzenai_gpu",
-                  "gpu/radeon"
+                  "gpu-radeon/index",
+                  "gpu-radeon/ryzenai_gpu",
+                  "gpu-radeon/radeon"
                 ]
               },
               {
@@ -141,23 +141,23 @@
                 "icon": "windows",
                 "expanded": false,
                 "pages": [
-                  "winml/index",
-                  "winml/winml_overview",
-                  "winml/installation",
-                  "winml/model_support",
-                  "winml/model_deployment",
-                  "winml/model_conversion",
-                  "winml/winml_ep",
-                  "winml/winml_example",
-                  "winml/faq",
-                  "winml/troubleshooting",
+                  "windows-ml/index",
+                  "windows-ml/winml_overview",
+                  "windows-ml/installation",
+                  "windows-ml/model_support",
+                  "windows-ml/model_deployment",
+                  "windows-ml/model_conversion",
+                  "windows-ml/winml_ep",
+                  "windows-ml/winml_example",
+                  "windows-ml/faq",
+                  "windows-ml/troubleshooting",
                   {
                     "group": "Examples",
                     "expanded": false,
                     "pages": [
-                      "winml-examples/resnet",
-                      "winml-examples/clip",
-                      "winml-examples/googlebert"
+                      "windows-ml/resnet",
+                      "windows-ml/clip",
+                      "windows-ml/googlebert"
                     ]
                   }
                 ]
@@ -172,9 +172,9 @@
                   "tools/ai_analyzer",
                   "tools/ryzen_ai_libraries",
                   "tools/ops_support",
-                  "benchmarking/quark-quantization",
-                  "benchmarking/onnx-benchmark",
-                  "benchmarking/npu-check"
+                  "tools/quark-quantization",
+                  "tools/onnx-benchmark",
+                  "tools/npu-check"
                 ]
               },
               {

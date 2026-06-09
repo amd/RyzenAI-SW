@@ -65,9 +65,9 @@ git lfs pull
 
 ## Windows ML Examples
 
-- [Running ResNet with Windows ML](docs/winml-examples/resnet.mdx)
-- [Running Transformer models with Windows ML](docs/winml-examples/googlebert.mdx)
-- [Running CLIP with Windows ML](docs/winml-examples/clip.mdx)
+- [Running ResNet with Windows ML](docs/windows-ml/resnet.mdx)
+- [Running Transformer models with Windows ML](docs/windows-ml/googlebert.mdx)
+- [Running CLIP with Windows ML](docs/windows-ml/clip.mdx)
 
 ## Demos
 
@@ -77,13 +77,13 @@ git lfs pull
 
 ## Other Tutorials
 
-- [AMD Quark Quantization](docs/benchmarking/quark-quantization.mdx)
+- [AMD Quark Quantization](docs/tools/quark-quantization.mdx)
 - [Run Ryzen AI CVML library application](docs/vision/cvml.mdx)
 - [Torchvision models end-to-end inference with Ryzen AI](docs/vision/torchvision.mdx)
 
 ## Benchmarking
 
-- [ONNX benchmark utilities](docs/benchmarking/onnx-benchmark.mdx)
+- [ONNX benchmark utilities](docs/tools/onnx-benchmark.mdx)
 
 ## Reference
 

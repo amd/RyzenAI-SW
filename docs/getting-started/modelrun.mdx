@@ -162,7 +162,7 @@ When compiling BF16 models, an optional configuration file can be provided to th
 
 <Note>
 - Running BF16 Models is only supported for STX/KRK or newer devices. For the model compatibility table see [Release Notes](/reference/relnotes).
-- For C++ applications that need to compile BF16 models at runtime, include `${CONDA_PREFIX}/Lib/site-packages/flexml/flexml_extras/lib/vaiml.dll` along with the DLLs specified in [Application Development](/running-models/app_development#app-development). However, using pre-compiled BF16 models is recommended for C++ deployment.
+- For C++ applications that need to compile BF16 models at runtime, include `${CONDA_PREFIX}/Lib/site-packages/flexml/flexml_extras/lib/vaiml.dll` along with the DLLs specified in [Application Development](/getting-started/app_development#app-development). However, using pre-compiled BF16 models is recommended for C++ deployment.
 </Note>
 
 ### Sample Python Code
@@ -221,7 +221,7 @@ The `target` provider options can be used to select which backend to use when co
 
 ### Device-Specific Settings
 
-Suitable settings for the `target` and `xclbin` provider options are dependent on the type of device. The application must perform a device detection check before configuring the Vitis AI EP. For more details on how to do this, refer to the [Application Development](/running-models/app_development) page.
+Suitable settings for the `target` and `xclbin` provider options are dependent on the type of device. The application must perform a device detection check before configuring the Vitis AI EP. For more details on how to do this, refer to the [Application Development](/getting-started/app_development) page.
 
 When compiling INT8 models on STX/KRK devices:
 

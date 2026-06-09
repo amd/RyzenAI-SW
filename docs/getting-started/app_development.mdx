@@ -50,7 +50,7 @@ The application must verify that it is running on an AMD processor with an NPU, 
 
 ## NPU Utilities
 
-When deploying applications across various NPU devices, users can determine the specific type of NPU device using Python/C++ code. Based on the detected device—such as PHX, STX, KRK, or other device—users should configure the appropriate provider options as outlined in [Model Compilation and Deployment](/running-models/modelrun).
+When deploying applications across various NPU devices, users can determine the specific type of NPU device using Python/C++ code. Based on the detected device—such as PHX, STX, KRK, or other device—users should configure the appropriate provider options as outlined in [Model Compilation and Deployment](/getting-started/modelrun).
 
 For Python, the user can get the specific NPU type using the following example `get_npu_info` function in the `%RYZEN_AI_INSTALLATION_PATH%\quicktest\quicktest.py`
 
@@ -71,15 +71,15 @@ Sample C++ code that implements the compatibility checks to be performed before 
 
 ### VitisAI EP Provider Options
 
-For INT8 models, the application should detect the type of APU present (PHX, HPT, STX, or KRK) and set the `target` and `xclbin` provider options accordingly. Refer to the section on [using INT8 models](/running-models/modelrun#int8-models) for more details.
+For INT8 models, the application should detect the type of APU present (PHX, HPT, STX, or KRK) and set the `target` and `xclbin` provider options accordingly. Refer to the section on [using INT8 models](/getting-started/modelrun#int8-models) for more details.
 
-For BF16 models, the application should set the `config_file` provider option to the same file that was used to precompile the BF16 model. Refer to the section on [using BF16 models](/running-models/modelrun#bf16-models) for more details.
+For BF16 models, the application should set the `config_file` provider option to the same file that was used to precompile the BF16 model. Refer to the section on [using BF16 models](/getting-started/modelrun#bf16-models) for more details.
 
 ### Pre-Compiled Models
 
 To avoid the overhead of recompiling models, it is highly recommended to save the compiled models and use these precompiled versions in the final application. Precompiled models can be loaded instantly and executed immediately on the NPU, significantly improving session creation time and overall end-user experience.
 
-AMD recommends using the ONNXRuntime [EP Context Cache](/running-models/modelrun#ort-ep-context-cache) feature for saving and reloading compiled models.
+AMD recommends using the ONNXRuntime [EP Context Cache](/getting-started/modelrun#ort-ep-context-cache) feature for saving and reloading compiled models.
 
 **BF16 models**
 
@@ -114,7 +114,7 @@ A C++ application built on the Ryzen AI ONNX Runtime must include the following 
 
 - NPU Binary files (.xclbin) from the `%RYZEN_AI_INSTALLATION_PATH%\voe-4.0-win_amd64\xclbins` folder
 
-- Recommended but not mandatory: pre-compiled models in the form of [Onnx Runtime EP context models](/running-models/modelrun#ort-ep-context-cache)
+- Recommended but not mandatory: pre-compiled models in the form of [Onnx Runtime EP context models](/getting-started/modelrun#ort-ep-context-cache)
 
 **For BF16 models**
 
@@ -131,7 +131,7 @@ A C++ application built on the Ryzen AI ONNX Runtime must include the following 
   - `%RYZEN_AI_INSTALLATION_PATH%\deployment\aiecompiler_client.dll`
   - `%RYZEN_AI_INSTALLATION_PATH%\deployment\vaiml.dll`
 
-- Pre-compiled models in the form of [Vitis AI EP cache folders](/running-models/modelrun#vitisai-ep-cache)
+- Pre-compiled models in the form of [Vitis AI EP cache folders](/getting-started/modelrun#vitisai-ep-cache)
 
 **For LLMs**
 
