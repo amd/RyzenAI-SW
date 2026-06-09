@@ -56,12 +56,9 @@
         { "version": "1.1", "href": "https://ryzenai.docs.amd.com/en/1.1/" }
       ]
     },
-    "tabs": [
+    "groups": [
       {
-        "tab": "Documentation",
-        "groups": [
-          {
-            "group": "Ryzen AI Software",
+        "group": "Ryzen AI Software",
             "pages": [
               "index",
               "installation",
@@ -184,8 +181,6 @@
             ]
           }
         ]
-      }
-    ]
   },
   "footer": {
     "socials": {
