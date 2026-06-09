@@ -8,7 +8,7 @@ and deployment. (The only other file you should ever read here is the generated
 ## Table of contents
 
 1. [Pipeline: execution order (what runs first)](#pipeline-at-a-glance)
-   - [Workflows](#workflows) · [Scripts (and when each runs)](#scripts-and-when-each-runs)
+   - [Workflows (in run order)](#workflows-in-run-order) · [Scripts (in run order)](#scripts-in-run-order)
 2. [Code-block testing model (test-by-default)](#code-block-testing-model-test-by-default)
 4. [Languages: what runs, what doesn't (incl. C++)](#languages-what-runs-what-doesnt-incl-c)
 5. [Authoring conventions](#authoring-conventions)
@@ -64,29 +64,29 @@ Scheduled separately (NOT on PRs):
 • Update Model List .. weekly · fetch_models.py · opens a PR if HF tables changed
 ```
 
-### Workflows
+### Workflows (in run order)
 
-| Order | Workflow (`.github/workflows/`) | Trigger | Where |
+| # | Workflow (`.github/workflows/`) | Trigger | Where |
 |---|---|---|---|
-| parallel | `mintlify-checks.yml` | PR/push `docs/**` | cloud |
-| parallel | `test-code-samples.yml` | PR/push `docs/**` | cloud → self-hosted |
-| parallel | `codeowners.yml` | PR/push `docs/**`,`.github/**` | cloud |
-| after a run fails | `notify-owner.yml` | `workflow_run` completed | cloud |
+| 1a (parallel) | `mintlify-checks.yml` | PR/push `docs/**` | cloud |
+| 1b (parallel) | `test-code-samples.yml` | PR/push `docs/**` | cloud → self-hosted |
+| 1c (parallel) | `codeowners.yml` | PR/push `docs/**`,`.github/**` | cloud |
+| 2 (after 1a/1b fails) | `notify-owner.yml` | `workflow_run` completed | cloud |
 | weekly | `link-check.yml` | schedule + manual | cloud |
 | weekly | `update-model-list.yml` | schedule + manual | cloud |
 
-### Scripts (and when each runs)
+### Scripts (in run order)
 
-| Script | Runs during | Purpose |
-|---|---|---|
-| `extract_code_blocks.py` | Test Code Samples — **syntax-check** then **test-hardware** | parse every block in `docs/**` (`.mdx` + `.md`); `--syntax-only` = python syntax + format lint; `--run` = execute / compile / WSL |
-| `report.py` | Test Code Samples — test-hardware (after the run) | run JSON → `CODE_TEST_REPORT.md` + inject the dashboard table |
-| `record_run.py` | end of Mintlify Docs Checks **and** Test Code Samples | append the run (status + per-page result + owner) to `ci-history.json` |
-| `check_owners.py` | CODEOWNERS — step 1 | every page has an owner header |
-| `generate_codeowners.py` | CODEOWNERS — step 2 | rebuild `docs/CODEOWNERS` from headers; fail if stale |
-| `notify_owner.py` / `resolve_owner.py` | Notify Owner (on failure) | resolve owners, compose the issue/email body |
-| `fetch_models.py` | Update Model List (weekly) | refresh the Vision/LLMs/Audio model tables |
-| `gen_cards.py` | manual (run when nav changes) | rebuild the "bubble" card lists on index pages |
+| # | Script | Runs during | What it does |
+|---|---|---|---|
+| 1 | `extract_code_blocks.py` | Test Code Samples — **syntax-check** (cloud), then **test-hardware** (runner) | parse every block in `docs/**` (`.mdx` + `.md`); `--syntax-only` = python syntax + format lint; `--run` = execute / compile / WSL |
+| 2 | `report.py` | Test Code Samples — after test-hardware | run JSON → `CODE_TEST_REPORT.md` + inject the dashboard table |
+| 3 | `record_run.py` | end of Mintlify Docs Checks **and** Test Code Samples | append the run (status + per-page result + owner) to `ci-history.json` |
+| 4 | `check_owners.py` | CODEOWNERS — step 1 | every page has an owner header |
+| 5 | `generate_codeowners.py` | CODEOWNERS — step 2 | rebuild `docs/CODEOWNERS` from headers; fail if stale |
+| 6 | `resolve_owner.py` | Notify Owner (helper, also used by 2 & 3) | read the owner GitHub ID from a page header |
+| 7 | `notify_owner.py` | Notify Owner — on failure | compose the issue/email body @mentioning owners |
+| 8 | `fetch_models.py` | Update Model List (weekly) | refresh the Vision/LLMs/Audio model tables |
 
 ## Code-block testing model (test-by-default)
 
