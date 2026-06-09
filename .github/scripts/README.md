@@ -56,10 +56,11 @@ no opt-in. The single opt-out is `notest`.
 
 ````
 ```python          -> EXECUTED (always; also python-syntax-checked)
-```powershell       -> EXECUTED (always)
-```bash             -> EXECUTED (always)
+```powershell       -> EXECUTED (Windows-native)
+```bash             -> EXECUTED via WSL on Windows
+```cpp / ```c       -> COMPILED with g++/gcc (run if it has main())
+```json / ```yaml   -> LINTED for format validity
 ```python notest    -> the only opt-out: skipped entirely
-```cpp / ```text    -> non-runnable language -> recorded "skip" (never "pass")
 ````
 
 Optional **authoring** tags (they do not make testing optional):
@@ -75,17 +76,21 @@ an early block persists for later blocks, and nothing pollutes the docs tree.
 
 ## Languages: what runs, what doesn't (incl. C++)
 
-| Fence | Runs in CI? | How |
+| Fence | Tested how | Where it runs |
 |---|---|---|
-| `python` | Yes | syntax-compiled, then run with the runner's `python` (inside the Ryzen AI conda env, so NPU/GPU/CPU providers are visible) |
-| `bash` / `sh` / `shell` | Yes | `bash -c` |
-| `powershell` / `pwsh` / `ps1` | Yes | `powershell -NoProfile -Command` (native on the Windows runner) |
-| `cmd` / `bat` / `batch` | Yes | written to a `.bat`, run with `cmd /c` |
-| `cpp` / `c` | **No** | C/C++ snippets in the docs are excerpts without a build context (headers, CMake, project). They are recorded as `skip (cpp not runnable)`, never passed. Compile-testing them would need the full example project; that's a future enhancement, not done today. |
-| `text` / `json` / `yaml` / `mdx` / `cmake` | No | output samples / config, not executable -> `skip`. |
+| `python` | syntax-compiled, then **run** | Ryzen AI conda env (NPU/GPU/CPU providers visible) |
+| `powershell` / `pwsh` / `ps1` | **run** | Windows-native (`powershell -NoProfile -Command`) |
+| `cmd` / `bat` / `batch` | **run** | Windows-native (`cmd /c`) |
+| `bash` / `sh` / `shell` | **run** | **WSL** on Windows (`wsl bash -lc`); native `bash` on Linux |
+| `cpp` / `c` | **compiled** with `g++`/`gcc` (and run if it defines `main()`; otherwise `-fsyntax-only`) | WSL on Windows; native on Linux |
+| `json` / `yaml` / `toml` / `cmake` / `text` | **linted** for format validity (`json.loads`, `yaml.safe_load`, `tomllib`, paren-balance, plain-text) | in-process (no shell) |
+| `mdx` / `ini` / other | skipped | n/a (not runnable or lintable) |
 
-So today's executed languages are **python, powershell, bash, and cmd/bat**;
-C++ (and other non-runnable fences) are explicitly reported as skipped.
+**Linux vs Windows routing:** `bash`, C/C++, and anything inside an `@os:linux`
+scope are Linux work, so on the Windows runner they execute through **WSL**
+(Ubuntu). Windows blocks (`powershell`, `cmd`) run natively. Pass `--no-wsl` to
+skip Linux blocks instead of running them through WSL. A dedicated Ubuntu runner
+can replace WSL later with no doc changes (the routing is automatic).
 
 ## Authoring conventions
 

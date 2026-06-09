@@ -19,14 +19,16 @@ TEST BY DEFAULT. Every fenced block written in a runnable language IS EXECUTED
 on every run. There is no opt-in tag. The ONLY way to skip a block is `notest`.
 
     ```python                  -> EXECUTED (always; also python-syntax-checked)
-    ```powershell              -> EXECUTED (always)
-    ```bash                    -> EXECUTED (always)
+    ```powershell / ```cmd     -> EXECUTED (Windows-native)
+    ```bash / ```sh            -> EXECUTED via WSL on Windows (native bash on Linux)
+    ```cpp / ```c              -> COMPILED with g++/gcc (run if it defines main();
+                                  otherwise -fsyntax-only). Via WSL on Windows.
+    ```json/yaml/toml/cmake/text -> LINTED for format validity (e.g. json.loads)
     ```python notest           -> the one opt-out: skipped entirely
-    ```cpp / ```text / ```json -> not a runnable language -> recorded "skipped"
 
-Runnable languages (executed): python, bash/sh/shell, powershell/pwsh/ps1,
-cmd/bat/batch. Everything else (cpp, c, text, json, yaml, mdx, cmake, ...) is
-recorded with status "skipped" (reason: non-runnable) - never silently passed.
+Linux blocks (bash, C/C++, anything in @os:linux) run through WSL on the Windows
+runner; pass --no-wsl to skip them instead. Only truly unknown fences (mdx, ini,
+...) are recorded "skipped" - nothing runnable is silently passed.
 
 =============================== Authoring extras ============================
 The tags/attributes below are OPTIONAL conveniences for authors (they do NOT
@@ -75,8 +77,12 @@ from typing import Optional
 
 FENCE_RE = re.compile(r"^```([^\n]*)\n(.*?)^```", re.MULTILINE | re.DOTALL)
 
-RUNNABLE = {"python", "bash", "sh", "shell", "powershell", "pwsh", "ps1",
-            "cmd", "bat", "batch"}
+RUNNABLE_SHELL_WIN = {"powershell", "pwsh", "ps1", "cmd", "bat", "batch"}
+RUNNABLE_SHELL_NIX = {"bash", "sh", "shell"}        # executed via WSL on Windows
+COMPILE_LANGS = {"cpp", "c++", "cc", "cxx", "c"}    # compiled (run if it has main)
+FORMAT_LANGS = {"json", "yaml", "yml", "toml", "cmake", "text"}  # validated/linted
+RUNNABLE = RUNNABLE_SHELL_WIN | RUNNABLE_SHELL_NIX | COMPILE_LANGS | {"python"}
+TESTABLE = RUNNABLE | FORMAT_LANGS                  # everything we check (else skip)
 DEVICE_TAGS = {"cpu", "gpu", "npu"}
 SKIP_TAG = "notest"
 
@@ -278,37 +284,124 @@ def check_python_syntax(code: str) -> tuple[bool, str]:
         return False, f"SyntaxError: {e}"
 
 
-def run_block(lang, code, timeout, setup, cwd) -> tuple[bool, str]:
+_WSL_CACHE: Optional[bool] = None
+
+
+def wsl_available() -> bool:
+    """True if a WSL distro is usable (Windows only). Cached."""
+    global _WSL_CACHE
+    if _WSL_CACHE is None:
+        if sys.platform != "win32":
+            _WSL_CACHE = False
+        else:
+            try:
+                _WSL_CACHE = subprocess.run(
+                    ["wsl.exe", "-e", "true"], capture_output=True, timeout=30
+                ).returncode == 0
+            except Exception:  # noqa: BLE001
+                _WSL_CACHE = False
+    return _WSL_CACHE
+
+
+def _run(cmd, timeout, cwd) -> tuple[bool, str]:
+    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
+                       cwd=str(cwd) if cwd else None)
+    return p.returncode == 0, (p.stderr or p.stdout)[-500:]
+
+
+def run_in_wsl(body, timeout, cwd) -> tuple[bool, str]:
+    """Run a bash snippet inside WSL, using the Windows sandbox dir as cwd."""
+    cmd = ["wsl.exe"]
+    if cwd:
+        cmd += ["--cd", str(cwd)]
+    cmd += ["bash", "-lc", body]
+    return _run(cmd, timeout, None)
+
+
+def check_format(lang, code) -> tuple[bool, str]:
+    """Lint a non-executable block: verify it really is valid for its language."""
+    try:
+        if lang == "json":
+            json.loads(code)
+            return True, "valid JSON"
+        if lang in ("yaml", "yml"):
+            try:
+                import yaml  # type: ignore
+            except ImportError:
+                return True, "skipped: pyyaml not installed"
+            list(yaml.safe_load_all(code))
+            return True, "valid YAML"
+        if lang == "toml":
+            try:
+                import tomllib  # type: ignore
+            except ImportError:
+                return True, "skipped: tomllib unavailable"
+            tomllib.loads(code)
+            return True, "valid TOML"
+        if lang == "cmake":
+            if code.count("(") != code.count(")"):
+                return False, "CMake: unbalanced parentheses"
+            return True, "CMake parentheses balanced"
+        if lang == "text":
+            return True, "plain text"
+    except Exception as e:  # noqa: BLE001
+        return False, f"{lang} format error: {e}"
+    return True, ""
+
+
+def compile_and_run(lang, code, timeout, cwd, use_wsl) -> tuple[bool, str]:
+    """Compile a C/C++ block (and run it if it defines main()). Uses WSL
+    gcc/g++ on Windows, native gcc/g++ on Linux. Snippets without main() get a
+    `-fsyntax-only` compile check."""
+    is_c = lang == "c"
+    comp = "gcc" if is_c else "g++"
+    std = "" if is_c else "-std=c++17"
+    src = f"_doc_block.{'c' if is_c else 'cpp'}"
+    (Path(cwd) / src).write_text(strip_hide(code), encoding="utf-8")
+    if re.search(r"\bmain\s*\(", code):
+        body = f"{comp} {std} {src} -o _doc_block.out && ./_doc_block.out"
+    else:
+        body = f"{comp} {std} -fsyntax-only {src}"
+    if use_wsl:
+        return run_in_wsl(body, timeout, cwd)
+    if sys.platform != "win32":
+        return _run(["bash", "-lc", body], timeout, cwd)
+    return False, "no C/C++ compiler available (need WSL or a native gcc/g++)"
+
+
+def run_block(lang, code, timeout, setup, cwd, use_wsl) -> tuple[bool, str]:
     code = strip_hide(code)
-    is_win = sys.platform == "win32"
     try:
         if lang == "python":
-            with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False, encoding="utf-8") as f:
+            with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False,
+                                             encoding="utf-8", dir=str(cwd)) as f:
                 f.write(code)
                 path = f.name
             if setup:
-                shell = "cmd" if is_win else "bash"
-                flag = "/c" if is_win else "-c"
+                is_win = sys.platform == "win32"
+                shell, flag = ("cmd", "/c") if is_win else ("bash", "-c")
                 cmd = [shell, flag, f'{setup} && python "{path}"']
             else:
                 cmd = [sys.executable, path]
-        elif lang in ("bash", "sh", "shell"):
+            return _run(cmd, timeout, cwd)
+        if lang in RUNNABLE_SHELL_NIX:
             body = f"{setup}\n{code}" if setup else code
-            cmd = ["bash", "-c", body]
-        elif lang in ("powershell", "pwsh", "ps1"):
+            if use_wsl:
+                return run_in_wsl(body, timeout, cwd)
+            return _run(["bash", "-c", body], timeout, cwd)
+        if lang in ("powershell", "pwsh", "ps1"):
             body = f"{setup}\n{code}" if setup else code
-            cmd = ["powershell", "-NoProfile", "-Command", body]
-        elif lang in ("bat", "cmd", "batch"):
+            return _run(["powershell", "-NoProfile", "-Command", body], timeout, cwd)
+        if lang in ("bat", "cmd", "batch"):
             body = code if not setup else "\n".join([setup, code])
-            with tempfile.NamedTemporaryFile("w", suffix=".bat", delete=False, encoding="utf-8") as f:
+            with tempfile.NamedTemporaryFile("w", suffix=".bat", delete=False,
+                                             encoding="utf-8", dir=str(cwd)) as f:
                 f.write(body)
                 path = f.name
-            cmd = ["cmd", "/c", path]
-        else:
-            return True, "skipped (unsupported lang)"
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
-                           cwd=str(cwd) if cwd else None)
-        return p.returncode == 0, (p.stderr or p.stdout)[-500:]
+            return _run(["cmd", "/c", path], timeout, cwd)
+        if lang in COMPILE_LANGS:
+            return compile_and_run(lang, code, timeout, cwd, use_wsl)
+        return True, "skipped (unsupported lang)"
     except subprocess.TimeoutExpired:
         return False, f"timeout after {timeout}s"
     except Exception as e:  # noqa: BLE001
@@ -326,13 +419,18 @@ def main() -> None:
     ap.add_argument("--device", choices=sorted(DEVICE_TAGS), default=None,
                     help="only run blocks tagged with this device (or untagged)")
     ap.add_argument("--platform", choices=["windows", "linux"], default=None,
-                    help="filter @os: blocks (defaults to the host OS)")
+                    help="host platform for native execution (defaults to host OS)")
+    ap.add_argument("--no-wsl", action="store_true",
+                    help="do not use WSL; Linux (bash/C/C++/@os:linux) blocks then skip on Windows")
     ap.add_argument("--timeout", type=int, default=300)
     ap.add_argument("--output-json", type=Path, default=Path("code-results.json"))
     ap.add_argument("--failed-pages", type=Path, default=Path("failed-pages.txt"))
     args = ap.parse_args()
 
     platform = args.platform or ("windows" if sys.platform == "win32" else "linux")
+    host_windows = sys.platform == "win32"
+    use_wsl = (not args.no_wsl) and wsl_available()
+    linux_ok = (not host_windows) or use_wsl
     results, failed_pages = [], set()
 
     # Scan every Markdown file (.mdx pages AND .md example READMEs) - no doc
@@ -364,15 +462,22 @@ def main() -> None:
             if SKIP_TAG in tags:
                 results.append(_rec(rel, i, lang, tags, False, "skipped", "notest"))
                 continue
-            if lang not in RUNNABLE:
-                results.append(_rec(rel, i, lang, tags, False, "skipped", "non-runnable lang"))
+            if lang not in TESTABLE:
+                results.append(_rec(rel, i, lang, tags, False, "skipped", f"{lang}: non-runnable lang"))
                 continue
 
-            # OS scope filter
+            # Which environment must this block run in? Explicit @os scope wins;
+            # else infer from language (nix shells / C-C++ -> linux; ps/cmd -> windows).
             block_os = infer_scope(os_blocks, pos)
-            if block_os != "all" and block_os != platform:
-                results.append(_rec(rel, i, lang, tags, False, "skipped", f"os!={platform}"))
-                continue
+            if block_os in ("windows", "linux"):
+                need = block_os
+            elif lang in (RUNNABLE_SHELL_NIX | COMPILE_LANGS):
+                need = "linux"
+            elif lang in RUNNABLE_SHELL_WIN:
+                need = "windows"
+            else:
+                need = "any"
+            block_platform = need if need in ("windows", "linux") else platform
 
             # Device filter: fence tags take precedence, else surrounding @device block
             block_devices = (tags & DEVICE_TAGS)
@@ -391,25 +496,42 @@ def main() -> None:
                 failed_pages.add(rel)
                 results.append(_rec(rel, i, lang, tags, False, "fail", str(e)))
                 continue
-            setup = resolve_setup(attrs.get("setup"), setup_defs, platform)
+            setup = resolve_setup(attrs.get("setup"), setup_defs, block_platform)
             timeout = attrs.get("timeout", args.timeout)
             workdir = (page_dir / attrs["workdir"]) if attrs.get("workdir") else page_dir
             workdir.mkdir(parents=True, exist_ok=True)
             cont = attrs.get("continue_on_error", False)
 
             status, detail, ran = "skipped", "", False
+
+            # Non-executable languages: lint that they're valid (json/yaml/etc.).
+            if lang in FORMAT_LANGS:
+                ok, detail = check_format(lang, code)
+                status = "pass" if ok else "fail"
+                if not ok and not cont:
+                    failed_pages.add(rel)
+                results.append(_rec(rel, i, lang, tags, False, status, detail))
+                continue
+
+            # Python: always syntax-check (cloud + hardware).
             if lang == "python":
                 ok, detail = check_python_syntax(code)
                 status = "pass" if ok else "fail"
                 if not ok and not cont:
                     failed_pages.add(rel)
 
+            # Execution (hardware/run mode only).
             if args.run and not args.syntax_only:
-                ok, detail = run_block(lang, code, timeout, setup, workdir)
-                ran = True
-                status = "pass" if ok else "fail"
-                if not ok and not cont:
-                    failed_pages.add(rel)
+                if need == "windows" and not host_windows:
+                    status, detail = "skipped", "needs Windows runner"
+                elif need == "linux" and not linux_ok:
+                    status, detail = "skipped", "needs Linux/WSL runner"
+                else:
+                    ok, detail = run_block(lang, code, timeout, setup, workdir, use_wsl)
+                    ran = True
+                    status = "pass" if ok else "fail"
+                    if not ok and not cont:
+                        failed_pages.add(rel)
 
             results.append(_rec(rel, i, lang, tags, ran, status, detail))
 

@@ -39,8 +39,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Syntax-check code blocks
+          python-version: '3.11'
+      - name: Install linters (YAML format check)
+        run: pip install pyyaml
+      - name: Syntax + format check code blocks
         run: python .github/scripts/extract_code_blocks.py --syntax-only --docs docs --failed-pages failed-pages-syntax.txt
       - uses: actions/upload-artifact@v4
         if: failure()
