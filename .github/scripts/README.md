@@ -7,9 +7,9 @@ and deployment. (The only other file you should ever read here is the generated
 
 ## Table of contents
 
-1. [Pipeline at a glance](#pipeline-at-a-glance)
-2. [Scripts](#scripts)
-3. [Code-block testing model (test-by-default)](#code-block-testing-model-test-by-default)
+1. [Pipeline: execution order (what runs first)](#pipeline-at-a-glance)
+   - [Workflows](#workflows) · [Scripts (and when each runs)](#scripts-and-when-each-runs)
+2. [Code-block testing model (test-by-default)](#code-block-testing-model-test-by-default)
 4. [Languages: what runs, what doesn't (incl. C++)](#languages-what-runs-what-doesnt-incl-c)
 5. [Authoring conventions](#authoring-conventions)
 6. [Runners (hardware execution)](#runners-hardware-execution)
@@ -23,31 +23,70 @@ and deployment. (The only other file you should ever read here is the generated
 
 ## Pipeline at a glance
 
-| Workflow (`.github/workflows/`) | What it does | Where |
+### Execution order (what runs first)
+
+A push/PR touching `docs/**` starts **three workflows in parallel**. The only
+ordered dependency is *inside* Test Code Samples: the cloud syntax gate must pass
+**before** the hardware run starts. Notification runs **after** a check workflow
+finishes (and only if it failed).
+
+```text
+push / PR to docs/**
+│
+├─ Mintlify Docs Checks ............................... cloud            (parallel)
+│     1. validate ........ mint validate  →  mint broken-links (internal)   [blocks merge]
+│     2. external-links .. mint broken-links --check-external/anchors        [non-blocking]
+│     3. prose (Vale)     4. spell (cspell)
+│     5. record ......... record_run.py  →  ci-history.json
+│
+├─ Test Code Samples ................................. cloud → self-hosted (parallel)
+│     1. syntax-check (cloud) .... extract_code_blocks.py --syntax-only
+│           └ python syntax  +  json/yaml/toml/cmake lint              [runs first]
+│     2. test-hardware (runner) .. extract_code_blocks.py --run        [needs #1 to pass]
+│           └ run python/powershell/cmd · bash via WSL · compile C/C++ · lint
+│           └ report.py  →  CODE_TEST_REPORT.md (uploaded artifact)
+│     3. record (always) ......... record_run.py  →  ci-history.json
+│
+└─ CODEOWNERS & Page Ownership ....................... cloud            (parallel)
+      1. check_owners.py ......... every page has an owner header
+      2. generate_codeowners.py .. fail if docs/CODEOWNERS is stale
+      3. codeowners-validator .... syntax / no-unowned / no-shadow
+
+AFTER Mintlify Docs Checks OR Test Code Samples completes:
+└─ Notify Owner On Failure (only if that run FAILED) . cloud
+      1. download the failed-pages artifact(s)
+      2. notify_owner.py  →  resolve owner GitHub IDs from page headers
+      3. open a GitHub issue @mentioning the owner(s)
+      4. email the full report to NOTIFY_EMAIL (if SMTP_* secrets are set)
+
+Scheduled separately (NOT on PRs):
+• Link Check ......... weekly · mint broken-links --check-external · opens an issue
+• Update Model List .. weekly · fetch_models.py · opens a PR if HF tables changed
+```
+
+### Workflows
+
+| Order | Workflow (`.github/workflows/`) | Trigger | Where |
+|---|---|---|---|
+| parallel | `mintlify-checks.yml` | PR/push `docs/**` | cloud |
+| parallel | `test-code-samples.yml` | PR/push `docs/**` | cloud → self-hosted |
+| parallel | `codeowners.yml` | PR/push `docs/**`,`.github/**` | cloud |
+| after a run fails | `notify-owner.yml` | `workflow_run` completed | cloud |
+| weekly | `link-check.yml` | schedule + manual | cloud |
+| weekly | `update-model-list.yml` | schedule + manual | cloud |
+
+### Scripts (and when each runs)
+
+| Script | Runs during | Purpose |
 |---|---|---|
-| `mintlify-checks.yml` | `mint validate`, internal `broken-links` (blocking); external links + anchors + redirects (non-blocking); Vale prose; cspell | cloud (ubuntu) |
-| `link-check.yml` | full external link check, opens a tracking issue on failure | cloud, weekly + manual |
-| `test-code-samples.yml` | python syntax check (cloud) + **execute every runnable block** on AMD hardware | cloud + self-hosted |
-| `codeowners.yml` | regenerate `CODEOWNERS`, fail if the committed file is stale | cloud |
-| `notify-owner.yml` | on failure, resolve the page owner and open an issue that @mentions them | cloud |
-| `update-model-list.yml` | refresh the model tables from Hugging Face | cloud, scheduled |
-
-Every code/link run ends by appending a record to `ci-history.json` (the data
-store behind the dashboard).
-
-## Scripts
-
-| Script | Purpose |
-|---|---|
-| `extract_code_blocks.py` | Parse every fenced block in `docs/**` (`.mdx` **and** `.md`) and **execute** each runnable one. `--syntax-only` for cloud; `--run` for hardware. |
-| `report.py` | Turn a run's JSON into `CODE_TEST_REPORT.md` (per-page + per-block dashboard) and inject the summary table into the CI dashboard page. |
-| `generate_codeowners.py` | Regenerate `docs/CODEOWNERS` from each page's `{/* owner: id */}` header (no external map). |
-| `resolve_owner.py` | Read the owner id from a single page. |
-| `check_owners.py` | Verify every page has an owner header. |
-| `notify_owner.py` | Compose the GitHub-native failure notification (issue @mentioning owners). |
-| `record_run.py` | Append a run (status + per-page results + owner) to `ci-history.json`. |
-| `fetch_models.py` | Regenerate the model tables on the Vision/LLMs/Audio pages. |
-| `gen_cards.py` | Regenerate the "bubble" card lists on each category index page. |
+| `extract_code_blocks.py` | Test Code Samples — **syntax-check** then **test-hardware** | parse every block in `docs/**` (`.mdx` + `.md`); `--syntax-only` = python syntax + format lint; `--run` = execute / compile / WSL |
+| `report.py` | Test Code Samples — test-hardware (after the run) | run JSON → `CODE_TEST_REPORT.md` + inject the dashboard table |
+| `record_run.py` | end of Mintlify Docs Checks **and** Test Code Samples | append the run (status + per-page result + owner) to `ci-history.json` |
+| `check_owners.py` | CODEOWNERS — step 1 | every page has an owner header |
+| `generate_codeowners.py` | CODEOWNERS — step 2 | rebuild `docs/CODEOWNERS` from headers; fail if stale |
+| `notify_owner.py` / `resolve_owner.py` | Notify Owner (on failure) | resolve owners, compose the issue/email body |
+| `fetch_models.py` | Update Model List (weekly) | refresh the Vision/LLMs/Audio model tables |
+| `gen_cards.py` | manual (run when nav changes) | rebuild the "bubble" card lists on index pages |
 
 ## Code-block testing model (test-by-default)
 
