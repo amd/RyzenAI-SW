@@ -50,8 +50,8 @@ VISION_META = [
     ("amd/sdxl-base-amdnpu", "SDXL Base", "1024x1024", True, True, False),
     ("amd/sdxl-turbo-amdnpu", "SDXL Turbo", "512x512", True, False, False),
     ("amd/segmind-vega-amdnpu", "Segmind-Vega", "1024x1024", True, True, False),
-    ("amd/stable-diffusion-3-medium-amdnpu", "SD3 Medium", "512-1024", True, True, True),
-    ("amd/stable-diffusion-3.5-medium-amdnpu", "SD3.5 Medium", "512-1024", True, True, True),
+    ("stabilityai/stable-diffusion-3-medium-amdnpu", "SD3 Medium", "512-1024", True, True, True),
+    ("stabilityai/stable-diffusion-3.5-medium-amdnpu", "SD3.5 Medium", "512-1024", True, True, True),
 ]
 
 # Curated Audio (ASR) models. NOTE: confirm the Parakeet repo id for your release.
@@ -122,13 +122,17 @@ def llm_table() -> str:
 
 def vision_table() -> str:
     known = {hf_id for hf_id, *_ in VISION_META}
+    # The amd/ SD3 and SD3.5 mirrors are private; we link the public stabilityai
+    # repos (in VISION_META) instead, so exclude the private ids from the append.
+    skip = known | {"amd/stable-diffusion-3-medium-amdnpu",
+                    "amd/stable-diffusion-3.5-medium-amdnpu"}
     out = ["| Model | Output Resolution | Text-to-Image | Image-to-Image | ControlNet |",
            "| --- | --- | --- | --- | --- |"]
     for hf_id, display, res, t2i, i2i, cn in VISION_META:
         out.append(f"| [{display}]({hf(hf_id)}) | {res} | {yes(t2i)} | {yes(i2i)} | {yes(cn)} |")
     # Append any collection models not already covered by the curated metadata.
     for mid in sorted(fetch(SD_COLLECTION), key=str.lower):
-        if mid not in known:
+        if mid not in skip:
             out.append(f"| [{base_name(mid, '')}]({hf(mid)}) |  | Yes |  |  |")
     return "\n".join(out)
 
