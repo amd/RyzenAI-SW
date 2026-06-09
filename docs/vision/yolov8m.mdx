@@ -28,7 +28,7 @@ The following steps outline how to deploy the quantized model on an NPU:
 &lt;Tabs groupId="os">
 &lt;TabItem value="windows" label="Windows">
 
-```powershell notest
+```powershell
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name yolov8m_env --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate yolov8m_env
@@ -37,7 +37,7 @@ conda activate yolov8m_env
 &lt;/TabItem>
 &lt;TabItem value="linux" label="Linux / WSL">
 
-```powershell notest
+```powershell
 export RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name yolov8m_env --clone $RYZEN_AI_CONDA_ENV_NAME
 conda activate yolov8m_env
@@ -59,7 +59,7 @@ pip install -r requirements.txt
 &lt;/TabItem>
 &lt;TabItem value="linux" label="Linux / WSL">
 
-```powershell notest
+```powershell
 cd <RyzenAI-SW>/docs/vision/object_detection/yolov8m
 pip install -r requirements.txt
 ```

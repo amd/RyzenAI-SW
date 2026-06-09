@@ -70,60 +70,58 @@
                 ]
               },
               {
-                "group": "Models & Tutorials",
-                "icon": "graduation-cap",
+                "group": "Vision",
+                "icon": "image",
                 "expanded": false,
                 "pages": [
-                  "models-tutorials/index",
-                  {
-                    "group": "Vision",
-                    "expanded": false,
-                    "pages": [
-                      "vision/getstartex",
-                      "vision/sd_demo",
-                      "vision/super_resolution",
-                      "vision/getting-started-resnet",
-                      "vision/getting-started-resnet-bf16",
-                      "vision/hello-world",
-                      "vision/image-classification",
-                      "vision/igpu-getting-started",
-                      "vision/yolov8m",
-                      "vision/yolov8s-worldv2",
-                      "vision/torchvision",
-                      "vision/cvml",
-                      "vision/nemotron-ocr-v2",
-                      "vision/npu-gpu-pipeline"
-                    ]
-                  },
-                  {
-                    "group": "LLMs",
-                    "expanded": false,
-                    "pages": [
-                      "llms/overview",
-                      "llms/high_level_python",
-                      "llms/server_interface",
-                      "llms/hybrid_oga",
-                      "llms/oga_model_prepare",
-                      "llms/oga_op_prepare",
-                      "llms/llm_linux",
-                      "llms/llm_list",
-                      "llms/oga-cpp-api",
-                      "llms/oga-inference",
-                      "llms/rag-oga",
-                      "llms/llm-sft-deploy",
-                      "llms/vlm",
-                      "llms/distilbert-example"
-                    ]
-                  },
-                  {
-                    "group": "Audio",
-                    "expanded": false,
-                    "pages": [
-                      "audio/whisper_cpp",
-                      "audio/whisper-asr",
-                      "audio/parakeet-tdt"
-                    ]
-                  }
+                  "vision/index",
+                  "vision/getstartex",
+                  "vision/sd_demo",
+                  "vision/super_resolution",
+                  "vision/getting-started-resnet",
+                  "vision/getting-started-resnet-bf16",
+                  "vision/hello-world",
+                  "vision/image-classification",
+                  "vision/igpu-getting-started",
+                  "vision/yolov8m",
+                  "vision/yolov8s-worldv2",
+                  "vision/torchvision",
+                  "vision/cvml",
+                  "vision/nemotron-ocr-v2",
+                  "vision/npu-gpu-pipeline"
+                ]
+              },
+              {
+                "group": "LLMs",
+                "icon": "comments",
+                "expanded": false,
+                "pages": [
+                  "llms/index",
+                  "llms/overview",
+                  "llms/high_level_python",
+                  "llms/server_interface",
+                  "llms/hybrid_oga",
+                  "llms/oga_model_prepare",
+                  "llms/oga_op_prepare",
+                  "llms/llm_linux",
+                  "llms/llm_list",
+                  "llms/oga-cpp-api",
+                  "llms/oga-inference",
+                  "llms/rag-oga",
+                  "llms/llm-sft-deploy",
+                  "llms/vlm",
+                  "llms/distilbert-example"
+                ]
+              },
+              {
+                "group": "Audio",
+                "icon": "microphone",
+                "expanded": false,
+                "pages": [
+                  "audio/index",
+                  "audio/whisper_cpp",
+                  "audio/whisper-asr",
+                  "audio/parakeet-tdt"
                 ]
               },
               {

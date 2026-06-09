@@ -33,7 +33,7 @@ Create a clone of the Ryzen AI installation conda environment to add required py
 &lt;Tabs groupId="os">
 &lt;TabItem value="windows" label="Windows">
 
-```powershell notest
+```powershell
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name quark_quantization --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate quark_quantization
@@ -42,7 +42,7 @@ conda activate quark_quantization
 &lt;/TabItem>
 &lt;TabItem value="linux" label="Linux / WSL">
 
-```powershell notest
+```powershell
 export RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name quark_quantization --clone $RYZEN_AI_CONDA_ENV_NAME
 conda activate quark_quantization
@@ -56,7 +56,7 @@ Add python packages needed for the tutorial:
 &lt;Tabs groupId="os">
 &lt;TabItem value="windows" label="Windows">
 
-```powershell notest
+```powershell
 cd <ryzenai-sw>\docs\models-tutorials\vision\quark_quantization
 pip install -r requirements.txt
 ```
@@ -64,7 +64,7 @@ pip install -r requirements.txt
 &lt;/TabItem>
 &lt;TabItem value="linux" label="Linux / WSL">
 
-```powershell notest
+```powershell
 cd <ryzenai-sw>/docs/vision/quark_quantization
 pip install -r requirements.txt
 ```

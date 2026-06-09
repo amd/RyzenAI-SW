@@ -1,7 +1,7 @@
 # =============================================================================
 # Update Model List
 # =============================================================================
-# Keeps the model tables in docs/models-tutorials/index.mdx in sync with the official AMD
+# Keeps the model tables in the category index pages (docs/{llms,vision,audio}/index.mdx) in sync with the official AMD
 # Hugging Face collections for the current Ryzen AI version. Runs weekly and on
 # demand; opens a PR when the collections change so the owner can review.
 # Owner: uday610.
@@ -34,10 +34,14 @@ jobs:
           commit-message: "docs: refresh Ryzen AI model table from Hugging Face"
           title: "Refresh model table from Hugging Face collections"
           body: |
-            Automated refresh of the model tables in `docs/models-tutorials/index.mdx`
+            Automated refresh of the model tables in the category index pages
+            (`docs/llms/index.mdx`, `docs/vision/index.mdx`, `docs/audio/index.mdx`)
             from the AMD Hugging Face collections for the current Ryzen AI version.
 
             @uday610 please review and merge to keep the published model list accurate.
           branch: auto/update-model-list
-          add-paths: docs/models-tutorials/index.mdx
+          add-paths: |
+            docs/llms/index.mdx
+            docs/vision/index.mdx
+            docs/audio/index.mdx
           reviewers: uday610

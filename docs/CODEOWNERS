@@ -47,6 +47,7 @@
 /utilities/npu_check/                                   @dwithchenna
 
 # Documentation pages (owner from each page's header)
+/docs/audio/index.mdx                                   @bconsolvo
 /docs/audio/parakeet-tdt.mdx                            @lakshay048
 /docs/audio/whisper-asr.mdx                             @dwithchenna
 /docs/audio/whisper_cpp.mdx                             @uday610
@@ -63,6 +64,7 @@
 /docs/llms/distilbert-example.mdx                       @dwithchenna
 /docs/llms/high_level_python.mdx                        @jeremyfowers
 /docs/llms/hybrid_oga.mdx                               @uday610
+/docs/llms/index.mdx                                    @bconsolvo
 /docs/llms/llm-sft-deploy.mdx                           @dwithchenna
 /docs/llms/llm_linux.mdx                                @lakshay048
 /docs/llms/llm_list.mdx                                 @dwithchenna
@@ -74,7 +76,6 @@
 /docs/llms/rag-oga.mdx                                  @dwithchenna
 /docs/llms/server_interface.mdx                         @jeremyfowers
 /docs/llms/vlm.mdx                                      @dwithchenna
-/docs/models-tutorials/index.mdx                        @bconsolvo
 /docs/reference/ci-dashboard.mdx                        @bconsolvo
 /docs/reference/index.mdx                               @bconsolvo
 /docs/reference/licenses.mdx                            @raholbharadwaj
@@ -95,6 +96,7 @@
 /docs/vision/hello-world.mdx                            @dwithchenna
 /docs/vision/igpu-getting-started.mdx                   @dwithchenna
 /docs/vision/image-classification.mdx                   @dwithchenna
+/docs/vision/index.mdx                                  @bconsolvo
 /docs/vision/nemotron-ocr-v2.mdx                        @lakshay048
 /docs/vision/npu-gpu-pipeline.mdx                       @dwithchenna
 /docs/vision/sd_demo.mdx                                @ThomasXilinx

@@ -62,7 +62,7 @@ python compile.py --model models\resnet_trained_for_cifar10.onnx
 
 Above script will use the config_file and cache_dir to compile model using VAIML(Vitis AI Model Compiler).
 
-```python notest
+```python
             cache_dir = Path(__file__).parent.resolve()
             cache_dir = os.path.join(cache_dir,'my_cache_dir')
             cache_key   = pathlib.Path(onnx_model).stem

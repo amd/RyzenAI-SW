@@ -21,14 +21,14 @@ Below instructions can be executed on Conda command prompt or Miniforge Prompt
 
 1. Create a clone of the Ryzen AI installation conda environment to add required python packages
 
-```bat notest
+```bat
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name npu-gpu-pipeline --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate npu-gpu-pipeline
 ```
 2. Set RyzenAI Environment variable
 
-```bat notest
+```bat
 rem Location of RyzenAI software installation path or default at "C:\Program Files\RyzenAI\<version>"
 set RYZEN_AI_INSTALLATION_PATH=<Path to RyzenAI Installation>
 ```

@@ -16,7 +16,7 @@ Then open http://localhost:3000.
 
 - `docs.json` - site configuration (navigation, theme, branding)
 - `index.mdx` - landing page
-- Category folders: `getting-started/`, `applications/`, `models-tutorials/`, `running-models/`, `llms/`, `audio/`, `vision/`, `gpu/`, `winml/`, `tools/`, `reference/`
+- Category folders (one level each): `getting-started/`, `vision/`, `llms/`, `audio/`, `gpu-radeon/`, `windows-ml/`, `tools/`, `reference/`
 - `images/` - inline diagrams
 - `assets/` - site assets (favicon)
 
@@ -29,7 +29,3 @@ Every page carries a hidden owner header, for example:
 ```
 
 CI uses this header to route failures to the responsible owner via GitHub @mention. Default owner is `@dwithchenna`. See `.github/scripts/generate_codeowners.py`.
-
-## License
-
-Ryzen AI is licensed under the [MIT License](https://github.com/amd/RyzenAI-SW/blob/main/LICENSE).
