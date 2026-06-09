@@ -23,7 +23,7 @@ on:
   pull_request:
     paths: ['docs/**/*.mdx']
   push:
-    branches: [main]
+    branches: [main, bconsolvo]
     paths: ['docs/**/*.mdx']
   workflow_dispatch:
 
