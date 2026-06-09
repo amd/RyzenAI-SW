@@ -34,8 +34,8 @@ jobs:
       - name: CODEOWNERS is in sync with page headers
         run: |
           python .github/scripts/generate_codeowners.py
-          git diff --exit-code CODEOWNERS || {
-            echo "::error::CODEOWNERS is stale. Run 'python .github/scripts/generate_codeowners.py' and commit.";
+          git diff --exit-code docs/CODEOWNERS || {
+            echo "::error::docs/CODEOWNERS is stale. Run 'python .github/scripts/generate_codeowners.py' and commit.";
             exit 1;
           }
 

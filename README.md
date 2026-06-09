@@ -1,103 +1,97 @@
-# Ryzen AI Software
+<table width="100%">
+ <tr width="100%">
+    <td align="center"><h1>Ryzen&trade; AI Software</h1></td>
+ </tr>
+</table>
 
-AMD Ryzen AI Software includes the tools and runtime libraries for optimizing and deploying AI inference on [AMD Ryzen AI](https://www.amd.com/en/products/processors/consumer/ryzen-ai.html) PCs. It enables developers to build and run AI applications on the neural processing unit (NPU), integrated GPU, and discrete GPU.
+## Introduction
 
-This repository contains documentation, examples, and tutorials demonstrating the usage and capabilities of Ryzen AI Software.
+AMD Ryzen&trade; AI Software includes the tools and runtime libraries for optimizing and deploying AI inference on your [AMD Ryzen&trade; AI](https://www.amd.com/en/products/processors/consumer/ryzen-ai.html) based PC. It enables developers to quickly build and run a variety of AI applications for Ryzen&trade; AI, taking advantage of the neural processing unit (NPU), integrated GPU, and CPU.
+
+This repository contains the demos, examples, and tutorials demonstrating the usage and capabilities of the Ryzen&trade; AI Software, along with the source for the documentation site.
+
+Follow the instructions at [Ryzen&trade; AI Software Installation](https://ryzenai.docs.amd.com/en/latest/inst.html) to get set up.
 
 ## Documentation
 
-The full documentation site is built from the `docs/` directory using [Docusaurus](https://docusaurus.io/).
+**Full documentation:** [ryzenai.docs.amd.com](https://ryzenai.docs.amd.com)
 
-**Live docs:** [ryzenai.docs.amd.com](https://ryzenai.docs.amd.com)
+The documentation source lives in the [`docs/`](docs/) directory.
 
-To run the docs site locally:
+## Git LFS and Instructions to clone
 
-```bash
-cd website
-npm install
-npx docusaurus start
-```
+Due to the presence of large files in some examples/tutorials, Git Large File Storage (LFS) is configured in this repository. Follow the instructions below to ensure Git LFS is properly set up:
 
-## Repository Structure
+- Install Git LFS from the [official website](https://git-lfs.com/).
+- After installation, set up Git LFS on your machine:
 
 ```
-RyzenAI-SW/
-├── docs/                        # MDX documentation (source of truth for the website)
-│   ├── getting-started/         # Installation, quickstart, hardware support
-│   ├── applications/            # Showcased AI PC applications
-│   ├── models-tutorials/        # Models, tutorials, and example code
-│   │   ├── llms/                # LLM and NLP tutorials
-│   │   ├── vision/              # CNN, object detection, image classification
-│   │   ├── audio/               # Whisper ASR
-│   │   └── multimodal/          # Multi-model pipelines
-│   ├── develop/                 # Developer guides (deployment, quantization)
-│   ├── tools/                   # AI Analyzer, NPU management, benchmarking
-│   └── reference/               # Changelog, model list, supported operators
-├── models-tutorials/            # Runnable code examples with plain README.md
-│   ├── llms/                    # LLM and NLP examples (DistilBERT, OGA, RAG, VLM, etc.)
-│   ├── vision/                  # Vision examples (ResNet, YOLO, CVML, etc.)
-│   ├── audio/                   # Audio examples (Whisper)
-│   ├── multimodal/              # Multimodal examples (NPU-GPU pipeline)
-│   └── tools/                   # Tool examples (benchmarking, NPU check)
-├── website/                     # Docusaurus build infrastructure
-│   ├── scripts/                 # Build-time scripts (sync-examples.mjs)
-│   └── src/                     # Theme customizations, components, CSS
-└── .github/workflows/           # CI/CD pipelines
-```
-
-## Getting Started
-
-- [Installation](docs/getting-started/installation.mdx)
-- [Quickstart](docs/getting-started/quickstart.mdx)
-- [Supported Hardware](docs/getting-started/supported-hardware.mdx)
-
-## LLM Tutorials
-
-- [LLMs on Ryzen AI with OGA API](docs/models-tutorials/llms/oga_api)
-- [RAG with OGA](docs/models-tutorials/llms/RAG-OGA)
-- [Vision Language Model (VLM)](docs/models-tutorials/llms/VLM)
-- [OGA Inference](docs/models-tutorials/llms/oga_inference)
-- [LLM Fine-tuning and Deployment](docs/models-tutorials/llms/llm-sft-deploy)
-- [DistilBERT Text Classification](docs/models-tutorials/llms/distilbert)
-
-## Vision Examples
-
-- [Getting Started with ResNet](docs/models-tutorials/vision/getting_started_resnet)
-- [Hello World Notebook](docs/models-tutorials/vision/hello_world)
-- [iGPU Getting Started](docs/models-tutorials/vision/iGPU/getting_started)
-- [Image Classification](docs/models-tutorials/vision/image_classification)
-- [Object Detection (YOLOv8)](docs/models-tutorials/vision/object_detection)
-- [Super-Resolution](docs/models-tutorials/vision/super-resolution)
-- [Torchvision Inference](docs/models-tutorials/vision/torchvision_inference)
-- [AMD Quark Quantization](docs/models-tutorials/vision/quark_quantization)
-- [CVML Library](docs/models-tutorials/vision/cvml)
-
-## Audio Examples
-
-- [Whisper ASR](docs/models-tutorials/audio/whisper)
-
-## Multimodal Examples
-
-- [NPU-GPU Pipeline](docs/vision/npu-gpu-pipeline)
-
-## Tools
-
-- [ONNX Benchmark Utilities](docs/tools/benchmarking)
-- [NPU Check](docs/tools/npu-check)
-
-## Git LFS
-
-Some examples contain large files managed by Git LFS. After cloning:
-
-```bash
 git lfs install
+```
+
+- Clone the repository (or a fork of it):
+
+```
+git clone https://github.com/amd/RyzenAI-SW.git
+```
+
+- Pull the LFS files:
+
+```
 git lfs pull
 ```
 
+## Getting Started Tutorials
+
+- [Getting started with a fine-tuned ResNet model](docs/vision/getstartex.mdx)
+- [Hello World tutorial](docs/vision/hello-world.mdx)
+- [ResNet50 on iGPU](docs/vision/igpu-getting-started.mdx)
+
+## LLM Flow
+
+- [LLMs on Ryzen AI with the ONNX Runtime GenAI (OGA) API](docs/llms/oga-cpp-api.mdx)
+- [ONNX Runtime GenAI (OGA)-based RAG LLM](docs/llms/rag-oga.mdx)
+- [Vision Language Model (VLM) on Ryzen AI NPU](docs/llms/vlm.mdx)
+- [GPT-OSS-20B with chat template](docs/llms/oga-inference.mdx)
+
+## Examples
+
+- BF16 model examples
+  - [Finetuned DistilBERT for Text Classification](docs/llms/distilbert-example.mdx)
+  - [Image classification](docs/vision/image-classification.mdx)
+- [Object detection with YOLOv8](docs/vision/yolov8m.mdx)
+- [Super-Resolution](docs/vision/super_resolution.mdx)
+- [Nemotron OCR v2 on AMD Ryzen AI NPU](docs/vision/nemotron-ocr-v2.mdx)
+
+## Windows ML Examples
+
+- [Running ResNet with Windows ML](docs/winml-examples/resnet.mdx)
+- [Running Transformer models with Windows ML](docs/winml-examples/googlebert.mdx)
+- [Running CLIP with Windows ML](docs/winml-examples/clip.mdx)
+
+## Demos
+
+- [NPU-GPU pipeline on Ryzen AI](docs/vision/npu-gpu-pipeline.mdx)
+- [Automatic Speech Recognition using OpenAI Whisper](docs/audio/whisper-asr.mdx)
+- [Automatic Speech Recognition using NVIDIA Parakeet TDT optimized for AMD Ryzen AI](docs/audio/parakeet-tdt.mdx)
+
+## Other Tutorials
+
+- [AMD Quark Quantization](docs/benchmarking/quark-quantization.mdx)
+- [Run Ryzen AI CVML library application](docs/vision/cvml.mdx)
+- [Torchvision models end-to-end inference with Ryzen AI](docs/vision/torchvision.mdx)
+
+## Benchmarking
+
+- [ONNX benchmark utilities](docs/benchmarking/onnx-benchmark.mdx)
+
 ## Reference
 
-- [AMD AI Developer Program](https://www.amd.com/en/developer/ai-dev-program.html)
-- [AMD Developer Community Discord](https://discord.gg/amd-dev)
-- [AMD AI Developer Forum](https://community.amd.com/t5/ai/ct-p/amd_ai)
-- [Ryzen AI Developer Guide](https://ryzenai.docs.amd.com)
+- [Ryzen&trade; AI Developer Guide](https://ryzenai.docs.amd.com/en/latest)
 - [ONNX Runtime Vitis-AI EP](https://onnxruntime.ai/docs/execution-providers/Vitis-AI-ExecutionProvider.html)
+- [AMD AI Developer Forum](https://community.amd.com/t5/ai/ct-p/amd_ai)
+- [AMD Developer Community Discord](https://discord.gg/amd-dev)
+
+## License
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).

@@ -22,7 +22,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 DOCS = REPO / "docs"
-OUT = REPO / "CODEOWNERS"
+OUT = DOCS / "CODEOWNERS"  # GitHub also reads CODEOWNERS from docs/
 
 DEFAULT_OWNER = "dwithchenna"   # per the proposal: Dwith Chenna is the default owner
 INFRA_OWNER = "bconsolvo"       # docs lead owns CI/infra
