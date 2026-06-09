@@ -12,7 +12,15 @@
     "light": "#F4484D",
     "dark": "#C8171E"
   },
-  "favicon": "/assets/favicon.ico",
+  "favicon": {
+    "light": "/logo/favicon-light.svg",
+    "dark": "/logo/favicon-dark.svg"
+  },
+  "logo": {
+    "light": "/logo/amd-ryzenai-light.svg",
+    "dark": "/logo/amd-ryzenai-dark.svg",
+    "href": "/"
+  },
   "contextual": {
     "options": [
       "copy",
