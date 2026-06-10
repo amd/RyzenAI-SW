@@ -1,5 +1,269 @@
 {
   "schema": 1,
   "description": "Append-only history of docs CI runs, written by .github/scripts/record_run.py. Each run lists per-page code-block results (pass if all blocks pass).",
-  "runs": []
+  "runs": [
+    {
+      "run_id": "local-20260610-144850",
+      "workflow": "Test Code Samples",
+      "event": "local",
+      "actor": "local",
+      "branch": "local",
+      "sha": "local",
+      "started_at": "2026-06-10T14:48:50-07:00",
+      "finished_at": "2026-06-10T14:48:50-07:00",
+      "status": "failure",
+      "jobs": [],
+      "pages": [
+        {
+          "page": "audio/parakeet-tdt.mdx",
+          "owner_id": "lakshay048",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "ffmpeg : The term 'ffmpeg' is not recognized as the name of a cmdlet, function, script file, or operable program. \nCheck the spelling of the name, or if a path was included, verify that the path is co"
+        },
+        {
+          "page": "audio/whisper-asr.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "--'.\nAt line:4 char:5\n+   --device npu \\\n+     ~~~~~~\nUnexpected token 'device' in expression or statement.\nAt line:5 char:5\n+   --input audio_files/1089-134686-0000.wav\n+     ~\nMissing expression aft"
+        },
+        {
+          "page": "gpu-radeon/igpu-getting-started.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "run.bat : The term 'run.bat' is not recognized as the name of a cmdlet, function, script file, or operable program. \nCheck the spelling of the name, or if a path was included, verify that the path is "
+        },
+        {
+          "page": "installation.mdx",
+          "owner_id": "uday610",
+          "check": "code-execution",
+          "status": "fail"
+        },
+        {
+          "page": "llms/distilbert-example.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "At line:3 char:4\n+ cd <RyzenAI-SW>\\Transformer-examples\\DistilBERT_text_classification_b ...\n+    ~\nThe '<' operator is reserved for future use.\n    + CategoryInfo          : ParserError: (:) [], Pare"
+        },
+        {
+          "page": "llms/high_level_python.mdx",
+          "owner_id": "jeremyfowers",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "ers.0.attn.o_proj.MatMulNBits.qweight\": tensor(uint8),\"model.layers.0.attn.o_proj.MatMulNBits.scales\": tensor(float16),\"model.layers.0.attn.o_proj.MatMulNBits.qzeros\": tensor(uint8),\"model.layers.0.at"
+        },
+        {
+          "page": "llms/hybrid_oga.mdx",
+          "owner_id": "uday610",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "At line:2 char:11\n+ git clone <link_to_model>\n+           ~\nThe '<' operator is reserved for future use.\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\n    + Ful"
+        },
+        {
+          "page": "llms/llm-sft-deploy.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "At line:1 char:59\n+ python inference.py --quark_safetensors --quant_model_dir <path to qu ...\n+                                                           ~\nThe '<' operator is reserved for future use."
+        },
+        {
+          "page": "llms/llm_linux.mdx",
+          "owner_id": "lakshay048",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "hon application,\n    it may be easiest to use pipx install xyz, which will manage a\n    virtual environment for you. Make sure you have pipx installed.\n    \n    See /usr/share/doc/python3.12/README.ve"
+        },
+        {
+          "page": "llms/oga-inference.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-bwf8tl6q\\\\model_chat.py': [Errno 2] No such file or direc"
+        },
+        {
+          "page": "README.md",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "\u280b preparing local preview...\n\u001b[2K\u001b[1A\u001b[2K\u001b[G\u2819 preparing local preview...\n\u001b[2K\u001b[1A\u001b[2K\u001b[G\u2839 preparing local preview...\n\u001b[2K\u001b[1A\u001b[2K\u001b[G\u2838 preparing local preview...\n\u001b[2K\u001b[1A\u001b[2K\u001b[G\u283c preparing local previe"
+        },
+        {
+          "page": "tools/ai_analyzer.mdx",
+          "owner_id": "savitha-srinivasan",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "Traceback (most recent call last):\n  File \"C:\\Users\\bconsolv\\AppData\\Local\\Temp\\docs-ci-gnptwo50\\tmpnx5cb_bn.py\", line 2, in <module>\n    sess_options = ort.SessionOptions()\n                   ^^^\nNam"
+        },
+        {
+          "page": "tools/model_quantization.mdx",
+          "owner_id": "uday610",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "Traceback (most recent call last):\n  File \"C:\\Users\\bconsolv\\AppData\\Local\\Temp\\docs-ci-w7rvs9w4\\tmppgb6am8v.py\", line 1, in <module>\n    quant_config = QuantizationConfig(calibrate_method=PowerOfTwoM"
+        },
+        {
+          "page": "tools/modelrun.mdx",
+          "owner_id": "uday610",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": " for member \u2018begin\u2019 in \u2018onnx_model\u2019, which is of non-class type \u2018const char*\u2019\n   15 |     std::basic_string<ORTCHAR_T>(onnx_model.begin(), onnx_model.end()).c_str(),\n      |                           "
+        },
+        {
+          "page": "tools/onnx-benchmark.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements-win.txt'\n"
+        },
+        {
+          "page": "tools/quark-quantization.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-ahcxbwh9\\\\quark_quantize.py': [Errno 2] No such file or d"
+        },
+        {
+          "page": "tools/xrt_smi.mdx",
+          "owner_id": "uday610",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "xrt-smi : The term 'xrt-smi' is not recognized as the name of a cmdlet, function, script file, or operable program. \nCheck the spelling of the name, or if a path was included, verify that the path is "
+        },
+        {
+          "page": "vision/cvml-face-detection.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "ace-detection.exe' is not recognized as the name of a cmdlet, \nfunction, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the \npath is correct a"
+        },
+        {
+          "page": "vision/cvml-face-mesh.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "emesh.exe : The term 'cvml-sample-facemesh.exe' is not recognized as the name of a cmdlet, function, \nscript file, or operable program. Check the spelling of the name, or if a path was included, verif"
+        },
+        {
+          "page": "vision/getstartex.mdx",
+          "owner_id": "savitha-srinivasan",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "resnet_cifar.exe : The term 'resnet_cifar.exe' is not recognized as the name of a cmdlet, function, script file, or \noperable program. Check the spelling of the name, or if a path was included, verify"
+        },
+        {
+          "page": "vision/getting-started-resnet-bf16.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "ErrorId : CommandNotFoundException\n \nImage : The term 'Image' is not recognized as the name of a cmdlet, function, script file, or operable program. Check \nthe spelling of the name, or if a path was i"
+        },
+        {
+          "page": "vision/hello-world.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-1v2arqri\\\\hello_world.py': [Errno 2] No such file or dire"
+        },
+        {
+          "page": "vision/image-classification.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-awbb51vb\\\\image_classification.py': [Errno 2] No such fil"
+        },
+        {
+          "page": "vision/nemotron-ocr-v2.mdx",
+          "owner_id": "lakshay048",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "ne:5 char:5\n+   --image \"Images\\test\\test.jpg\" \\\n+     ~~~~~\nUnexpected token 'image' in expression or statement.\nAt line:6 char:5\n+   --vai-config vitisai_config.json\n+     ~\nMissing expression after"
+        },
+        {
+          "page": "vision/npu-gpu-pipeline.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\pipeline.py': [Errno 2] No such file or directory\n"
+        },
+        {
+          "page": "vision/super_resolution.mdx",
+          "owner_id": "bconsolvo",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-z0vtjxao\\\\onnx_inference.py': [Errno 2] No such file or d"
+        },
+        {
+          "page": "vision/torchvision.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-9cybfihi\\\\classification.py': [Errno 2] No such file or d"
+        },
+        {
+          "page": "vision/yolov8m.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-hj8z0x1a\\\\run_inference.py': [Errno 2] No such file or di"
+        },
+        {
+          "page": "vision/yolov8s-worldv2.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "C:\\Users\\bconsolv\\AppData\\Local\\miniforge3\\envs\\ryzen-ai-1.7.1\\python.exe: can't open file 'C:\\\\Users\\\\bconsolv\\\\AppData\\\\Local\\\\Temp\\\\docs-ci-pac6to12\\\\infer_single.py': [Errno 2] No such file or dir"
+        },
+        {
+          "page": "windows-ml/clip.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "                                        ~\nMissing expression after unary operator '-'.\nAt line:36 char:1\n+ -------------------------------------+------------+--+-\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        },
+        {
+          "page": "windows-ml/googlebert.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "                                              ~\nAn expression was expected after '('.\nAt line:21 char:232\n+ ... ch().clone() or sourceTensor.detach().clone().requires_grad_(True), r ...\n+             "
+        },
+        {
+          "page": "windows-ml/installation.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail"
+        },
+        {
+          "page": "windows-ml/llm.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail"
+        },
+        {
+          "page": "windows-ml/resnet.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "Traceback (most recent call last):\n  File \"C:\\Users\\bconsolv\\AppData\\Local\\Temp\\docs-ci-4g3alg45\\tmpjqabtxe3.py\", line 1, in <module>\n    session = ort.InferenceSession(model_path, sess_options=sessio"
+        },
+        {
+          "page": "windows-ml/winml_ep.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "Traceback (most recent call last):\n  File \"C:\\Users\\bconsolv\\AppData\\Local\\Temp\\docs-ci-c42ripjy\\tmp3m45vq6b.py\", line 4, in <module>\n    model_compiler = ort.ModelCompiler(\n                     ^^^\nN"
+        },
+        {
+          "page": "windows-ml/winml_example.mdx",
+          "owner_id": "dwithchenna",
+          "check": "code-execution",
+          "status": "fail",
+          "detail": "soccer' in expression or statement.\nAt line:8 char:5\n+ 208,Labrador retriever                0.61%\n+     ~\nMissing expression after ','.\nAt line:8 char:5\n+ 208,Labrador retriever                0.61%\n"
+        }
+      ]
+    }
+  ]
 }
