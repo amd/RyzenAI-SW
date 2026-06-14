@@ -176,7 +176,12 @@ corresponding,
 header file under the **include/** folder, where `feature-name` is the name
 of the desired Ryzen AI feature.
 
-For example, the definitions for the Ryzen AI Depth Estimation feature are
+For example, the definitions for the Ryzen AI Body Pose feature are
+available after adding a line similar to the following example:
+
+    #include <cvml-body-pose.h>
+
+Similarly, the definitions for the Ryzen AI Depth Estimation feature are
 available after adding a line similar to the following example:
 
     #include <cvml-depth-estimation.h>
@@ -392,6 +397,7 @@ Date               | Revision  | Notes
 November 30, 2023  |  1.0      | Initial revision
 April 2, 2024      |  1.1      | Include driver/copyright info
 March 7, 2025      |  1.2      | Minor updates and notes
+June 14, 2026      |  1.3      | Add Body Pose feature
 
 [Back to top](#top)
 
