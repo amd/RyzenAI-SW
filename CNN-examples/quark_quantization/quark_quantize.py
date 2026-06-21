@@ -106,16 +106,17 @@ def main(args):
         provider = ['VitisAIExecutionProvider']
         cache_dir = Path(__file__).parent.resolve()
         provider_options = [{
-                    'cacheDir': str(cache_dir),
-                    'cacheKey': 'modelcachekey',
-                    'enable_cache_file_io_in_mem':'0'
-                }]
+            'cache_dir': str(cache_dir),
+            'cache_key': 'modelcachekey',
+            'enable_cache_file_io_in_mem': '0'
+        }]
         # Create session options
         session_options = ort.SessionOptions()
         session_options.log_severity_level = 1  # 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Fatal
         # For PHX/HPT, xclbin is required
         if npu_device == 'PHX/HPT':
             provider_options[0]['target'] = 'X1'
+            provider_options[0]['xlnx_enable_py3_round'] = 0
             provider_options[0]['xclbin'] = get_xclbin(npu_device)
         session = ort.InferenceSession(quant_model.SerializeToString(),
                                        sess_options=session_options,
