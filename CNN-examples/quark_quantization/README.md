@@ -197,8 +197,8 @@ cache_dir = Path(__file__).parent.resolve()
 print(cache_dir)
 provider_options = [{
                 'config_file': 'vaip_config.json',
-                'cacheDir': str(cache_dir),
-                'cacheKey': 'modelcachekey'
+                'cache_dir': str(cache_dir),
+                'cache_key': 'modelcachekey'
             }]
 
 session = ort.InferenceSession(quant_model.SerializeToString(), providers=provider,
@@ -234,4 +234,3 @@ Advancted Quantization Tools
 ----------------------------
 
 While the default quantization configurations work well for many popular models, more sophisticated models might experience a decline in accuracy due to errors introduced during the quantization process. To address this, Quark APIs offer advanced tools to help recover lost accuracy. Some of these tools are highlighted in the [Advanced Quantization Tools](../docs/advanced_quant_readme.md) tutorial.
-
