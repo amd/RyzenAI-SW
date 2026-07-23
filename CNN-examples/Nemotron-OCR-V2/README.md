@@ -183,7 +183,7 @@ python test_e2e_pipeline.py \
   --detector "Models\nvidia-nemotron-ocr-v2-detector-english\nvidia-nemotron-ocr-v2-detector-english_1x3x1024x1024.onnx" \
   --recognizer "Models\nvidia-nemotron-ocr-v2-recognizer-english\nvidia-nemotron-ocr-v2-recognizer-english_1x128x8x32.onnx" \
   --relational "Models\nvidia-nemotron-ocr-v2-relational-english\nvidia-nemotron-ocr-v2-relational-english_128x128x2x3.onnx" \
-  --image "Images\test\image.png" \
+  --image "Images\test\test.jpg" \
   --vai-config vitisai_config.json
 ```
 
