@@ -1,8 +1,28 @@
 # Parakeet ASR on Ryzen AI NPU
 
-Speech-to-text transcription using NVIDIA's **Parakeet TDT 0.6B** model, optimized for the **AMD Ryzen AI NPU**. Achieves **35-43x real-time** transcription by running the Conformer encoder on the NPU, LSTM decoder on the integrated Radeon GPU, and mel features on the CPU -- all three processors working in parallel.
+Speech-to-text transcription using NVIDIA's **Parakeet TDT 0.6B** model, optimized for the **AMD Ryzen AI NPU**. Achieves **35-43x real-time** transcription by running the Conformer encoder on the NPU, LSTM decoder on the integrated Radeon GPU, and mel features on the CPU—all three processors working in parallel.
 
-Includes an OpenAI Whisper-compatible REST API, a CLI benchmark tool, and a real-time microphone transcription demo.
+This demo includes an OpenAI Whisper-compatible REST API, a CLI benchmark tool, and a real-time microphone transcription demo.
+
+## Features
+
+* 🚀 High-performance NPU-accelerated speech recognition (35-43x real-time)
+* 🎯 Distributed compute across NPU, iGPU, and CPU for optimal performance
+* 🎧 Real-time microphone transcription
+* 📊 Benchmark tool with detailed performance metrics
+* 🌐 OpenAI Whisper-compatible REST API
+
+## Prerequisites
+
+Install Ryzen AI Software using the automatic installer. See [RyzenAI documentation](https://ryzenai.docs.amd.com/en/latest/inst.html) for installation instructions.
+
+**System Requirements:**
+
+- AMD Ryzen AI processor (Strix)
+- Windows 11
+- Miniforge with `ryzen-ai-<version>` conda environment
+- onnxruntime-vitisai, flexml-lite (included in Ryzen AI SDK)
+- sounddevice (for live microphone mode)
 
 ## Performance
 
@@ -18,7 +38,23 @@ To set NPU performance mode: `C:\Windows\System32\AMD\xrt-smi.exe configure --pm
 
 ## Quick Start
 
-### 1. Download Models
+### Step 1: Install Dependencies
+
+Clone the repository and create a new conda environment based on your Ryzen AI installation:
+
+```bash
+git clone https://github.com/amd/RyzenAI-SW.git
+cd RyzenAI-SW/Demos/ASR/Parakeet-TDT
+
+conda create --name asr_parakeet_env --clone ryzen-ai-<version>
+conda activate asr_parakeet_env
+
+pip install -r requirements.txt
+```
+
+### Step 2: Download Models
+
+Download the FP32 Parakeet TDT models from HuggingFace (~2.4GB):
 
 ```bash
 python download_models.py --precision fp32
@@ -175,7 +211,7 @@ python server.py [options]
 
 **VitisAI EP not available:**
 ```bash
-conda activate ryzen-ai-1.7.1
+conda activate ryzen-ai-<version>
 python -c "import onnxruntime; print(onnxruntime.get_available_providers())"
 # Should show: ['VitisAIExecutionProvider', 'DmlExecutionProvider', 'CPUExecutionProvider']
 ```

@@ -4,8 +4,25 @@
 # --------------------------------------------------------------------------
 import argparse
 import random
+import ssl
+import sys
 import tarfile
 import urllib.request
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
+
+def download_progress(block_num, block_size, total_size):
+    downloaded = block_num * block_size
+    if total_size > 0:
+        percent = min(downloaded / total_size * 100, 100)
+        mb_downloaded = downloaded / (1024 * 1024)
+        mb_total = total_size / (1024 * 1024)
+        bar = "#" * int(percent // 2) + "-" * (50 - int(percent // 2))
+        sys.stdout.write(f"\r[{bar}] {percent:.1f}% ({mb_downloaded:.1f}/{mb_total:.1f} MB)")
+        sys.stdout.flush()
+        if downloaded >= total_size:
+            print()
 
 import torch
 import torch.nn as nn
@@ -137,14 +154,23 @@ def main():
 
     data_download_path_python = data_dir / "cifar-10-python.tar.gz"
     data_download_path_bin = data_dir / "cifar-10-binary.tar.gz"
-    urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz", data_download_path_python)
-    urllib.request.urlretrieve("https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz", data_download_path_bin)
-    file_python = tarfile.open(data_download_path_python)
-    file_python.extractall(data_dir)
-    file_python.close()
-    file_bin = tarfile.open(data_download_path_bin)
-    file_bin.extractall(data_dir)
-    file_bin.close()
+    cifar_extracted = data_dir / "cifar-10-batches-py"
+    if cifar_extracted.exists():
+        print("CIFAR-10 data already exists, skipping download.")
+    else:
+        for url, path, label in [
+            ("https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz", data_download_path_python, "cifar-10-python.tar.gz"),
+            ("https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz", data_download_path_bin, "cifar-10-binary.tar.gz"),
+        ]:
+            if path.exists() and not tarfile.is_tarfile(path):
+                print(f"{label} is corrupted, re-downloading...")
+                path.unlink()
+            if not path.exists():
+                print(f"Downloading {label}...")
+                urllib.request.urlretrieve(url, path, reporthook=download_progress)
+            print(f"Extracting {label}...")
+            with tarfile.open(path) as f:
+                f.extractall(data_dir)
     if args.train:
         prepare_model(args.num_epochs, models_dir, data_dir)
     model = torch.load(str(models_dir / "resnet_trained_for_cifar10.pt"), weights_only=False)

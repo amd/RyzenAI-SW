@@ -30,29 +30,29 @@ Follow these simple steps to get started:
 ### 1.1 Download the ONNX-Based Llama Model from Hugging Face
 
 ```sh
-git clone https://huggingface.co/amd/Llama-3.2-3B-Instruct-onnx-ryzenai-1.7-hybrid /path/to/your/directory/
+git clone https://huggingface.co/amd/Llama-3.2-3B-Instruct_rai_1.8.0_hybrid /path/to/your/directory/
 ```
 replace `/path/to/your/directory/` with actual path where you want to download the model.
 
 ### 1.2  Activate Ryzen AI Environment
 
-To ensure compatibility with ONNX-based Llama model, activate the ryzen-ai-1.7.0 Conda environment.
+To ensure compatibility with ONNX-based Llama model, activate the ryzen-ai-<version> Conda environment.
 
-Please follow instructions provided in the official AMD documentation to install Ryzen AI 1.7.0:
+Please follow instructions provided in the official AMD documentation to install Ryzen AI:
 
-👉 [Ryzen AI 1.7.0 Installation and Conda Environment Creation](https://ryzenai.docs.amd.com/en/latest/inst.html)
+👉 [Ryzen AI Installation and Conda Environment Creation](https://ryzenai.docs.amd.com/en/latest/inst.html)
 
 After installation, activate the environment by running:
 
 ```sh
-conda activate ryzen-ai-1.7.0
+conda activate ryzen-ai-<version>
 ```
 ### 1.3  Install Dependencies
 
 After activating the environment, install the required Python dependencies by running:
 ```sh
 git clone https://github.com/amd/RyzenAI-SW.git
-cd RyzenAI-SW/example/llm/RAG-OGA
+cd RyzenAI-SW/LLM-examples/RAG-OGA
 pip install -r requirements.txt
 ```
 
@@ -63,11 +63,11 @@ To explore the use case, please refer below steps:
 
 This example demonstrates a Retrieval-Augmented Generation (RAG) pipeline orchestrated using the LangChain framework. In this setup, documents are indexed into a Facebook AI Similarity Search(FAISS) vector database and retrieved at inference time to enrich user prompts with relevant contextual information.
 
-The following models are deployed using Ryzen AI 1.7.0:
+The following models are deployed using Ryzen AI:
 
 - **Embedding Model**: [BGE (BAAI General Embedding)](https://huggingface.co/BAAI/bge-large-en-v1.5), compiled using Vitis AI Execution Provider.
 
-- **Hybrid LLM**: [Llama3.2-3B-Instruct](https://huggingface.co/amd/Llama-3.2-3B-Instruct-onnx-ryzenai-1.7-hybrid), a quantized ONNX model, running using the OGA(OnnxRuntime GenAI) framework on Ryzen AI 1.7.0.
+- **Hybrid LLM**: [Llama3.2-3B-Instruct](https://huggingface.co/amd/Llama-3.2-3B-Instruct_rai_1.8.0_hybrid), a quantized ONNX model, running using the OGA(OnnxRuntime GenAI) framework on Ryzen AI.
 
 By running both critical models on the NPU and/or GPU, this setup enables faster and more efficient inference, delivering a high-performance RAG system optimized for AI PCs.
 
@@ -105,7 +105,7 @@ Run the following command to perform download, export and compile steps:
 ```bash
 python custom_embedding/export_bge_onnx.py
 ```
-Note : Please ensure that you have activated your ryzen‑ai‑1.7.0 environment and are in the RyzenAI‑SW/example/llm/RAG‑OGA directory.
+Note : Please ensure that you have activated your ryzen‑ai‑<version> environment and are in the RyzenAI-SW/LLM-examples/RAG-OGA directory.
 
 This script generates a static‑shape, non‑quantized FP32 ONNX model that serves as the baseline for further deployment. 
 The compiled BGE (BAAI General Embedding) ONNX model will be stored in the cache folder named ``modelcachekey_bge``.

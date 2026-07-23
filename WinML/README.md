@@ -1,6 +1,6 @@
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Windows ML Examples </h1>
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI WinML Tutorial </h1>
     </td>
  </tr>
 </table>
@@ -21,13 +21,13 @@ In this document, we discuss how to enable AMD hardware through WinML APIs. This
 
 ## System Requirements
 
-- Windows 10/11 with NPU support
-- Visual Studio Code with AI Toolkit extension (for AI model conversion)
-- Install compatible version of Windows App SDK
-- Visual Studio 2022 (for building the C++ application)
-- Python package management (Miniforge) and Python 3.10+
+- Windows 11 with a supported AMD Ryzen AI NPU and the current NPU driver
+- Python (Miniforge) with Python 3.10+ for the Python examples
+- Visual Studio 2022 or newer with the **Desktop development with C++** workload for the C++ example
+- CMake 3.23+ on PATH — for the C++ example
+- A compatible Windows App SDK runtime (see the setup sections below)
 
-## Model Support
+# Model Support
 
 The VitisAI EP within WinML supports input models in the following formats:
 
@@ -39,77 +39,54 @@ The VitisAI EP within WinML supports input models in the following formats:
     - Quantized QDQ model using A16W8 configuration
   - LLM Models:
     - Quantized and pre-compiled LLM models
+    - Support for custom models through Olive recipe and Windows ML + OGA APIs
 
-## WinML Installation Instructions
+# Python Setup
 
 Install the required python packages in the conda environment `winml_env`
 
 ```sh
-conda create -n winml_env python==3.11
+conda create -n winml_env python==3.12
 conda activate winml_env
-pip install --pre --upgrade -r .\requirements.txt
+pip install --upgrade -r .\requirements.txt
 ```
 
-Check installed wasdk python version and install same version of [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads):
+The `wasdk` pip packages require a matching **Windows App SDK runtime** installed on the
+machine. Check the installed pip version:
 
 ```sh
 conda list | findstr wasdk
 ```
 
-Expected Output:
+Then install the Windows App SDK runtime whose version matches that `wasdk` version from the
+official [Windows App SDK downloads](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+page (choose the runtime installer for your architecture, e.g. x64).
 
-```shell
-wasdk-microsoft-windows-ai-machinelearning 2.0.0.dev4               pypi_0    pypi
-wasdk-microsoft-windows-applicationmodel-dynamicdependency-bootstrap 2.0.0.dev4               pypi_0    pypi
-```
+> **Note:** All stable 2.x runtimes share the `Microsoft.WindowsAppRuntime.2` package family.
+> A newer runtime (e.g. 2.2.0) supersedes an older one (e.g. 2.1.3) in place and remains
+> compatible with the `wasdk` pip package.
 
-Download the Windows App SDK corresponding to the wasdk version (e.g., 2.0.0.dev4) or latest and install it to ensure the WinML execution providers work correctly.
 
-```shell
-curl -L -o windowsappruntimeinstall-x86.exe "https://aka.ms/windowsappsdk/2.0/2.0.0-experimental4/windowsappruntimeinstall-x86.exe"
-windowsappruntimeinstall-x86.exe --quiet
-```
+# C++ Setup
 
-After installation instructions run the check_winml_setup.py to verify the Windows ML installation
+Each `CMakeLists.txt` fetches its NuGet packages automatically on the first configure (pinned
+versions).
 
-```sh
-============================================================
-WinML Setup Checker
-============================================================
-Python: 3.11.0 (<path_to_python_installation>\python.exe)
-WASDK Python Packages:
-----------------------------------------
-  [✓] wasdk-ML: 2.0.0.dev4
-  [✓] wasdk-Bootstrap: 2.0.0.dev4
-Windows App SDK Runtime:
-----------------------------------------
-  [✓] Windows App SDK: 2.0-experimental5 (internal: 0.770.2319.0)
-Installed runtimes (newest first):
-    - 2.0-experimental5 (internal: 0.770.2319.0)
-    * 2.0-experimental4 (internal: 0.738.2207.0)
-    - 1.8 (internal: 8000.642.119.0)
-    - 1.8 (internal: 8000.675.1142.0)
-    - 1.8 (internal: 8000.731.1532.0)
-    - 1.8 (internal: 8000.770.947.0)
-    - 1.8-experimental (internal: 8000.589.1529.0)
-    - 1.8-preview (internal: 8000.591.1127.0)
-    * Active runtime used by this checker
-Expected SDK: 2.0.0-experimental4
-============================================================
-Status: All components installed. Please, ensure matching Windows App SDK version is Installed.
-```
+> If `cmake` isn't found, run from the **Developer PowerShell for VS**, which puts the
+> VS-bundled CMake on PATH.
 
-## WinML examples
+See the [ResNet C++ README](./CNN/ResNet/cpp/README.md) for the build and run commands.
+
+# WinML examples
 
 For detailed step by step tutorials:
 
 - [Getting Started ResNet Tutorial](./CNN/ResNet/README.md)
 - [Transformer Tutorial using Google BERT](./Transformers/GoogleBert/README.md)
-- [Transformer Tutorial using OpenAI CLIP model](./Transformers/clip-vit-base-patch16/README.md)
 - [LLM Examples](./LLM/README.md)
 
-## References
+# References
 
 - [Windows ML Documentation](https://learn.microsoft.com/en-us/windows/ai/windows-ml/)
-- [AI Toolkit Documentation](https://code.visualstudio.com/docs/intelligentapps/modelconversion)
+- [Foundry Toolkit (VS Code)](https://code.visualstudio.com/docs/intelligentapps/modelconversion)
 - [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/)

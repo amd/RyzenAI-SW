@@ -23,90 +23,10 @@ from typing import Optional
 import onnxruntime_genai as og
 
 
-def register_vitisai_ep():
-    """
-    Register VitisAI Execution Provider via WinML.
-
-    Returns:
-        bool: True if registration successful, False otherwise
-    """
-    try:
-        # Import WinML components using the correct bootstrap module
-        from winui3.microsoft.windows.applicationmodel.dynamicdependency.bootstrap import (
-            InitializeOptions,
-            initialize
-        )
-        import winui3.microsoft.windows.ai.machinelearning as winml
-
-        # Initialize WinAppSDK
-        # Use version with experimental suffix to match installed package name
-        # Runtime version: 0.738.2207.0 (experimental4) or 0.770.2319.0 (experimental5)
-        print("[INFO] Initializing WinAppSDK 2.0-experimental5...")
-        wasdk_handle = initialize(
-            version="2.0-experimental5",
-            min_version="0.738.2207.0",
-            options=InitializeOptions.ON_NO_MATCH_SHOW_UI
-        )
-        wasdk_handle.__enter__()
-        print("[INFO] WinAppSDK 2.0-experimental5 initialized")
-
-        # Get and ensure VitisAI EP
-        catalog = winml.ExecutionProviderCatalog.get_default()
-        providers = catalog.find_all_providers()
-
-        # Print all available execution providers from WinML catalog
-        print("\n[INFO] Available Execution Providers in WinML catalog:")
-        print("       (Note: CPU EP is built-in to ONNX Runtime and not shown here)")
-        for i, provider in enumerate(providers, 1):
-            ready_status = provider.ready_state.name if hasattr(provider.ready_state, 'name') else str(provider.ready_state)
-            print(f"  {i}. {provider.name} (Status: {ready_status})")
-        print()
-
-        vitisai_provider = None
-        for provider in providers:
-            if provider.name == "VitisAIExecutionProvider":
-                vitisai_provider = provider
-                break
-
-        if not vitisai_provider:
-            print("[WARNING] VitisAIExecutionProvider not found in catalog")
-            return False
-
-        # Ensure the provider is ready
-        if vitisai_provider.ready_state != winml.ExecutionProviderReadyState.READY:
-            print(f"[INFO] Ensuring VitisAIExecutionProvider (state: {vitisai_provider.ready_state})...")
-            result = vitisai_provider.ensure_ready_async().get()
-            if result.status != winml.ExecutionProviderReadyResultState.SUCCESS:
-                print(f"[ERROR] Failed to ensure VitisAIExecutionProvider: {result.status}")
-                return False
-
-        print("[INFO] VitisAIExecutionProvider is ready")
-
-        # Register to ONNX Runtime GenAI
-        if vitisai_provider.library_path:
-            og.register_execution_provider_library(vitisai_provider.name, vitisai_provider.library_path)
-            print(f"[INFO] Registered {vitisai_provider.name} to ONNX GenAI")
-            print(f"[INFO] Library path: {vitisai_provider.library_path}")
-            return True
-        else:
-            print("[WARNING] VitisAIExecutionProvider has no library path")
-            return False
-
-    except ImportError as e:
-        print(f"[ERROR] Failed to import WinML components: {e}")
-        print("[INFO] Make sure you're running on Windows with WinML support")
-        return False
-    except Exception as e:
-        print(f"[ERROR] Failed to register VitisAI EP: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-
 def run_inference(
     model_path: Path,
     prompt: str,
-    use_vitisai: bool = True,
+    use_npu: bool = True,
     max_length: int = 512
 ) -> None:
     """
@@ -115,7 +35,7 @@ def run_inference(
     Args:
         model_path: Path to the ONNX model directory
         prompt: Text prompt for the model
-        use_vitisai: Whether to use VitisAI EP (default: True)
+        use_npu: Whether to use the NPU EP configured in genai_config.json (default: True)
         max_length: Maximum generation length
     """
     print(f"\n{'='*60}")
@@ -126,23 +46,23 @@ def run_inference(
     try:
         config = og.Config(str(model_path))
 
-        if not use_vitisai:
+        if not use_npu:
             # Force CPU EP
             config.clear_providers()
             config.append_provider("CPU")
             print("[INFO] Using CPU Execution Provider")
         else:
-            print("[INFO] Using VitisAI Execution Provider (configured in genai_config.json)")
+            print("[INFO] Using NPU Execution Provider (configured in genai_config.json)")
 
         # Load model
         print("[INFO] Loading model (this may take a minute)...")
         model = og.Model(config)
-        print("[INFO] ✓ Model loaded successfully")
+        print("[INFO] Model loaded successfully")
 
         # Create tokenizer
         print("[INFO] Creating tokenizer...")
         tokenizer = og.Tokenizer(model)
-        print("[INFO] ✓ Tokenizer created")
+        print("[INFO] Tokenizer created")
 
         # Create generator params
         params = og.GeneratorParams(model)
@@ -181,7 +101,7 @@ def run_inference(
 
 def interactive_mode(
     model_path: Path,
-    use_vitisai: bool = True,
+    use_npu: bool = True,
     max_length: int = 512
 ) -> None:
     """
@@ -189,7 +109,7 @@ def interactive_mode(
 
     Args:
         model_path: Path to the ONNX model directory
-        use_vitisai: Whether to use VitisAI EP (default: True)
+        use_npu: Whether to use the NPU EP configured in genai_config.json (default: True)
         max_length: Maximum generation length
     """
     print(f"\n{'='*60}")
@@ -200,21 +120,21 @@ def interactive_mode(
     try:
         config = og.Config(str(model_path))
 
-        if not use_vitisai:
+        if not use_npu:
             config.clear_providers()
             config.append_provider("CPU")
             print("[INFO] Using CPU Execution Provider")
         else:
-            print("[INFO] Using VitisAI Execution Provider (configured in genai_config.json)")
+            print("[INFO] Using NPU Execution Provider (configured in genai_config.json)")
 
         print("[INFO] Loading model (this may take a minute)...")
         model = og.Model(config)
-        print("[INFO] ✓ Model loaded successfully")
+        print("[INFO] Model loaded successfully")
 
         print("[INFO] Creating tokenizer...")
         tokenizer = og.Tokenizer(model)
         tokenizer_stream = tokenizer.create_stream()
-        print("[INFO] ✓ Tokenizer created")
+        print("[INFO] Tokenizer created")
 
     except Exception as e:
         print(f"\n[ERROR] Model initialization failed: {e}")
@@ -337,27 +257,97 @@ Examples:
         print(f"[ERROR] genai_config.json not found in model directory: {args.model}")
         sys.exit(1)
 
-    use_vitisai = not args.cpu
+    use_npu = not args.cpu
 
-    # Register VitisAI EP once if requested
-    if use_vitisai:
+    # Register the AMD execution providers via WinML if requested. Every catalog
+    # EP except MIGraphX (non-functional on AMD systems) is made ready and
+    # registered with ONNX Runtime GenAI, so models that request VitisAI or
+    # RyzenAI in their genai_config.json can load. Keep the bootstrap handle
+    # alive for the whole run and close it in the finally below.
+    wasdk_handle = None
+    if use_npu:
         print(f"\n{'='*60}")
         print("Registering Execution Providers")
         print(f"{'='*60}")
-        if not register_vitisai_ep():
-            print("[WARNING] Failed to register VitisAI EP, falling back to CPU")
-            use_vitisai = False
+        try:
+            from winui3.microsoft.windows.applicationmodel.dynamicdependency.bootstrap import (
+                InitializeOptions,
+                initialize,
+            )
+            import winui3.microsoft.windows.ai.machinelearning as winml
+
+            # Pass no version so the bootstrapper matches whatever Windows App
+            # SDK runtime is installed on the machine.
+            print("[INFO] Initializing WinAppSDK...")
+            wasdk_handle = initialize(options=InitializeOptions.ON_NO_MATCH_SHOW_UI)
+            wasdk_handle.__enter__()
+            print("[INFO] WinAppSDK initialized")
+
+            providers = winml.ExecutionProviderCatalog.get_default().find_all_providers()
+            print("\n[INFO] Available Execution Providers in WinML catalog:")
+            for i, provider in enumerate(providers, 1):
+                print(f"  {i}. {provider.name} (Status: {provider.ready_state})")
+            print()
+
+            registered = []
+            for provider in providers:
+                if provider.name == "MIGraphXExecutionProvider":
+                    continue  # non-functional on AMD systems
+                try:
+                    if provider.ready_state != winml.ExecutionProviderReadyState.READY:
+                        print(f"[INFO] Ensuring {provider.name} (state: {provider.ready_state})...")
+                        provider.ensure_ready_async().get()
+
+                    # try_register() activates the EP system-wide. Without it,
+                    # library_path may be empty and og.Model() can fail (Error 126).
+                    if not provider.try_register() or not provider.library_path:
+                        print(f"[WARNING] {provider.name} could not be registered with WinML")
+                        continue
+
+                    # WinML makes the EP and its dependent DLLs loadable via this
+                    # registration; no manual DLL path handling needed.
+                    try:
+                        og.register_execution_provider_library(provider.name, provider.library_path)
+                        print(f"[INFO] Registered {provider.name}: {provider.library_path}")
+                    except RuntimeError as e:
+                        # An EP already registered with the runtime is fine.
+                        if "already registered" not in str(e).lower():
+                            raise
+                        print(f"[INFO] {provider.name} already registered")
+                    registered.append(provider.name)
+                except Exception as e:
+                    print(f"[WARNING] {provider.name} registration failed: {e}")
+
+            if not registered:
+                print("[WARNING] No execution providers registered, falling back to CPU")
+                if wasdk_handle is not None:
+                    wasdk_handle.__exit__(None, None, None)
+                    wasdk_handle = None
+                use_npu = False
+        except Exception as e:
+            print(f"[WARNING] WinML EP setup failed ({e}), falling back to CPU")
+            import traceback
+            traceback.print_exc()
+            wasdk_handle = None
+            use_npu = False
 
     # Run in appropriate mode
-    if args.interactive:
-        interactive_mode(args.model, use_vitisai=use_vitisai, max_length=args.max_length)
-    elif args.prompt:
-        run_inference(args.model, args.prompt, use_vitisai=use_vitisai, max_length=args.max_length)
-    else:
-        # Default: run with a demo prompt
-        default_prompt = "Explain what an AMD NPU is in one sentence."
-        print("[INFO] No prompt provided, using demo prompt")
-        run_inference(args.model, default_prompt, use_vitisai=use_vitisai, max_length=args.max_length)
+    try:
+        if args.interactive:
+            interactive_mode(args.model, use_npu=use_npu, max_length=args.max_length)
+        elif args.prompt:
+            run_inference(args.model, args.prompt, use_npu=use_npu, max_length=args.max_length)
+        else:
+            # Default: run with a demo prompt
+            default_prompt = "Explain what an AMD NPU is in one sentence."
+            print("[INFO] No prompt provided, using demo prompt")
+            run_inference(args.model, default_prompt, use_npu=use_npu, max_length=args.max_length)
+    finally:
+        if wasdk_handle is not None:
+            try:
+                wasdk_handle.__exit__(None, None, None)
+            except Exception as e:
+                print(f"[WARNING] WinAppSDK bootstrap shutdown failed: {e}")
 
 
 if __name__ == "__main__":

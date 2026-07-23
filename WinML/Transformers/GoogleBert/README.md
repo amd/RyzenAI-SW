@@ -1,11 +1,4 @@
-<table class="sphinxhide" width="100%">
- <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Windows ML BERT Example </h1>
-    </td>
- </tr>
-</table>
-
-# Windows ML Google BERT - Text Embedding
+# WinML Google BERT - Text Embedding
 
 Run quantized Google BERT models on Windows NPU for text embedding generation.
 
@@ -16,25 +9,7 @@ Install the required python packages in the conda environment `winml_env` and Wi
 ```sh
 conda create -n winml_bert --clone winml_env
 conda activate winml_bert
-pip install --pre -r .\requirements.txt
-```
-
-Check installed wasdk python version and install same version of [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/stable-channel):
-```sh
-conda list | findstr wasdk
-```
-Expected Output:
-
-```shell
-wasdk-microsoft-windows-ai-machinelearning 2.0.0.dev4               pypi_0    pypi
-wasdk-microsoft-windows-applicationmodel-dynamicdependency-bootstrap 2.0.0.dev4               pypi_0    pypi
-```
-
-Download the Windows App SDK corresponding to the wasdk version (e.g., 2.0.0.dev4) or latest and install it to ensure the WinML execution providers work correctly.
-
-```shell
-curl -L -o windowsappruntimeinstall-x86.exe "https://aka.ms/windowsappsdk/2.0/2.0.0-experimental4/windowsappruntimeinstall-x86.exe"
-windowsappruntimeinstall-x86.exe --quiet
+pip install --upgrade -r requirements.txt
 ```
 
 ### Model Conversion

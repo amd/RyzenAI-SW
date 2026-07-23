@@ -1,0 +1,13 @@
+numpy>=1.24.0
+pillow>=10.0.0
+opencv-python>=4.8.0
+onnx>=1.15.0
+torch>=2.0.0
+torchvision>=0.15.0
+# Optional: INT8 quantization (install separately before running quantize_deeplabv3.py)
+# olive-ai
+# amd-quark
+
+# Quantization (optional, for INT8 model creation)
+olive-ai==0.11.0
+amd-quark

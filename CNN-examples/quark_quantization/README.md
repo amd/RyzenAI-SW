@@ -26,7 +26,7 @@ Create a clone of the Ryzen AI installation conda environment to add required py
 ### Create and Activate Conda Environment
 
 ```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>s
+set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
 conda create --name quark_quantization --clone %RYZEN_AI_CONDA_ENV_NAME%
 conda activate quark_quantization
 ```
@@ -36,24 +36,24 @@ Add python packages needed for the tutorial:
 ```bash
 cd ryzenai-sw\tutorial\quark_quantization
 pip install -r requirements.txt
-``` 
+```
 
 Input model
 -----------
 
-Download the pre-trained float ONNX models for [ResNet50](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet50-v1-12.onnx) 
+Download the pre-trained float ONNX models for [ResNet50](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet50-v1-12.onnx)
 
 The downloaded model should be placed in the models folder, and the script ``quark_quantize.py`` will use it as the input model for quantization as shown below.
 ```python
-input_model_path = "models\\resnet50.onnx"  
-output_model_path = "models\\resnet50_quant.onnx" 
+input_model_path = "models\\resnet50.onnx"
+output_model_path = "models\\resnet50_quant.onnx"
 ```
 
 Alternatively you can use the python script to download the pre-trained ResNet50 model
 
 ```python
 cd models
-python download_ResNet.py 
+python download_ResNet.py
 ```
 
 ImageNet Dataset
@@ -71,7 +71,7 @@ python prepare_data.py val_data calib_data
 
 Quantization configuration
 --------------------------
-Users can apply their own **Customer Settings** for the ``QuantizationConfig``, ``CalibrationMethod``, or use the some of predefined configurations ``XINT8`` or ``INT8_CNN_DEFAULT`` or ``INT16_CNN_DEFAULT_CONFIG`` they can refer to the Quark's User Guide for help.
+Users can apply their own **Customer Settings** for the ``QuantizationConfig``, ``CalibrationMethod``, or use the some of predefined configurations  ``A8W8``  or ``A16W8`` they can refer to the Quark's User Guide for help. ``XINT8`` is the special case within ``A8W8`` with power of two scales and zero offset for improved performance, which can be used for models with minimal accuracy drop after quantization. The quantization configuration is defined as below:
 
 ```python
 from quark.onnx.quantization.config import Config, get_default_config
@@ -115,8 +115,8 @@ from quark.onnx import ModelQuantizer
 quantizer = ModelQuantizer(config)
 
 # Quantize the ONNX model
-quant_model = quantizer.quantize_model(model_input = input_model_path, 
-                                       model_output = output_model_path, 
+quant_model = quantizer.quantize_model(model_input = input_model_path,
+                                       model_output = output_model_path,
                                        calibration_data_path = None)
 ```
 
@@ -127,7 +127,7 @@ Print the original and quantized models.
 ```python
 print("Model Size:")
 print("Float32 model size: {:.2f} MB".format(os.path.getsize(input_model_path)/(1024 * 1024)))
-print("Int8 quantized model size: {:.2f} MB".format(os.path.getsize(output_model_path)/(1024 * 1024)))
+print("{} quantized model size: {:.2f} MB".format(args.config, os.path.getsize(output_model_path)/(1024 * 1024)))
 ```
 
 Model Evaluation
@@ -135,15 +135,15 @@ Model Evaluation
 Print the original and quantized models accuracy
 
 ```python
-from utils import evaluate_onnx_model  
+from utils import evaluate_onnx_model
 
 print("Model Accuracy:")
 top1_acc, top5_acc = evaluate_onnx_model(input_model_path, imagenet_data_path='calib_data')
 print("Float32 model accuracy: Top1 {:.3f}, Top5 {:.3f} ".format(top1_acc, top5_acc))
 top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path='calib_data')
-print("Int8 quantized model accuracy: Top1 {:.3f}, Top5 {:.3f} ".format(top1_acc, top5_acc))
+print("{} quantized model accuracy: Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
 top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path='calib_data', device='npu')
-print("Int8 quantized model accuracy (NPU): Top1 {:.3f}, Top5 {:.3f} ".format(top1_acc, top5_acc))
+print("{} quantized model accuracy (NPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
 ```
 
 Accuracy Summary
@@ -152,23 +152,52 @@ Accuracy Summary
 Quantize and Evaluation the top1 and top5 accuracy of the models on ImageNet validation dataset using the ``quark_quantize.py`` script.
 
 ```python
-python quark_quantize.py --quantize --evaluate
+python quark_quantize.py --model_input 'models\resnet50.onnx' --model_output 'models\resnet50_a8w8.onnx' --config A8W8 --quantize --evaluate
+```
 
+ResNet50: Using ``A8W8`` configuration
+
+<div align="center">
+
+| ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy |
+|---------------|------------|----------------|----------------|
+| Float 32      |  97.41 MB  | 88.0%          | 98.0%          |
+| A8W8 (CPU)    |  24.54 MB  | 83.0%          | 95.0%          |
+| A8W8 (NPU)    |  24.54 MB  | 81.0%          | 96.0%          |
+
+</div>
+
+```python
+python quark_quantize.py --model_input 'models\resnet50.onnx' --model_output 'models\resnet50_xint8.onnx' --config XINT8 --quantize --evaluate
 ```
 
 ResNet50: Using ``XINT8`` configuration
 
-<div align="center">  
+<div align="center">
+
+| ResNet50       | Model Size | Top-1 Accuracy | Top-5 Accuracy |
+|----------------|------------|----------------|----------------|
+| Float 32       |  97.41 MB  | 88.0%          | 98.0%          |
+| XINT8 (CPU)    |  24.46 MB  | 85.0%          | 97.0%          |
+| XINT8 (NPU)    |  24.46 MB  | 85.0%          | 98.0%          |
+
+</div>
+
+```python
+python quark_quantize.py --model_input 'models\resnet50.onnx' --model_output 'models\resnet50_a16w8.onnx' --config A16W8 --quantize --evaluate
+```
+
+ResNet50: Using ``A16W8`` configuration
+
+<div align="center">
 
 | ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy |
-|---------------|------------|----------------|----------------|  
-| Float 32      |  97.41 MB  | 80.0%          | 96.1%          |  
-| INT8 (CPU)    |  24.46 MB  | 78.1%          | 95.6%          |  
-| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |  
+|---------------|------------|----------------|----------------|
+| Float 32      |  97.41 MB  | 80.0%          | 98.0%          |
+| A16W8 (CPU)   |  24.54 MB  | 83.0%          | 97.0%          |
+| A16W8 (NPU)   |  24.54 MB  | 83.0%          | 97.0%          |
 
-</div>  
-
-
+</div>
 
 Run model on CPU
 ----------------
@@ -196,10 +225,14 @@ provider = ['VitisAIExecutionProvider']
 cache_dir = Path(__file__).parent.resolve()
 print(cache_dir)
 provider_options = [{
-                'config_file': 'vaip_config.json',
-                'cacheDir': str(cache_dir),
-                'cacheKey': 'modelcachekey'
-            }]
+                    'cacheDir': str(cache_dir),
+                    'cacheKey': 'modelcachekey',
+                    'enable_cache_file_io_in_mem':'0'
+                }]
+# For PHX/HPT, xclbin is required
+if npu_device == 'PHX/HPT':
+   provider_options[0]['target'] = 'X1'
+   provider_options[0]['xclbin'] = get_xclbin(npu_device)
 
 session = ort.InferenceSession(quant_model.SerializeToString(), providers=provider,
                                provider_options=provider_options)
@@ -217,21 +250,21 @@ Inference Performance
 Evaluate the inference performance of the float and quantized models on CPU and NPU
 
 ```python
-python quark_quantize.py --quantize --evaluate --benchmark
+python quark_quantize.py --config XINT8 --quantize --evaluate --benchmark
 ```
 
-<div align="center"> 
+<div align="center">
 
-| ResNet50      | Model Size | Top-1 Accuracy | Top-5 Accuracy | Inference Time |
-|---------------|------------|----------------|----------------|----------------|
-| Float 32      |  97.41 MB  | 80.0%          | 96.1%          | 10.70 ms       |
-| INT8 (CPU)    |  24.46 MB  | 78.1%          | 95.6%          | 34.45 ms       |
-| INT8 (NPU)    |  24.46 MB  | 77.4%          | 95.2%          |  5.74 ms       |
+| ResNet50       | Model Size  | Top-1 Accuracy | Top-5 Accuracy  | Inference Time |
+|----------------|-------------|----------------|-----------------|----------------|
+| Float 32       |  97.41 MB   | 88.0%          | 98.0%           | 21.18 ms       |
+| XINT8 (CPU)    |  24.46 MB   | 85.0%          | 97.0%           | 47.04 ms       |
+| XINT8 (NPU)    |  24.46 MB   | 85.0%          | 98.0%           | 16.41 ms       |
 
-</div> 
+</div>
 
 Advancted Quantization Tools
 ----------------------------
 
-While the default quantization configurations work well for many popular models, more sophisticated models might experience a decline in accuracy due to errors introduced during the quantization process. To address this, Quark APIs offer advanced tools to help recover lost accuracy. Some of these tools are highlighted in the [Advanced Quantization Tools](../docs/advanced_quant_readme.md) tutorial.
+While the default quantization configurations work well for many popular models, more sophisticated models might experience a decline in accuracy due to errors introduced during the quantization process. To address this, Quark APIs offer advanced tools to help recover lost accuracy. Some of these tools are highlighted in the [Advanced Quantization Tools](docs/advanced_quant_readme.md) tutorial.
 

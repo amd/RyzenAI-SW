@@ -1,6 +1,6 @@
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Windows ML LLM Example </h1>
+    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI LLM Tutorial </h1>
     </td>
  </tr>
 </table>
@@ -25,6 +25,8 @@ The LLM models can be run on AMD NPU using Foundry Local or Windows ML APIs. Fou
 
 - **Running LLM using Foundry Local**: This is the recommended option for most users as it provides a simple and efficient way to run LLM models on AMD NPU without needing to manage dependencies or optimize the model manually.
 - **Running custom LLM model using Windows ML APIs**: This option allows users to run LLM models on AMD NPU using Windows ML APIs. This option is suitable for users who want more control over the inference process and are comfortable managing dependencies and model management manually.
+- **Running custom LLM model using Foundry Local**: This option allows users to run LLM models on AMD NPU using Foundry Local. This option is suitable for users who want to bring custom LLM model and use Foundry Local for managing dependencies and model management.
+
 
 # Running LLM using Foundry Local
 
@@ -126,17 +128,21 @@ qwen2.5-7b                     NPU        chat-completion    5.20 GB      apache
 For more details abou the Foundry Local, please refer to the official documentation: [Foundry Local Documentation](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-local/get-started)
 
 
-# Run custom LLM model using Windows ML APIs
+# Run custom LLM model
 
-In this example we use Windows ML APIs with ONNX Runtime GenAI to run LLM models on AMD NPU. This option is suitable for users who want more control over the inference process and are comfortable managing dependencies and model management manually.
+In this section, we will show how to run custom LLM models in three steps:
+1. Convert and optimize the model using Olive
+2. Run with ONNX Generation API (OGA) and Windows ML
+3. Run with Foundry Local
 
-Download and quantize / optimize the model using [olive recipe](https://github.com/microsoft/olive-recipes/), then use the generated ONNX model with Windows ML and OGA APIs to run the inference on AMD NPU.
+## Model conversion with Olive
 
-You will need two different python environment due to incompatible package requirements:
+First, we need to convert and optimize the model using [Olive](https://github.com/microsoft/olive-recipes/). This step will download, quantize, and optimize the model for AMD NPU.
+
+You will need a separate python environment for model conversion due to specific package requirements:
   - Model Quantization with Olive/AMD-Quark: Needs specific older versions (transformers 4.50.0, onnx 1.18.0/1.19.0, standard onnxruntime)
-  - Model Inference with WinML: Needs latest nightly WinML packages (onnxruntime-winml, onnxruntime-genai-winml)
 
-Use the following command to set up the python environment and install dependencies:
+Set up the python environment and install dependencies:
 
 ```bash
 conda create -n winml_olive python=3.10
@@ -146,7 +152,12 @@ pip install -r requirements_olive.txt
 
 Install PyTorch
 
-For Windows:
+For Windows (CPU):
+```bash
+pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cpu
+```
+
+For Windows (CUDA):
 ```bash
 pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128
 ```
@@ -156,11 +167,17 @@ For Linux:
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.1
 ```
 
-For `Phi-4-mini-Instruct` model, download and quantize / optimize the model using [olive recipe](https://github.com/microsoft/olive-recipes/blob/main/microsoft-Phi-4-mini-instruct/VitisAI/Phi-4-mini-instruct_quark_vitisai_llm.json), then use the generated ONNX model with `run_genai_llm.py` inference script to run on AMD NPU/CPU.
+For `Phi-4-mini-Instruct` model, download and quantize / optimize the model using [olive recipe](https://github.com/microsoft/olive-recipes/blob/main/microsoft-Phi-4-mini-instruct/VitisAI/Phi-4-mini-instruct_quark_vitisai_llm.json):
 
 ```bash
 olive run --config Phi-4-mini-instruct_quark_vitisai_llm.json
 ```
+
+The converted model will be saved in the output directory specified in the Olive configuration file.
+
+## Run custom LLM model with Windows ML and OGA API
+
+After converting the model with Olive, you can run it using Windows ML APIs with ONNX Runtime GenAI. This option is suitable for users who want more control over the inference process and are comfortable managing dependencies manually.
 
 Create a separate environment for running the inference with Windows ML APIs:
 
@@ -191,6 +208,8 @@ Registering Execution Providers
 [INFO] VitisAIExecutionProvider is ready
 [INFO] Registered VitisAIExecutionProvider to ONNX GenAI
 [INFO] Library path: C:\Program Files\WindowsApps\MicrosoftCorporationII.WinML.AMD.NPU.EP.1.8_1.8.51.0_x64__8wekyb3d8bbwe\ExecutionProvider\onnxruntime_providers_vitisai.dll
+C:\Users\dwchenna\github\dwchenna\RyzenAI-SW\WinML\LLM\run_genai_llm.py:347: RuntimeWarning: Shutdown object was not called before being garbage collected.
+  if not register_vitisai_ep():
 
 ============================================================
 Loading model from: models\Phi-4-mini-instruct-vai-npu
@@ -214,3 +233,51 @@ Prompt: What is AI accelerator?
 Response:  An AI accelerator is specialized hardware designed to enhance the efficiency and speed of training and deploying AI and deep learning models. Traditional CPUs may not be optimized for the specific tasks involved in AI, so an AI accelerator takes over these tasks and devotes specialized hardware and specialized hardware
 ------------------------------------------------------------
 ```
+
+## Run custom LLM model with Foundry Local
+
+After converting your custom LLM model with Olive, you can use Foundry Local cache to import and run the model.
+
+Change the Foundry cache directory to your model output location:
+
+```bash
+foundry cache cd <path-to-your-olive-output-directory>
+```
+
+List the available models in the cache:
+
+```bash
+foundry cache ls
+```
+
+Expected Output:
+
+```
+Models cached on device:
+   Alias                                             Model ID
+💾 DeepSeek-R1-Distill-Qwen-1.5B:1                   DeepSeek-R1-Distill-Qwen-1.5B:1
+```
+
+Run your custom model with Foundry:
+
+```bash
+foundry model run <your-model-name>
+```
+
+Expected Output:
+```
+🟢 Service is Started on http://127.0.0.1:61301/, PID 8460!
+🕑 Downloading complete!...
+Successfully downloaded and registered the following EPs: VitisAIExecutionProvider.
+Valid EPs: CPUExecutionProvider, WebGpuExecutionProvider, VitisAIExecutionProvider
+🕕 Loading model...
+🟢 Model DeepSeek-R1-Distill-Qwen-1.5B:1 loaded successfully
+
+Interactive Chat. Enter /? or /help for help.
+Press Ctrl+C to cancel generation. Type /exit to leave the chat.
+
+Interactive mode, please enter your prompt
+>
+```
+
+The model will load and you can interact with it through the CLI interface, similar to running pre-packaged Foundry models.

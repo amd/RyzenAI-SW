@@ -49,6 +49,7 @@ def main(args):
         quant_config.extra_options["BF16QDQToCast"] = True
     else:
         quant_config = get_default_config("XINT8")
+    quant_config.enable_npu_cnn = True
     # Defines the quantization configuration for the whole model
     config = Config(global_quant_config=quant_config)
     print("The configuration of the quantization is {}".format(config))
@@ -82,6 +83,8 @@ def main(args):
             top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path, device='npu')
             print("{} quantized model accuracy (NPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
         else:
+            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path)
+            print("{} quantized model accuracy (CPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
             top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path, device='npu')
             print("{} quantized model accuracy (NPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
 
@@ -97,7 +100,7 @@ def main(args):
         # Run the quantized model on CPU
         quant_model = onnx.load(output_model_path)
         session = ort.InferenceSession(quant_model.SerializeToString(), providers=provider)
-        print('Benchmarking CPU quantized model:')
+        print('Benchmarking CPU {} quantized model:'.format(args.config))
         benchmark_model(session)
 
         # Run quantized model on NPU
@@ -121,7 +124,7 @@ def main(args):
                                        sess_options=session_options,
                                        providers=provider,
                                        provider_options=provider_options)
-        print('Benchmarking NPU quantized model:')
+        print('Benchmarking NPU {} quantized model:'.format(args.config))
         benchmark_model(session)
 
 if __name__ == "__main__":

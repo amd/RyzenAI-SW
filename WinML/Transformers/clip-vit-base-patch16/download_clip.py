@@ -39,8 +39,14 @@ def export_model_to_onnx():
     model_name = 'openai/clip-vit-base-patch16'
     print(f"Downloading model: {model_name}")
 
-    # Load the pre-trained model and processor
-    clip_model = CLIPModel.from_pretrained(model_name)
+    # Load the pre-trained model and processor using safetensors format
+    # This avoids the CVE-2025-32434 vulnerability in torch.load
+    # Set attn_implementation to 'eager' to avoid scaled_dot_product_attention ONNX export issues
+    clip_model = CLIPModel.from_pretrained(
+        model_name,
+        use_safetensors=True,
+        attn_implementation="eager"
+    )
     processor = CLIPProcessor.from_pretrained(model_name)
 
     print(f"Model downloaded successfully")
@@ -80,7 +86,7 @@ def export_model_to_onnx():
     )
 
     print(f"Exporting model to ONNX format...")
-    print(f"Input shapes - pixel_values: {inputs['pixel_values'].shape}, input_ids: {inputs['input_ids'].shape}")
+    # print(f"Input shapes - pixel_values: {inputs['pixel_values'].shape}, input_ids: {inputs['input_ids'].shape}")
 
     # Export to ONNX with fixed shapes (1 image, 10 text prompts, 77 tokens)
     with torch.no_grad():
@@ -97,7 +103,7 @@ def export_model_to_onnx():
         )
 
     print(f"Model successfully exported to: {onnx_model_path}")
-    print(f"Model file size: {onnx_model_path.stat().st_size / (1024*1024):.2f} MB")
+    # print(f"Model file size: {onnx_model_path.stat().st_size / (1024*1024):.2f} MB")
 
     # Verify the exported model
     try:

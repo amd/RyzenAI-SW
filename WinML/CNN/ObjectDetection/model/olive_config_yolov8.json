@@ -1,0 +1,60 @@
+{
+    "workflow_id": "YOLOv8_Object_Detection",
+    "input_model": {
+        "type": "ONNXModel",
+        "model_path": "yolov8m.onnx"
+    },
+    "passes": {
+        "quantization": {
+            "type": "QuarkQuantization",
+            "data_config": "calib_data_config",
+            "global_config": {
+                "activation": {
+                    "symmetric": true,
+                    "calibration_method": "MinMSE",
+                    "quant_granularity": "Tensor",
+                    "scale_type": "PowerOf2",
+                    "data_type": "UInt8"
+                },
+                "weight": {
+                    "symmetric": true,
+                    "calibration_method": "MinMax",
+                    "quant_granularity": "Tensor",
+                    "scale_type": "PowerOf2",
+                    "data_type": "Int8"
+                }
+            },
+            "exclude": ["/model.22/Concat_3"],
+            "algo_config": [
+                {
+                    "name": "cle",
+                    "cle_steps": 6
+                }
+            ],
+            "extra_options": {
+                "EnableNPUCnn": true,
+                "ConvertOpsetVersion": 21,
+                "ReplaceClip6Relu": true,
+                "Int32Bias": false
+            }
+        }
+    },
+    "data_configs": [
+        {
+            "name": "calib_data_config",
+            "user_script": "user_script_yolov8.py",
+            "load_dataset_config": {
+                "type": "yolov8_dataset",
+                "data_dir": "./calib_data",
+                "max_images": 50
+            },
+            "pre_process_data_config": {
+                "type": "yolov8_preprocess"
+            }
+        }
+    ],
+    "engine": {
+        "cache_dir": "olive_cache",
+        "output_dir": "olive_output"
+    }
+}

@@ -1,0 +1,2 @@
+# CMake build tree (contains fetched NuGet packages, generated projections, binaries)
+build/

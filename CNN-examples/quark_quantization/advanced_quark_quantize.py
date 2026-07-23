@@ -2,49 +2,124 @@ import os
 import argparse
 import onnxruntime
 from quark.onnx import ModelQuantizer
-from quark.onnx.quantization.config import Config, get_default_config
-from quark.onnx.quantization.config.config import QuantizationConfig
+from quark.onnx.quantization.config import Config
+from quark.onnx.quantization.config.legacy import QuantizationConfig
 from onnxruntime.quantization.calibrate import CalibrationMethod
-from onnxruntime.quantization.quant_utils import QuantType, QuantFormat
-from quark.onnx import ModelQuantizer, PowerOfTwoMethod, QuantType
-from quark.onnx.quant_utils import PowerOfTwoMethod, VitisQuantType, VitisQuantFormat
+from onnxruntime.quantization.quant_utils import QuantType
+from quark.onnx.quantization.quant_utils import ExtendedQuantFormat
 from utils import top1_accu, ImageDataReader, evaluate_onnx_model
+
+# Custom quantization parameters for advanced fine-tuning algorithms
+# These parameters follow the pattern defined in quark.onnx.quantization.config.custom_config
+
+DEFAULT_ADAROUND_PARAMS = {
+    "DataSize": 1000,
+    "FixedSeed": 1705472343,
+    "BatchSize": 2,
+    "NumIterations": 1000,
+    "LearningRate": 0.1,
+    "OptimAlgorithm": "adaround",
+    "OptimDevice": "cpu",
+    "InferDevice": "cpu",
+    "EarlyStop": True,
+}
+
+DEFAULT_ADAQUANT_PARAMS = {
+    "DataSize": 1000,
+    "FixedSeed": 1705472343,
+    "BatchSize": 2,
+    "NumIterations": 1000,
+    "LearningRate": 0.00001,
+    "OptimAlgorithm": "adaquant",
+    "OptimDevice": "cpu",
+    "InferDevice": "cpu",
+    "EarlyStop": True,
+}
+
+# Custom A8W8 quantization configurations following quark.onnx.quantization.config.custom_config pattern
+# A8W8: 8-bit symmetric activations, 8-bit symmetric weights
+
+A8W8_CONFIG = QuantizationConfig(
+    calibrate_method=CalibrationMethod.MinMax,
+    quant_format=ExtendedQuantFormat.QDQ,
+    activation_type=QuantType.QInt8,
+    weight_type=QuantType.QInt8,
+    extra_options={
+        "ActivationSymmetric": True,
+        "AlignSlice": False,
+        "FoldRelu": True,
+        "AlignConcat": True,
+    },
+)
+
+A8W8_ADAROUND_CONFIG = QuantizationConfig(
+    calibrate_method=CalibrationMethod.MinMax,
+    quant_format=ExtendedQuantFormat.QDQ,
+    activation_type=QuantType.QInt8,
+    weight_type=QuantType.QInt8,
+    include_fast_ft=True,
+    extra_options={
+        "ActivationSymmetric": True,
+        "AlignSlice": False,
+        "FoldRelu": True,
+        "AlignConcat": True,
+        "FastFinetune": DEFAULT_ADAROUND_PARAMS,
+    },
+)
+
+A8W8_ADAQUANT_CONFIG = QuantizationConfig(
+    calibrate_method=CalibrationMethod.MinMax,
+    quant_format=ExtendedQuantFormat.QDQ,
+    activation_type=QuantType.QInt8,
+    weight_type=QuantType.QInt8,
+    include_fast_ft=True,
+    extra_options={
+        "ActivationSymmetric": True,
+        "AlignSlice": False,
+        "FoldRelu": True,
+        "AlignConcat": True,
+        "FastFinetune": DEFAULT_ADAQUANT_PARAMS,
+    },
+)
 
 def main(args):
     # Setup the Input model
     input_model_path = args.model_input
     output_model_path = args.model_output
     calibration_dataset_path = args.calib_data
+    quant_type = 'A8W8'
 
     # Select quantization configuration based on arguments
+    # Using custom configurations defined above following quark.onnx.quantization.config.custom_config pattern
     if args.adaround:
-        quant_config = get_default_config('XINT8_ADAROUND')
+        quant_config = A8W8_ADAROUND_CONFIG
+        print("Using custom A8W8_ADAROUND_CONFIG")
     elif args.adaquant:
-        quant_config = get_default_config('XINT8_ADAQUANT')
-    elif args.fast_finetune:
-        quant_type = 'XINT8'
-        quant_config = QuantizationConfig(calibrate_method=PowerOfTwoMethod.MinMSE,
-                                          activation_type=QuantType.QUInt8,
-                                          weight_type=QuantType.QInt8,
-                                          enable_npu_cnn=True,
-                                          include_fast_ft=True,
-                                          extra_options={'ActivationSymmetric': True})
-    elif args.cross_layer_equalization:
-        quant_type = 'XINT8'
-        quant_config = QuantizationConfig(calibrate_method=PowerOfTwoMethod.MinMSE,
-                                          activation_type=QuantType.QUInt8,
-                                          weight_type=QuantType.QInt8,
-                                          enable_npu_cnn=True,
-                                          include_cle=True,
-                                          extra_options={
-                                              'ActivationSymmetric': True})
+        quant_config = A8W8_ADAQUANT_CONFIG
+        print("Using custom A8W8_ADAQUANT_CONFIG")
     else:
-        quant_type = 'XINT8'
-        quant_config = get_default_config("XINT8")
+        quant_config = A8W8_CONFIG
+        print("Using custom A8W8_CONFIG")
+
+    # Enable NPU CNN optimizations
+    quant_config.enable_npu_cnn = True
+
+    # Optionally enable cross-layer equalization
+    if args.cross_layer_equalization:
+        quant_config.include_cle = True
+        print("Cross-layer equalization enabled")
 
     # Defines the quantization configuration for the whole model
     config = Config(global_quant_config=quant_config)
-    print("The configuration of the quantization is {}".format(config))
+    print("\nQuantization Configuration:")
+    print(f"  Calibration Method: {quant_config.calibrate_method}")
+    print(f"  Activation Type: {quant_config.activation_type}")
+    print(f"  Weight Type: {quant_config.weight_type}")
+    print(f"  Quant Format: {quant_config.quant_format}")
+    print(f"  NPU CNN Enabled: {quant_config.enable_npu_cnn}")
+    print(f"  Fast Fine-tune: {quant_config.include_fast_ft}")
+    if args.cross_layer_equalization:
+        print(f"  Cross-layer Equalization: {quant_config.include_cle}")
 
     # Define the calibration data reader
     num_calib_data = 100
@@ -76,10 +151,9 @@ if __name__ == "__main__":
     parser.add_argument('--model_input', type=str, default='models/mobilenetv2.onnx', help='Path to the input ONNX model.')
     parser.add_argument('--model_output', type=str, default='models/mobilenetv2_quant.onnx', help='Path to save the quantized ONNX model.')
     parser.add_argument('--calib_data', type=str, default='calib_data', help='Path to the calibration dataset.')
-    parser.add_argument('--fast_finetune', action='store_true', help='Use fast fine-tuning configuration.')
     parser.add_argument('--cross_layer_equalization', action='store_true', help='Use cross-layer equalization configuration.')
-    parser.add_argument('--adaround', action='store_true', help='Use adaround quantization')
-    parser.add_argument('--adaquant', action='store_true', help='Use adaquant quantization')
+    parser.add_argument('--adaround', action='store_true', help='Use ADAROUND configuration.')
+    parser.add_argument('--adaquant', action='store_true', help='Use ADAQUANT configuration.')
 
     args = parser.parse_args()
     main(args)

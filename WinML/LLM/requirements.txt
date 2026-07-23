@@ -7,9 +7,9 @@ torch
 torchvision
 onnx
 onnxscript
-wasdk-Microsoft.Windows.AI.MachineLearning[all]>=2.0.0.dev1
-wasdk-Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap>=2.0.0.dev1
-onnxruntime-winml
+wasdk-Microsoft.Windows.AI.MachineLearning[all]==2.3.0
+wasdk-Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap==2.3.0
+onnxruntime-windowsml
 onnxruntime-genai-winml
 transformers
 tokenizers
