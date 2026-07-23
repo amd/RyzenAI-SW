@@ -1,0 +1,70 @@
+{
+    "workflow_id": "RetinaFace_Face_Detection",
+    "input_model": {
+        "type": "ONNXModel",
+        "model_path": "retinaface_mobilenet.onnx"
+    },
+    "passes": {
+        "quantization": {
+            "type": "QuarkQuantization",
+            "data_config": "calib_data_config",
+            "global_config": {
+                "activation": {
+                    "symmetric": true,
+                    "calibration_method": "MinMSE",
+                    "quant_granularity": "Tensor",
+                    "scale_type": "PowerOf2",
+                    "data_type": "UInt8"
+                },
+                "weight": {
+                    "symmetric": true,
+                    "calibration_method": "MinMax",
+                    "quant_granularity": "Tensor",
+                    "scale_type": "PowerOf2",
+                    "data_type": "Int8"
+                }
+            },
+            "exclude": [],
+            "algo_config": [
+                {
+                    "name": "cle",
+                    "cle_steps": 6
+                },
+                {
+                    "batch_size": 4,
+                    "data_size": 100,
+                    "early_stop": true,
+                    "infer_device": "cuda:6",
+                    "learning_rate": 0.1,
+                    "name": "adaround",
+                    "num_iterations": 200,
+                    "optim_device": "cuda:6"
+                }
+            ],
+            "extra_options": {
+                "EnableNPUCnn": true,
+                "ConvertOpsetVersion": 21,
+                "ReplaceClip6Relu": true,
+                "Int32Bias": false
+            }
+        }
+    },
+    "data_configs": [
+        {
+            "name": "calib_data_config",
+            "user_script": "user_script_retinaface.py",
+            "load_dataset_config": {
+                "type": "retinaface_dataset",
+                "data_dir": "./calib_data",
+                "max_images": 100
+            },
+            "pre_process_data_config": {
+                "type": "retinaface_preprocess"
+            }
+        }
+    ],
+    "engine": {
+        "cache_dir": "olive_cache",
+        "output_dir": "olive_output"
+    }
+}

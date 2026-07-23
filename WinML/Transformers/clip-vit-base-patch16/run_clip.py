@@ -150,7 +150,7 @@ def main():
 
     # Validation against PyTorch reference
     print("Validating against PyTorch reference ...")
-    model = CLIPModel.from_pretrained('openai/clip-vit-base-patch16').eval()
+    model = CLIPModel.from_pretrained('openai/clip-vit-base-patch16', use_safetensors=True).eval()
     with torch.no_grad():
         pt_outputs = model(**inputs)
         pt_logits = pt_outputs.logits_per_image[0]

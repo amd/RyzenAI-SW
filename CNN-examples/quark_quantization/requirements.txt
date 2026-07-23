@@ -1,3 +1,4 @@
+amd-quark==0.11
 numpy==1.26.4
 Pillow==12.0.0
 protobuf==6.33.0

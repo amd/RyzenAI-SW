@@ -1,3 +1,5 @@
+amd-quark==0.11
 torchvision==0.23.0
 opencv-python==4.11.0.86
 numpy==1.26.4
+

@@ -1,42 +1,16 @@
-<table class="sphinxhide" width="100%">
- <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Windows ML CLIP Example </h1>
-    </td>
- </tr>
-</table>
-
-# Windows ML CLIP
-
+# WinML CLIP-ViT 
 Run quantized CLIP Vision Transformer models on Windows NPU for zero-shot image classification using natural language prompts.
 
 
 ## Installation Instructions
 
-Install the required python packages in the conda environment `winml_clip`
+Install the required python packages in the conda environment `winml_clip` and Windows Apps SDK using the [Windows ML installation instructions](../README.md#winml-installation-instructions) in the main README.:
 
 ```sh
-conda create -n winml_clip python==3.11
+cd <RyzenAI-SW>\WinML\Transformers\clip-vit-base-patch16
+conda create -n winml_clip --clone winml_env
 conda activate winml_clip
-pip install --pre -r .\requirements.txt
-```
-
-Check installed wasdk python version and install same version of [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/stable-channel):
-```sh
-conda list | findstr wasdk
-```
-
-Expected Output:
-
-```shell
-wasdk-microsoft-windows-ai-machinelearning 2.0.0.dev4               pypi_0    pypi
-wasdk-microsoft-windows-applicationmodel-dynamicdependency-bootstrap 2.0.0.dev4               pypi_0    pypi
-```
-
-Download the Windows App SDK corresponding to the wasdk version (e.g., 2.0.0.dev4) or latest and install it to ensure the WinML execution providers work correctly.
-
-```shell
-curl -L -o windowsappruntimeinstall-x86.exe "https://aka.ms/windowsappsdk/2.0/2.0.0-experimental4/windowsappruntimeinstall-x86.exe"
-windowsappruntimeinstall-x86.exe --quiet
+pip install --upgrade -r .\requirements.txt
 ```
 
 ## Model Download and Export

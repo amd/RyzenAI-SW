@@ -1,0 +1,38 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+import json
+
+def _get_ep_paths() -> dict[str, str]:
+    from winui3.microsoft.windows.applicationmodel.dynamicdependency.bootstrap import (
+        InitializeOptions,
+        initialize
+    )
+    import winui3.microsoft.windows.ai.machinelearning as winml
+    eps = {}
+    with initialize(options = InitializeOptions.ON_NO_MATCH_SHOW_UI):
+        pass
+        catalog = winml.ExecutionProviderCatalog.get_default()
+        providers = catalog.find_all_providers()
+        for provider in providers:
+            if provider.name != 'VitisAIExecutionProvider':
+                continue
+            if provider.ready_state == winml.ExecutionProviderReadyState.READY:
+                eps[provider.name] = provider.library_path
+                continue
+            elif provider.ready_state == winml.ExecutionProviderReadyState.NOT_PRESENT:
+                result = provider.ensure_ready_async().get()
+                if result.status != winml.ExecutionProviderReadyResultState.SUCCESS:
+                    print(f"Failed to ensure EP {provider.name} is ready. Status: {result.status}")
+            elif provider.ready_state == winml.ExecutionProviderReadyState.NOT_READY:
+                result = provider.ensure_ready_async().get()
+                if result.status != winml.ExecutionProviderReadyResultState.SUCCESS:
+                    print(f"Failed to ensure EP {provider.name} is ready. Status: {result.status}")
+            else:
+                print(f"EP {provider.name} is in unexpected state {provider.ready_state}")
+            eps[provider.name] = provider.library_path
+    return eps
+
+if __name__ == "__main__":
+    eps = _get_ep_paths()
+    print(json.dumps(eps))

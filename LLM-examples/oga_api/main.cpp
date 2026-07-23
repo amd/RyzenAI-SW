@@ -2,8 +2,10 @@
 #include <string>
 #include "ort_genai.h"
 
-std::string apply_llama2_chat_template(const std::string& user_input, const std::string& system_prompt = "You are a helpful assistant.") {
-    return "<s>[INST] <<SYS>>\n" + system_prompt + "\n<</SYS>>\n\n" + user_input + " [/INST]";
+std::string apply_llama3_chat_template(const std::string& user_input, const std::string& system_prompt = "You are a helpful assistant.") {
+    return "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n" + system_prompt +
+           "<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n" + user_input +
+           "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -51,7 +53,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Enter prompt: ";
     std::getline(std::cin, input);
 
-    std::string prompt = apply_llama2_chat_template(input);
+    std::string prompt = apply_llama3_chat_template(input);
 
     auto sequences = OgaSequences::Create();
     tokenizer->Encode(prompt.c_str(), *sequences);

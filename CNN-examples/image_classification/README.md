@@ -45,7 +45,7 @@ ImageNet Dataset
 ----------------
 If you already have an ImageNet datasets, you can directly use your dataset path.
 
-To prepare the test data, please check the download section of the main website: https://huggingface.co/datasets/imagenet-1k/tree/main/data. You need to register and download **val_images.tar.gz**.
+To prepare the test data, please check the download section of the main website: https://huggingface.co/datasets/ILSVRC/imagenet-1k/blob/script/data/val_images.tar.gz. You need to register and download **val_images.tar.gz**.
 
 Then, create the validation dataset and calibration dataset:
 
@@ -59,7 +59,7 @@ python prepare_data.py val_data calib_data
 Evaluate the accuracy of the model using ImageNet dataset on CPU/NPU
 
 ```bash
-python image_classification.py --model_input models\resnet50_bf16.onnx --calib_data calib_data --device cpu/npu --evaluate
+python image_classification.py --model_input models\resnet50.onnx --calib_data calib_data --device cpu/npu --evaluate
 ```
 
 Summary of BF16 model accuracy:

@@ -13,9 +13,39 @@ import os
 
 def register_execution_providers():
     worker_script = os.path.abspath('winml_worker.py')
-    result = subprocess.check_output([sys.executable, worker_script], text=True)
-    paths = json.loads(result)
-    print("paths:", paths)
+    proc = subprocess.run(
+        [sys.executable, worker_script],
+        capture_output=True,
+        text=True
+    )
+
+    if proc.returncode != 0 or not proc.stdout.strip():
+        print(f"[ERROR] winml_worker.py failed (exit code {proc.returncode})")
+        if proc.stderr.strip():
+            print(f"        stderr: {proc.stderr.strip()}")
+        if proc.stdout.strip():
+            print(f"        stdout: {proc.stdout.strip()}")
+        print("\n[HINT] Possible causes:")
+        print("  1. Windows App SDK version mismatch — check 'conda list | findstr wasdk'")
+        print("     and install the matching Windows App SDK runtime.")
+        print("  2. VitisAI EP not installed — reinstall with:")
+        print("     pip install --pre --upgrade -r requirements.txt")
+        raise RuntimeError("Failed to retrieve execution provider paths from winml_worker.py")
+
+    # winml_worker may print diagnostic lines before the JSON; find the JSON line.
+    json_line = None
+    for line in proc.stdout.splitlines():
+        line = line.strip()
+        if line.startswith('{'):
+            json_line = line
+            break
+
+    if not json_line:
+        raise RuntimeError(
+            f"winml_worker.py produced no JSON output.\nstdout: {proc.stdout!r}\nstderr: {proc.stderr!r}"
+        )
+
+    paths = json.loads(json_line)
     for name, lib_path in paths.items():
         if not lib_path or not os.path.exists(lib_path):
             print(f"Skipping execution provider {name}: invalid or missing library path")
@@ -164,7 +194,7 @@ if __name__ == "__main__":
 
     # Use image_path argument if provided, else use all images in folder
     if args.image_path:
-        image_files = [Path(args.image_path)]
+        image_files = [Path(args.image_path).resolve()]
     else:
         images_folder = resource_path / "images"
         if not images_folder.exists():

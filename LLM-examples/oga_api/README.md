@@ -7,8 +7,8 @@ Ryzen AI Software includes support for deploying LLMs on Ryzen AI PCs using the 
 AMD provides a set of pre-optimized LLMs ready to be deployed with Ryzen AI Software and the supporting runtime for hybrid and NPU execution. These models can be found on Hugging Face: 
 
 ### Published models: 
-- [Ryzen AI Hybrid models.](https://huggingface.co/collections/amd/ryzen-ai-17-hybrid-llm)
-- [Ryzen AI NPU models.](https://huggingface.co/collections/amd/ryzen-ai-17-npu-llm)
+- [Ryzen AI Hybrid models.](https://huggingface.co/collections/amd/ryzen-ai-180-hybrid)
+- [Ryzen AI NPU models.](https://huggingface.co/collections/amd/ryzen-ai-180-npu-16k)
 
 ## Ryzen AI Installation
 
@@ -17,15 +17,15 @@ AMD provides a set of pre-optimized LLMs ready to be deployed with Ryzen AI Soft
 ## Steps to compile and run LLM example.
 - Activate Ryzen AI environment:
 ```
-conda activate ryzen-ai-1.7.0
+  conda activate ryzen-ai-<version>
 ```
-- Download the model: This example uses the Llama-2-7b-chat model.
+- Download the model: This example uses the Llama-3.1-8B-Instruct model.
 ```
 #hyrbid model:
-git clone https://huggingface.co/amd/Llama-2-7b-chat-hf-onnx-ryzenai-1.7-hybrid
+git clone https://huggingface.co/amd/Meta-Llama-3.1-8B-Instruct_rai_1.8.0_hybrid
 
 #npu model:
-git clone https://huggingface.co/amd/Llama-2-7b-chat-hf-onnx-ryzenai-npu
+git clone https://huggingface.co/amd/Meta-Llama-3.1-8B-Instruct_rai_1.8.0_npu_16K
 ```
 
 - Clone the RyzenAI-SW repository:
@@ -34,7 +34,7 @@ git clone https://github.com/amd/RyzenAI-SW
 ```
 - Navigate to OGA_API folder:
 ```
-cd path\to\RyzenAI-SW\example\llm\oga_api
+cd path\to\RyzenAI-SW\LLM-examples\oga_api
 ```
 - Copy necessary DLLs and header files:
 ```
@@ -56,13 +56,13 @@ xcopy /I "%RYZEN_AI_INSTALLATION_PATH%\LLM\include\*" include
 ```
 - Sample command
 ```
-.\example.exe -m "path\to\Llama-2-7b-chat-hf-awq-g128-int4-asym-fp16-onnx-hybrid"
+.\example.exe -m "path\to\Llama-3.1-8B-Instruct_hybrid"
 ```
 
 - Sample output:
 ```
 Initializing ORT GenAI...
-Loading Model from: C:\Users\satreysa\Downloads\RyzenAI-SW\example\llm\oga_api\models\Llama-2-7b-chat-hf-awq-g128-int4-asym-fp16-onnx-hybrid
+Loading Model from: path\to\Meta-Llama-3.1-8B-Instruct_hybrid
 Model loaded.
 Creating Tokenizer...
 Tokenizer created.
@@ -71,27 +71,50 @@ Generator created.
 --------------------------------
 Enter prompt: Explain the basics of object oriented programming
 Generating response:
-  Of course! Object-oriented programming (OOP) is a programming paradigm that organizes software design around objects, which are instances of classes, rather than functions and data. Here are the basics of OOP:
+Object-Oriented Programming (OOP) is a programming paradigm that revolves around the concept of objects and their interactions. Here are the basics:
 
-1. Classes and Objects: In OOP, a class is a blueprint or template for creating objects. A class defines the properties and behaviors of an object, and it can contain other classes or objects as members. An object is an instance of a class, and it has its own set of attributes (data) and methods (functions).
-2. Inheritance: Inheritance is the process of creating a new class based on an existing class. The new class (the subclass) inherits the properties and behaviors of the existing class (the superclass), and it can also add new properties and behaviors.
-3. Polymorphism: Polymorphism is the ability of an object to take on many forms. In OOP, polymorphism can occur in two ways: method overriding and method overloading. Method overriding occurs when a subclass provides a different implementation of a method that is already defined in its superclass. Method overloading occurs when a class provides multiple definitions for a method with the same name but different parameters.
-4. Encapsulation: Encapsulation is the practice of hiding the implementation details of an object from the outside world. In OOP, encapsulation is used to protect the data and methods of an object from external interference or misuse.
-5. Abstraction: Abstraction is the process of representing complex real-world objects or systems in a simplified way. In OOP, abstraction is used to focus on the essential features of an object and to hide the irrelevant details.
-6. Composition: Composition is the process of combining objects or classes to create a new object or system. In OOP, composition is used to create complex objects by combining simpler objects or classes.
-7. Inheritance Hierarchy: Inheritance hierarchy is a tree-like structure that represents the relationship between classes. A class can inherit properties and behaviors from its parent class, and it can also have its own subclasses that inherit properties and behaviors from it.
-8. Interfaces: Interfaces are used to define a set of methods that a class must implement. Interfaces are used to define a contract between a class and its clients, and they are used to ensure that a class implements a set of methods that are common to all classes in a particular category.
-9. Abstract Classes: Abstract classes are classes that cannot be instantiated. They are used to define a blueprint for a class, and they can contain methods that are intended to be overridden by subclasses.
-10. Final Classes: Final classes are classes that cannot be subclassed. They are used to define a class that cannot be modified or extended.
+**Key Concepts:**
 
-These are the basic concepts of object-oriented programming. Of course, there are many more advanced concepts and techniques that can be used in OOP, but these are the fundamental building blocks upon which all other concepts are based.
+1. **Objects**: An object is a self-contained entity that has its own properties and behavior. It's a "thing" in your program that can interact with other objects.
+2. **Classes**: A class is a blueprint or a template that defines the structure and behavior of an object. It's a set of instructions that defines the characteristics and actions of an object.
+3. **Inheritance**: Inheritance is the mechanism by which one class can inherit the properties and behavior of another class. This allows for code reuse and facilitates the creation of a hierarchy of classes.
+4. **Polymorphism**: Polymorphism is the ability of an object to take on multiple forms. This can be achieved through method overriding or method overloading.
+5. **Encapsulation**: Encapsulation is the concept of bundling data and its associated methods that operate on that data within a single unit (i.e., an object).
+6. **Abstraction**: Abstraction is the process of hiding implementation details and showing only the necessary information to the outside world.
+
+**OOP Principles:**
+
+1. **Single Responsibility Principle (SRP)**: Each object should have a single responsibility and should not be responsible for multiple, unrelated tasks.
+2. **Open/Closed Principle (OCP)**: Objects should be open for extension but closed for modification.
+3. **Liskov Substitution Principle (LSP)**: Derived classes should be substitutable for their base classes.
+4. **Interface Segregation Principle (ISP)**: A client should not be forced to depend on interfaces it does not use.
+5. **Dependency Inversion Principle (DIP)**: High-level modules should not depend on low-level modules, but both should depend on abstractions.
+
+**OOP Concepts in Action:**
+
+1. **Objects**: Create an object that represents a car. The car object has properties (color, make, model) and behavior (startEngine, accelerate).
+2. **Classes**: Define a Car class that serves as a blueprint for creating car objects.
+3. **Inheritance**: Create a ElectricCar class that inherits from the Car class and adds electric-specific properties and behavior.
+4. **Polymorphism**: Create a method that takes an object as an argument and performs different actions based on the object's type.
+5. **Encapsulation**: Create a BankAccount object that encapsulates the account balance and associated methods (deposit, withdraw).
+
+**Benefits of OOP:**
+
+1. **Modularity**: OOP promotes modularity, making it easier to maintain and extend code.
+2. **Code Reuse**: OOP enables code reuse through inheritance and polymorphism.
+3. **Easier Maintenance**: OOP makes it easier to modify and extend code without affecting existing functionality.
+4. **Improved Readability**: OOP promotes clear and concise code that's easier to understand.
+
+I hope this helps! Do you have any specific questions or topics you'd like me to expand on??
 ```
 
-**Note:** This example script demonstrates how to run the LLaMA-2-7b-Chat model. The chat template used in `main.cpp` is specifically tailored for the LLaMA-2-7b-Chat model. If you are using a different model, you may need to modify the chat template accordingly to ensure compatibility with that model’s expected input format.
+**Note:** This example script demonstrates how to run the Llama-3.1-8B-Instruct model. The chat template used in `main.cpp` is specifically tailored for Llama-3 Instruct models. If you are using a different model, you may need to modify the chat template accordingly to ensure compatibility with that model’s expected input format. Note that this template only works with instruction-tuned (Instruct) models; base (pretrained) models do not follow chat templates.
 
 ```
-std::string apply_llama2_chat_template(const std::string& user_input, const std::string& system_prompt = "You are a helpful assistant.") {
-    return "<s>[INST] <<SYS>>\n" + system_prompt + "\n<</SYS>>\n\n" + user_input + " [/INST]";
+std::string apply_llama3_chat_template(const std::string& user_input, const std::string& system_prompt = "You are a helpful assistant.") {
+    return "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n" + system_prompt +
+           "<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n" + user_input +
+           "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
 }
 ```
 

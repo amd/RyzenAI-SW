@@ -1,0 +1,16 @@
+# Windows ML Example Requirements
+# Python 3.11 recommended
+
+numpy>=1.24.0
+pillow>=10.0.0
+opencv-python>=4.8.0
+
+# Model download and optimization (for model/ scripts)
+onnx>=1.15.0
+onnx-simplifier>=0.4.0
+
+# Quantization (optional, for INT8 model creation)
+olive-ai==0.11.0
+amd-quark
+
+# Windows App SDK Python bindings: install per the main README Python Setup

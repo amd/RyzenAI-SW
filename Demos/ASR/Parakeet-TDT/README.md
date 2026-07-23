@@ -27,7 +27,7 @@ Install Ryzen AI Software using the automatic installer. See [RyzenAI documentat
 
 - AMD Ryzen AI processor (Strix)
 - Windows 11
-- Miniforge with `ryzen-ai-1.7.0` or `ryzen-ai-1.7.1` conda environment
+- Miniforge with `ryzen-ai-<version>` conda environment
 - onnxruntime-vitisai, flexml-lite (included in Ryzen AI SDK)
 - sounddevice (for live microphone mode)
 
@@ -57,7 +57,7 @@ Clone the repository and create a new conda environment based on your Ryzen AI i
 git clone https://github.com/amd/RyzenAI-SW.git
 cd RyzenAI-SW/Demos/ASR/Parakeet-TDT
 
-conda create --name asr_parakeet_env --clone ryzen-ai-1.7.1
+conda create --name asr_parakeet_env --clone ryzen-ai-<version>
 conda activate asr_parakeet_env
 
 pip install -r requirements.txt
@@ -465,7 +465,7 @@ python server.py [options]
 Verify that the VitisAI Execution Provider is available in your environment:
 
 ```bash
-conda activate ryzen-ai-1.7.1
+conda activate ryzen-ai-<version>
 python -c "import onnxruntime; print(onnxruntime.get_available_providers())"
 ```
 
