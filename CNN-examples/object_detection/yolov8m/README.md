@@ -30,6 +30,7 @@ Install the required python packages for the tutorial:
 
 ```bash
 cd <RyzenAI-SW>\CNN-examples\object_detection
+pip install amd-quark
 pip install -r requirements.txt
 ```
 
