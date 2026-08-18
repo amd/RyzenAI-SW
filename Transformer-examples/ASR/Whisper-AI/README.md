@@ -8,7 +8,7 @@
 # Running Whisper on Ryzen AI
 
 This Ryzen AI example lets you bring in OpenAI’s Whisper model and run fast, local automatic speech recognition (ASR) on your AMD NPU. Whisper is a versatile speech model trained on 680,000+ hours of diverse audio, capable of speech-to-text, translation, and language detection.
-This example uses the [Whisper-base](https://huggingface.co/openai/whisper-base) variant and provides a simple demonstration of how to run it on the NPU. For real-time factor (RTF) evaluation of the model on the NPU, please refer to the [whisper-demo](https://github.com/amd/RyzenAI-SW/tree/main/demo/ASR/Whisper).
+This example uses the [Whisper-base](https://huggingface.co/openai/whisper-base) variant and provides a simple demonstration of how to run it on the NPU. For real-time factor (RTF) evaluation of the model on the NPU, please refer to the [whisper-demo](https://github.com/amd/RyzenAI-SW/tree/main/demo/ASR/Whisper)
 
 Learn how you can:
 - **Export Whisper models** from Hugging Face to ONNX format
