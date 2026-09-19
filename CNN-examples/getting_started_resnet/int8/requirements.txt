@@ -1,5 +1,22 @@
-amd-quark==0.11
-torchvision==0.23.0
-opencv-python==4.11.0.86
-numpy==1.26.4
+# ==============================================================================
+# Ryzen AI ResNet INT8 Tutorial Requirements
+# ==============================================================================
+# WARNING / IMPORTANT NOTICE (Issue #385):
+# AMD Quark is unbundled from Ryzen AI 1.8. Installing 'amd-quark' or
+# conflicting 'torchvision' directly into your active 'ryzen-ai-1.8.0' environment
+# will break 'flexml 1.8.0' (which requires torch==2.6.0+cpu & onnx==1.21.0).
+#
+# Please use the decoupled requirement files based on the stage:
+#
+# 1. QUANTIZATION STAGE (Docker / Google Cloud Console / Isolated Conda):
+#    Use: requirements_quantize.txt
+#    Or run the pre-configured Docker container:
+#      bash docker_run.sh  (Linux / Google Cloud Console / WSL)
+#      docker_run.bat      (Windows)
+#
+# 2. RUNTIME INFERENCE STAGE (Ryzen AI Host Environment):
+#    In your active 'ryzen-ai-1.8.0' environment, run:
+#      pip install -r requirements_infer.txt
+# ==============================================================================
 
+-r requirements_infer.txt

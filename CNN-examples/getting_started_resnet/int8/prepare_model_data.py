@@ -3,13 +3,71 @@
 # Licensed under the MIT License.
 # --------------------------------------------------------------------------
 import argparse
+import hashlib
+import os
 import random
-import ssl
 import sys
 import tarfile
 import urllib.request
 
-ssl._create_default_https_context = ssl._create_unverified_context
+EXPECTED_CHECKPOINT_SHA256 = "6fbc917577ccf951e7c6039e3d85e95b11162abc06f9a69fe9ef26a5178d00cd"
+CHECKPOINT_LFS_URL = os.environ.get(
+    "RYZENAI_RESNET_CHECKPOINT_URL",
+    "https://media.githubusercontent.com/media/amd/RyzenAI-SW/main/CNN-examples/getting_started_resnet/int8/models/resnet_trained_for_cifar10.pt"
+)
+
+
+def compute_sha256(filepath):
+    sha256_hash = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        for byte_block in iter(lambda: f.read(65536), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest().lower()
+
+
+def is_git_lfs_pointer(filepath):
+    """Detects Git-LFS pointer signature: 'version https://git-lfs.github.com/spec/v1'"""
+    if not filepath.exists():
+        return False, None
+    if filepath.stat().st_size > 1024:
+        return False, None
+    try:
+        content = filepath.read_text(encoding="utf-8")
+        if "version https://git-lfs.github.com/spec/v1" in content:
+            for line in content.splitlines():
+                if line.startswith("oid sha256:"):
+                    return True, line.split("oid sha256:")[1].strip()
+            return True, None
+    except Exception:
+        pass
+    return False, None
+
+
+def verify_or_download_checkpoint(model_pt_path):
+    """Ensures authoritative pre-trained checkpoint is present and verified by SHA-256."""
+    is_lfs, pointer_sha = is_git_lfs_pointer(model_pt_path)
+
+    # Check for consistency if local pointer exists
+    if is_lfs and pointer_sha and pointer_sha.lower() != EXPECTED_CHECKPOINT_SHA256.lower():
+        raise RuntimeError(
+            f"Security Error: Repository Git-LFS pointer digest ({pointer_sha}) does not match "
+            f"authoritative checkpoint digest ({EXPECTED_CHECKPOINT_SHA256})."
+        )
+
+    if not model_pt_path.exists() or is_lfs:
+        print("Pre-trained checkpoint is an LFS pointer or missing. Downloading from Git LFS...")
+        print(f"Downloading from: {CHECKPOINT_LFS_URL}")
+        urllib.request.urlretrieve(CHECKPOINT_LFS_URL, model_pt_path, reporthook=download_progress)
+
+    actual_sha = compute_sha256(model_pt_path)
+    if actual_sha != EXPECTED_CHECKPOINT_SHA256.lower():
+        raise RuntimeError(
+            f"Security/Integrity Error: SHA-256 checksum mismatch for {model_pt_path}!\n"
+            f"Expected: {EXPECTED_CHECKPOINT_SHA256}\n"
+            f"Actual  : {actual_sha}\n"
+            f"The downloaded file may be corrupted or compromised."
+        )
+    print(f"Verified checkpoint SHA-256 digest: {actual_sha} (Integrity OK)")
 
 
 def download_progress(block_num, block_size, total_size):
@@ -171,9 +229,13 @@ def main():
             print(f"Extracting {label}...")
             with tarfile.open(path) as f:
                 f.extractall(data_dir)
+    model_pt_path = models_dir / "resnet_trained_for_cifar10.pt"
     if args.train:
         prepare_model(args.num_epochs, models_dir, data_dir)
-    model = torch.load(str(models_dir / "resnet_trained_for_cifar10.pt"), weights_only=False)
+    else:
+        verify_or_download_checkpoint(model_pt_path)
+
+    model = torch.load(str(model_pt_path), weights_only=False)
     export_to_onnx(model, models_dir)
 
 
