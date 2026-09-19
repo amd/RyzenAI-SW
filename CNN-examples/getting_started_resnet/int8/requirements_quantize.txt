@@ -1,8 +1,8 @@
 # ==============================================================================
 # Phase 1: Quantization & Build Pipeline Requirements (Offline / Docker / GCP)
 # ==============================================================================
-# Exact pinned dependency set tested for AMD Quark INT8 quantization.
-# Locking versions ensures reproducible builds and prevents dependency drift.
+# 100% exact pinned dependency set tested for AMD Quark INT8 quantization.
+# Locking all versions ensures fully reproducible, hermetic builds.
 #
 # Tested environment: Python 3.10 (Linux x86_64)
 # ==============================================================================
@@ -13,5 +13,5 @@ torchvision==0.21.0
 onnx==1.19.0
 onnxruntime==1.23.2
 numpy==1.26.4
-Pillow>=10.0.0
-tqdm>=4.66.0
+Pillow==10.4.0
+tqdm==4.67.1

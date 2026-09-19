@@ -6,12 +6,9 @@ import argparse
 import hashlib
 import os
 import random
-import ssl
 import sys
 import tarfile
 import urllib.request
-
-ssl._create_default_https_context = ssl._create_unverified_context
 
 EXPECTED_CHECKPOINT_SHA256 = "6fbc917577ccf951e7c6039e3d85e95b11162abc06f9a69fe9ef26a5178d00cd"
 CHECKPOINT_LFS_URL = os.environ.get(
@@ -44,6 +41,33 @@ def is_git_lfs_pointer(filepath):
     except Exception:
         pass
     return False, None
+
+
+def verify_or_download_checkpoint(model_pt_path):
+    """Ensures authoritative pre-trained checkpoint is present and verified by SHA-256."""
+    is_lfs, pointer_sha = is_git_lfs_pointer(model_pt_path)
+
+    # Check for consistency if local pointer exists
+    if is_lfs and pointer_sha and pointer_sha.lower() != EXPECTED_CHECKPOINT_SHA256.lower():
+        raise RuntimeError(
+            f"Security Error: Repository Git-LFS pointer digest ({pointer_sha}) does not match "
+            f"authoritative checkpoint digest ({EXPECTED_CHECKPOINT_SHA256})."
+        )
+
+    if not model_pt_path.exists() or is_lfs:
+        print("Pre-trained checkpoint is an LFS pointer or missing. Downloading from Git LFS...")
+        print(f"Downloading from: {CHECKPOINT_LFS_URL}")
+        urllib.request.urlretrieve(CHECKPOINT_LFS_URL, model_pt_path, reporthook=download_progress)
+
+    actual_sha = compute_sha256(model_pt_path)
+    if actual_sha != EXPECTED_CHECKPOINT_SHA256.lower():
+        raise RuntimeError(
+            f"Security/Integrity Error: SHA-256 checksum mismatch for {model_pt_path}!\n"
+            f"Expected: {EXPECTED_CHECKPOINT_SHA256}\n"
+            f"Actual  : {actual_sha}\n"
+            f"The downloaded file may be corrupted or compromised."
+        )
+    print(f"Verified checkpoint SHA-256 digest: {actual_sha} (Integrity OK)")
 
 
 def download_progress(block_num, block_size, total_size):
@@ -205,27 +229,12 @@ def main():
             print(f"Extracting {label}...")
             with tarfile.open(path) as f:
                 f.extractall(data_dir)
+    model_pt_path = models_dir / "resnet_trained_for_cifar10.pt"
     if args.train:
         prepare_model(args.num_epochs, models_dir, data_dir)
-    model_pt_path = models_dir / "resnet_trained_for_cifar10.pt"
-    is_lfs, pointer_sha = is_git_lfs_pointer(model_pt_path)
-    expected_sha = pointer_sha if pointer_sha else EXPECTED_CHECKPOINT_SHA256
+    else:
+        verify_or_download_checkpoint(model_pt_path)
 
-    if not model_pt_path.exists() or is_lfs:
-        print("Pre-trained checkpoint is an LFS pointer or missing. Downloading from Git LFS...")
-        print(f"Downloading from: {CHECKPOINT_LFS_URL}")
-        urllib.request.urlretrieve(CHECKPOINT_LFS_URL, model_pt_path, reporthook=download_progress)
-
-    # Verify SHA-256 checksum before calling torch.load()
-    actual_sha = compute_sha256(model_pt_path)
-    if actual_sha != expected_sha.lower():
-        raise RuntimeError(
-            f"Security/Integrity Error: SHA-256 checksum mismatch for {model_pt_path}!\n"
-            f"Expected: {expected_sha}\n"
-            f"Actual  : {actual_sha}\n"
-            f"The downloaded file may be corrupted or compromised."
-        )
-    print(f"Verified checkpoint SHA-256 digest: {actual_sha} (Integrity OK)")
     model = torch.load(str(model_pt_path), weights_only=False)
     export_to_onnx(model, models_dir)
 
