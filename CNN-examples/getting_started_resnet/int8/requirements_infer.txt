@@ -8,10 +8,13 @@
 #   - torchvision==0.21.0+cpu
 #   - onnx==1.21.0
 #   - onnxruntime (with VitisAIExecutionProvider)
-#   - numpy==1.26.4
 #
-# Additional runtime packages required by predict.py:
+# Runtime dependencies for predict.py:
+# Explicitly pinning 'numpy==1.26.4' ensures that installing opencv-python
+# does not transitively upgrade to NumPy 2.x, which is incompatible with
+# flexml 1.8.0 and PyTorch 2.6.
 # ==============================================================================
 
+numpy==1.26.4
 opencv-python>=4.8.0
 Pillow>=9.0.0

@@ -13,7 +13,7 @@ import urllib.request
 EXPECTED_CHECKPOINT_SHA256 = "6fbc917577ccf951e7c6039e3d85e95b11162abc06f9a69fe9ef26a5178d00cd"
 CHECKPOINT_LFS_URL = os.environ.get(
     "RYZENAI_RESNET_CHECKPOINT_URL",
-    "https://media.githubusercontent.com/media/amd/RyzenAI-SW/43b2dabe4d1bf084d0421953b134707b8cb7275a/CNN-examples/getting_started_resnet/int8/models/resnet_trained_for_cifar10.pt"
+    "https://media.githubusercontent.com/media/amd/RyzenAI-SW/main/CNN-examples/getting_started_resnet/int8/models/resnet_trained_for_cifar10.pt"
 )
 
 
