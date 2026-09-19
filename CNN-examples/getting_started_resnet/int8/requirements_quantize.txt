@@ -1,21 +1,17 @@
 # ==============================================================================
 # Phase 1: Quantization & Build Pipeline Requirements (Offline / Docker / GCP)
 # ==============================================================================
-# These dependencies are used strictly for:
-#   1. Exporting PyTorch ResNet-50 to ONNX (prepare_model_data.py)
-#   2. Running AMD Quark INT8 Quantization (resnet_quantize.py)
+# Exact pinned dependency set tested for AMD Quark INT8 quantization.
+# Locking versions ensures reproducible builds and prevents dependency drift.
 #
-# NOTE: DO NOT install this directly into your local 'ryzen-ai-1.8.0' runtime
-# environment to avoid breaking 'flexml 1.8.0' (See GitHub Issue #385).
-# Run this inside Docker (e.g. Google Cloud Console) or a dedicated conda env.
+# Tested environment: Python 3.10 (Linux x86_64)
 # ==============================================================================
 
-amd-quark>=0.11
-torch>=2.0.0
-torchvision>=0.15.0
-onnx>=1.15.0
-onnxruntime>=1.16.0
-numpy>=1.24.0,<2.0.0
-Pillow>=9.0.0
-tqdm>=4.65.0
-
+amd-quark==0.11.2
+torch==2.6.0
+torchvision==0.21.0
+onnx==1.19.0
+onnxruntime==1.23.2
+numpy==1.26.4
+Pillow>=10.0.0
+tqdm>=4.66.0
