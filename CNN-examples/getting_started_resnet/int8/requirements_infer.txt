@@ -1,0 +1,17 @@
+# ==============================================================================
+# Phase 2: Runtime Inference Requirements (Ryzen AI Host Environment)
+# ==============================================================================
+# Install these packages inside your active 'ryzen-ai-1.8.0' conda environment.
+#
+# DO NOT add 'amd-quark' or pinned 'torchvision' here. The base Ryzen AI
+# environment already provides compatible 'flexml 1.8.0', 'torch==2.6.0+cpu',
+# 'torchvision==0.21.0+cpu', and 'onnxruntime' with VitisAIExecutionProvider.
+#
+# Usage:
+#   conda activate ryzen-ai-1.8.0
+#   pip install -r requirements_infer.txt
+# ==============================================================================
+
+opencv-python>=4.8.0
+Pillow>=9.0.0
+

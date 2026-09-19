@@ -173,7 +173,13 @@ def main():
                 f.extractall(data_dir)
     if args.train:
         prepare_model(args.num_epochs, models_dir, data_dir)
-    model = torch.load(str(models_dir / "resnet_trained_for_cifar10.pt"), weights_only=False)
+    model_pt_path = models_dir / "resnet_trained_for_cifar10.pt"
+    # Check if checkpoint is missing or a Git LFS pointer text file (<1KB)
+    if not model_pt_path.exists() or model_pt_path.stat().st_size < 1000:
+        print("Pre-trained checkpoint is an LFS pointer or missing. Downloading from Git LFS...")
+        lfs_url = "https://media.githubusercontent.com/media/amd/RyzenAI-SW/main/CNN-examples/getting_started_resnet/int8/models/resnet_trained_for_cifar10.pt"
+        urllib.request.urlretrieve(lfs_url, model_pt_path, reporthook=download_progress)
+    model = torch.load(str(model_pt_path), weights_only=False)
     export_to_onnx(model, models_dir)
 
 
