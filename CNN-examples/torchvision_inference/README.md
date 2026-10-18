@@ -122,7 +122,8 @@ Choose one of the following:
 
   ```sh
   python -m pip install ipykernel jupyterlab
-  jupyter lab
+  cd CNN-examples/torchvision_inference   # from the RyzenAI-SW repository root
+  jupyter lab classification.ipynb
   ```
 
 - **VS Code / Cursor:** these editors start kernels without running `activate`, so register a kernel that runs it first. Run this block once from the shell where you ran the two `source` commands from Getting Started; it fills in your paths automatically:
