@@ -10,6 +10,17 @@ cache/
 quantized_info.csv
 aianalyzer.log
 
+# Written by the NPU cell (compiler log, AI Analyzer and ONNX Runtime profiling)
+npu_compile.log
+onnxruntime_profile*.json
+record_timer_*.json
+*inference_summary_*.json
+original-info-signature.txt
+original-model-signature.txt
+partition.json
+summary.csv
+xrt.run_summary
+
 # Copied from the Ryzen AI installation folder (Windows)
 vaip_config.json
 
