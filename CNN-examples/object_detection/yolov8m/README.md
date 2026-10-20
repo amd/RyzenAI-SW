@@ -7,31 +7,41 @@
 
 # Introduction
 
-In this tutorial we will using yolov8m model for object detection, including preparing, quantization and deploying a `BF16` and `XINT8` model using RyzenAI Software.
+In this tutorial we deploy a YOLOv8m object detector on the Ryzen AI NPU. The path below is `XINT8`. `BF16` is left for later.
 
 ## Overview
 
 The following steps outline how to deploy the quantized model on an NPU:
 
-- Download the yolov8m model from the Ultralytics and export it to ONNX (Optset 17) model
-- Quantize the model to `BF16` or `XINT8` using the AMD Quark Quantization API
-- Compile and run the model on NPU using ONNX Runtime with the Vitis AI Execution Provider
+- Export `yolov8m.pt` to ONNX (opset 17)
+- Quantize with AMD Quark `XINT8`, leaving the detection-head concat subgraph in float
+- Compile and run on the NPU with ONNX Runtime and the Vitis AI Execution Provider
 
 
-## Create and Activate Conda Environment
+## Environment
 
-```python
+Use the Ryzen AI environment from the installer. `requirements.txt` only adds `pycocotools`, `wget`, and `onnxsim`. It does not install `torch`, `numpy`, `opencv`, or `ultralytics`, because replacing the builds already in the Ryzen AI environment breaks the NPU stack.
+
+### Windows
+
+```bat
 set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
-conda create --name yolov8m_env --clone %RYZEN_AI_CONDA_ENV_NAME%
-conda activate yolov8m_env
-```
-
-Install the required python packages for the tutorial:
-
-```bash
-cd <RyzenAI-SW>\CNN-examples\object_detection
+conda activate %RYZEN_AI_CONDA_ENV_NAME%
+cd <RyzenAI-SW>\CNN-examples\object_detection\yolov8m
 pip install amd-quark
 pip install -r requirements.txt
+```
+
+### Linux
+
+Activate the installer venv first. That sets `RYZEN_AI_INSTALLATION_PATH` to the venv directory. Then load XRT, which adds the NPU libraries to `LD_LIBRARY_PATH`. This is the order in the [Linux installation instructions](https://ryzenai.docs.amd.com/en/latest/linux.html).
+
+```sh
+source <Ryzen-AI-install>/venv/bin/activate
+source /opt/xilinx/xrt/setup.sh
+cd <RyzenAI-SW>/CNN-examples/object_detection/yolov8m
+python -m pip install amd-quark
+python -m pip install -r requirements.txt
 ```
 
 ## Download and export the model
@@ -43,120 +53,29 @@ cd models
 python export_to_onnx.py
 ```
 
-## Model Quantization and Compilation
+## Quantize and run XINT8
 
-Model quantization levarages the power of AMD-Quark to optimize the model for significant performance without losing accuracy.
-This tutorial will guide through quantizing model for `BF16` configuration as well as `XINT8` configuration
+Quark `XINT8` is the same configuration used by `CNN-examples/torchvision_inference`: `get_default_config("XINT8")`, with no `BF16QDQToCast`. The NPU session is created with the Vitis AI Execution Provider and cache options only. No VAIML config file is passed.
 
-### BF16 quantization
-
-- **Model Quantization** - Model is quantized using AMD-Quark with `BF16` configuration
-
-
-```bash
-python quantize_quark.py --input_model_path models/yolov8m.onnx \
-                         --calib_data_path calib_images \
-                         --output_model_path models/yolov8m_BF16.onnx \
-                         --config BF16
-```
-
-- **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
-
-```bash
-python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16
-```
-
-### Evaluate the model accuracy
-
-The `BF16` quantized model accuracy is evaluated on COCO dataset
-
-Use the `prepare_data.py` script to download the COCO dataset
-
-```bash
-python prepare_data.py
-```
-
-Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-bf16` to measure accuracy metrics on CPU/NPU respectively.
-
-```bash
-python run_inference --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
-```
-
-<div align="center">
-
-|  Yolov8m      | mAP (AP@[IoU=0.50:0.95]) |  mAP50 (AP@IoU=0.50) |  mAP75 (AP@IoU=0.75) |
-|---------------|--------------------------|----------------------|----------------------|
-| Float 32      |       44.0               |     57.4             |      47.9            |
-| BF16 (CPU)    |       42.5               |     57.2             |      46.6            |
-| BF16 (NPU)    |       42.8               |     57.7             |      46.7            |
-
-</div>
-
-
-- **Sample Output** - Sample outputs generated using `BF16` model
-
-![test_output_bf16](results/test_output_bf16.png)
-
-
-### XINT8 quantization
-
-- **Model Quantization** - Model is quantized using AMD-Quark with `XINT8` configuration
+Quantizing the whole graph, including the head that concatenates boxes and class scores, drops detections. Exclude that subgraph. In `models/yolov8m.onnx` it starts at `/model.22/Concat_3` and ends at `/model.22/Concat_10`. There is no `/model.22/Concat_5` in this file.
 
 ```bash
 python quantize_quark.py --input_model_path models/yolov8m.onnx \
                          --calib_data_path calib_images \
                          --output_model_path models/yolov8m_XINT8.onnx \
-                         --config XINT8
-```
-
-- **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
-
-```bash
-python run_inference.py --model_input models\yolov8m_XINT8.onnx --input_image test_image.jpg --output_image test_output_int8.jpg --device npu-int8
-```
-
-- **Sample Output** - Sample outputs generated using `XINT8` configuration
-
-![test_output_int8](results/test_output_int8.jpg)
-
-### Evaluate quantized model accuracy
-
-The `XINT8` quantized model accuracy is evaluated on COCO dataset
-
-```bash
-python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_dataset datasets\coco --device npu-int8
-```
-*Note:* The evaluation functions fails to detect any objects
-
-## Modification
-
-The model uses concat operations to combine the `confidence` and `bounding boxes` as shown in the below in yolov8m ONNX model. This leads to significant degradation in confidence values, missing most of the bounding boxes.
-
-![image](results/yolov8m_quantized_concat_node.png)
-
-
-We need to skip the post-processing sub-graph to improve the accuracy of the `XINT8` quantized model. Shown below in the post-processing sub-graph yolov8m model.
-
-![image](results/yolov8m_skip_nodes.png)
-
-
-## Model Quantization
-
-After the above modifications model is quantized using AMD-Quark with `XINT8` configuration
-
-```bash
-python quantize_quark.py --input_model_path models/yolov8m.onnx \
-                         --calib_data_path calib_images \
-                         --output_model_path models/yolov8m_XINT8.onnx \
-                         --config XINT8
+                         --config XINT8 \
                          --exclude_subgraphs "[/model.22/Concat_3], [/model.22/Concat_10]]"
 ```
 
-## Sample Output
+Run it on `test_image.jpg`. Use forward slashes in the model path so the command is the same in bash and in the Windows shell.
 
-Sample outputs generated using `XINT8` quantized model with skipped nodes.
+```bash
+python run_inference.py --model_input models/yolov8m_XINT8.onnx --input_image test_image.jpg --output_image test_output_int8.jpg --device npu-int8
+```
 
-![test_output_int8](results/test_output_int8_skip_nodes.jpg)
+The run writes `test_output_int8.jpg`.
+
+![test_output_int8](test_output_int8.jpg)
 
 ### Evaluate the model accuracy
 
