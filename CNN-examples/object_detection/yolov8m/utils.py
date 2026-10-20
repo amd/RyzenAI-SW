@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 import sys
 import cv2
 import os
@@ -13,17 +14,25 @@ from tqdm import tqdm
 PROJECT_DIR = Path(__file__).parent
 
 def get_npu_info():
-    # Run pnputil as a subprocess to enumerate PCI devices
-    command = r'pnputil /enum-devices /bus PCI /deviceids '
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
+    # Windows pnputil and Linux lspci print the same PCI ids in different text.
+    # Normalize Linux to the pnputil strings, then use one set of checks.
+    if sys.platform == "win32":
+        command = r'pnputil /enum-devices /bus PCI /deviceids '
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        out = stdout.decode()
+    else:
+        raw = subprocess.run(["lspci", "-nn"], capture_output=True, text=True).stdout
+        out = ""
+        for dev, rev in re.findall(r"1022:([0-9a-fA-F]{4})\].*\(rev ([0-9a-fA-F]+)\)", raw):
+            out += "PCI\\VEN_1022&DEV_{}&REV_{} ".format(dev.upper(), rev.upper())
     # Check for supported Hardware IDs
     apu_type = ''
-    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): apu_type = 'KRK'
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in out: apu_type = 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in out: apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in out: apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in out: apu_type = 'STX'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in out: apu_type = 'KRK'
     return apu_type
 
 def get_xclbin(npu_device):
@@ -43,28 +52,6 @@ id_to_cls_map_default = {'0': 'person', '1': 'bicycle', '2': 'car', '3': 'motorc
                 '50': 'broccoli', '51': 'carrot', '52': 'hot dog', '53': 'pizza', '54': 'donut', '55': 'cake', '56': 'chair', '57': 'couch', '58': 'potted plant', '59': 'bed',
                 '60': 'dining table', '61': 'toilet', '62': 'tv', '63': 'laptop', '64': 'mouse', '65': 'remote', '66': 'keyboard', '67': 'cell phone', '68': 'microwave', '69': 'oven',
                 '70': 'toaster', '71': 'sink', '72': 'refrigerator', '73': 'book', '74': 'clock', '75': 'vase', '76': 'scissors', '77': 'teddy bear', '78': 'hair drier', '79': 'toothbrush'}
-
-def get_npu_info():
-    # Run pnputil as a subprocess to enumerate PCI devices
-    command = r'pnputil /enum-devices /bus PCI /deviceids '
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    # Check for supported Hardware IDs
-    apu_type = ''
-    if 'PCI\\VEN_1022&DEV_1502&REV_00' in stdout.decode(): apu_type = 'PHX/HPT'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_00' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_10' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_11' in stdout.decode(): apu_type = 'STX'
-    if 'PCI\\VEN_1022&DEV_17F0&REV_20' in stdout.decode(): apu_type = 'KRK'
-    return apu_type
-
-def get_xclbin(npu_device):
-    xclbin_file = ''
-    if npu_device == 'STX' or npu_device=='KRK':
-        xclbin_file = '{}\\voe-4.0-win_amd64\\xclbins\\strix\\AMD_AIE2P_4x4_Overlay.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
-    if npu_device == 'PHX/HPT':
-        xclbin_file = '{}\\voe-4.0-win_amd64\\xclbins\\phoenix\\4x4.xclbin'.format(os.environ["RYZEN_AI_INSTALLATION_PATH"])
-    return xclbin_file
 
 def load_onnx_model(session, device: str):
     # if device=='npu':

@@ -123,7 +123,7 @@ def main(args):
                 'target': 'X1',
                 'xclbin': get_xclbin(npu_device)
             }]
-        elif npu_device == 'STX' or 'KRK':
+        elif npu_device == 'STX' or npu_device == 'KRK':
             provider_options = [{
                 'cache_dir': str(Path(__file__).parent.resolve()),
                 'cache_key': 'modelcachekey',

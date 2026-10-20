@@ -1,6 +1,5 @@
-numpy==1.26.4
-opencv-python==4.11.0.86
+# Packages that are not already in the Ryzen AI venv.
+# torch, numpy, opencv, and onnx are provided by that venv. Do not pin them here.
 pycocotools==2.0.10
 wget==3.2
-torch==2.8.0
-ultralytics==8.3.155
+onnxsim
