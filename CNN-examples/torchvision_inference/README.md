@@ -16,12 +16,13 @@ SPDX-License-Identifier: MIT
 
 This folder contains the following files:
 
-- `classification.ipynb`: Jupyter Notebook demonstrating how to grab a classificatioin model from torchvision and port it to run on the Ryzen AI Neural Processing Unit (NPU)
+- `classification.ipynb`: Jupyter Notebook demonstrating how to grab a classification model from torchvision and port it to run on the Ryzen AI Neural Processing Unit (NPU)
 - `classification_utils.py`: This is a Python file contains some sub-functions.
 - `README.md`: This file provides an overview of the folder's contents.
 - `requirements.txt`: This file contains the necessary dependencies and packages required to run the code in this folder.
-- `data\`: This folder conatains an input image with corresponding classes info.
-- `vaip_config.json`: This is the default runtime configuration file. It can also be found in the `ryzen-ai-sw` installation package.
+- `data/`: This folder contains an input image with corresponding classes info.
+- `vaiml_config_bf16.json`: VAIML config that sets `enable_f32_to_bf16_conversion` — compiles an FP32 ONNX model to BF16 on the NPU.
+- `vaiml_config_quark.json`: VAIML config for running a Quark-quantized BF16 ONNX model on the NPU (no float conversion, the model is already BF16).
 
 ## Getting Started
 
@@ -35,7 +36,13 @@ Before running this example, ensure that you have followed the Ryzen AI installa
   source <TARGET-PATH>/venv/bin/activate
   ```
 
->**:pushpin: NOTE:** Do not run `pip install -r requirements.txt` inside the Ryzen AI environment. Its `torch` / `torchvision` pins would replace the versions installed by Ryzen AI, which AMD Quark depends on.
+`requirements.txt` only adds `torchvision==0.19.1+cpu`. It does not install `torch`, `numpy`, `onnx`, or `amd-quark`, because replacing the builds already in the Ryzen AI environment breaks the NPU stack. Ryzen AI 1.7.1 ships `torch` 2.4.1 and does not ship `torchvision`. `0.19.1+cpu` is the `torchvision` build for that `torch`.
+
+From this directory, on either operating system:
+
+```sh
+python -m pip install -r requirements.txt
+```
 
 ## Download the Calibration Dataset
 
@@ -88,88 +95,74 @@ The notebook and the script then build the `calib_data` directory from `val_imag
 
 ## Running the classification.ipynb
 
-### Jupyter Notebook
+The notebook runs unchanged on Windows and Linux. It detects the platform and NPU type itself. On Linux the iGPU (DirectML) cell is skipped because DirectML is only available on Windows.
 
-The notebook runs unchanged on Windows and Linux. It detects the platform and NPU type itself; on Linux the iGPU (DirectML) cell is skipped because DirectML is only available on Windows.
+Download and extract the calibration dataset first (see [Download the Calibration Dataset](#download-the-calibration-dataset)). Then, from the activated Ryzen AI environment in this directory, install Jupyter and open the notebook. The same commands work on Windows and Linux:
 
-Steps for both platforms:
-
-1. Download and extract the calibration dataset (see [Download the Calibration Dataset](#download-the-calibration-dataset)).
-2. Open the notebook and select the Ryzen AI kernel for your platform (see below).
-3. Run all the cells in the notebook.
-
-#### Windows
-
-1. Copy the ***vaip_config.json*** file to here from the Ryzen AI installation folder.
-2. Launch the Jupyter Notebook.
-3. Ensure that you've pointed the Jupyter Notebook to the correct Python environment. To do this, in the top-right corner of the notebook, click "Select Kernel" and provide the path to the conda environment.
-
->**:pushpin: NOTE (Windows only):** If you can't find the kernel from the top-right dropdown menu, please exit the notebook and install it as below. On Linux, use the kernel setup in the Linux section instead.
-
-```python
-python -m ipykernel install --user --name [CONDA_ENV_NAME]
+```sh
+python -m pip install ipykernel jupyterlab
+jupyter lab classification.ipynb
 ```
 
-#### Linux
+On Linux, run them in the same shell where you sourced `/opt/xilinx/xrt/setup.sh` and activated the installer venv. Jupyter then starts with that environment, including `LD_LIBRARY_PATH` and `RYZEN_AI_INSTALLATION_PATH`.
 
-`vaip_config.json` is not needed on Linux.
-
-Do not register the kernel with `python -m ipykernel install` on Linux. The Ryzen AI venv does not include `ipykernel`, and a kernel registered that way starts the venv's Python without running `setup.sh` and `activate`. Then `LD_LIBRARY_PATH`, `RYZEN_AI_INSTALLATION_PATH` and the other variables the NPU libraries need are missing, and they cannot be set from inside a running kernel.
-
-Choose one of the following:
-
-- **Jupyter in the browser:** install `ipykernel` and JupyterLab into the venv, then start JupyterLab from the shell where you ran the two `source` commands from Getting Started. Its kernels inherit that environment:
-
-  ```sh
-  python -m pip install ipykernel jupyterlab
-  jupyter lab
-  ```
-
-- **VS Code / Cursor:** these editors start kernels without running `activate`, so register a kernel that runs it first. Run this block once from the shell where you ran the two `source` commands from Getting Started; it fills in your paths automatically:
-
-  ```sh
-  python -m pip install ipykernel
-  KDIR=~/.local/share/jupyter/kernels/ryzen-ai-1.7.1
-  mkdir -p "$KDIR"
-  cat > "$KDIR/launch.sh" <<EOF
-  #!/usr/bin/env bash
-  source /opt/xilinx/xrt/setup.sh >/dev/null
-  source "$VIRTUAL_ENV/bin/activate"
-  exec python -m ipykernel_launcher "\$@"
-  EOF
-  chmod +x "$KDIR/launch.sh"
-  cat > "$KDIR/kernel.json" <<EOF
-  {
-    "argv": ["$KDIR/launch.sh", "-f", "{connection_file}"],
-    "display_name": "Ryzen AI 1.7.1 (Linux)",
-    "language": "python"
-  }
-  EOF
-  ```
-
-  Then reload the editor and select **Ryzen AI 1.7.1 (Linux)** as the notebook kernel.
-
->**:pushpin: NOTE:** If the notebook's Platform Setup cell reports that `VitisAIExecutionProvider` or `RYZEN_AI_INSTALLATION_PATH` is missing, the kernel was not started from the activated Ryzen AI environment. Select the kernel described above.
+>**:pushpin: NOTE:** If the notebook's Platform Setup cell reports that `VitisAIExecutionProvider` or `RYZEN_AI_INSTALLATION_PATH` is missing, Jupyter was not started from the activated Ryzen AI environment.
 
 ## Running the classification.py
 
->**:pushpin: NOTE:** `classification.py` currently supports Windows only. On Linux, use the notebook.
+Run the notebook first, from this directory, so it writes `models/resnet50_bf16.onnx` or `models/resnet50_xint8.onnx` and compiles that file into `cache/`. Then run the script from the same directory. It loads that ONNX file and reuses the notebook's NPU cache.
 
-To run the classification.py script, follow these steps:
-
-**Step 1:** Ensure Environment Setup
-Before running the script, ensure you have activated the Ryzen AI conda environment
-```sh
-conda activate ryzen-ai-<version>
-```
-**Step 2:** Download the Dataset.
-Download and extract the calibration dataset as described in [Download the Calibration Dataset](#download-the-calibration-dataset).
-
-**Step 3:** Run the Quark-Based Example
-To execute the hello_world_quark.py script, use the following command:
 ```sh
 python classification.py
 ```
+
+On Linux, run it in the same shell where you sourced `/opt/xilinx/xrt/setup.sh` and activated the installer venv. DirectML iGPU inference is skipped there. If neither notebook model exists, the script quantizes to `models/resnet50_quantized.onnx` and compiles its own cache.
+
+## NPU compilation paths: XINT8 vs BF16
+
+The notebook and `classification.py` currently run the **Quark XINT8** path on the NPU. There are two additional BF16 paths that can be run manually with `run_inference.py` from the [yolov8m example](../object_detection/yolov8m/) or adapted into new scripts. All three paths use the Vitis AI Execution Provider.
+
+### Path 1: Quark XINT8 (current default)
+
+The notebook quantizes the FP32 ONNX model with `get_default_config("XINT8")` and runs it on the NPU. No VAIML config file is passed — the EP uses its default DPU partition pass. This is the path used by `classification.ipynb` and `classification.py`.
+
+### Path 2: Quark BF16 + `vaiml_config_quark.json`
+
+Quantize with Quark using `get_default_config("BF16")` with `BF16QDQToCast=True`. This produces a BF16 ONNX model. Then pass `vaiml_config_quark.json` as the `config_file` provider option to compile it with VAIML:
+
+```python
+provider_options = [{
+    'config_file': 'vaiml_config_quark.json',
+    'cache_dir': '<cache_dir>',
+    'cache_key': '<cache_key>'
+}]
+session = onnxruntime.InferenceSession(
+    'model_bf16.onnx',
+    providers=['VitisAIExecutionProvider'],
+    provider_options=provider_options
+)
+```
+
+### Path 3: FP32 model + `vaiml_config_bf16.json` (no Quark)
+
+Skip Quark entirely. Pass the original FP32 ONNX model directly with `vaiml_config_bf16.json`, which sets `enable_f32_to_bf16_conversion: true`. VAIML casts the model to BFloat16 during compilation:
+
+```python
+provider_options = [{
+    'config_file': 'vaiml_config_bf16.json',
+    'cache_dir': '<cache_dir>',
+    'cache_key': '<cache_key>'
+}]
+session = onnxruntime.InferenceSession(
+    'model_fp32.onnx',
+    providers=['VitisAIExecutionProvider'],
+    provider_options=provider_options
+)
+```
+
+Both BF16 paths require a VAIML config file on **both** Windows and Linux. The first VAIML compilation takes several minutes; the compiled model is cached in `cache_dir` and reused on later runs.
+
+See the [yolov8m README](../object_detection/yolov8m/README.md) for a fully worked example with all three paths validated on both platforms.
 
 ## License
 
