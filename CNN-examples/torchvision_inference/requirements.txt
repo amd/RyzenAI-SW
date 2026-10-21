@@ -1,6 +1,6 @@
-amd-quark==0.11
-torch==2.8.0
-torchvision==0.23.0
-tqdm==4.67.1
-ipykernel==7.1.0
-matplotlib==3.10.8
+# Packages that are not already in the Ryzen AI environment.
+# torch, numpy, onnx, and amd-quark are provided by that environment. Do not pin them here.
+# Ryzen AI 1.7.1 ships torch 2.4.1 and does not ship torchvision.
+# 0.19.1+cpu is the torchvision build for that torch.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torchvision==0.19.1+cpu

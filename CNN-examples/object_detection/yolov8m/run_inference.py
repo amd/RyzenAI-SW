@@ -78,6 +78,25 @@ def postprocess(outputs, img, conf_thres=0.4):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
     return img
 
+def npu_cache_key(datatype, quark):
+    # FP32 conversion: modelcachekey_<datatype>
+    # Quark-quantized model: modelcachekey_<datatype>_quark
+    name = f'modelcachekey_{datatype}'
+    if quark:
+        name += '_quark'
+    return name
+
+def quark_model_datatype(onnx_path):
+    stem = Path(onnx_path).stem.upper()
+    if stem.endswith('_XINT8') or stem.endswith('_INT8'):
+        return 'xint8'
+    if stem.endswith('_FP16'):
+        return 'fp16'
+    if stem.endswith('_BF16'):
+        return 'bf16'
+    print(f'Cannot tell the datatype from {onnx_path}. The file name should end in _BF16, _FP16, or _XINT8.')
+    sys.exit(1)
+
 def benchmark(session,input_name,input_img,num_inference=100):
 
     # Perform warmup and 100 inference run of onnx model
@@ -118,25 +137,34 @@ def main(args):
         if npu_device == 'PHX/HPT':
             provider_options = [{
                 'cache_dir': str(Path(__file__).parent.resolve()),
-                'cache_key': 'modelcachekey',
+                'cache_key': npu_cache_key('xint8', quark=True),
                 'enable_cache_file_io_in_mem':'0',
                 'target': 'X1',
                 'xclbin': get_xclbin(npu_device)
             }]
-        elif npu_device == 'STX' or 'KRK':
+        elif npu_device == 'STX' or npu_device == 'KRK':
             provider_options = [{
                 'cache_dir': str(Path(__file__).parent.resolve()),
-                'cache_key': 'modelcachekey',
+                'cache_key': npu_cache_key('xint8', quark=True),
                 'enable_cache_file_io_in_mem':'0'
             }]
         ort_session = ort.InferenceSession(onnx_path, sess_options=session_options, providers=['VitisAIExecutionProvider'], provider_options=provider_options)
 
     elif args.device == 'npu-bf16':
-        print('Running BF16 Model on NPU')
+        config_file = args.config_file if args.config_file else 'vaiml_config_bf16.json'
+        config_stem = Path(config_file).stem
+        if config_stem == 'vaiml_config_quark':
+            cache_key = npu_cache_key(quark_model_datatype(onnx_path), quark=True)
+        else:
+            cache_key = npu_cache_key(config_stem.removeprefix('vaiml_config_'), quark=False)
+        print(f'Running Model on NPU with {config_file}')
+        if config_stem == 'vaiml_config_quark':
+            from quark.onnx.utils.model_utils import register_custom_ops_library
+            register_custom_ops_library(session_options, device='CPU')
         provider_options = [{
-            'config_file': 'vaiml_config.json',
+            'config_file': config_file,
             'cache_dir': str(Path(__file__).parent.resolve()),
-            'cache_key': 'modelcachekey'
+            'cache_key': cache_key
         }]
         ort_session = ort.InferenceSession(onnx_path, sess_options=session_options, providers=['VitisAIExecutionProvider'], provider_options=provider_options)
     else:
@@ -169,6 +197,7 @@ if __name__ == "__main__":
     parser.add_argument('--input_image', type=str, default='test_image.jpg', help='Path to the input image for inference.')
     parser.add_argument('--output_image', type=str, default='test_output.jpg', help='Path to the output image for inference.')
     parser.add_argument('--device', type=str, default='cpu', choices=['cpu', 'npu-int8', 'npu-bf16'], required=False, help='device to run the model.')
+    parser.add_argument('--config_file', type=str, default='', help='VAIML config for --device npu-bf16. Default is vaiml_config_bf16.json. Ignored by npu-int8.')
     parser.add_argument('--int', action='store_true', help='Flag to set xclbin if model is INT8 type')
     parser.add_argument('--evaluate', action='store_true', help='Flag to evaluate the model.')
     parser.add_argument('--coco_dataset', type=str, default='datasets/coco', help='Path to the validation dataset.')

@@ -5,7 +5,6 @@ import subprocess
 import onnxruntime
 import numpy as np
 import onnx
-import shutil
 from timeit import default_timer as timer
 
 torch.manual_seed(0)
@@ -145,21 +144,7 @@ match npu_type:
         print("Unrecognized APU type. Exiting.")
         exit()
 
-# We want to make sure we compile everytime, otherwise the tools will use the cached version
-# Get the current working directory
-current_directory = os.getcwd()
-directory_path = os.path.join(current_directory,  r'cache\hello_cache')
-cache_directory = os.path.join(current_directory,  r'cache')
-
-# Check if the directory exists and delete it if it does.
-if os.path.exists(directory_path):
-    shutil.rmtree(directory_path)
-    print(f"Directory '{directory_path}' deleted successfully.")
-else:
-    print(f"Directory '{directory_path}' does not exist.")
-
-
-# Compile and run
+# Compile and run. An existing NPU cache is reused.
 
 # Point to the config file path used for the VitisAI Execution Provider
 install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']

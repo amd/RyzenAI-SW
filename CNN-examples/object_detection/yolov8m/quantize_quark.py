@@ -119,7 +119,8 @@ def parse_args() -> Namespace:
 
 def main(args: Namespace) -> None:
     quant_config = get_default_config(args.config)
-    quant_config.extra_options["BF16QDQToCast"] = True
+    if args.config == "BF16":
+        quant_config.extra_options["BF16QDQToCast"] = True
     config_copy = copy.deepcopy(quant_config)
     config_copy.use_external_data_format = args.save_as_external_data
     if args.exclude_nodes:
