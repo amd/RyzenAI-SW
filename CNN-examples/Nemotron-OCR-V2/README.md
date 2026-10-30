@@ -39,7 +39,7 @@ This repository provides utilities to run these models on AMD Ryzen AI NPUs usin
 - **Python** distribution (Miniforge recommended)
 
 ### AMD Ryzen AI Environment
-- **AMD Ryzen AI 1.7.1** conda environment required
+- **AMD Ryzen AI 1.9.1** python virtual environment required
 - Installation guide: https://ryzenai.docs.amd.com/en/latest/inst.html
 
 ## Quick Start
@@ -63,11 +63,30 @@ git lfs install
 git clone https://huggingface.co/nvidia/nemotron-ocr-v2
 ```
 
-#### 2.2 Create a Conda environment with the dependencies
+#### 2.2 Create a Python virtual environment with the dependencies
 
 ```bash
-conda create -n nemotron_export python=3.12 pytorch cpuonly -c pytorch -c conda-forge
-conda activate nemotron_export
+Step 1: Activate the Ryzen AI 1.9 environment
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+
+Step 2: Export Ryzen AI dependencies
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+
+Step 3: Navigate to YOLOv8m
+cd /d C:\path\to\RyzenAI-SW\CNN-examples\Nemotron-OCR-V2
+
+Step 4: Create nemotron_export
+python -m venv nemotron_export
+
+This creates an independent environment inside your YOLOv8m directory.
+
+Step 5: Deactivate the Ryzen AI environment
+deactivate
+
+Step 6: Activate nemotron_export
+nemotron_export\Scripts\activate.bat
+
+Step 7: Install packages
 pip install "onnx>=1.16,<1.20" "onnxruntime>=1.18" "torchvision>=0.19"
 ```
 
@@ -113,7 +132,7 @@ All shapes are static (no dynamic axes).
 ### 3. Activate AMD Ryzen AI Environment
 
 ```bash
-conda activate ryzen-ai-1.7.1
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
 ```
 
 ### 4. Model Compilation - [BF16](https://ryzenai.docs.amd.com/en/latest/modelrun.html#using-bf16-models)
