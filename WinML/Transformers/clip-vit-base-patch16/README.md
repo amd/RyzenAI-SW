@@ -4,14 +4,35 @@ Run quantized CLIP Vision Transformer models on Windows NPU for zero-shot image 
 
 ## Installation Instructions
 
-Install the required python packages in the conda environment `winml_clip` and Windows Apps SDK using the [Windows ML installation instructions](../README.md#winml-installation-instructions) in the main README.:
+Install the required python packages in the Python virtual environment `winml_clip` and Windows Apps SDK using the [Windows ML installation instructions](../README.md#winml-installation-instructions) in the main README.:
 
-```sh
+
+Step 1: Navigate to the example directory.
+```bash
 cd <RyzenAI-SW>\WinML\Transformers\clip-vit-base-patch16
-conda create -n winml_clip --clone winml_env
-conda activate winml_clip
-pip install --upgrade -r .\requirements.txt
 ```
+
+Step 2: Create a Python virtual environment.
+```bash
+py -3.12 -m venv "%USERPROFILE%\winml_clip"
+```
+
+Step 3: Activate the virtual environment.
+```bash
+"%USERPROFILE%\winml_clip\Scripts\activate.bat"
+```
+
+Step 4: Upgrade pip.
+```bash
+python -m pip install --upgrade pip
+```
+
+Step 5: Install the required Python packages.
+```bash
+python -m pip install --upgrade -r .\requirements.txt
+```
+
+The winml_clip virtual environment is now configured for running the CLIP-ViT example.
 
 ## Model Download and Export
 

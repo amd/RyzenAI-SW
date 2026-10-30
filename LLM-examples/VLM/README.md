@@ -20,13 +20,39 @@ Benchmarking and inference tools for Vision Language Models (VLMs) using ONNX Ru
 
 ## Requirements
 
+Step 1: Activate the Ryzen AI installation environment
 ```bash
-conda create -n vlm-bench python=3.12
-conda activate vlm-bench
-pip install onnxruntime-genai pillow numpy psutil
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
 
-> **Note:** The above setup is for CPU models. To run AMD NPU models, activate the Ryzen AI conda environment instead.
+Step 2: Export the installed Python packages
+```bash
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 3: Create a virtual environment for vlm-bench
+```bash
+cd /d <RyzenAI-SW>\LLM-examples\VLM
+python -m venv vlm-bench
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bash
+deactivate
+```
+
+Step 5: Activate the example environment
+```bash
+"vlm-bench\Scripts\activate.bat"
+```
+
+Step 6: Install environment dependencies
+```bash
+python -m pip install onnxruntime-genai pillow numpy psutil
+```
+
+> **Note:** The above setup is for CPU models. To run AMD NPU models, activate the Ryzen AI python virtual environment instead.
 
 ## Quick Start
 

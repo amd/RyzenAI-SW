@@ -18,51 +18,43 @@ def get_directories():
     return current_dir, models_dir
 
 def calib_data_formatting():
+    import os
+    import shutil
 
-    source_folder = 'val_images'
-    calib_data_path = 'calib_data'
+    source_folder = "val_images"
+    calib_data_path = "calib_data"
 
-    if not os.path.exists(source_folder):
-        print("The provided data path does not exist.")
-        sys.exit(1)
+    if not os.path.isdir(source_folder):
+        raise FileNotFoundError(
+            f"ImageNet validation directory missing: {source_folder}"
+        )
 
-    files = os.listdir(source_folder)
+    images = sorted(
+        filename for filename in os.listdir(source_folder)
+        if filename.startswith("ILSVRC2012_val_")
+        and filename.endswith(".JPEG")
+        and os.path.isfile(os.path.join(source_folder, filename))
+    )
 
-    for filename in files:
-        if not filename.startswith('ILSVRC2012_val_') or not filename.endswith(
-                '.JPEG'):
-            continue
+    if len(images) < 100:
+        raise RuntimeError(
+            f"At least 100 ImageNet validation images required; "
+            f"found {len(images)}."
+        )
 
-        n_identifier = filename.split('_')[-1].split('.')[0]
-        folder_name = n_identifier
-        folder_path = os.path.join(source_folder, folder_name)
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        file_path = os.path.join(source_folder, filename)
-        destination = os.path.join(folder_path, filename)
-        shutil.move(file_path, destination)
+    os.makedirs(calib_data_path, exist_ok=True)
 
-    print("File organization complete.")
+    for filename in images[:100]:
+        identifier = filename.split("_")[-1].split(".")[0]
 
-    if not os.path.exists(calib_data_path):
-        os.makedirs(calib_data_path)
+        destination_folder = os.path.join(
+            calib_data_path, identifier
+        )
+        os.makedirs(destination_folder, exist_ok=True)
 
-    destination_folder = calib_data_path
+        shutil.copy2(
+            os.path.join(source_folder, filename),
+            os.path.join(destination_folder, filename)
+        )
 
-    subfolders = os.listdir(source_folder)
-
-    for subfolder in subfolders:
-        source_subfolder = os.path.join(source_folder, subfolder)
-        destination_subfolder = os.path.join(destination_folder, subfolder)
-        os.makedirs(destination_subfolder, exist_ok=True)
-
-        files = os.listdir(source_subfolder)
-
-        if files:
-            file_to_copy = files[0]
-            source_file = os.path.join(source_subfolder, file_to_copy)
-            destination_file = os.path.join(destination_subfolder, file_to_copy)
-
-            shutil.copy(source_file, destination_file)
-
-    print("Creating calibration dataset complete.")
+    print("Created calibration dataset with 100 images.")

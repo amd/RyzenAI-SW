@@ -1,0 +1,31 @@
+# Everything the walkthrough generates in this folder. None of it belongs in git:
+# the models and datasets are large, and the adapters/results are reproducible by
+# following the README.
+
+# Step 1 - quantized base
+qwen3-4b-quark-int4/
+
+# Step 2 - prepared data and trained adapters
+data_*/
+*.jsonl
+adapters/
+runs/
+checkpoint-*/
+
+# Downloaded datasets
+spider_data/
+
+# Step 3 - compiled NPU models
+qwen3-4b-npu*/
+*.bin
+*.onnx
+*.onnx.data
+
+# Eval output
+*_200.txt
+*_300.txt
+results/
+
+# Ryzen AI runtime binaries copied into the run folder
+*.exe
+*.dll

@@ -36,16 +36,17 @@ replace `/path/to/your/directory/` with actual path where you want to download t
 
 ### 1.2  Activate Ryzen AI Environment
 
-To ensure compatibility with ONNX-based Llama model, activate the ryzen-ai-<version> Conda environment.
+To ensure compatibility with ONNX-based Llama model, activate the Python virtual environment provided by the Ryzen AI 1.9 MSI installer.
 
 Please follow instructions provided in the official AMD documentation to install Ryzen AI:
 
-👉 [Ryzen AI Installation and Conda Environment Creation](https://ryzenai.docs.amd.com/en/latest/inst.html)
+👉 [Ryzen AI Installation Instructions](https://ryzenai.docs.amd.com/en/latest/inst.html)
 
 After installation, activate the environment by running:
 
 ```sh
-conda activate ryzen-ai-<version>
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
 ### 1.3  Install Dependencies
 
@@ -105,7 +106,7 @@ Run the following command to perform download, export and compile steps:
 ```bash
 python custom_embedding/export_bge_onnx.py
 ```
-Note : Please ensure that you have activated your ryzen‑ai‑<version> environment and are in the RyzenAI-SW/LLM-examples/RAG-OGA directory.
+Note : Please ensure that you have activated the Ryzen AI 1.9 Python virtual environment and are in the RyzenAI-SW/LLM-examples/RAG-OGA directory.
 
 This script generates a static‑shape, non‑quantized FP32 ONNX model that serves as the baseline for further deployment. 
 The compiled BGE (BAAI General Embedding) ONNX model will be stored in the cache folder named ``modelcachekey_bge``.

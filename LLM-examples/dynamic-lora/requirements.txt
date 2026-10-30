@@ -1,0 +1,8 @@
+# Training / data-prep (Linux GPU box). Install PyTorch (ROCm or CUDA) and AMD Quark
+# separately -- see README. AMD Quark: https://quark.docs.amd.com/latest/install.html
+transformers
+datasets
+trl
+peft
+accelerate
+pyyaml

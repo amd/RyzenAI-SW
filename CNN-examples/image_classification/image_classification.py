@@ -11,6 +11,7 @@ from onnxruntime.quantization.quant_utils import QuantType
 from quark.onnx import ModelQuantizer, PowerOfTwoMethod
 from quark.onnx.quantization.config import Config, get_default_config
 from utils import ImageDataReader, evaluate_onnx_model
+import sys
 
 def preprocess_image(image_path):
     image = Image.open(image_path)
@@ -65,6 +66,16 @@ def main(args):
         print("Model Accuracy:")
         top1_acc, top5_acc = evaluate_onnx_model(input_model_path, imagenet_data_path=calibration_dataset_path, device=args.device)
         print("{} model accuracy on {}: Top1 {:.3f}, Top5 {:.3f} ".format(args.model_input, args.device, top1_acc, top5_acc))
+
+        top1_percent = top1_acc * 100
+        top5_percent = top5_acc * 100
+
+        if top1_percent > 0 and top5_percent > 0:
+            print("TEST RESULT: PASS")
+            sys.exit(0)
+        else:
+            print("TEST RESULT: FAIL")
+            sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Quantize and evaluate ONNX models.")

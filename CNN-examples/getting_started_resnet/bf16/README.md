@@ -1,9 +1,9 @@
 <!-- Getting started with RESNET18_BF16 flow test with Python and C++ deployment -->
 <table class="sphinxhide" width="100%">
- <tr width="100%">
+  <tr width="100%">
     <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI ResNet BF16 Tutorial </h1>
     </td>
- </tr>
+  </tr>
 </table>
 
 ## Introduction
@@ -24,24 +24,55 @@ To build the example, the following software must be installed:
 
 - Ryzen AI
 - Cmake
-- Visual Studio 2022
 
-Please follow the steps given in Installation Instruction to install Ryzen AI, NPU driver and Visual Studio 2022
+Before running this example, install Ryzen AI using the [Ryzen AI installation instructions](https://ryzenai.docs.amd.com/en/latest/inst.html). The Ryzen AI MSI installer creates a Python virtual environment at the installation location. The commands below assume Ryzen AI version **1.9.0** and Windows Command Prompt (`cmd.exe`). Replace `ryzen-ai-1.9.0` if your installed version differs. 
 
 
 ### Step 1: Install Packages
 
 Ensure that the Ryzen AI Software is correctly installed. For more details, see the installation instructions.
-Use the conda environment created during the installation for the rest of the steps. This example requires a couple of additional packages. Run the following command to install them:
+Use the Python virtual environment created during the installation for the following setup steps. This example requires a couple of additional packages. Run the following commands to install them:
 
-```bash
-conda create --name resnet_bf16 --clone ryzen-ai-<version>
-conda activate resnet_bf16
-set RYZEN_AI_INSTALLATION_PATH = <path/to/RyzenAI/installation>
+Set Up Python Virtual Environment for ResNet BF16
 
-cd <RyzenAI-SW>\CNN-examples\getting_started_resnet\bf16
+Step 1: Activate the Ryzen AI installation environment
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
+```
+
+Step 2: Export the installed Python packages
+```bat
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+This creates a requirements file containing the packages installed in the Ryzen AI environment.
+
+Step 3: Create a virtual environment for ResNet BF16
+```bat
+cd /d <RyzenAI-SW>\CNN-examples\getting_started_resnet\bf16
+python -m venv resnet_bf16
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bat
+deactivate
+```
+
+Step 5: Activate the ResNet BF16 environment
+```bat
+"resnet_bf16\Scripts\activate.bat"
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+```bat
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bat
 python -m pip install -r requirements.txt
 ```
+The resnet_bf16 virtual environment is now configured for running the example.
 
 ###  Step 2: Download Model and Dataset
 

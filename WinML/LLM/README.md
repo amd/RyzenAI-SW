@@ -144,11 +144,44 @@ You will need a separate python environment for model conversion due to specific
 
 Set up the python environment and install dependencies:
 
+Step 1: Activate the Ryzen AI installation environment
 ```bash
-conda create -n winml_olive python=3.10
-conda activate winml_olive
-pip install -r requirements_olive.txt
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
+
+Step 2: Export the installed Python packages
+```bash
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 3: Create a virtual environment for winml_olive
+```bash
+py -3.10 -m venv "%USERPROFILE%\winml_olive"
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bash
+deactivate
+```
+
+Step 5: Activate the example environment
+```bash
+"%USERPROFILE%\winml_olive\Scripts\activate.bat"
+```
+
+Step 6: Install environment dependencies
+```bash
+python -m pip install --upgrade pip
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd <RyzenAI-SW>\WinML\LLM
+python -m pip install -r requirements_olive.txt
+```
+
+Note: Requires Python 3.10 and requirements_olive.txt; keep separate from inference environment.
 
 Install PyTorch
 
@@ -181,11 +214,44 @@ After converting the model with Olive, you can run it using Windows ML APIs with
 
 Create a separate environment for running the inference with Windows ML APIs:
 
+Step 1: Activate the Ryzen AI installation environment
 ```bash
-conda create -n winml_llm python=3.11
-conda activate winml_llm
-pip install -r .\requirements.txt
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
+
+Step 2: Export the installed Python packages
+```bash
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 3: Create a virtual environment for winml_llm
+```bash
+py -3.11 -m venv "%USERPROFILE%\winml_llm"
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bash
+deactivate
+```
+
+Step 5: Activate the example environment
+```bash
+"%USERPROFILE%\winml_llm\Scripts\activate.bat"
+```
+
+Step 6: Install environment dependencies
+```bash
+python -m pip install --upgrade pip
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd <RyzenAI-SW>\WinML\LLM
+python -m pip install -r requirements.txt
+```
+
+Note: Requires Python 3.11 and requirements.txt; keep separate from Olive environment.
 
 ```bash
 python run_genai_llm.py --model models\phi-4-mini-instruct-vai-npu --interactive

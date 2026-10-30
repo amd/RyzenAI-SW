@@ -1,12 +1,12 @@
 # Ryzen AI LLM - Onnxruntime GenAI
 
-Ryzen AI Software includes support for deploying LLMs on Ryzen AI PCs using the ONNX Runtime generate() API (OGA). 
+Ryzen AI Software includes support for deploying LLMs on Ryzen AI PCs using the ONNX Runtime generate() API (OGA).
 
 ## Pre-optimized Models
 
-AMD provides a set of pre-optimized LLMs ready to be deployed with Ryzen AI Software and the supporting runtime for hybrid and NPU execution. These models can be found on Hugging Face: 
+AMD provides a set of pre-optimized LLMs ready to be deployed with Ryzen AI Software and the supporting runtime for hybrid and NPU execution. These models can be found on Hugging Face:
 
-### Published models: 
+### Published models:
 - [Ryzen AI Hybrid models.](https://huggingface.co/collections/amd/ryzen-ai-180-hybrid)
 - [Ryzen AI NPU models.](https://huggingface.co/collections/amd/ryzen-ai-180-npu-16k)
 
@@ -16,8 +16,9 @@ AMD provides a set of pre-optimized LLMs ready to be deployed with Ryzen AI Soft
 
 ## Steps to compile and run LLM example.
 - Activate Ryzen AI environment:
-```
-  conda activate ryzen-ai-<version>
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
 - Download the model: This example uses the Llama-3.1-8B-Instruct model.
 ```
@@ -93,7 +94,7 @@ Object-Oriented Programming (OOP) is a programming paradigm that revolves around
 **OOP Concepts in Action:**
 
 1. **Objects**: Create an object that represents a car. The car object has properties (color, make, model) and behavior (startEngine, accelerate).
-2. **Classes**: Define a Car class that serves as a blueprint for creating car objects.
+2. **Classes**: Create a Car class that serves as a blueprint for creating car objects.
 3. **Inheritance**: Create a ElectricCar class that inherits from the Car class and adds electric-specific properties and behavior.
 4. **Polymorphism**: Create a method that takes an object as an argument and performs different actions based on the object's type.
 5. **Encapsulation**: Create a BankAccount object that encapsulates the account balance and associated methods (deposit, withdraw).

@@ -25,6 +25,7 @@ torch.onnx.export(
     input_names=["input_ids", "attention_mask"],
     output_names=["last_hidden_state", "pooler_output"],
     dynamic_axes=None,  # Static input only
+    dynamo=False,
     opset_version=17
 )
 

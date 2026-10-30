@@ -35,8 +35,9 @@ Unlock fast, on-device speech recognition with RyzenAI and OpenAI’s Whisper. T
 
 2. **Activate environment**
 
-   ```bash
-   conda activate ryzen-ai-<version>
+   ```bat
+   "C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+   set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
    ```
 
 3. **Clone repository**
@@ -152,7 +153,6 @@ python run_whisper.py \
 
 ## Notes
 
-* First run on NPU may take \~15 min for model compilation.
+* First run on NPU may take ~15 min for model compilation.
 * Ensure paths for encoder, decoder, and config files are correct.
 * Supports CPU and NPU devices.
-

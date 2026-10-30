@@ -19,22 +19,26 @@ Tested on 16.5 minutes of audio (987.7 seconds). NPU beats CPU by 44%.
 
 ## Optimization Steps (in order)
 
-### 1. Static Shape Models + NPU Graph Fixes
+### 1. Static Shape Models for NPU
 
 The VitisAI BF16 compiler (VAIML) requires static tensor shapes to compile for the NPU's AI Engine. We converted the dynamic-shape ONNX models to fixed shapes:
 
 - **Encoder:** Fixed at 1498 mel frames (15-second audio chunks)
 - **Decoder:** Fixed at batch=1, single timestep
 
-The VAIML compiler also errored on standalone Pad ops in depthwise convs: *"Zero padding is not supported for access patterns for kernel ports."* We fused 24 `Pad -> Conv` pairs by folding padding into Conv's `pads` attribute. For VAIML 1.7.x we additionally rewrite the shared attention mask path to avoid BOOL `Slice` / `Where` patterns (`unknown type 9`).
+Script: `convert_static.py`
 
-Script: `preprocess_for_npu.py` (single step for FP32: writes `encoder-model.fp32.static.npu.onnx`)
+### 2. Pad -> Conv Fusion
+
+The VAIML compiler errored on standalone Pad ops: *"Zero padding is not supported for access patterns for kernel ports."* We fused 24 `Pad -> Conv` pairs in the depthwise convolution layers by folding the padding into Conv's built-in `pads` attribute.
+
+Script: `fuse_pads_direct.py`
 
 After this, BF16 compilation succeeded and the NPU produced correct transcriptions.
 
 **Result: NPU working at 6.1x real-time** (first unoptimized baseline)
 
-### 2. Vectorized Mel Feature Extraction (6.1x -> 7.2x)
+### 3. Vectorized Mel Feature Extraction (6.1x -> 7.2x)
 
 The mel filterbank extraction used a Python for-loop over ~1500 frames, taking 255ms per chunk (15% of total time). We replaced it with fully vectorized numpy operations:
 
@@ -46,13 +50,13 @@ The mel filterbank extraction used a Python for-loop over ~1500 frames, taking 2
 
 File: `inference/mel.py`
 
-### 3. Decoder on CPU Only (code cleanup)
+### 4. Decoder on CPU Only (code cleanup)
 
 We forced the decoder to always use CPUExecutionProvider instead of going through VitisAI EP. The decoder is a tiny 27-node LSTM called ~130 times per chunk -- running it through VitisAI EP added unnecessary overhead. (Profiling later showed VitisAI was already falling back to CPU for the decoder, so this was mainly a code clarity improvement.)
 
 File: `inference/transcriber.py`
 
-### 4. VitisAI optimize_level 2 (7.2x -> 20.7x)
+### 5. VitisAI optimize_level 2 (7.2x -> 20.7x)
 
 Bumped the VAIML compiler optimization level from 1 to 2 in `vai_ep_config.json`. This was the single largest improvement, likely enabling better operator fusion, memory layout optimization, and instruction scheduling in the compiled NPU kernel.
 
@@ -60,7 +64,7 @@ Requires clearing the VAIML cache and recompiling (~30 minutes).
 
 File: `models/vai_ep_config.json`
 
-### 5. Pre-allocated Decoder Buffers (20.7x -> 23.1x)
+### 6. Pre-allocated Decoder Buffers (20.7x -> 23.1x)
 
 The TDT decoder loop runs ~14,000 iterations for a 16-minute audio file. Each iteration was allocating new numpy arrays for inputs (targets, target_length, encoder slice) and copying state arrays. We:
 
@@ -72,7 +76,7 @@ The TDT decoder loop runs ~14,000 iterations for a 16-minute audio file. Each it
 
 File: `inference/transcriber.py` (`_init_decoder_buffers`, `_tdt_decode`)
 
-### 6. Encoder/Decoder Pipelining (concurrent with step 5)
+### 7. Encoder/Decoder Pipelining (concurrent with step 6)
 
 For multi-chunk audio, we pipeline the encoder and decoder across chunks using a background thread:
 
@@ -86,13 +90,13 @@ This works because ONNX Runtime releases the GIL during `session.run()`, so the 
 
 File: `inference/transcriber.py` (`_process_chunks_pipelined`)
 
-### 7. VitisAI optimize_level 3 (23.1x -> 24.2x)
+### 8. VitisAI optimize_level 3 (23.1x -> 24.2x)
 
 Bumped VAIML compiler to the highest optimization level. Shaved ~3 seconds off the encoder (39.9s -> 36.8s for 16.5 min of audio).
 
 File: `models/vai_ep_config.json`
 
-### 8. Triple-Processor Pipeline: iGPU Decoder (24.2x -> 26.0x)
+### 9. Triple-Processor Pipeline: iGPU Decoder (24.2x -> 26.0x)
 
 Moved the decoder from CPU to the integrated AMD Radeon GPU via DirectML Execution Provider. ORT profiling confirmed all 12 decoder ops (2 LSTM + 10 fused DML nodes) run on the iGPU.
 
@@ -147,9 +151,9 @@ Total wall time : 38.0s  (26.0x real-time)
 | `inference/audio.py` | WAV parsing |
 | `models/vai_ep_config.json` | VitisAI EP config (optimize_level=3, data_storage=auto) |
 | `models/static_config.json` | Static shape config (15s chunks, 1498 frames) |
-| `preprocess_for_npu.py` | Static shapes + Pad->Conv fuse + VAIML 1.7.x mask rewrite (FP32) |
-| `fuse_pads_direct.py` | Optional legacy: fuse Pad->Conv on an unfused `.static.onnx` |
-| `optimize_model.py` | Experimental ORT constant folding + fusion (unfused static.onnx only) |
+| `convert_static.py` | Convert dynamic ONNX models to static shapes |
+| `fuse_pads_direct.py` | Fuse Pad->Conv pairs for NPU compatibility |
+| `optimize_model.py` | ORT constant folding + Pad->Conv fusion |
 | `fuse_attn_pads.py` | Analyze remaining attention Pad ops |
 | `test_transcribe.py` | Benchmark script with per-stage timing |
 | `benchmark_npu.py` | Multi-config benchmark sweep |
@@ -165,8 +169,11 @@ conda activate ryzen-ai-1.7.0
 # Download models
 python download_models.py --precision fp32
 
-# Static shapes + NPU encoder fixes
-python preprocess_for_npu.py --precision fp32
+# Convert to static shapes
+python convert_static.py --precision fp32
+
+# Fuse Pad->Conv for NPU
+python fuse_pads_direct.py
 
 # Benchmark (first run = ~30min compile, subsequent = ~4s init)
 python test_transcribe.py audio.wav --device npu --decoder-device gpu --runs 3

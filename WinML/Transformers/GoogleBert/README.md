@@ -4,13 +4,34 @@ Run quantized Google BERT models on Windows NPU for text embedding generation.
 
 ### Installation Instructions
 
-Install the required python packages in the conda environment `winml_env` and Windows Apps SDK using the [Windows ML installation instructions](../README.md#winml-installation-instructions) in the main README.:
+Install the required python packages in the Python virtual environment `winml_bert` and Windows Apps SDK using the [Windows ML installation instructions](../README.md#winml-installation-instructions) in the main README.:
 
-```sh
-conda create -n winml_bert --clone winml_env
-conda activate winml_bert
-pip install --upgrade -r requirements.txt
+
+Step 1: Navigate to the example directory.
+```bash
+cd <RyzenAI-SW>\WinML\Transformers\GoogleBert
 ```
+
+Step 2: Create a Python virtual environment.
+```bash
+py -3.12 -m venv "%USERPROFILE%\winml_bert"
+```
+
+Step 3: Activate the virtual environment.
+```bash
+"%USERPROFILE%\winml_bert\Scripts\activate.bat"
+```
+
+Step 4: Upgrade pip.
+```bash
+python -m pip install --upgrade pip
+```
+
+Step 5: Install the required Python packages.
+```bash
+python -m pip install --upgrade -r .\requirements.txt
+```
+The winml_bert virtual environment is now configured for running the Google BERT example.
 
 ### Model Conversion
 
