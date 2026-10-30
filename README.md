@@ -51,20 +51,21 @@ To run the demos and examples in this repository, please follow the instructions
 - BF16 Model Examples
   - [Finetuned DistilBERT for Text Classification](Transformer-examples/DistilBERT_text_classification_bf16)
   - [Image classification](CNN-examples/image_classification)
-  - [Text Embedding Model Alibaba-NLP/gte-large-en-v1.5](Transformer-examples/gte-large-en-v1.5-bf16)
 - [Object detection with Yolov8](CNN-examples/object_detection)
 - [Super-Resolution](CNN-examples/super-resolution)
+- [Nemotron OCR v2 models on AMD Ryzen AI NPU](CNN-examples/Nemotron-OCR-V2)
 
 ## Windows ML Examples
 
-- [Running ResNet with Windows ML](WinML/ResNet)
-- [Running Transformer models with Windows ML](WinML/Transformer)
+- [Running ResNet with Windows ML](WinML/CNN/ResNet)
+- [Running Transformer models with Windows ML](WinML/Transformers)
 - [Running LLMs with Windows ML](WinML/LLM)
 
 ## Demos
 
 - [NPU-GPU pipeline on RyzenAI](Demos/NPU-GPU-Pipeline)
 - [Automatic Speech Recognition using OpenAI Whisper](Demos/ASR/Whisper)
+- [Automatic Speech Recognition using NVIDIA Parakeet TDT optimized for AMD Ryzen AI](Demos/ASR/Parakeet-TDT)
 
 ## Other Tutorials
 

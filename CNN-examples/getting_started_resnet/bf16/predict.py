@@ -17,8 +17,6 @@ import os
 from torchvision.datasets import CIFAR10
 
 
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--ep', type=str, default ='cpu',choices = ['cpu','npu'], help='EP backend selection')
@@ -35,7 +33,7 @@ def main():
     providers = ['CPUExecutionProvider']
     provider_options_dict = {}
 
-    #NPU/CPU  Setup
+    #NPU/CPU setup
     if opt.ep == 'npu':
         print("execution started on NPU")
         npu_device = get_npu_info()
