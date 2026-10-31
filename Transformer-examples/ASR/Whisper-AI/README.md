@@ -1,14 +1,14 @@
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI ASR </h1>
-    </td>
+   <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI ASR </h1>
+   </td>
  </tr>
 </table>
 
 # Running Whisper on Ryzen AI
 
 This Ryzen AI example lets you bring in OpenAI’s Whisper model and run fast, local automatic speech recognition (ASR) on your AMD NPU. Whisper is a versatile speech model trained on 680,000+ hours of diverse audio, capable of speech-to-text, translation, and language detection.
-This example uses the [Whisper-base](https://huggingface.co/openai/whisper-base) variant and provides a simple demonstration of how to run it on the NPU. For real-time factor (RTF) evaluation of the model on the NPU, please refer to the [whisper-demo](https://github.com/amd/RyzenAI-SW/tree/main/demo/ASR/Whisper)
+This example uses the [Whisper-base](https://huggingface.co/openai/whisper-base) variant and provides a simple demonstration of how to run it on the NPU. For real-time factor (RTF) evaluation of the model on the NPU, please refer to the [whisper-demo](https://github.com/amd/RyzenAI-SW/tree/main/demo/ASR/Whisper).
 
 Learn how you can:
 - **Export Whisper models** from Hugging Face to ONNX format
@@ -20,38 +20,65 @@ This example supports:
 - **Audio file transcription** – load your own `.wav` files for instant speech-to-text
 
 ## Prerequisites
-**Step 1:**  Install the latest Conda environment using [RyzenAI Documentation](https://ryzenai.docs.amd.com/en/latest/inst.html#).
+
+Install the Ryzen AI Python virtual environment using [RyzenAI Documentation](https://ryzenai.docs.amd.com/en/latest/inst.html#).
 Ensure the SDK and driver are installed.
 
-**Step 2:** Export Hugging face Whisper model to onnx and set static shape as mentioned below:
-1. Activate conda environment:
-```bash
-   conda create --name asr --clone ryzen-ai-<version>
-   conda activate asr
+Export Hugging face Whisper model to onnx and set static shape as mentioned below:
+
+Step 1: Activate the Ryzen AI installation environment
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
-2. Navigate to the Whisper-AI directory:
-```bash
-   cd <RyzenAI-SW>\Transformer-examples\ASR\Whisper-AI
+
+Step 2: Export the installed Python packages
+```bat
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
 ```
-3. Install the necessary libraries:
-```bash
-   pip install -r requirements.txt
-   ```
-4. Export Whisper AI model to ONNX using [Hugging Face Optimum library](https://huggingface.co/docs/optimum/exporters/onnx/usage_guides/export_a_model):
+
+Step 3: Create a virtual environment for asr
+```bat
+cd /d "<RyzenAI-SW>\Transformer-examples\ASR\Whisper-AI"
+python -m venv asr
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bat
+deactivate
+```
+
+Step 5: Activate the example environment
+```bat
+asr\Scripts\activate.bat
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+```bat
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bat
+cd /d "<RyzenAI-SW>\Transformer-examples\ASR\Whisper-AI"
+python -m pip install -r requirements.txt
+```
+
+Export Whisper AI model to ONNX using [Hugging Face Optimum library](https://huggingface.co/docs/optimum/exporters/onnx/usage_guides/export_a_model):
 ```bash
    optimum-cli export onnx --model openai/whisper-base.en --opset 17 exported_model_directory
-   ```
+```
 **Note:**
 The above command creates a new directory `exported_model_directory` in the current path. In `exported_model_directory`, you should see `encoder_model.onnx` and `decoder_model.onnx` models available.
 
-5. Convert the dynamic ONNX model to static using the `dynamic_to_static.py` script.
+Convert the dynamic ONNX model to static using the `dynamic_to_static.py` script.
 ```bash
    #Convert the encoder
    python dynamic_to_static.py --input_model ".\exported_model_directory\encoder_model.onnx"
 
    #Convert the decoder
    python dynamic_to_static.py --input_model ".\exported_model_directory\decoder_model.onnx"
-   ```
+```
 The `dynamic_to_static.py` script utilizes `onnxruntime.tools.make_dynamic_shape_fixed` to convert dynamic shapes in an ONNX model to static shapes. It takes as input a `params.json` file, which specifies the dynamic dimensions to be fixed and their target static values. After the conversion, the script verifies the correctness of the modified ONNX model using the ONNX Checker and performs a dummy inference to ensure the model runs as expected.
 
 The `params.json` file defines the static shapes used to convert a dynamic Whisper-base ONNX model to a fixed-shape version suitable for optimized inference on NPUs.

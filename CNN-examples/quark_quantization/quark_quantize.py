@@ -36,6 +36,7 @@ def main(args):
     input_model_path = args.model_input
     output_model_path = args.model_output
     calibration_dataset_path = args.calib_data
+    validation_dataset_path = args.val_data
 
     # Get quantization configuration
     if args.config == "XINT8":
@@ -54,15 +55,23 @@ def main(args):
     config = Config(global_quant_config=quant_config)
     print("The configuration of the quantization is {}".format(config))
 
-    # Define the calibration data reader
-    num_calib_data = 100
-    calibration_dataset = ImageDataReader(calibration_dataset_path, input_model_path, data_size=num_calib_data, batch_size=1)
-
     # Create an ONNX Quantizer
     quantizer = ModelQuantizer(config)
 
     # Quantize the ONNX model if the flag is set
     if args.quantize:
+        calibration_dataset = ImageDataReader(
+        calibration_dataset_path,
+        input_model_path,
+        data_size=100,
+        batch_size=1
+        )
+
+        if calibration_dataset.datasize == 0:
+            raise RuntimeError("Calibration reader contains zero batches")
+
+        print(f"[QUARK] Calibration batches: "f"{calibration_dataset.datasize}")
+        
         quant_model = quantizer.quantize_model(model_input=input_model_path,
                                                model_output=output_model_path,
                                                calibration_data_reader=calibration_dataset)
@@ -73,19 +82,19 @@ def main(args):
     # Evaluate the model if the flag is set
     if args.evaluate:
         print("Model Accuracy:")
-        top1_acc, top5_acc = evaluate_onnx_model(input_model_path, imagenet_data_path=calibration_dataset_path)
+        top1_acc, top5_acc = evaluate_onnx_model(input_model_path, imagenet_data_path=validation_dataset_path)
         print("Float32 model accuracy: Top1 {:.3f}, Top5 {:.3f} ".format(top1_acc, top5_acc))
         model_name = os.path.basename(output_model_path)[:-5]
         print('model_name:', model_name)
         if 'XINT8' in model_name:
-            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path)
+            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=validation_dataset_path)
             print("{} quantized model accuracy (CPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
-            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path, device='npu')
+            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=validation_dataset_path, device='npu')
             print("{} quantized model accuracy (NPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
         else:
-            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path)
+            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=validation_dataset_path)
             print("{} quantized model accuracy (CPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
-            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=calibration_dataset_path, device='npu')
+            top1_acc, top5_acc = evaluate_onnx_model(output_model_path, imagenet_data_path=validation_dataset_path, device='npu')
             print("{} quantized model accuracy (NPU): Top1 {:.3f}, Top5 {:.3f} ".format(args.config, top1_acc, top5_acc))
 
     # Benchmark the float/quantized models on CPU/NPU
@@ -132,6 +141,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_input', type=str, default='models/resnet50.onnx', help='Path to the input ONNX model.')
     parser.add_argument('--model_output', type=str, default='models/resnet50_quant.onnx', help='Path to save the quantized ONNX model.')
     parser.add_argument('--calib_data', type=str, default='calib_data', help='Path to the calibration dataset.')
+    parser.add_argument("--val_data", type=str, default="val_data", help="Path to labeled ImageNet validation images.")
     parser.add_argument('--config', type=str, choices=["XINT8", "A8W8", "A16W8", "BF16"], default="XINT8", help='The model quantization configuration.')
     parser.add_argument('--quantize', action='store_true', help='Flag to quantize the model.')
     parser.add_argument('--evaluate', action='store_true', help='Flag to evaluate the model.')

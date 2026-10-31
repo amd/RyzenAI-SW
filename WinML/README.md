@@ -22,7 +22,7 @@ In this document, we discuss how to enable AMD hardware through WinML APIs. This
 ## System Requirements
 
 - Windows 11 with a supported AMD Ryzen AI NPU and the current NPU driver
-- Python (Miniforge) with Python 3.10+ for the Python examples
+- Python 3.12 for the Python examples (no Conda or Miniforge required)
 - Visual Studio 2022 or newer with the **Desktop development with C++** workload for the C++ example
 - CMake 3.23+ on PATH — for the C++ example
 - A compatible Windows App SDK runtime (see the setup sections below)
@@ -43,19 +43,50 @@ The VitisAI EP within WinML supports input models in the following formats:
 
 # Python Setup
 
-Install the required python packages in the conda environment `winml_env`
+Install the required python packages in the python virtual environment `winml_env`
 
-```sh
-conda create -n winml_env python==3.12
-conda activate winml_env
-pip install --upgrade -r .\requirements.txt
+Step 1: Activate the Ryzen AI installation environment
+```bash
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
+```
+
+Step 2: Export the installed Python packages
+```bash
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 3: Create a virtual environment for winml_env
+```bash
+py -3.12 -m venv "%USERPROFILE%\winml_env"
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bash
+deactivate
+```
+
+Step 5: Activate the example environment
+```bash
+"%USERPROFILE%\winml_env\Scripts\activate.bat"
+```
+
+Step 6: Install environment dependencies
+```bash
+python -m pip install --upgrade pip
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd <RyzenAI-SW>\WinML
+python -m pip install -r requirements.txt
 ```
 
 The `wasdk` pip packages require a matching **Windows App SDK runtime** installed on the
 machine. Check the installed pip version:
 
 ```sh
-conda list | findstr wasdk
+python -m pip show wasdk
 ```
 
 Then install the Windows App SDK runtime whose version matches that `wasdk` version from the

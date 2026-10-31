@@ -11,20 +11,56 @@ This tutorial demonstrates how to use Windows Machine Learning (WinML) for ONNX 
 
 ## Quick Start
 
-```sh
+
 # 1. Setup environment (one-time)
-conda create -n winml_face --clone winml_env
-conda activate winml_face
-cd <RyzenAI-SW>\WinML\CNN\FaceDetection\python
-pip install --upgrade -r requirements.txt
+Step 1: Activate the base WinML installation environment
+```bash
+call "%USERPROFILE%\winml_env\Scripts\activate.bat"
+```
+
+Step 2: Export the installed WinML Python packages
+```bash
+python -m pip freeze > "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 3: Create a virtual environment for FaceDetection
+```bash
+python -m venv "%USERPROFILE%\winml_face"
+```
+
+Step 4: Deactivate the base WinML environment
+```bash
+deactivate
+```
+
+Step 5: Activate the FaceDetection environment
+```bash
+"%USERPROFILE%\winml_face\Scripts\activate.bat"
+```
+
+Step 6: Install the base WinML Python dependencies
+```bash
+python -m pip install -r "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd /d <RyzenAI-SW>\WinML\CNN\FaceDetection\python
+python -m pip install --upgrade -r requirements.txt
+```
+
+The `winml_face` virtual environment is now configured for running the FaceDetection example.
 
 # 2. Download and optimize model (one-time)
+```bash
 cd ..\model
 python download_and_export.py  # Default: ResNet34
 # OR for lightweight MobileNet model:
 # python download_and_export.py --backbone mobilenet
+```
 
 # 3. Run inference
+```bash
 cd ..\python
 python run_model.py --model ..\model\retinaface_resnet.onnx --image ..\images\face_detection_input.jpg --ep_policy NPU  # or CPU for testing
 ```

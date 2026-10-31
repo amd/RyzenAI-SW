@@ -86,7 +86,7 @@ def evaluate_onnx_model(onnx_model_path, imagenet_data_path, batch_size=1, devic
         # session = ort.InferenceSession(onnx_model_path)
         if 'BF16' in onnx_model_path:
             from quark.onnx import get_library_path
-            sess_options = onnxruntime.SessionOptions()
+            sess_options = ort.SessionOptions()
             sess_options.register_custom_ops_library(get_library_path(device='cpu'))
             session = ort.InferenceSession(onnx_model_path, providers=['CPUExecutionProvider'], sess_options=sess_options)
         else:
@@ -104,6 +104,8 @@ def evaluate_onnx_model(onnx_model_path, imagenet_data_path, batch_size=1, devic
 
     # Load the ImageNet validation dataset
     imagenet_data = datasets.ImageFolder(root=imagenet_data_path, transform=preprocess)
+    if len(imagenet_data) == 0:
+        raise ValueError(f"No validation images found in {imagenet_data_path}")
     # Limit to num samples using subnet
     subset_indices = range(min(num_samples, len(imagenet_data)))
     imagenet_subset = Subset(imagenet_data, subset_indices)
@@ -145,74 +147,124 @@ from PIL import Image
 import onnxruntime
 from onnxruntime.quantization.calibrate import CalibrationDataReader
 
-def _preprocess_images(images_folder: str,
-                       height: int,
-                       width: int,
-                       size_limit=0,
-                       batch_size=100):
-    """
-    Loads a batch of images and preprocess them
-    parameter images_folder: path to folder storing images
-    parameter height: image height in pixels
-    parameter width: image width in pixels
-    parameter size_limit: number of images to load. Default is 0 which means all images are picked.
-    return: list of matrices characterizing multiple images
-    """
-    image_path = os.listdir(images_folder)
-    image_names = []
-    for image_dir in image_path:
-        image_name = os.listdir(os.path.join(images_folder, image_dir))
-        image_names.append(os.path.join(image_dir, image_name[0]))
-    if size_limit > 0 and len(image_names) >= size_limit:
-        batch_filenames = [image_names[i] for i in range(size_limit)]
-    else:
-        batch_filenames = image_names
-    unconcatenated_batch_data = []
 
-    batch_data = []
-    for index, image_name in enumerate(batch_filenames):
-        image_filepath = images_folder + "/" + image_name
-        pillow_img = Image.new("RGB", (width, height))
-        pillow_img.paste(Image.open(image_filepath).resize((width, height)))
-        image_array = numpy.array(pillow_img) / 255.0
-        mean = numpy.array([0.485, 0.456, 0.406])
-        image_array = (image_array - mean)
-        std = numpy.array([0.229, 0.224, 0.225])
-        nchw_data = image_array / std
-        nchw_data = nchw_data.transpose((2, 0, 1))
-        nchw_data = numpy.expand_dims(nchw_data, axis=0)
-        nchw_data = nchw_data.astype(numpy.float32)
-        unconcatenated_batch_data.append(nchw_data)
+def _preprocess_images(
+    images_folder: str,
+    height: int,
+    width: int,
+    size_limit=0,
+    batch_size=100
+):
+    root = Path(images_folder)
 
-        if (index + 1) % batch_size == 0:
-            one_batch_data = numpy.concatenate(unconcatenated_batch_data,
-                                               axis=0)
-            unconcatenated_batch_data.clear()
-            batch_data.append(one_batch_data)
+    if not root.is_dir():
+        raise FileNotFoundError(
+            f"Calibration directory not found: {root.resolve()}"
+        )
 
-    return batch_data
+    extensions = {".jpg", ".jpeg", ".png", ".bmp"}
+    image_files = sorted(
+        p for p in root.rglob("*")
+        if p.is_file() and p.suffix.lower() in extensions
+    )
+
+    if size_limit > 0:
+        image_files = image_files[:size_limit]
+
+    if not image_files:
+        raise ValueError(
+            f"No calibration images found in {root.resolve()}"
+        )
+
+    if batch_size < 1:
+        raise ValueError("batch_size must be at least 1")
+
+    mean = numpy.array([0.485, 0.456, 0.406])
+    std = numpy.array([0.229, 0.224, 0.225])
+
+    batches = []
+    pending = []
+
+    for image_path in image_files:
+        with Image.open(image_path) as img:
+            img = img.convert("RGB").resize((width, height))
+            array = numpy.asarray(img, dtype=numpy.float32) / 255.0
+
+        array = (array - mean) / std
+        array = array.transpose((2, 0, 1))
+        pending.append(array[numpy.newaxis].astype(numpy.float32))
+
+        if len(pending) == batch_size:
+            batches.append(numpy.concatenate(pending, axis=0))
+            pending.clear()
+
+    if pending:
+        batches.append(numpy.concatenate(pending, axis=0))
+
+    print(f"[CALIB] Path: {root.resolve()}")
+    print(f"[CALIB] Images: {len(image_files)}")
+    print(f"[CALIB] Batches: {len(batches)}")
+
+    return batches
+
+
 
 class ImageDataReader(CalibrationDataReader):
-
-    def __init__(self, calibration_image_folder: str, model_path: str, data_size: int, batch_size: int):
+    def __init__(
+        self,
+        calibration_image_folder: str,
+        model_path: str,
+        data_size: int,
+        batch_size: int
+    ):
         self.enum_data = None
 
-        # Use inference session to get input shape.
         session = onnxruntime.InferenceSession(
-            model_path, providers=['CPUExecutionProvider'])
-        (_, _, height, width) = session.get_inputs()[0].shape
+            model_path,
+            providers=["CPUExecutionProvider"]
+        )
 
-        # Convert image to input data
-        self.nhwc_data_list = _preprocess_images(calibration_image_folder,
-                                                 height, width, data_size, batch_size)
-        self.input_name = session.get_inputs()[0].name
+        inputs = session.get_inputs()
+        if len(inputs) != 1:
+            raise ValueError(
+                f"ImageDataReader expects one model input; "
+                f"found {len(inputs)}"
+            )
+
+        input_shape = inputs[0].shape
+        if len(input_shape) != 4:
+            raise ValueError(
+                f"Expected NCHW image input, got {input_shape}"
+            )
+
+        _, channels, height, width = input_shape
+
+        if channels != 3:
+            raise ValueError(
+                f"Expected 3-channel RGB input, got {input_shape}"
+            )
+
+        if not isinstance(height, int) or not isinstance(width, int):
+            raise ValueError(
+                f"Static image dimensions required: {input_shape}"
+            )
+
+        self.input_name = inputs[0].name
+        self.nhwc_data_list = _preprocess_images(
+            calibration_image_folder,
+            height,
+            width,
+            size_limit=data_size,
+            batch_size=batch_size
+        )
         self.datasize = len(self.nhwc_data_list)
 
     def get_next(self):
         if self.enum_data is None:
-            self.enum_data = iter([{
-                self.input_name: nhwc_data
-            } for nhwc_data in self.nhwc_data_list])
+            self.enum_data = iter(
+                [{self.input_name: batch}
+                 for batch in self.nhwc_data_list]
+            )
         return next(self.enum_data, None)
 
     def rewind(self):
@@ -220,6 +272,7 @@ class ImageDataReader(CalibrationDataReader):
 
     def reset(self):
         self.enum_data = None
+
 
 import torch
 from timm.data import create_loader, resolve_data_config, create_dataset

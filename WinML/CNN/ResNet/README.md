@@ -20,14 +20,45 @@ This Tutorial will help with the steps to deploy ResNet model demonstrating:
 
 ## Setup Instructions
 
-Install the required python packages in the conda environment `winml_env` and Windows Apps SDK using the [Python Setup](../../README.md#python-setup) in the main README.:
+Install the required python packages in the python virtual environment `winml_env` and Windows Apps SDK using the [Python Setup](../../README.md#python-setup) in the main README.:
 
-```sh
-conda create -n winml_resnet --clone winml_env
-conda activate winml_resnet
-cd <RyzenAI-SW>\WinML\CNN\ResNet\python
-pip install --upgrade -r requirements.txt
+Step 1: Activate the base WinML installation environment
+```bash
+"%USERPROFILE%\winml_env\Scripts\activate.bat"
 ```
+
+Step 2: Export the installed WinML Python packages
+```bash
+python -m pip freeze > "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 3: Create a virtual environment for ResNet
+```bash
+python -m venv "%USERPROFILE%\winml_resnet"
+```
+
+Step 4: Deactivate the base WinML environment
+```bash
+deactivate
+```
+
+Step 5: Activate the ResNet environment
+```bash
+"%USERPROFILE%\winml_resnet\Scripts\activate.bat"
+```
+
+Step 6: Install the base WinML Python dependencies
+```bash
+python -m pip install -r "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd /d <RyzenAI-SW>\WinML\CNN\ResNet\python
+python -m pip install --upgrade -r requirements.txt
+```
+
+The `winml_resnet` virtual environment is now configured for running the ResNet example.
 
 ## Download Model
 

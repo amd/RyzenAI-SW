@@ -95,9 +95,23 @@ def benchmark(session,input_name,input_img,num_inference=100):
         time_list.append(end-start)
     
     avg_time_per_inference = sum(time_list)/num_inference
-    print("Avg time for each inference run:{:.3f} seconds".format(avg_time_per_inference))
-    print("Model performance:{:.1f} FPS".format(1/avg_time_per_inference))
+    fps = 1 / avg_time_per_inference
 
+    print("Avg time for each inference run:{:.3f} seconds".format(avg_time_per_inference))
+    print("Model performance:{:.1f} FPS".format(fps))
+
+    # PASS / FAIL criteria
+    if (
+            np.isfinite(avg_time_per_inference)
+            and np.isfinite(fps)
+            and avg_time_per_inference > 0
+            and fps > 0
+        ):
+        print("TEST RESULT: PASS")
+        sys.exit(0)
+    else:
+        print("TEST RESULT: FAIL")
+        sys.exit(1)
 
 def main(args):
     image_path = args.input_image
@@ -158,6 +172,20 @@ def main(args):
         print("Model Accuracy:")
         mAP, mAP50, mAP75 = evaluate_on_coco(args.model_input, ort_session, coco_dataset=args.coco_dataset, device=args.device)
         print("{} model accuracy on {}: mAP {:.3f}, mAP50 {:.3f}, mAP75 {:.3f}".format(args.model_input, args.device, mAP, mAP50, mAP75))
+        mAP_percent = mAP * 100
+        mAP50_percent = mAP50 * 100
+        mAP75_percent = mAP75 * 100
+
+        if (
+            mAP_percent > 0
+            and mAP50_percent > 0
+            and mAP75_percent > 0
+        ):
+            print("TEST RESULT: PASS")
+            sys.exit(0)
+        else:
+            print("TEST RESULT: FAIL")
+            sys.exit(1)
     
     if args.benchmark:
         print("Model Performance:")

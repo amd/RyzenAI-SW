@@ -2,7 +2,7 @@
  <tr width="100%">
     <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Text Classification </h1>
     </td>
- </tr>
+  </tr>
 </table>
 
 # Running DistilBERT on Ryzen AI
@@ -13,14 +13,48 @@ For more details, refer to the Hugging Face Model Card: [distilbert-base-uncased
 
 ## Setup Instructions
 
-Clone and Activate the conda environment created by the RyzenAI installer
+Set Up Python Virtual Environment for DistilBERT
 
-```bash
-conda create --name bert --clone ryzen-ai-<version>
-conda activate bert
-cd <RyzenAI-SW>\Transformer-examples\DistilBERT_text_classification_bf16
+Step 1: Activate the Ryzen AI installation environment
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
+```
+
+Step 2: Export the installed Python packages
+```bat
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+This creates a requirements file containing the packages installed in the Ryzen AI environment.
+
+Step 3: Create a virtual environment for DistilBERT
+```bat
+cd /d "<RyzenAI-SW>\Transformer-examples\DistilBERT_text_classification_bf16"
+python -m venv bert
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bat
+deactivate
+```
+
+Step 5: Activate the DistilBERT environment
+```bat
+"bert\Scripts\activate.bat"
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+```bat
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bat
+cd "<RyzenAI-SW>\Transformer-examples\DistilBERT_text_classification_bf16"
 python -m pip install -r requirements.txt
 ```
+The bert virtual environment is now configured for running the DistilBERT text classification BF16 example.
+
 
 ## Deployment Steps
 

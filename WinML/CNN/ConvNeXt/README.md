@@ -22,11 +22,43 @@ This Tutorial will help with the steps to deploy ConvNeXt model demonstrating:
 
 Complete the [Python Setup](../../README.md#python-setup) in the main README first, then clone that environment for this example and install its requirements:
 
-```sh
-conda create -n winml_convnext --clone winml_env
-conda activate winml_convnext
-pip install --upgrade -r requirements.txt
+Step 1: Activate the base WinML installation environment
+```bash
+"%USERPROFILE%\winml_env\Scripts\activate.bat"
 ```
+
+Step 2: Export the installed WinML Python packages
+```bash
+python -m pip freeze > "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 3: Create a virtual environment for ConvNeXt
+```bash
+python -m venv "%USERPROFILE%\winml_convnext"
+```
+
+Step 4: Deactivate the base WinML environment
+```bash
+deactivate
+```
+
+Step 5: Activate the ConvNeXt environment
+```bash
+call "%USERPROFILE%\winml_convnext\Scripts\activate.bat"
+```
+
+Step 6: Install the base WinML Python dependencies
+```bash
+python -m pip install -r "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd /d <RyzenAI-SW>\WinML\CNN\ConvNeXt
+python -m pip install --upgrade -r requirements.txt
+```
+
+The `winml_convnext` virtual environment is now configured for running the ConvNeXt example.
 
 ## Download Model
 

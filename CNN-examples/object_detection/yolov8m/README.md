@@ -14,29 +14,55 @@ In this tutorial we will using yolov8m model for object detection, including pre
 The following steps outline how to deploy the quantized model on an NPU:
 
 - Download the yolov8m model from the Ultralytics and export it to ONNX (Optset 17) model
-- Quantize the model to `BF16` or `XINT8` using the AMD Quark Quantization API
+- Quantize the model using the AMD Quark Quantization API
 - Compile and run the model on NPU using ONNX Runtime with the Vitis AI Execution Provider
 
 
-## Create and Activate Conda Environment
+## Set Up and Activate Python Virtual Environment for YOLOv8m
 
-```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
-conda create --name yolov8m_env --clone %RYZEN_AI_CONDA_ENV_NAME%
-conda activate yolov8m_env
+Step 1: Activate the Ryzen AI installation environment
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
 
-Install the required python packages for the tutorial:
+Step 2: Export the installed Python packages
+```bat
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+This creates a requirements file containing the packages installed in the Ryzen AI environment.
 
-```bash
+Step 3: Create a virtual environment for YOLOv8m
+```bat
+cd /d <RyzenAI-SW>\CNN-examples\object_detection\yolov8m
+python -m venv yolov8m_env
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bat
+deactivate
+```
+
+Step 5: Activate the YOLOv8m environment
+```bat
+"yolov8m_env\Scripts\activate.bat"
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+```bat
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bat
 cd <RyzenAI-SW>\CNN-examples\object_detection
-pip install amd-quark
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
+The yolov8m_env virtual environment is now configured for running the YOLOv8m example.
 
 ## Download and export the model
 
-Download the PyTorch model [yolov8m.pt](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8m.pt) from Ultralytics. Use the python script to export the model from `yolov8m.pt` to `yolov8m.onnx`. The script assumes the `yolov8m.pt` is in the models directory. 
+Download the PyTorch model [yolov8m.pt](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8m.pt) from Ultralytics. Use the python script to export the model from `yolov8m.pt` to `yolov8m.onnx`. The script assumes the `yolov8m.pt` is in the models directory.
 
 ```python
 cd models
@@ -46,29 +72,22 @@ python export_to_onnx.py
 ## Model Quantization and Compilation
 
 Model quantization levarages the power of AMD-Quark to optimize the model for significant performance without losing accuracy.
-This tutorial will guide through quantizing model for `BF16` configuration as well as `XINT8` configuration
+This tutorial will guide through preparing and evaluating the model for `BF16` configuration as well as `XINT8` configuration
 
-### BF16 quantization
+### BF16 flow
 
-- **Model Quantization** - Model is quantized using AMD-Quark with `BF16` configuration
+- The compiler automatically converts to `BF16` configuration. The input model is `FP32 onnx model`, while the `--device` options must be `npu-bf16`.
 
-
-```bash
-python quantize_quark.py --input_model_path models/yolov8m.onnx \
-                         --calib_data_path calib_images \
-                         --output_model_path models/yolov8m_BF16.onnx \
-                         --config BF16
-```
 
 - **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
 
 ```bash
-python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16
+python run_inference.py --model_input models\yolov8m.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16
 ```
 
 ### Evaluate the model accuracy
 
-The `BF16` quantized model accuracy is evaluated on COCO dataset
+The `BF16` model accuracy is evaluated on COCO dataset
 
 Use the `prepare_data.py` script to download the COCO dataset
 
@@ -79,7 +98,7 @@ python prepare_data.py
 Evaluate the accuracy of the model on COCO dataset, use `--device` options `cpu` or  `npu-bf16` to measure accuracy metrics on CPU/NPU respectively.
 
 ```bash
-python run_inference --model_input models\yolov8m_BF16.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
+python run_inference.py --model_input models\yolov8m.onnx --evaluate --coco_dataset datasets\coco --device npu-bf16
 ```
 
 <div align="center">
@@ -92,41 +111,13 @@ python run_inference --model_input models\yolov8m_BF16.onnx --evaluate --coco_da
 
 </div>
 
-
 - **Sample Output** - Sample outputs generated using `BF16` model
 
 ![test_output_bf16](results/test_output_bf16.png)
 
-
 ### XINT8 quantization
 
-- **Model Quantization** - Model is quantized using AMD-Quark with `XINT8` configuration
-
-```bash
-python quantize_quark.py --input_model_path models/yolov8m.onnx \
-                         --calib_data_path calib_images \
-                         --output_model_path models/yolov8m_XINT8.onnx \
-                         --config XINT8
-```
-
-- **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
-
-```bash
-python run_inference.py --model_input models\yolov8m_XINT8.onnx --input_image test_image.jpg --output_image test_output_int8.jpg --device npu-int8
-```
-
-- **Sample Output** - Sample outputs generated using `XINT8` configuration
-
-![test_output_int8](results/test_output_int8.jpg)
-
-### Evaluate quantized model accuracy
-
-The `XINT8` quantized model accuracy is evaluated on COCO dataset
-
-```bash
-python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_dataset datasets\coco --device npu-int8
-```
-*Note:* The evaluation functions fails to detect any objects
+- **Model Quantization** - Model is quantized using AMD-Quark with `XINT8` configuration after the modificiations shown below:
 
 ## Modification
 
@@ -134,22 +125,26 @@ The model uses concat operations to combine the `confidence` and `bounding boxes
 
 ![image](results/yolov8m_quantized_concat_node.png)
 
-
 We need to skip the post-processing sub-graph to improve the accuracy of the `XINT8` quantized model. Shown below in the post-processing sub-graph yolov8m model.
 
 ![image](results/yolov8m_skip_nodes.png)
-
 
 ## Model Quantization
 
 After the above modifications model is quantized using AMD-Quark with `XINT8` configuration
 
 ```bash
-python quantize_quark.py --input_model_path models/yolov8m.onnx \
+python quantize_quark.py --input_model_path models\yolov8m.onnx \
                          --calib_data_path calib_images \
-                         --output_model_path models/yolov8m_XINT8.onnx \
+                         --output_model_path models\yolov8m_XINT8.onnx \
                          --config XINT8
                          --exclude_subgraphs "[/model.22/Concat_3], [/model.22/Concat_10]]"
+```
+
+- **Compile and Test Model** - Run model inference on the `test_image.jpg` from the COCO dataset
+
+```bash
+python run_inference.py --model_input models\yolov8m_XINT8.onnx --input_image test_image.jpg --output_image test_output_int8_skip_nodes.jpg --device npu-int8
 ```
 
 ## Sample Output
@@ -157,6 +152,7 @@ python quantize_quark.py --input_model_path models/yolov8m.onnx \
 Sample outputs generated using `XINT8` quantized model with skipped nodes.
 
 ![test_output_int8](results/test_output_int8_skip_nodes.jpg)
+
 
 ### Evaluate the model accuracy
 
@@ -182,15 +178,13 @@ python run_inference --model_input models\yolov8m_XINT8.onnx --evaluate --coco_d
 | XINT8 (CPU)   |       38.2               |     52.3             |      41.8            |
 | XINT8 (NPU)   |       38.1               |     52.2             |      41.6            |
 
-
 </div>
-
 
 ## Evaluate the Model Performance across formats
 
-Evaluate the Performance of Model across Float32 (CPU), BF16 and XINT8. Model is benchmarked across 100 inference runs and we measure  
+Evaluate the Performance of Model across Float32 (CPU), BF16 and XINT8. Model is benchmarked across 100 inference runs and we measure
 1) Latency - Average time for each Inference run on CPU/NPU
-2) Frames per Second - Indicates how many individual images, or frames, are inferred per second 
+2) Frames per Second - Indicates how many individual images, or frames, are inferred per second
 
 Use `--benchmark` option while running the Model
 
@@ -198,10 +192,9 @@ Use `--benchmark` option while running the Model
 python run_inference.py --model_input models\yolov8m_BF16.onnx --input_image test_image.jpg --output_image test_output.jpg --device npu-bf16 --benchmark
 ```
 
-
 <div align="center">
 
-|  Yolov8m      | Avg time for each Inference (Latency) |  Frames per Second (FPS)| 
+|  Yolov8m      | Avg time for each Inference (Latency) |  Frames per Second (FPS)|
 |---------------|---------------------------------------|-------------------------|
 | Float32 (CPU) |       0.486 sec                       |     2.1                 |
 | BF16    (NPU) |       0.075 sec                       |     13.4                |

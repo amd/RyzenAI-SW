@@ -17,6 +17,7 @@ Refer to [OnnxRuntime GenAI (OGA)](oga_api/README.md) or https://ryzenai.docs.am
 - [ONNX Runtime GenAI(OGA)-based RAG LLM](RAG-OGA)
 - [Running Vision Language Model (VLM) on RyzenAI NPU](VLM)
 - [Running GPT-OSS-20B with chat template](oga_inference)
+- [Dynamic LoRA: fine-tune adapters and switch them at runtime on the NPU](dynamic-lora)
 
 # Copyright
 

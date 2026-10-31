@@ -13,18 +13,55 @@ DeepLabV3 classifies every pixel in an image into one of **21 PASCAL VOC semanti
 
 ## Quick Start
 
-```sh
+
 # 1. Setup environment (one-time)
-conda create -n winml_seg --clone winml_env
-conda activate winml_seg
-cd <RyzenAI-SW>\WinML\CNN\ImageSegmentation\python
-pip install --upgrade -r requirements.txt
+
+Step 1: Activate the base WinML installation environment
+```bash
+"%USERPROFILE%\winml_env\Scripts\activate.bat"
+```
+
+Step 2: Export the installed WinML Python packages
+```bash
+python -m pip freeze > "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 3: Create a virtual environment for ImageSegmentation
+```bash
+python -m venv "%USERPROFILE%\winml_seg"
+```
+
+Step 4: Deactivate the base WinML environment
+```bash
+deactivate
+```
+
+Step 5: Activate the ImageSegmentation environment
+```bash
+"%USERPROFILE%\winml_seg\Scripts\activate.bat"
+```
+
+Step 6: Install the base WinML Python dependencies
+```bash
+python -m pip install -r "%USERPROFILE%\winml_requirements.txt"
+```
+
+Step 7: Install the example-specific dependencies
+```bash
+cd /d <RyzenAI-SW>\WinML\CNN\ImageSegmentation\python
+python -m pip install --upgrade -r requirements.txt
+```
+
+The `winml_seg` virtual environment is now configured for running the ImageSegmentation example.
 
 # 2. Download model (one-time, ~167 MB)
+```bash
 cd ..\model
 python download_model.py
+```
 
 # 3. Run inference
+```bash
 cd ..\python
 python run_model.py --model ..\model\deeplabv3_resnet50.onnx --ep_policy NPU
 ```

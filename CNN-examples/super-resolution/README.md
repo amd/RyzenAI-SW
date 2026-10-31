@@ -33,13 +33,40 @@ You need an AMD AI PC with a Ryzen AI NPU. Supported processors:
 
 1. Install the latest NPU drivers and Ryzen AI Software by following the [Ryzen AI SW Installation Instructions](https://ryzenai.docs.amd.com/en/latest/inst.html). Allow approximately **30 minutes** for the full installation.
 
-2. Clone and activate your own conda environment based on the installed ryzen-ai-v.v.v environment installed. Substitute the correct version number for `v.v.v` (e.g., `1.8.0`). Also, be sure to set the environment variable for the `RYZEN_AI_INSTALLATION_PATH`.
+2. Setup 
 
-```powershell
-conda create -n super-resolution --clone ryzen-ai-<version>
-conda activate super-resolution
-$Env:RYZEN_AI_INSTALLATION_PATH = 'C:/Program Files/RyzenAI/<version>/'
+Step 1: Activate the Ryzen AI installation environment
+```bash
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
+
+Step 2: Export the installed Python packages
+```bash
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+Step 3: Create a virtual environment for super-resolution
+```bash
+cd /d "C:\path\to\RyzenAI-SW\CNN-examples\super-resolution"
+python -m venv super-resolution
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bash
+deactivate
+```
+
+Step 5: Activate the example environment
+```bash
+"super-resolution\Scripts\activate.bat"
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+```bash
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
 ---
 
 ## Real-ESRGAN — 4x Super-Resolution

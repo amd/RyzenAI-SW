@@ -1,7 +1,7 @@
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Object Detection with Yolov8s-Worldv2 </h1>
-    </td>
+   <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI Object Detection with Yolov8s-Worldv2 </h1>
+   </td>
  </tr>
 </table>
 
@@ -17,24 +17,56 @@ The following steps outline how to deploy the quantized model on an NPU:
 - Quantize the model to `a16w8_adaround` using the AMD Quark Quantization API
 - Compile and run the model on NPU using ONNX Runtime with the Vitis AI Execution Provider
 
-## Create and Activate Conda Environment
+## Set Up and Activate Python Virtual Environment
 
-```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
-conda create --name ryzen-ai-yoloworld --clone %RYZEN_AI_CONDA_ENV_NAME%  
-conda activate ryzen-ai-yoloworld
+Step 1: Activate the Ryzen AI installation environment
 
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
+```
+
+Step 2: Export the installed Python packages
+
+```bat
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+This creates a requirements file containing the packages installed in the Ryzen AI environment.
+
+Step 3: Create a virtual environment for YOLOv8s-Worldv2
+
+```bat
+cd <RyzenAI-SW>\CNN-examples\object_detection\yolov8s-worldv2
+python -m venv yoloworld_env
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+
+```bat
+deactivate
+```
+
+Step 5: Activate the YOLOv8s-Worldv2 environment
+
+```bat
+"yoloworld_env\Scripts\activate.bat"
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+
+```bat
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
 ```
 
 Install the other required python packages
 
 ```bash
-pip install opencv-python  
-pip install pycocotools  
-pip install torch  
-pip install ultralytics  
+pip install opencv-python
+pip install pycocotools
+pip install torch
+pip install ultralytics
 pip install --force-reinstall numpy==1.26.4
-
 ```
 
 ## Prepare dataset
@@ -75,7 +107,7 @@ We can test the mAP of origin onnx model and quantized model
 
 (CPU)
 ```bash
-python eval_on_coco.py --model models\yolov8s-worldv2.onnx --device cpu  
+python eval_on_coco.py --model models\yolov8s-worldv2.onnx --device cpu
 ```
 (NPU)
 ```bash
@@ -86,7 +118,7 @@ python eval_on_coco.py --model models\yolov8s-worldv2-A16W8_ADAROUND-640x640-exc
 
 (CPU)
 ```bash
-python infer_single.py --model models\yolov8s-worldv2.onnx --image .\images\test.jpg --runtime-seconds 60 --device cpu  
+python infer_single.py --model models\yolov8s-worldv2.onnx --image .\images\test.jpg --runtime-seconds 60 --device cpu
 ```
 (NPU)
 ```bash
@@ -95,7 +127,7 @@ python infer_single.py --model .\models\yolov8s-worldv2-A16W8_ADAROUND-640x640-e
 
 <div align="center">
 
-|    Yolov8m      | mAP (AP@\[IoU=0.50:0.95]) |  mAP50 (AP@IoU=0.50) |  mAP75 (AP@IoU=0.75) |
+|    Yolov8m      | mAP (AP@[IoU=0.50:0.95]) |  mAP50 (AP@IoU=0.50) |  mAP75 (AP@IoU=0.75) |
 |-----------------|--------------------------|----------------------|----------------------|
 | Float 32        |       35.9               |     49.7             |      39.0            |
 | quantized model |       35.6               |     49.6             |      38.7            |

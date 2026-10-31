@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import subprocess
 import onnx
@@ -6,9 +7,7 @@ import json
 import os
 import argparse
 import shutil
-
 from onnx import shape_inference
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Fix dynamic shapes in ONNX file using onnxruntime")
@@ -18,13 +17,11 @@ def parse_args():
         args.params_to_fix = json.load(f)
     return args
 
-
 def directorycreation(directory_name):
     if os.path.exists(directory_name):
         shutil.rmtree(directory_name)
         print(f"Directory '{directory_name}' already exists. It has been deleted.")
     os.mkdir(directory_name)
-
 
 def generate_dummy_data(input_tensor, name):
     input_shape = input_tensor.shape
@@ -49,7 +46,6 @@ def generate_dummy_data(input_tensor, name):
     else:
         raise ValueError(f"Unsupported input type: {input_type}")
 
-
 def validate_onnx_model(model):
     try:
         onnx.checker.check_model(model)
@@ -59,7 +55,6 @@ def validate_onnx_model(model):
         print("ONNX model is not valid.")
         print(e)
         return False
-
 
 if __name__ == "__main__":
     args = parse_args()
@@ -76,14 +71,47 @@ if __name__ == "__main__":
     final_output_path = os.path.join(exported_model_directory, base_filename)
 
     # Fix dynamic shapes
-    print("WARNING: You might have to comment out ONNX checker in //onnxruntime/tools/onnx_model_utils.py if model > 2GB")
-    command_base = ["python", "-m", "onnxruntime.tools.make_dynamic_shape_fixed"]
-    for param, value in args.params_to_fix.items():
-        command = command_base + [input_model_path, tmp_output_path, "--dim_param", str(param), "--dim_value", str(value)]
-        subprocess.run(command)
-        input_model_path = tmp_output_path  # use modified model as next input
+    print("Starting dynamic-to-static conversion...")
+    print(f"Using Python: {sys.executable}")
+
+    command_base = [
+        sys.executable,
+        "-m",
+        "onnxruntime.tools.make_dynamic_shape_fixed"
+    ]
+
+    current_input_path = input_model_path
+
+    for index, (param, value) in enumerate(args.params_to_fix.items()):
+        intermediate_path = os.path.join(
+            tmp_dir,
+            f"step_{index}_{base_filename}"
+        )
+
+        command = command_base + [
+            "--dim_param", str(param),
+            "--dim_value", str(value),
+            current_input_path,
+            intermediate_path
+        ]
+
+        print(f"Fixing dimension: {param} = {value}")
+
+        subprocess.run(command, check=True)
+
+        if not os.path.isfile(intermediate_path):
+            raise FileNotFoundError(
+                f"Conversion failed. Expected file not found: {intermediate_path}"
+            )
+
+        current_input_path = intermediate_path
+
+    tmp_output_path = current_input_path
 
     print("Static conversion complete.")
+
+    if not args.params_to_fix:
+        raise ValueError("params.json contains no dimensions to fix.")
 
     # Shape inference
     print(f"Inferencing shapes for: {tmp_output_path}")

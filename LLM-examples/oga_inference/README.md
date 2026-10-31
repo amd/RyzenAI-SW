@@ -9,9 +9,10 @@ Based on Microsoft OGA [model-chat.py](https://github.com/microsoft/onnxruntime-
 
 ## Prerequisites
 - Ryzen AI Software installed (see [Installation Instructions](https://ryzenai.docs.amd.com/en/latest/inst.html))
-- Activate the conda environment created by the MSI installer:
-```bash
-  conda activate ryzen-ai-<version>
+- Activate the Python virtual environment created by the MSI installer:
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
 - For more details on running LLMs with OGA, see [OnnxRuntime GenAI (OGA) Flow](https://ryzenai.docs.amd.com/en/latest/hybrid_oga.html).
 
@@ -76,4 +77,3 @@ The `-j` flag accepts a JSON file where prompts are sent sequentially to test co
 | `-tm` | `--timings` | off | Print TTFT, prefill tps, decode tps |
 | `-gtype` | `--guidance_type` | `none` | Guided generation: `json_schema`, `regex`, `lark_grammar` |
 | `-ginfo` | `--guidance_info` | — | Guidance payload |
-

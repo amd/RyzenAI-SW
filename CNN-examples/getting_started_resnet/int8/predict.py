@@ -11,6 +11,7 @@ from PIL import Image
 from pathlib import Path
 from resnet_utils import get_npu_info, get_xclbin
 from torchvision.datasets import CIFAR10
+import sys
 
 quantized_model_path = r'./models/resnet_quantized.onnx'
 model = onnx.load(quantized_model_path)
@@ -71,6 +72,8 @@ for i in range (0,10):
     im_name = f'./images/image_{i}.png'
     cv2.imwrite(im_name, im)
 
+correct_predictions = 0
+
 #Pick dumped images and predict
 for i in range (0,10):
     image_name = f'./images/image_{i}.png'
@@ -95,6 +98,7 @@ for i in range (0,10):
     output_array = outputs[0]
     predicted_class = np.argmax(output_array)
     
+    actual_class = labels[i]
 
     predicted_label = label_names[predicted_class]
     
@@ -102,6 +106,19 @@ for i in range (0,10):
     
     print(f'Image {i}: Actual Label {label}, Predicted Label {predicted_label}')
 
+    # Check prediction
+    if predicted_class == actual_class:
+        correct_predictions += 1
+
+print(f"\nCorrect predictions: {correct_predictions}/10")
+
+# PASS if at least 9 out of 10 are correct
+if correct_predictions >= 9:
+    print("TEST RESULT: PASS")
+    sys.exit(0)
+else:
+    print("TEST RESULT: FAIL")
+    sys.exit(1)
 
 #################################################################################
 #License

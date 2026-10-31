@@ -1,45 +1,62 @@
 <table class="sphinxhide" width="100%">
  <tr width="100%">
-    <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI iGPU Example </h1>
-    </td>
+   <td align="center"><img src="https://raw.githubusercontent.com/Xilinx/Image-Collateral/main/xilinx-logo.png" width="30%"/><h1> Ryzen™ AI iGPU Example </h1>
+   </td>
  </tr>
 </table>
 
-# Getting started with iGPU 
+# Getting started with iGPU
 
-This is an example showing how to run the ResNet50 model from PyTorch on AMD's integrated GPU. We will use Olive to convert the model to ONNX format, convert it to FP16 precision, and optimize it. We will then use DirectML execution provider to run the model on the iGPU. 
+This is an example showing how to run the ResNet50 model from PyTorch on AMD's integrated GPU. We will use Olive to convert the model to ONNX format, convert it to FP16 precision, and optimize it. We will then use DirectML execution provider to run the model on the iGPU.
 
-## Activate Ryzen AI conda environment
+## Setup and activate environment
 
-Create a clone of the Ryzen AI installation conda environment to add required python packages
-
-```python
-set RYZEN_AI_CONDA_ENV_NAME=ryzen-ai-<version>
-conda create --name igpu-example --clone %RYZEN_AI_CONDA_ENV_NAME%
-conda activate igpu-example
+Step 1: Activate the Ryzen AI installation environment
+```bat
+"C:\Program Files\RyzenAI\ryzen-ai-1.9.0\Scripts\activate.bat"
+set "RYZEN_AI_INSTALLATION_PATH=C:\Program Files\RyzenAI\ryzen-ai-1.9.0"
 ```
 
-Set RyzenAI Environment variable
-
-```bash
-# Default location of RyzenAI software installation
-set RYZEN_AI_INSTALLATION_PATH=<Path to RyzenAI Installation>
+Step 2: Export the installed Python packages
+```bat
+python -m pip freeze > "%TEMP%\ryzenai_1.9_requirements.txt"
 ```
 
-## Install Olive 
+Step 3: Navigate to the example directory and create a virtual environment for igpu-example
+```bat
+cd /d <RyzenAI-SW>\CNN-examples\iGPU\getting_started
+python -m venv igpu-example
+```
+
+Step 4: Deactivate the Ryzen AI installation environment
+```bat
+deactivate
+```
+
+Step 5: Activate the example environment
+```bat
+"igpu-example\Scripts\activate.bat"
+```
+
+Step 6: Install the Ryzen AI Python dependencies
+```bat
+python -m pip install -r "%TEMP%\ryzenai_1.9_requirements.txt"
+```
+
+## Install Olive
 
 ```bash
 cd <RyzenAI-SW>\CNN-examples\iGPU\getting_started
 python -m pip install -r requirements.txt
 ```
 
-## Install additional dependencies for the example 
+## Install additional dependencies for the example
 
 ```bash
 python -m olive.workflows.run --config resnet50_config.json --setup
 ```
 
-## Optimize the model using Olive 
+## Optimize the model using Olive
 
 ```bash
 python -m olive.workflows.run --config resnet50_config.json
@@ -48,14 +65,14 @@ python -m olive.workflows.run --config resnet50_config.json
 The optimized models will be available in `./torch_to_onnx-float16_conversion-perf_tuning/.`
 
 
-## Run the generated model on the iGPU 
+## Run the generated model on the iGPU
 
-### Deployment in Python 
+### Deployment in Python
 
 ```bash
 python predict.py
 ```
-**_NOTE:_**  In predict.py, line 15, the iGPU device ID is enumerated as 0. For PCs with multiple GPUs, you may adjust the device_id to target a specific iGPU.
+**NOTE:** In predict.py, line 15, the iGPU device ID is enumerated as 0. For PCs with multiple GPUs, you may adjust the device_id to target a specific iGPU.
 
 ### Deployment in C++
 
@@ -65,9 +82,9 @@ python predict.py
 2. cmake (version >= 3.26)
 3. opencv (version=4.6.0) required for the resnet50 example
 
-#### Install OpenCV from source 
+#### Install OpenCV from source
 
-It is recommended to build OpenCV from the source code and use static build. The following instruction installs OpenCV in the location "C:\\opencv" as an example, this can be changed by modifying `CMAKE_PREFIX_PATH` in the following cmake command. You may first change the directory to where you want to clone the OpenCV repository.
+It is recommended to build OpenCV from the source code and use static build. The following instruction installs OpenCV in the location "C:\opencv" as an example, this can be changed by modifying `CMAKE_PREFIX_PATH` in the following cmake command. You may first change the directory to where you want to clone the OpenCV repository.
 
 ```bash
 git clone https://github.com/opencv/opencv.git -b 4.6.0
@@ -82,19 +99,15 @@ The build files will be written to ``build\``.
 
 #### Run Olive-optimized ResNet50 model on the iGPU
 
-Build the given ResNet50 C++ example: 
+Build the given ResNet50 C++ example:
 
 ```bash
-cd cpp 
+cd cpp
 compile.bat "path/to/your/opencv/build"
 ```
 
-Run inference: 
+Run inference:
 
 ```bash
 run.bat
 ```
-
-
-
-
