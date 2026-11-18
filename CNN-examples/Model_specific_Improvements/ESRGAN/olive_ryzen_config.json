@@ -1,0 +1,88 @@
+{
+    "workflow_id": "ryzen_workflow",
+    "input_model": {
+        "type": "ONNXModel",
+        "model_path": "esrgan_fp32.onnx"
+    },
+    "passes": {
+        "quantization": {
+            "type": "QuarkQuantization",
+            "data_config": "calib_data",
+            "global_config": {
+                "activation": {
+                    "symmetric": true,
+                    "calibration_method": "MinMSE",
+                    "quant_granularity": "Tensor",
+                    "scale_type": "PowerOf2",
+                    "data_type": "UInt8"
+                },
+                "weight": {
+                    "symmetric": true,
+                    "calibration_method": "MinMSE",
+                    "quant_granularity": "Tensor",
+                    "scale_type": "PowerOf2",
+                    "data_type": "Int8"
+                }
+            },
+            "exclude": [ ],
+            "algo_config": [
+                {
+                    "name": "cle",
+                    "cle_steps": 6
+                },
+                {
+                    "name": "adaround",
+                    "data_size": 1000,
+                    "batch_size": 4,
+                    "num_iterations": 1000,
+                    "learning_rate": 0.1,
+                    "optim_device": "cpu",
+                    "infer_device": "cpu",
+                    "early_stop": true
+                }
+            ],
+            "extra_options": {
+                "EnableNPUCnn": true,
+                "ConvertNCHWToNHWC": true,
+                "ExecutionProviders": [ "CPUExecutionProvider" ],
+                "RemoveQDQMulAdd": true,
+                "Int32Bias":false
+            }
+        }
+    },
+    "systems": {
+        "host_system": {
+            "type": "LocalSystem",
+            "accelerators": [ { "device": "cpu", "execution_providers": [ "CPUExecutionProvider" ] } ]
+        },
+        "target_system": {
+            "type": "LocalSystem",
+            "accelerators": [ { "device": "npu", "execution_providers": [ "CPUExecutionProvider" ] } ]
+        }
+    },
+    "data_configs": [
+        {
+            "name": "calib_data",
+            "user_script": "olive_ryzen_data_scripts.py",
+            "load_dataset_config": {
+                "type": "my_dataset",
+                "data_dir": "calibration_dataset/images",
+                "transpose": true
+            },
+            "pre_process_data_config": {
+                "type": "my_pre_process"
+            },
+            "post_process_data_config": {
+                "type": "my_post_process"
+            }
+        }
+    ],
+    "engine": {
+        "host": "host_system",
+        "target": "target_system",
+        "cache_dir": "cache",
+        "clean_cache": true,
+        "log_to_file": false,
+        "output_dir": "output/ryzen_model"
+    }
+}

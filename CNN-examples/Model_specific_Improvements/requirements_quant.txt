@@ -1,0 +1,38 @@
+# FP32 export + Olive/Quark quantization environment for ConvNext, DeTR and ESRGAN.
+# Python 3.11 or 3.12.
+#   python -m venv quant_env
+#   quant_env\Scripts\activate            (Linux: source quant_env/bin/activate)
+#   pip install -r requirements_quant.txt
+#
+# Pinned to the environment the pre-built models were built with (Olive 0.11.0 + AMD Quark 0.10).
+# Other versions can change the exported graph (DeTR TensorQuantOverrides use exported tensor
+# names) or the quantization result.
+
+# Olive + Quark
+git+https://github.com/microsoft/Olive.git@v0.11.0
+amd-quark==0.10
+
+# ONNX stack
+onnx==1.18.0
+onnxruntime==1.22.1
+onnxscript==0.5.6
+onnx-ir==0.1.12
+onnxslim==0.1.65
+onnxsim==0.4.36              # DeTR AMDONNXSIM pass
+protobuf==6.31.1
+
+# Calibration data loading / pre-processing
+numpy==1.26.4
+scipy==1.14.1
+opencv-python==4.11.0.86
+pillow==11.2.1
+
+# Transitive dependencies (not imported by the recipes)
+datasets==4.0.0              # pulled in by amd-quark via evaluate
+pyarrow==21.0.0              # pulled in by datasets; pinned because numpy is pinned to 1.26 (pyarrow>=22 needs numpy 2)
+
+# FP32 export (export_fp32.py); torch is also used by Quark (CLE, AdaRound)
+torch==2.8.0
+torchvision==0.23.0
+transformers==4.48.3         # DeTR: facebook/detr-resnet-50
+basicsr==1.4.2               # ESRGAN: RRDBNet architecture

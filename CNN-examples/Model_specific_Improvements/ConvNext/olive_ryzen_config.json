@@ -1,0 +1,78 @@
+{
+    "workflow_id": "ryzen_workflow",
+    "input_model": {
+        "type": "OnnxModel",
+        "model_path": "convnext_fp32.onnx",
+        "model_attributes": {
+            "model_type": "image-classification"
+        }
+    },
+    "systems": {
+        "host_system": {
+            "type": "LocalSystem",
+            "accelerators": [ { "device": "cpu", "execution_providers": [ "CPUExecutionProvider" ] } ]
+        },
+        "target_system": {
+            "type": "LocalSystem",
+            "accelerators": [ { "device": "npu", "execution_providers": [ "CPUExecutionProvider" ] } ]
+        }
+    },
+    "data_configs": [
+        {
+            "name": "quantize_data_config",
+            "user_script": "olive_ryzen_data_scripts.py",
+            "load_dataset_config": {
+                "type": "my_dataset",
+                "data_dir": "calibration_dataset/images",
+                "transpose": true,
+                "list_file": "calibration_dataset/calib_list.txt"
+            },
+            "pre_process_data_config": {
+                "type": "my_pre_process"
+            },
+            "post_process_data_config": {
+                "type": "my_post_process"
+            }
+        }
+    ],
+    "passes": {
+        "fuse_conv_mul": {
+            "type": "AMDConvnextFuseConvMul",
+            "model_name": "convnext_conv_mul_fuse_fp32.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "quantization": {
+            "type": "QuarkQuantization",
+            "data_config": "quantize_data_config",
+            "global_config": {
+                "activation": {
+                    "symmetric": true,
+                    "calibration_method": "Entropy",
+                    "quant_granularity": "Tensor",
+                    "data_type": "Int8"
+                },
+                "weight": {
+                    "symmetric": true,
+                    "calibration_method": "MinMax",
+                    "quant_granularity": "Tensor",
+                    "data_type": "Int8"
+                }
+            },
+            "exclude": [ ],
+            "algo_config": [
+                {
+                    "name": "cle",
+                    "cle_steps": 6
+                }
+            ],
+            "extra_options": {
+                "Percentile": 99.999,
+                "ConvertNCHWToNHWC": true,
+                "ExecutionProviders": [ "CPUExecutionProvider" ]
+            }
+        }
+    },
+    "cache_dir": "cache",
+    "evaluate_input_model": false,
+    "output_dir": "output/ryzen_model"
+}
