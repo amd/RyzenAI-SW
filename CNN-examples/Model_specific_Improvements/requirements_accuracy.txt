@@ -1,0 +1,19 @@
+# Accuracy-evaluation environment (CPU EP and VitisAI EP on the NPU), Windows 11, Python 3.12.
+#   conda create -y -n mdl-accu python=3.12
+#   conda activate mdl-accu
+#   pip install -r requirements_accuracy.txt
+#
+# Keep this separate from the quantization environment. Install ONLY onnxruntime-windowsml:
+# onnxruntime / onnxruntime-winml provide the same "onnxruntime" module and overwrite each other.
+# The VitisAI EP is registered through Windows ML (accuracy/winml_helper.py); the NPU driver and
+# the VitisAI EP package must already be installed on the machine.
+
+numpy==2.5.4
+pillow==13.0.0
+datasets==5.1.0              # ImageNet-1K val / COCO 2017 val streamed from Hugging Face
+pycocotools==2.0.11          # DeTR COCO mAP
+scipy==1.18.1                # ESRGAN SSIM
+
+onnxruntime-windowsml==1.25.2.202605110140
+wasdk-Microsoft.Windows.AI.MachineLearning[all]==2.3.0
+wasdk-Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap==2.3.0

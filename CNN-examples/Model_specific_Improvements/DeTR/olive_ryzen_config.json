@@ -1,0 +1,390 @@
+{
+    "workflow_id": "ryzen_workflow",
+    "input_model": {
+        "type": "OnnxModel",
+        "model_path": "detr_resnet50_fp32.onnx",
+        "model_attributes": {
+            "model_type": "object-detection"
+        }
+    },
+    "systems": {
+        "host_system": {
+            "type": "LocalSystem",
+            "accelerators": [ { "device": "cpu", "execution_providers": [ "CPUExecutionProvider" ] } ]
+        },
+        "target_system": {
+            "type": "LocalSystem",
+            "accelerators": [ { "device": "npu", "execution_providers": [ "CPUExecutionProvider" ] } ]
+        }
+    },
+    "data_configs": [
+        {
+            "name": "quantize_data_config",
+            "user_script": "olive_ryzen_data_scripts.py",
+            "load_dataset_config": {
+                "type": "my_dataset",
+                "data_dir": "calibration_dataset/images",
+                "transpose": true
+            },
+            "pre_process_data_config": {
+                "type": "my_pre_process"
+            },
+            "post_process_data_config": {
+                "type": "my_post_process"
+            }
+        }
+    ],
+    "passes": {
+        "onnx_simply": {
+            "type": "AMDONNXSIM",
+            "model_name": "detr_resnet50_fp32_sim.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "store_ori_model": {
+            "type": "AMDDetrStoreModel",
+            "model_name": "detr_resnet50_fp32_ori.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "remove_const_op": {
+            "type": "AMDRemoveConstOp",
+            "model_name": "detr_resnet50_fp32_without_const_op.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "onnxruntime_optimize": {
+            "type": "AMDONNXRuntimeOptimize",
+            "model_name": "detr_resnet50_fp32_without_const_op_onnruntime_optimized.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "store_src_model": {
+            "type": "AMDDetrStoreModel",
+            "model_name": "detr_resnet50_fp32_bak.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "split_model": {
+            "type": "AMDDetrSplitModel",
+            "trunk_model_name": "detr_resnet50_fp32_trunk.onnx",
+            "tail_model_name": "detr_resnet50_fp32_tail.onnx",
+            "split_node_name": "/model/Transpose",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "xint8_redirect_model": {
+            "type": "AMDDetrRedirectModel",
+            "model_name": "detr_resnet50_fp32_trunk.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "xint8_quantization": {
+            "type": "QuarkQuantization",
+            "data_config": "quantize_data_config",
+            "global_config": {
+                "activation": {
+                    "symmetric": true,
+                    "calibration_method": "MinMSE",
+                    "quant_granularity": "Tensor",
+                    "data_type": "Int8"
+                },
+                "weight": {
+                    "symmetric": true,
+                    "calibration_method": "MinMax",
+                    "quant_granularity": "Tensor",
+                    "data_type": "Int8"
+                }
+            },
+            "exclude": [ "/model/Transpose" ],
+            "algo_config": [
+                {
+                    "name": "cle",
+                    "cle_steps": 6
+                }
+            ],
+            "extra_options": {
+                "SimplifyModel": false,
+                "EnableNPUCnn": true,
+                "ConvertNCHWToNHWC": true,
+                "MinMSEModePof2Scale": "MostCommon",
+                "ExecutionProviders": [ "CPUExecutionProvider" ],
+                "Int32Bias": false
+            }
+        },
+        "store_xint8_model": {
+            "type": "AMDDetrStoreModel",
+            "model_name": "detr_resnet50_trunk_xint8.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "uint16_redirect_model": {
+            "type": "AMDDetrRedirectModel",
+            "model_name": "detr_resnet50_fp32_ori.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "uint16_quantization": {
+            "type": "QuarkQuantization",
+            "data_config": "quantize_data_config",
+            "global_config": {
+                "activation": {
+                    "symmetric": false,
+                    "calibration_method": "Percentile",
+                    "quant_granularity": "Tensor",
+                    "data_type": "UInt16"
+                },
+                "weight": {
+                    "symmetric": true,
+                    "calibration_method": "MinMax",
+                    "quant_granularity": "Tensor",
+                    "data_type": "Int8"
+                }
+            },
+            "exclude": [ "/model/Transpose" ],
+            "algo_config": [
+                {
+                    "name": "cle",
+                    "cle_steps": 6
+                }
+            ],
+            "extra_options": {
+                "SimplifyModel": false,
+                "AdjustBiasScale": false,
+                "ConvertNCHWToNHWC": true,
+                "Percentile": 99.999,
+                "ExecutionProviders": [ "CPUExecutionProvider" ],
+                "OptimizeModel": true,
+                "TensorQuantOverrides": {
+                    "onnx::MatMul_4617": [{"axis": 0}],
+                    "model.encoder.layers.0.self_attn.k_proj.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_4616": [{"axis": 0}],
+                    "model.encoder.layers.0.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4628": [{"axis": 0}],
+                    "model.encoder.layers.0.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4660": [{"axis": 0}],
+                    "model.encoder.layers.0.self_attn.out_proj.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_4661": [{"axis": 1}],
+                    "model.encoder.layers.0.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4662": [{"axis": 1}],
+                    "model.encoder.layers.0.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_4664": [{"axis": 0}],
+                    "model.encoder.layers.1.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4663": [{"axis": 0}],
+                    "model.encoder.layers.1.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4675": [{"axis": 0}],
+                    "model.encoder.layers.1.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4707": [{"axis": 0}],
+                    "model.encoder.layers.1.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4708": [{"axis": 1}],
+                    "model.encoder.layers.1.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4709": [{"axis": 1}],
+                    "model.encoder.layers.1.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_4711": [{"axis": 0}],
+                    "model.encoder.layers.2.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4710": [{"axis": 0}],
+                    "model.encoder.layers.2.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4722": [{"axis": 0}],
+                    "model.encoder.layers.2.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4754": [{"axis": 0}],
+                    "model.encoder.layers.2.self_attn.out_proj.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_4755": [{"axis": 1}],
+                    "model.encoder.layers.2.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4756": [{"axis": 1}],
+                    "model.encoder.layers.2.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_4758": [{"axis": 0}],
+                    "model.encoder.layers.3.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4757": [{"axis": 0}],
+                    "model.encoder.layers.3.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4769": [{"axis": 0}],
+                    "model.encoder.layers.3.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4801": [{"axis": 0}],
+                    "model.encoder.layers.3.self_attn.out_proj.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_4802": [{"axis": 1}],
+                    "model.encoder.layers.3.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4803": [{"axis": 1}],
+                    "model.encoder.layers.3.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_4805": [{"axis": 0}],
+                    "model.encoder.layers.4.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4804": [{"axis": 0}],
+                    "model.encoder.layers.4.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4816": [{"axis": 0}],
+                    "model.encoder.layers.4.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4848": [{"axis": 0}],
+                    "model.encoder.layers.4.self_attn.out_proj.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_4849": [{"axis": 1}],
+                    "model.encoder.layers.4.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4850": [{"axis": 1}],
+                    "model.encoder.layers.4.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_4852": [{"axis": 0}],
+                    "model.encoder.layers.5.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4851": [{"axis": 0}],
+                    "model.encoder.layers.5.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4863": [{"axis": 0}],
+                    "model.encoder.layers.5.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4895": [{"axis": 0}],
+                    "model.encoder.layers.5.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4896": [{"axis": 1}],
+                    "model.encoder.layers.5.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4897": [{"axis": 1}],
+                    "model.encoder.layers.5.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_5386": [{"axis": 0}],
+                    "model.decoder.layers.5.encoder_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5299": [{"axis": 0}],
+                    "model.decoder.layers.4.encoder_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5212": [{"axis": 0}],
+
+                    "model.decoder.layers.3.encoder_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5125": [{"axis": 0}],
+                    "model.decoder.layers.2.encoder_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5038": [{"axis": 0}],
+                    "model.decoder.layers.1.encoder_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4951": [{"axis": 0}],
+                    "model.decoder.layers.0.encoder_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4962": [{"axis": 0}],
+                    "model.decoder.layers.0.encoder_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4994": [{"axis": 0}],
+                    "model.decoder.layers.0.encoder_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4995": [{"axis": 1}],
+                    "model.decoder.layers.0.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_4996": [{"axis": 1}],
+                    "model.decoder.layers.0.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_4998": [{"axis": 0}],
+                    "model.decoder.layers.1.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_4997": [{"axis": 0}],
+                    "model.decoder.layers.1.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5009": [{"axis": 0}],
+                    "model.decoder.layers.1.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5036": [{"axis": 0}],
+                    "model.decoder.layers.1.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5037": [{"axis": 0}],
+                    "model.decoder.layers.1.encoder_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5049": [{"axis": 0}],
+                    "model.decoder.layers.1.encoder_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5081": [{"axis": 0}],
+                    "model.decoder.layers.1.encoder_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5082": [{"axis": 1}],
+                    "model.decoder.layers.1.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_5083": [{"axis": 1}],
+                    "model.decoder.layers.1.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_5085": [{"axis": 0}],
+                    "model.decoder.layers.2.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5084": [{"axis": 0}],
+                    "model.decoder.layers.2.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5096": [{"axis": 0}],
+                    "model.decoder.layers.2.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5123": [{"axis": 0}],
+                    "model.decoder.layers.2.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5124": [{"axis": 0}],
+                    "model.decoder.layers.2.encoder_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5136": [{"axis": 0}],
+                    "model.decoder.layers.2.encoder_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5168": [{"axis": 0}],
+                    "model.decoder.layers.2.encoder_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5169": [{"axis": 1}],
+                    "model.decoder.layers.2.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_5170": [{"axis": 1}],
+                    "model.decoder.layers.2.fc2.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_5172": [{"axis": 0}],
+                    "model.decoder.layers.3.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5171": [{"axis": 0}],
+                    "model.decoder.layers.3.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5183": [{"axis": 0}],
+                    "model.decoder.layers.3.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5210": [{"axis": 0}],
+                    "model.decoder.layers.3.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5211": [{"axis": 0}],
+                    "model.decoder.layers.3.encoder_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5223": [{"axis": 0}],
+                    "model.decoder.layers.3.encoder_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5255": [{"axis": 0}],
+                    "model.decoder.layers.3.encoder_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5256": [{"axis": 1}],
+                    "model.decoder.layers.3.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_5257": [{"axis": 1}],
+                    "model.decoder.layers.3.fc2.bias": [{"axis": 0}],
+                    "onnx::MatMul_5259": [{"axis": 0}],
+
+                    "model.decoder.layers.4.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5258": [{"axis": 0}],
+                    "model.decoder.layers.4.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5270": [{"axis": 0}],
+                    "model.decoder.layers.4.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5297": [{"axis": 0}],
+                    "model.decoder.layers.4.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5298": [{"axis": 0}],
+                    "model.decoder.layers.4.encoder_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5310": [{"axis": 0}],
+                    "model.decoder.layers.4.encoder_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5342": [{"axis": 0}],
+                    "model.decoder.layers.4.encoder_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5343": [{"axis": 1}],
+                    "model.decoder.layers.4.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_5344": [{"axis": 1}],
+                    "model.decoder.layers.4.fc2.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_5346": [{"axis": 0}],
+                    "model.decoder.layers.5.self_attn.k_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5345": [{"axis": 0}],
+                    "model.decoder.layers.5.self_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5357": [{"axis": 0}],
+                    "model.decoder.layers.5.self_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5384": [{"axis": 0}],
+                    "model.decoder.layers.5.self_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5385": [{"axis": 0}],
+                    "model.decoder.layers.5.encoder_attn.q_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5397": [{"axis": 0}],
+                    "model.decoder.layers.5.encoder_attn.v_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5429": [{"axis": 0}],
+                    "model.decoder.layers.5.encoder_attn.out_proj.bias": [{"axis": 0}],
+                    "onnx::MatMul_5430": [{"axis": 1}],
+                    "model.decoder.layers.5.fc1.bias": [{"axis": 0}],
+                    "onnx::MatMul_5431": [{"axis": 1}],
+                    "model.decoder.layers.5.fc2.bias": [{"axis": 0}],
+
+                    "onnx::MatMul_5432": [{"axis": 1}],
+                    "class_labels_classifier.bias": [{"axis": 0}],
+                    "onnx::MatMul_5433": [{"axis": 1}],
+                    "bbox_predictor.layers.0.bias": [{"axis": 0}],
+                    "onnx::MatMul_5434": [{"axis": 1}],
+                    "bbox_predictor.layers.1.bias": [{"axis": 0}],
+                    "onnx::MatMul_5435": [{"axis": 1}],
+                    "bbox_predictor.layers.2.bias": [{"axis": 0}]
+                },
+                "MixedPrecisionTensor": {
+                    "UInt16": [
+                        "/model/decoder/layers.0/encoder_attn/Reshape_3_output_0"
+                    ]
+                }
+            }
+        },
+        "store_uint16_model": {
+            "type": "AMDDetrStoreModel",
+            "model_name": "detr_resnet50_uint16.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "uint16_split_model": {
+            "type": "AMDDetrSplitModel",
+            "trunk_model_name": "detr_resnet50_uint16_trunk.onnx",
+            "tail_model_name": "detr_resnet50_uint16_tail.onnx",
+            "split_node_name": "/model/Transpose",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "merge_redirect_model": {
+            "type": "AMDDetrRedirectModel",
+            "model_name": "detr_resnet50_trunk_xint8.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "merge_model": {
+            "type": "AMDDetrMergeModel",
+            "model_name": "detr_resnet50_xint8_au16w8.onnx",
+            "tail_model_name": "detr_resnet50_uint16_tail.onnx",
+            "tmp_name": "tmp_olive_custom"
+        },
+        "add_bf16_qdq": {
+            "type": "AMDDetrAddBF16QDQ",
+            "model_name": "detr_resnet50_bf16_qdq.onnx",
+            "tmp_name": "tmp_olive_custom"
+        }
+    },
+    "cache_dir": "cache",
+    "evaluate_input_model": false,
+    "output_dir": "output/ryzen_model"
+}
