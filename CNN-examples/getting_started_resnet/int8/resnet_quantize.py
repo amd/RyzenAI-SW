@@ -25,9 +25,8 @@ class CIFAR10DataSet:
         self.setup("fit")
 
     def setup(self, stage: str):
-        transform = transforms.Compose(
-            [transforms.Pad(4), transforms.RandomHorizontalFlip(), transforms.RandomCrop(32), transforms.ToTensor()]
-        )
+        # Use deterministic transform for calibration/validation (avoid random flips and crops)
+        transform = transforms.Compose([transforms.ToTensor()])
         self.train_dataset = CIFAR10(root=self.train_path, train=True, transform=transform, download=False)
         self.val_dataset = CIFAR10(root=self.vld_path, train=True, transform=transform, download=False)
 
@@ -48,7 +47,11 @@ class PytorchResNetDataset(Dataset):
 
 def create_dataloader(data_dir, batch_size):
     cifar10_dataset = CIFAR10DataSet(data_dir)
-    _, val_set = torch.utils.data.random_split(cifar10_dataset.val_dataset, [49000, 1000])
+    # Set explicit random seed generator for deterministic calibration split across runs
+    generator = torch.Generator().manual_seed(0)
+    _, val_set = torch.utils.data.random_split(
+        cifar10_dataset.val_dataset, [49000, 1000], generator=generator
+    )
     benchmark_dataloader = DataLoader(PytorchResNetDataset(val_set), batch_size=batch_size, drop_last=True)
     return benchmark_dataloader
 
